@@ -1,24 +1,37 @@
-import logo from './logo.svg';
+import React, { Fragment } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
+
+import Home from './pages/Home';
+import List from './pages/List';
+import Mypage from './pages/Mypage';
+import Party from './pages/Party';
+import Post from './pages/Post';
+import Search from './pages/Search';
+
+import Nav from './components/Nav';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <div className="App">
+        <main>
+          <Nav />
+          <section className="features">
+            <Routes>
+              <Fragment>
+                <Route exact path="/" element={<Home />} />
+                <Route path="/list" element={<List />} />
+                <Route path="/mypage" element={<Mypage />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/party" element={<Party />} />
+                <Route path="/post" element={<Post />} /> 
+              </Fragment>
+            </Routes>
+          </section>
+        </main>
+      </div>
+    </BrowserRouter>
   );
 }
 
