@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "풀팟",
+  "name": "풀팟: 당신의 파티원을 찾아보세요!",
   "icons": [
     {
       "src": "favicon.ico",

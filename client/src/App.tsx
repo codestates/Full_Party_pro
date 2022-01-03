@@ -20,7 +20,7 @@ function App() {
           <section className="features">
             <Routes>
               <Fragment>
-                <Route exact path="/" element={<Home />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/list" element={<List />} />
                 <Route path="/mypage" element={<Mypage />} />
                 <Route path="/search" element={<Search />} />
