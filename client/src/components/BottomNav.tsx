@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faPlusCircle, faBookmark, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faPlusCircle, faBookmark, faUser } from '@fortawesome/free-solid-svg-icons';
 
 export const NavContainer = styled.footer`
   width: 100vw;

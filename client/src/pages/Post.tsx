@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
+import { AppState } from '../reducers';
 
 export const PostContainer = styled.div`
   width: 100%;
@@ -14,7 +15,7 @@ export const PostContainer = styled.div`
 export default function Post () {
 
   const isLoggedIn = useSelector(
-    ({ userReducer }) => userReducer.isLoggedIn
+    (state: AppState) => state.userReducer.isLoggedIn
   );
 
   if(!isLoggedIn){
