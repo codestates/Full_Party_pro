@@ -1,4 +1,4 @@
-require('dotenv').config();
+const dotenv = require('dotenv').config();
 
 const importer = (key, defaultValue = undefined) => {
   const value = process.env[key] || defaultValue;
@@ -13,5 +13,7 @@ module.exports = {
     username: importer("DATABASE_USERNAME"),
     password: importer("DATABASE_PASSWORD"),
     name: importer("DATABASE_NAME"),
-  }
+  },
+  port: parseInt(importer("HTTPS_PORT", 8080), 10),
+  cors: { allowedOrigin: importer("CORS_ALLOW_ORIGIN") }
 }
