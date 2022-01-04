@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import './App.css';
 
 import Home from './pages/Home';
@@ -9,14 +10,20 @@ import Party from './pages/Party';
 import Post from './pages/Post';
 import Search from './pages/Search';
 
-import Nav from './components/Nav';
+import TopNav from './components/TopNav';
+import BottomNav from './components/BottomNav';
 
-function App() {
+export default function App() {
+
+  const isLoggedIn = useSelector(
+    ({ userReducer }) => userReducer.isLoggedIn
+  );
+
   return (
     <BrowserRouter>
       <div className="App">
         <main>
-          <Nav />
+          <TopNav />
           <section className="features">
             <Routes>
               <Fragment>
@@ -29,10 +36,11 @@ function App() {
               </Fragment>
             </Routes>
           </section>
+          {isLoggedIn? <BottomNav /> : null}
         </main>
       </div>
     </BrowserRouter>
   );
 }
 
-export default App;
+// export default App;
