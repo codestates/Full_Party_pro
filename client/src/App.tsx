@@ -10,13 +10,17 @@ import Post from './pages/Post';
 import Search from './pages/Search';
 
 import Nav from './components/Nav';
+import SigninModal from './components/SigninModal'
+import SignupModal from './components/SignupModal'
+
 
 function App() {
   return (
     <BrowserRouter>
       <div className="App">
         <main>
-          <Nav />
+          <SignupModal />
+          {/* <Nav />
           <section className="features">
             <Routes>
               <Fragment>
@@ -28,7 +32,7 @@ function App() {
                 <Route path="/post" element={<Post />} /> 
               </Fragment>
             </Routes>
-          </section>
+          </section> */}
         </main>
       </div>
     </BrowserRouter>
