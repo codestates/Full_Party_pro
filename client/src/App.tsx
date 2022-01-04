@@ -12,6 +12,8 @@ import Search from './pages/Search';
 
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
+import SigninModal from './components/SigninModal'
+import SignupModal from './components/SignupModal'
 
 export default function App() {
 
