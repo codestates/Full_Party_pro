@@ -12,13 +12,13 @@ import Search from './pages/Search';
 
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
-import SigninModal from './components/SigninModal'
-import SignupModal from './components/SignupModal'
+
+import { AppState } from './reducers';
 
 export default function App() {
 
   const isLoggedIn = useSelector(
-    ({ userReducer }) => userReducer.isLoggedIn
+    (state: AppState) => state.userReducer.isLoggedIn
   );
 
   return (
@@ -44,5 +44,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-
-// export default App;

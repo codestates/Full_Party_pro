@@ -4,7 +4,8 @@ import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faBell } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
+import { AppState } from '../reducers';
 
 export const NavContainer = styled.header`
   width: 100vw;
@@ -92,7 +93,7 @@ export const NavContainer = styled.header`
 export default function TopNav () {
 
   const isLoggedIn = useSelector(
-    ({ userReducer }) => userReducer.isLoggedIn
+    (state: AppState) => state.userReducer.isLoggedIn
   );
 
   // const [isSearchBarOn, setIsSearchBarOn] = useState(true);

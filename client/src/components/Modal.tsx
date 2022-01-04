@@ -6,10 +6,7 @@ export const ModalContainer = styled.div`
   height: 100vh;
   position: fixed;
   left: 0;
-  right: 0;
   top: 0;
-  bottm: 0;
-  overflow: auto;
   z-index: 1000;
 `;
 

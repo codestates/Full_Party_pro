@@ -3,6 +3,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { AppState } from '../reducers';
 
 export const SearchContainer = styled.div`
   width: 100%;
@@ -14,7 +15,7 @@ export const SearchContainer = styled.div`
 export default function Search () {
 
   const isLoggedIn = useSelector(
-    ({ userReducer }) => userReducer.isLoggedIn
+    (state: AppState) => state.userReducer.isLoggedIn
   );
 
   if(!isLoggedIn){

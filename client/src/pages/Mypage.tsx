@@ -3,6 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
+import { AppState } from '../reducers';
 
 export const MypageContainer = styled.div`
   width: 100%;
@@ -14,7 +15,7 @@ export const MypageContainer = styled.div`
 export default function Mypage () {
 
   const isLoggedIn = useSelector(
-    ({ userReducer }) => userReducer.isLoggedIn
+    (state: AppState) => state.userReducer.isLoggedIn
   );
 
   if(!isLoggedIn){
