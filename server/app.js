@@ -28,7 +28,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
-  console.log("HELLO HERE IS APP.JS");
   res.status(200).send("Welcome to Full Party!");
 });
 
