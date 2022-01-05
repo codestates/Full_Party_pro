@@ -5,6 +5,6 @@ const {
 } = require("../controllers/list");
 
 router.get("/:userId", getPartyList);
-router.get("/creation:", createParty);
+router.post("/creation", createParty);
 
 module.exports = router;

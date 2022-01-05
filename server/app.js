@@ -33,8 +33,8 @@ app.get("/", (req, res) => {
 
 app.use("/", authRouter);
 app.use("/list", listRouter);
-app.use("user", userRouter);
-app.use("party", partyRouter);
+app.use("/user", userRouter);
+app.use("/party", partyRouter);
 app.use("/favorite", favoriteRouter);
 app.use("/search", searchRouter);
 app.use("/notification", notificationRouter);

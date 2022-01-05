@@ -11,7 +11,7 @@ router.post("/:commentId/subcomment", createSubcomment);
 router.post("/:partyId/comment", createComment);
 router.delete("/:partyId/comment", deleteComment);
 router.delete("/subcomment/:subcommentId", deleteSubcomment);
-router.post("/enqueue", enqueue);
+router.post("/enqueued", enqueue);
 router.patch("/message", modifyMessage);
 router.post("/approval", approveMember);
 router.delete("/dequeued/:partyId/:userId", dequeue);
