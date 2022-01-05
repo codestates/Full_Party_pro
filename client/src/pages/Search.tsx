@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import axios from 'axios';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -44,10 +45,28 @@ export const SearchBar = styled.div`
   }
 `
 
+export const RadioBox = styled.div`
+  color: #888;
+  position: absolute;
+  left: 8%;
+  bottom: 83%;
+
+  .radio {
+    margin 5px;
+    color: black;
+  }
+
+  .txt {
+    margin-right: 10px;
+  }
+`
+
 export const SearchContent = styled.div`
   width: 100%;
   height: 100vh;
   display: flex;
+
+  padding-top: 16px;
 `
 
 export const NoQuest = styled.div`
@@ -83,10 +102,36 @@ export const NoQuest = styled.div`
 export default function Search () {
 
   const [word, setWord] = useState('')
+  const [searchBy, setSearchBy] = useState('byName')
   const [isQuest, setIsQuest] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value)
+  }
+
+  const searchQuest = () => {
+    console.log(searchBy)
+    if(searchBy === 'byName') {
+      axios.get(`http://localhost:3000/search?keyword=${word}`)
+      .then((res) => {
+        console.log(res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    } else {
+      axios.get(`http://localhost:3000/search?tagName=${word}`)
+      .then((res) => {
+        console.log(res.data)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    }
+  }
+
+  const handleSearchBy = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchBy(e.target.value)
   }
 
   const isLoggedIn = useSelector(
@@ -106,10 +151,29 @@ export default function Search () {
           onChange={(e) => handleInputChange(e)}
           placeholder='Search...'
         ></input>
-        <FontAwesomeIcon icon={faSearch} className='faSearch' />
+        <FontAwesomeIcon icon={faSearch} className='faSearch' onClick={searchQuest}/>
       </SearchBar>
+      <RadioBox>
+        <input
+          className='radio'
+          type='radio'
+          name='searchBy'
+          value='byName'
+          onChange={(e) => handleSearchBy(e)}
+          checked
+        />
+        <span className='txt'>이름으로 검색</span>
+        <input
+          className='radio'
+          type='radio' 
+          name='searchBy'
+          value='byTag'
+          onChange={(e) => handleSearchBy(e)}
+        />
+        <span className='txt'>태그로 검색</span>
+      </RadioBox>
       <SearchContent>
-        {isQuest ? <div>기본배경</div> : 
+        {isQuest ? <div>여기에 퀘스트카드 렌더링</div> : 
         <NoQuest>
           <FontAwesomeIcon icon={faSadTear} className='faSadTear' />
           <div className='noQuestMsg'>
