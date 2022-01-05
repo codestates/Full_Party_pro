@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -9,9 +10,7 @@ export const ModalContainer = styled.div`
   height: 100vh;
   position: fixed;
   left: 0;
-  right: 0;
   top: 0;
-  bottm: 0;
   overflow: auto;
   z-index: 1000;
 `;
@@ -38,18 +37,22 @@ export const ModalView = styled.div`
   padding: 3vh;
   text-align: center;
 
-  .closeBtn {
-    text-align: right;
-  }
-
   .header {
     font-size: 25px;
     margin: 1.5vh 0;
+
+    font-family: 'SilkscreenBold';
   }
 
   fieldset {
     border: none;
     margin: 1.5vh 0;
+  }
+
+  .label {
+    margin: 0.5vh 0;
+
+    font-family: 'SilkscreenRegular';
   }
 
   input {
@@ -62,7 +65,7 @@ export const ModalView = styled.div`
     text-align: center;
   }
 
-  button {
+  .signinBtn {
     width: 60vw;
     height: 5vh;
 
@@ -71,6 +74,7 @@ export const ModalView = styled.div`
     background-image: linear-gradient(to right, #329D9C 20%, #56C596 100%);
     color: white;
 
+    font-family: 'SilkscreenBold';
     font-size: 15px;
     margin: 1.5vh 0;
   }
@@ -79,25 +83,68 @@ export const ModalView = styled.div`
     color: #56C596;
   }
 
-  .error {
-    color: red;
-    font-size: 9px;
-    margin-top: 0.5vh;
+  .toSignup {
+    font-size: 13px;
   }
+
   .notUser{
     color: red;
     font-size: 9px;
   }
 `
 
-const SigninModal = () => {
+export const CloseBtn = styled.button`
+  width: 100%;
+  text-align: right;
+
+  cursor: pointer;
+  margin-bottom: 10px;
+
+  background-color: white;
+  border: none;
+`
+
+type Props = {
+  signinModalHandler: Function,
+}
+
+const SigninModal = ({ signinModalHandler }: Props) => {
+  const [userInfo, setUserInfo] = useState({
+    email: '',
+    password: ''
+  })
+  const [notUser, setNotUser] = useState({
+    isNotUser: false,
+    notUserMsg: ''
+  })
+
   const handleSignin = () => {
-    console.log('로그인한다네')
+    axios.post('http://localhost:3000/signin',{
+      email: userInfo.email,
+      password: userInfo.password
+    })
+    .then((res) => {
+      if(res.data.message !== "You Have Successfully Signed In") {
+        setNotUser({
+          isNotUser: true,
+          notUserMsg: '입력하신 이메일 또는 비밀번호가 유효하지 않습니다'
+        })
+      }
+      console.log('대충 리덕스 설정해야된다는 이야기')
+    })
+    .catch((err) => {
+      console.log(err)
+    })
   }
 
-  const handleInput = () => {
-    console.log('상태가 바뀐다네')
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {name, value} = e.target
+    setUserInfo({
+      ...userInfo,
+      [name]: value
+    })
   }
+  
   const closeModal =() => {
     console.log('모달창이 닫힌다네')
   }
@@ -106,7 +153,7 @@ const SigninModal = () => {
     <ModalContainer>
       <ModalBackdrop>
         <ModalView>
-          <div className='closeBtn' onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></div>
+          <CloseBtn className='closeBtn' onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
           <div className='header'>
             <div>Sign in</div>
             <div>1st player</div>
@@ -116,26 +163,20 @@ const SigninModal = () => {
             <input
               type='text'
               name='email'
-              // value={}
-              onChange={(e) => handleInput()}
+              value={userInfo.email}
+              onChange={(e) => handleInput(e)}
             />
-            <div className='error'>
-              올바른 이메일을 입력하세요
-            </div>
           </fieldset>
           <fieldset>
             <div className='label'>password</div>
             <input
               type='text'
               name='password'
-              // value={}
-              onChange={(e) => handleInput()}
+              value={userInfo.password}
+              onChange={(e) => handleInput(e)}
             />
-            <div className='error'>
-              숫자/영문자/특수문자를 포함한<br />8~16자리의 비밀번호여야 합니다
-            </div>
           </fieldset>
-          <div className='notUser'>입력하신 이메일 또는 비밀번호가 존재하지 않습니다</div>
+          {notUser ? <div className='notUser'>{notUser.notUserMsg}</div> : <div />}
           <div className='footer'>
             <button className='signinBtn' onClick={handleSignin}>
               Press Button
