@@ -173,7 +173,7 @@ export default function Search () {
         <span className='txt'>태그로 검색</span>
       </RadioBox>
       <SearchContent>
-        {isQuest ? <div>여기에 퀘스트카드 렌더링</div> : 
+        {isQuest ? <div>여기에 퀘스트카드 렌더링</div> :
         <NoQuest>
           <FontAwesomeIcon icon={faSadTear} className='faSadTear' />
           <div className='noQuestMsg'>
@@ -182,7 +182,7 @@ export default function Search () {
               <Link to='/post' style={{ textDecoration: 'none' }}>
                 <span className='makeQ'> 퀘스트</span>
               </Link>
-              를 만들어 파티를 모집해 보세요</div>
+              를 만들어 파티를 모집해 보세요!</div>
           </div>
         </NoQuest>}
       </SearchContent>
