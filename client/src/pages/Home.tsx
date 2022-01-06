@@ -6,7 +6,7 @@ export const HomeContainer = styled.div`
   width: 100%;
   height: 100%;
 
-  padding: 60px 0;
+  margin: 60px 0;
 `
 
 export default function Home () {
