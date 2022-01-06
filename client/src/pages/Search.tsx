@@ -52,7 +52,7 @@ export const RadioBox = styled.div`
   bottom: 83%;
 
   .radio {
-    margin 5px;
+    margin: 5px;
     color: black;
   }
 
