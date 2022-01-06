@@ -100,7 +100,7 @@
     "jsx": "react"
   },
   "include": [
-    "./src/"
+    "./src/*.tsx"
   ],
   "exclude": [ 
     "node_modules"
