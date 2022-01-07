@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import './App.css';
@@ -17,6 +17,8 @@ import BottomNav from './components/BottomNav';
 
 import initialize from './config/initialize';
 import { AppState } from './reducers';
+import SigninModal from './components/SigninModal';
+import SignupModal from './components/SignupModal';
 
 declare global {
   interface Window {
@@ -26,6 +28,11 @@ declare global {
 }
 
 export default function App() {
+  const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
+
+  function signinModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
+    setIsSigninModalOpen(!isSigninModalOpen);
+  }
 
   const isLoggedIn = useSelector(
     (state: AppState) => state.userReducer.isLoggedIn
@@ -43,6 +50,8 @@ export default function App() {
     <BrowserRouter>
       <div className="App">
         <main>
+          {/* <SigninModal signinModalHandler={signinModalHandler} /> */}
+          {/* <SignupModal /> */}
           <TopNav />
           <section className="features">
             <Routes>
