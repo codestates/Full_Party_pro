@@ -9,9 +9,7 @@ export const ModalContainer = styled.div`
   height: 100vh;
   position: fixed;
   left: 0;
-  right: 0;
   top: 0;
-  bottm: 0;
   overflow: auto;
   z-index: 1000;
 `;
@@ -90,7 +88,12 @@ export const ModalView = styled.div`
   }
 `
 
-const SigninModal = () => {
+// 타입은 스타일드 컴포넌트와 컴포넌트 함수 export 전에 정의
+type Props = {
+  signinModalHandler: Function,
+}
+
+const SigninModal = ({ signinModalHandler }: Props) => {
   const handleSignin = () => {
     console.log('로그인한다네')
   }
@@ -99,7 +102,7 @@ const SigninModal = () => {
     console.log('상태가 바뀐다네')
   }
   const closeModal =() => {
-    console.log('모달창이 닫힌다네')
+    signinModalHandler();
   }
 
   return(
