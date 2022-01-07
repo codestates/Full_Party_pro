@@ -5,7 +5,7 @@ const dummyParty = {
     image: "https://pbs.twimg.com/media/Es4KAp3U4AM01nT?format=jpg",
     privateLink: "https://open.kakao.com/o/g2ufJhOd",
     content: "등 좀 긁어주세요...",
-    region: "수원시 장안구",
+    region: "경기도 수원시",
     location: "경기도 수원시 장안구 정자동 111 101호",
     // location: "http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/",
     isOnline: false,
@@ -121,21 +121,27 @@ const dummyParty = {
         comment: {
           id: 1,
           userId: 13,
+          userName: "앤",
           profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/9/93/Maelle_NH.png",
-          content: "1인당 얼마인가요?"
+          content: "참가비는 1인당 얼마인가요?",
+          createdAt: "2021-12-17"
         },
         subcomments: [
           {
             id: 1,
             userId: 1,
+            userName: "귀오미",
             profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png",
-            content: "5000원입니다."
+            content: "5000원입니다.",
+            createdAt: "2021-12-17"
           },
           {
             id: 2,
             userId: 13,
+            userName: "앤",
             profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/9/93/Maelle_NH.png",
-            content: "인원이 많아져도 같나요?"
+            content: "인원이 많아져도 같나요?",
+            createdAt: "2021-12-19"
           },
         ]
       },
@@ -143,21 +149,27 @@ const dummyParty = {
         comment: {
           id: 2,
           userId: 14,
+          userName: "푸아그라",
           profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/e/e0/Drake_NH.png",
-          content: "넷플 말고 왓챠는 안 되나요?"
+          content: "제 등도 긁어주시나요?",
+          createdAt: "2021-12-18"
         },
         subcomments: [
           {
             id: 1,
             userId: 1,
+            userName: "귀오미",
             profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png",
-            content: "안돼요!"
+            content: "아니요!",
+            createdAt: "2021-12-18"
           },
           {
             id: 2,
             userId: 14,
+            userName: "푸아그라",
             profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/e/e0/Drake_NH.png",
-            content: "넵ㅠㅠ"
+            content: "넵ㅠㅠ",
+            createdAt: "2021-12-18"
           }
         ]
       }

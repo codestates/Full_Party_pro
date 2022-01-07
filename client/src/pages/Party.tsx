@@ -104,6 +104,12 @@ export const PartyContainer = styled.div`
         line-height: 2rem;
       }
     }
+
+    .mapDesc {
+      padding: 0 30px;
+      font-size: 0.8rem;
+      color: #777;
+    }
   }
 `;
 
@@ -189,7 +195,6 @@ export const FavAndTag = styled.section`
 `;
 
 export const TimeandLocation = styled.section`
-  /* display: flex; */
   padding: 0 30px;
 
   color: #777;
@@ -542,17 +547,21 @@ export default function Party () {
               <div className="icon"><FontAwesomeIcon icon={ faGlobe } /></div>
               {isMember? 
                 <a href={location}>{location}</a>
-              : "이 모임은 온라인으로 진행되는 모임입니다." }
+              : "이 퀘스트는 온라인으로 진행되는 퀘스트입니다." }
             </div>
           : null}
         </TimeandLocation>
 
         {/* 지도 */}
         {!isOnline? 
-          <Map
-            isMember={isMember}
-            location={location}
-          />
+          <div className="mapDesc">
+            <Map
+              isMember={isMember}
+              location={location}
+              image={image}
+            />  
+            {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null}
+          </div> 
         : null}
 
         {/* 파티원과 대기자 리스트 */}
