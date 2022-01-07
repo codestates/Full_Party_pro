@@ -146,7 +146,7 @@ const SigninModal = ({ signinModalHandler }: Props) => {
   }
   
   const closeModal =() => {
-    console.log('모달창이 닫힌다네')
+    signinModalHandler();
   }
 
   return(
