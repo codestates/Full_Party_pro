@@ -5,6 +5,9 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { AppState } from '../reducers';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 export const MypageContainer = styled.div`
   width: 100%;
   height: 100%;
@@ -25,6 +28,8 @@ export default function Mypage () {
   return (
     <MypageContainer>
       <div>마이페이지</div>
+      {/* <div>{process.env.REACT_APP_TEST}</div> */}
+      <div>{process.env.REACT_APP_TEST}</div>
     </MypageContainer>
   );
 }
