@@ -1,0 +1,10 @@
+{
+  "apps": [
+      {
+          "name": "full_party_pro",
+          "script": "./node_modules/.bin/ts-node",
+          "args": "./server/app.ts",
+          "watch": true
+      }
+  ]
+}
