@@ -1,21 +1,31 @@
-import React, { Fragment, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import './App.css';
 
 import Home from './pages/Home';
 import List from './pages/List';
-import Mypage from './pages/Mypage';
 import Party from './pages/Party';
 import Post from './pages/Post';
 import Search from './pages/Search';
+import Notification from './pages/Notification';
+import Favorite from './pages/Favorite';
+import Mypage from './pages/Mypage';
 
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
 
+import initialize from './config/initialize';
 import { AppState } from './reducers';
 import SigninModal from './components/SigninModal';
 import SignupModal from './components/SignupModal';
+
+declare global {
+  interface Window {
+    Kakao: any;
+    kakao: any;
+  }
+}
 
 export default function App() {
   const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
@@ -27,6 +37,14 @@ export default function App() {
   const isLoggedIn = useSelector(
     (state: AppState) => state.userReducer.isLoggedIn
   );
+
+  const { Kakao } = window;
+
+  useEffect(() => {
+    if(!Kakao.isInitialized()){
+      initialize();
+    }
+  }, [])
 
   return (
     <BrowserRouter>
@@ -40,10 +58,12 @@ export default function App() {
               <Fragment>
                 <Route path="/" element={<Home />} />
                 <Route path="/list" element={<List />} />
-                <Route path="/mypage" element={<Mypage />} />
-                <Route path="/search" element={<Search />} />
                 <Route path="/party" element={<Party />} />
                 <Route path="/post" element={<Post />} /> 
+                <Route path="/search" element={<Search />} />
+                <Route path="/notification" element={<Notification />} />
+                <Route path="/favorite" element={<Favorite />} />
+                <Route path="/mypage" element={<Mypage />} />
               </Fragment>
             </Routes>
           </section>
