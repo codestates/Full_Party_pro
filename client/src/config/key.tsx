@@ -1,3 +1,0 @@
-const KAKAO_JAVASCRIPT_KEY='04471cdc5d8d87c9557ff05b8ee1ce40'
-
-export default KAKAO_JAVASCRIPT_KEY;
