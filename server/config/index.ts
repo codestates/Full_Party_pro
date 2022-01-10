@@ -1,12 +1,12 @@
 const dotenv = require('dotenv').config();
 
-const importer = (key, defaultValue = undefined) => {
+const importer = (key: any, defaultValue: any = undefined) => {
   const value = process.env[key] || defaultValue;
   if (value === null) throw new Error(`Key ${key} is undefined`);
   return value;
 }
 
-module.exports = {
+const index = {
   database: {
     host: importer("DATABASE_HOST"),
     port: importer("DATABASE_PORT"),
@@ -17,3 +17,5 @@ module.exports = {
   port: parseInt(importer("HTTPS_PORT", 8080), 10),
   cors: { allowedOrigin: importer("CORS_ALLOW_ORIGIN") }
 }
+
+export default index;

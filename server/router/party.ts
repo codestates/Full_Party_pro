@@ -1,9 +1,6 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const {
-  getPartyInfo, deleteParty, createSubcomment, createComment, deleteComment, deleteSubcomment,
-  enqueue, dequeue, modifyMessage, approveMember, quitParty, fullParty, completeParty, reviewMembers
-} = require("../controllers/party");
+import { getPartyInfo, deleteParty, createSubcomment, createComment, deleteComment, deleteSubcomment, enqueue, dequeue, modifyMessage, approveMember, quitParty, fullParty, completeParty, reviewMembers } from "../controllers/party";
 
 router.get("/:partyId", getPartyInfo);
 router.delete("/:partyId", deleteParty);
@@ -20,4 +17,4 @@ router.patch("/fullParty", fullParty);
 router.patch("/completed", completeParty);
 router.patch("/review", reviewMembers);
 
-module.exports = router;
+export = router;

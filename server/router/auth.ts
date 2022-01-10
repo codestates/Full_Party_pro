@@ -1,8 +1,9 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const {
+
+import {
    signin, signout, signup, guest, google, kakao
-} = require("../controllers/auth");
+} from "../controllers/auth";
 
 router.post("/signin", signin);
 router.post("/signout", signout);
@@ -11,4 +12,4 @@ router.post("/guest", guest);
 router.post("/google", google);
 router.post("/kakao", kakao);
 
-module.exports = router;
+export = router;

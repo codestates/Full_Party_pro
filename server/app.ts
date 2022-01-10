@@ -1,18 +1,25 @@
-const https = require("https");
-const fs = require("fs");
-const express = require("express");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const config = require("./config");
-require("express-async-errors");
+// const https = require("https");
+// const fs = require("fs");
+// const express = require("express");
+// const cors = require("cors");
+// const cookieParser = require("cookie-parser");
+// const config = require("./config");
+// require("express-async-errors");
+import https from "https";
+import fs from "fs";
+import express, { Request, Response } from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import config from "./config";
+// import express_async_errors from "express-async-errors"; // module not found
 
-const authRouter = require("./router/auth");
-const listRouter = require("./router/list");
-const userRouter = require("./router/user");
-const partyRouter = require("./router/party");
-const favoriteRouter = require("./router/favorite");
-const searchRouter = require("./router/search");
-const notificationRouter = require("./router/notification");
+import authRouter from "./router/auth";
+import listRouter from "./router/list";
+import userRouter from "./router/user";
+import partyRouter from "./router/party";
+import favoriteRouter from "./router/favorite";
+import searchRouter from "./router/search";
+import notificationRouter from "./router/notification";
 
 const app = express();
 
@@ -27,7 +34,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   res.status(200).send("Welcome to Full Party!");
 });
 
@@ -41,7 +48,7 @@ app.use("/notification", notificationRouter);
 app.use((req, res) => {
   res.status(400).json({ message: "Invalid request" });
 });
-app.use((err, req, res, next) => {
+app.use((err: any, req: Request, res: Response, next: any) => {
   res.status(500).json({ message: `Something went wrong: ${err}` });
 });
 

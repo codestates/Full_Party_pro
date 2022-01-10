@@ -1,6 +1,6 @@
-const config = require("./index");
+import config from "./index";
 
-module.exports = {
+export default {
   development: {
     username: config.database.username,
     password: config.database.password,

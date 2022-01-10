@@ -1,9 +1,6 @@
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const {
-  getUserInfo, withdrawUser, getRecruitingParty, getParticipatingParty, 
-  getCompletedParty, getFavoriteParty, getUserProfile, verifyUser, modifyUserInfo
-} = require("../controllers/user");
+import { getUserInfo, withdrawUser, getRecruitingParty, getParticipatingParty, getCompletedParty, getFavoriteParty, getUserProfile, verifyUser, modifyUserInfo } from "../controllers/user";
 
 router.get("/:userId", getUserInfo);
 router.delete("/:userId", withdrawUser);
@@ -15,4 +12,4 @@ router.get("/profile/:userId", getUserProfile);
 router.post("/verification", verifyUser);
 router.patch("/profile", modifyUserInfo);
 
-module.exports = router;
+export = router;
