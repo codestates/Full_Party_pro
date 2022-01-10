@@ -399,7 +399,7 @@ const SignupModal = () => {
                       onChange={(e) => handleSelectChange(e)}
                       id='gender'
                     >
-                      <option value='none' selected>선택</option>
+                      <option value='none' selected disabled>선택</option>
                       <option value='남성'>남성</option>
                       <option value='여성'>여성</option>
                       <option value='기타'>기타</option>

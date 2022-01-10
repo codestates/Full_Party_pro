@@ -9,11 +9,13 @@ export const HomeContainer = styled.div`
   margin: 60px 0;
 `
 
-export default function Home () {
-
+function Home () {
   return (
     <HomeContainer>
       <div>홈</div>
     </HomeContainer>
   );
 }
+
+
+export default Home;

@@ -4,6 +4,9 @@ import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { RootReducerType } from '../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserdata } from '../actions/signin';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -109,33 +112,11 @@ type Props = {
 }
 
 const SigninModal = ({ signinModalHandler }: Props) => {
+  const dispatch = useDispatch()
   const [userInfo, setUserInfo] = useState({
     email: '',
     password: ''
   })
-  const [notUser, setNotUser] = useState({
-    isNotUser: false,
-    notUserMsg: ''
-  })
-
-  const handleSignin = () => {
-    axios.post('http://localhost:3000/signin',{
-      email: userInfo.email,
-      password: userInfo.password
-    })
-    .then((res) => {
-      if(res.data.message !== "You Have Successfully Signed In") {
-        setNotUser({
-          isNotUser: true,
-          notUserMsg: '입력하신 이메일 또는 비밀번호가 유효하지 않습니다'
-        })
-      }
-      console.log('대충 리덕스 설정해야된다는 이야기')
-    })
-    .catch((err) => {
-      console.log(err)
-    })
-  }
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target
@@ -147,6 +128,12 @@ const SigninModal = ({ signinModalHandler }: Props) => {
   
   const closeModal =() => {
     signinModalHandler();
+  }
+
+  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
+
+  const handleSignin = () => {
+    dispatch(fetchUserdata(userInfo))
   }
 
   return(
@@ -176,7 +163,7 @@ const SigninModal = ({ signinModalHandler }: Props) => {
               onChange={(e) => handleInput(e)}
             />
           </fieldset>
-          {notUser ? <div className='notUser'>{notUser.notUserMsg}</div> : <div />}
+          {signinReducer.success === false ? <div className='notUser'>입력하신 아이디 혹은 비밀번호가 유효하지 않습니다</div> : <span />}
           <div className='footer'>
             <button className='signinBtn' onClick={handleSignin}>
               Press Button
@@ -186,6 +173,13 @@ const SigninModal = ({ signinModalHandler }: Props) => {
               지금 바로 <span className='toSignupHL'>회원가입</span> 하세요 🥳
             </section>
           </div>
+          <fieldset>
+            <div>리덕스 확인용</div>
+            <div>id: {signinReducer.userInfo?.id}</div>
+            <div>name: {signinReducer.userInfo?.name}</div>
+            <div>userImage: {signinReducer.userInfo?.userImage}</div>
+            <div>success: {String(signinReducer.success)}</div>
+          </fieldset>
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
