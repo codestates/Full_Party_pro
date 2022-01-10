@@ -50,9 +50,9 @@ export default function App() {
     <BrowserRouter>
       <div className="App">
         <main>
-          {/* <SigninModal signinModalHandler={signinModalHandler} /> */}
+          <SigninModal signinModalHandler={signinModalHandler} />
           {/* <SignupModal /> */}
-          <TopNav />
+          {/* <TopNav />
           <section className="features">
             <Routes>
               <Fragment>
@@ -67,7 +67,7 @@ export default function App() {
               </Fragment>
             </Routes>
           </section>
-          {isLoggedIn? <BottomNav /> : null}
+          {isLoggedIn? <BottomNav /> : null} */}
         </main>
       </div>
     </BrowserRouter>

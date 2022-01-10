@@ -48,8 +48,8 @@ export const SearchBar = styled.div`
 export const RadioBox = styled.div`
   color: #888;
   position: absolute;
-  left: 8%;
-  bottom: 83%;
+  left: 12%;
+  bottom: 82%;
 
   .radio {
     margin: 5px;
