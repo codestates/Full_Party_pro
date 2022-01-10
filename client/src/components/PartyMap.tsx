@@ -91,7 +91,7 @@ type Props = {
   image: string,
 };
 
-export default function Map ({ isMember, location, image }: Props) {
+export default function PartyMap ({ isMember, location, image }: Props) {
 
   const { kakao } = window;
 
@@ -110,18 +110,24 @@ export default function Map ({ isMember, location, image }: Props) {
         const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
         const { La, Ma } = coords;
 
-        const infoWindow = '<div class="infoWindow">' +
+        const infoWindow = isMember ? ( 
+          '<div class="infoWindow">' +
           `  <a href="https://map.kakao.com/link/map/퀘스트장소,${Ma.toFixed(6)},${La.toFixed(6)}" target="_blank">` +
           '    <span class="title">퀘스트 장소</span>' +
           '  </a>' +
-          '</div>';
+          '</div>' ) : (
+            '<div class="infoWindow">' +
+            `  <a href="javascript:void(0)">` +
+            '    <span class="title">퀘스트 장소</span>' +
+            '  </a>' +
+            '</div>'
+          )
 
         if(isMember){
 
-          // 로컬 이미지로 변경할 것
-          const imageSrc = 'https://i.imgur.com/V8PN3K3.png',    
+          const imageSrc = 'img/mapMarker.png',    
           imageSize = new kakao.maps.Size(50, 50),
-          imageOption = {offset: new kakao.maps.Point(24.15, 69)};
+          imageOption = { offset: new kakao.maps.Point(24.15, 69) };
             
           const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
 

@@ -176,11 +176,12 @@ type Props = {
   userId: number,
   leaderId: number,
   isLeader: boolean,
+  isMember: boolean,
   from: string,
   userInfo: { [key: string]: any }
 }
 
-const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, from, userInfo }: Props) => {
+const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, isMember, from, userInfo }: Props) => {
 
   const { id, name, profileImage, level, message, joinDate } = userInfo;
 
@@ -230,19 +231,21 @@ const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, from,
         <ModalView onClick={(e) => e.stopPropagation()}>
           <CloseBtn onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
           <header>{from === "members"? <>Party<br />Member</> : <>Quest<br />Volunteer</>}</header>
-          <section className="speechBubble">
-            {isEditMode ?
-              <input 
-                type="text"
-                name="newMsg"
-                onChange={(e) => inputHandler(e)}
-                value={newMsg}
-                maxLength={45}
-              />
-            : null}
-            {message && !isEditMode ? message : null}
-            {!message && !isEditMode ? `안녕하세요, ${name}입니다!` : null}
-          </section> 
+          {isMember ? 
+            <section className="speechBubble">
+              {isEditMode ?
+                <input 
+                  type="text"
+                  name="newMsg"
+                  onChange={(e) => inputHandler(e)}
+                  value={newMsg}
+                  maxLength={45}
+                />
+              : null}
+              {message && !isEditMode ? message : null}
+              {!message && !isEditMode ? `안녕하세요, ${name}입니다!` : null}
+            </section> 
+          : null}
           <section className="memberContainer">
             <div 
               className="profileImage" 

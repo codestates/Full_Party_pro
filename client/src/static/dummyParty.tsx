@@ -1,6 +1,6 @@
 const dummyParty = {
     partyId: 1,
-    partyState: 1,
+    partyState: 0,
     name: "등 긁어주실 분...",
     image: "https://pbs.twimg.com/media/Es4KAp3U4AM01nT?format=jpg",
     privateLink: "https://open.kakao.com/o/g2ufJhOd",
@@ -18,7 +18,7 @@ const dummyParty = {
     //
     tag: ["이웃", "효자손", "도와주세요"],
     leaderId: 1,
-    memberLimit: 10,
+    memberLimit: 11,
     members: [ {
         id: 1,
         name: "귀오미",
@@ -116,6 +116,7 @@ const dummyParty = {
     //   }
     // ],
     waitingQueue: [],
+    // comments: [],
     comments: [
       {
         comment: {

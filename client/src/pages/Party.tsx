@@ -13,7 +13,7 @@ import PartyJoinModal from '../components/PartyJoinModal';
 import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
 
-import Map from '../components/Map';
+import PartyMap from '../components/PartyMap';
 import MemberList from '../components/MemberList';
 import QnA from '../components/QnA';
 
@@ -166,6 +166,8 @@ export const FavAndTag = styled.section`
 
     margin: 0 2vw;
 
+    overflow-x: auto;
+
     .tag {
       max-width: 180px;
 
@@ -297,7 +299,7 @@ export default function Party () {
     (state: AppState) => state.userReducer.isLoggedIn
   );
 
-  // [dev] 유저 모달 메시지 수정 권한을 위해 임시로 설정한 유저 아이디
+  // [dev] 유저 모달 메시지 수정 권한을 위해 임시로 설정한 유저 아이디, 나중에 리덕스에서 userId 불러오는 코드로 바꾸기
   const userId = 1;
 
   const { partyId, name, image, memberLimit, partyState, privateLink, content, region, startDate, endDate, favorite, tag, location, isOnline, isReviewed, leaderId, members, waitingQueue, comments } = dummyParty;
@@ -309,7 +311,7 @@ export default function Party () {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const [isLeader, setIsLeader] = useState(true);
+  const [isLeader, setIsLeader] = useState(false);
   const [isMember, setIsMember] = useState(true);
   const [isWaiting, setIsWaiting] = useState(false);
 
@@ -555,7 +557,7 @@ export default function Party () {
         {/* 지도 */}
         {!isOnline? 
           <div className="mapDesc">
-            <Map
+            <PartyMap
               isMember={isMember}
               location={location}
               image={image}
@@ -598,7 +600,9 @@ export default function Party () {
 
         {/* 문의 게시판 */}
         <QnA 
+          partyId={partyId}
           isLeader={isLeader}
+          leaderId={leaderId}
           comments={comments}
         />
 
@@ -658,6 +662,7 @@ export default function Party () {
           userId={userId}
           leaderId={leaderId}
           isLeader={isLeader}
+          isMember={isMember}
           from={from}
           userInfo={userInfo}
         /> 

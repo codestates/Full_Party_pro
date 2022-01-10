@@ -124,7 +124,7 @@ const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
             name="message"
             value={message}
             onChange={(e) => inputHandler(e)}
-            placeholder="나에 대해 파티원들에게 소개해주세요.&#13;&#10;이 정보는 파티원이 아닌 사람들에게도 공개될 수 있으니 민감한 정보나 개인 정보는 포함되지 않도록 주의해주세요.">
+            placeholder="나에 대해 파티원들에게 소개해주세요.&#13;&#10;이 메시지는 가입 신청 승인 후 파티원 모두가 열람할 수 있는 정보이므로, 민감한 정보나 개인 정보는 포함되지 않도록 주의해주세요.">
           </textarea> 
           <button id="join" onClick={joinHandler}>
             가입 신청
