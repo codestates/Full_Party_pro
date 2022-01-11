@@ -79,7 +79,7 @@ Parties.init(
     type: DataTypes.INTEGER,
     references: {
       model: "users",
-      key: "id",
+      key: "id"
     },
     allowNull: false
   },

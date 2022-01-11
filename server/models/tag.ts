@@ -34,10 +34,8 @@ Tag.init(
   partyId: {
     type: DataTypes.INTEGER,
     references: {
-      model: {
-        tableName: "parties"
-      },
-      key: "id",
+      model: "parties",
+      key: "id"
     },
     allowNull: false
   }

@@ -32,20 +32,16 @@ Comment.init(
   userId: {
     type: DataTypes.INTEGER,
     references: {
-      model: {
-        tableName: "users"
-      },
-      key: "id",
+      model: "users",
+      key: "id"
     },
     allowNull: false
   },
   partyId: {
     type: DataTypes.INTEGER,
     references: {
-      model: {
-        tableName: "parties"
-      },
-      key: "id",
+      model: "parties",
+      key: "id"
     },
     allowNull: false
   },

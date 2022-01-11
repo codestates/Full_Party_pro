@@ -32,20 +32,16 @@ SubComment.init(
   userId: {
     type: DataTypes.INTEGER,
     references: {
-      model: {
-        tableName: "users"
-      },
-      key: "id",
+      model: "users",
+      key: "id"
     },
     allowNull: false
   },
   commentId: {
     type: DataTypes.INTEGER,
     references: {
-      model: {
-        tableName: "comment"
-      },
-      key: "id",
+      model: "comment",
+      key: "id"
     },
     allowNull: false
   },
