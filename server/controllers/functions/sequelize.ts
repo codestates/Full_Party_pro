@@ -13,7 +13,7 @@ interface localParty extends Parties {
   members?: object[];
 };
 
-export const findUser = async (prop: object, attributes: string[] = []) => {
+export const findUser = async (prop: object, attributes: string[] = [ "id" ]) => {
   const user = await Users.findOne({
     where: { ...prop },
     attributes
