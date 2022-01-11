@@ -90,14 +90,14 @@ type Props = {
   image: string,
 };
 
-export default function ModulePartyMap ({ isMember, location, image }: Props) {
+export default function PartyMap ({ isMember, location, image }: Props) {
 
   const { kakao } = window;
 
   const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
 
-  const [level, setLevel] = useState(isMember ? 4 : 5);
+  const level = (isMember ? 4 : 5);
   const zoomable = (isMember ? true : false);
 
   useEffect(() => {

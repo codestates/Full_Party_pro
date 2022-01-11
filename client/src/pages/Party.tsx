@@ -13,9 +13,7 @@ import PartyJoinModal from '../components/PartyJoinModal';
 import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
 
-//[dev]
-import PartyMap from '../components/PartyMap';
-import ModulePartyMap from '../components/ModulePartyMap';
+import PartyMap from '../components/ModulePartyMap';
 import MemberList from '../components/MemberList';
 import QnA from '../components/QnA';
 
@@ -490,7 +488,7 @@ export default function Party () {
               <div id="title">{ name }</div>
               {isMember? 
                 <button className="privateLink">
-                  <a href={ privateLink } style={{ color: "#000" }}>
+                  <a href={ privateLink } target="_blank" style={{ color: "#000" }}>
                     <FontAwesomeIcon icon={ faComments } className="icon" />
                   </a>
                 </button>
@@ -557,20 +555,9 @@ export default function Party () {
         </TimeandLocation>
 
         {/* 지도 */}
-        {/* {!isOnline? 
-          <div className="mapDesc">
-            <PartyMap
-              isMember={isMember}
-              location={location}
-              image={image}
-            />  
-            {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null}
-          </div> 
-        : null} */}
-
         {!isOnline? 
           <div className="mapDesc">
-            <ModulePartyMap
+            <PartyMap
               isMember={isMember}
               location={location}
               image={image}
