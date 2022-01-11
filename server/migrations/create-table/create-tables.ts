@@ -8,25 +8,25 @@ import Tag from "../../models/tag";
 import Comment from "../../models/comment";
 import SubComment from "../../models/subComment";
 
-const createUsers =async () => {
+const createUsers = async () => {
   await Users.sync({ force: true })
     .then(() => console.log("✅ users table created"))
     .catch((error) => console.log("Error occured: ", error));
 };
 
-const createParties =async () => {
+const createParties = async () => {
   await Parties.sync({ force: true })
   .then(() => console.log("✅ parties table created"))
   .catch((error) => console.log("Error occured: ", error));
 };
 
-const createUserParty =async () => {
+const createUserParty = async () => {
   await UserParty.sync({ force: true })
   .then(() => console.log("✅ userParty table created"))
   .catch((error) => console.log("Error occured: ", error));
 };
 
-const createWaitingQueue =async () => {
+const createWaitingQueue = async () => {
   await WaitingQueue.sync({ force: true })
   .then(() => console.log("✅ waitingQueue table created"))
   .catch((error) => console.log("Error occured: ", error));
