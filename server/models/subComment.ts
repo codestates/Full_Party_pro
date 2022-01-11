@@ -33,8 +33,7 @@ SubComment.init(
     type: DataTypes.INTEGER,
     references: {
       model: {
-        tableName: "users",
-        schema: "",
+        tableName: "users"
       },
       key: "id",
     },
@@ -44,8 +43,7 @@ SubComment.init(
     type: DataTypes.INTEGER,
     references: {
       model: {
-        tableName: "comment",
-        schema: "",
+        tableName: "comment"
       },
       key: "id",
     },

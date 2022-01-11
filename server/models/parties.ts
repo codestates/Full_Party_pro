@@ -79,8 +79,7 @@ Parties.init(
     type: DataTypes.INTEGER,
     references: {
       model: {
-        tableName: "users",
-        schema: "",
+        tableName: "users"
       },
       key: "id",
     },

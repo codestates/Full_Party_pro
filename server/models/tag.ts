@@ -35,8 +35,7 @@ Tag.init(
     type: DataTypes.INTEGER,
     references: {
       model: {
-        tableName: "parties",
-        schema: "",
+        tableName: "parties"
       },
       key: "id",
     },

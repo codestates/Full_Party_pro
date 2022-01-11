@@ -33,8 +33,7 @@ WaitingQueue.init(
     type: DataTypes.INTEGER,
     references: {
       model: {
-        tableName: "users",
-        schema: "",
+        tableName: "users"
       },
       key: "id",
     },
@@ -44,8 +43,7 @@ WaitingQueue.init(
     type: DataTypes.INTEGER,
     references: {
       model: {
-        tableName: "parties",
-        schema: "",
+        tableName: "parties"
       },
       key: "id",
     },
