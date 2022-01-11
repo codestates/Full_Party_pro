@@ -11,12 +11,12 @@ interface PartiesAttributes {
   endDate: Date;
   partyState: number;
   leaderId: {
-    type: any;
+    type: any,
     references: {
       model: {
-        tableName: string;
-      };
-      key: string;
+        tableName: string,
+      },
+      key: string,
     };
     allowNull: boolean;
   };
