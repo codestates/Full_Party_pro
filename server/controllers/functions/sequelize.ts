@@ -22,7 +22,7 @@ export const findUser = async (prop: object, attributes: string[] = []) => {
 };
 
 export const createUser = async (userInfo: UsersAttributes) => {
-  const user = await findUser(userInfo);
+  const user = await findUser({ email: userInfo.email });
   if (user) return false;
   return await Users.create({ ...userInfo, exp: 10 });
 };
