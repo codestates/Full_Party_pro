@@ -16,7 +16,7 @@ export const LoadingContainer = styled.div`
   z-index: 1000;
 `;
 
-export const Backdrop = styled.div`
+export const LoadingBackdrop = styled.div`
   width: 100%;
   height: 100%;
   position: absolute;
@@ -99,7 +99,7 @@ export const Backdrop = styled.div`
 export default function Loading() {
   return (
     <LoadingContainer>
-      <Backdrop>
+      <LoadingBackdrop>
         <div className="lds-ellipsis">
           <div>
           </div>
@@ -111,7 +111,7 @@ export default function Loading() {
           </div>
         </div>
         <div className="text">Loading...</div>
-      </Backdrop>
+      </LoadingBackdrop>
     </LoadingContainer>
   );
 }

@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHome, faPlusCircle, faBookmark, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faPlusCircle, faBookmark, faUser } from '@fortawesome/free-solid-svg-icons';
 
-export const NavContainer = styled.footer`
+export const NavContainer = styled.nav`
   width: 100vw;
   height: 60px;
 
@@ -18,13 +18,17 @@ export const NavContainer = styled.footer`
   box-shadow: rgba(149, 157, 165, 0.2) 0px -8px 24px;
 
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 
   .button {
+    width: 25vw;
+
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+
+    padding: 10px;
 
     color: #777;
     font-size: 10pt;
@@ -56,7 +60,8 @@ export default function BottomNav () {
           <FontAwesomeIcon icon={ faPlusCircle } className="icon" /> 파티 개설
         </div>  
       </Link>
-      <Link to="/list" style={{ textDecoration: 'none' }}>
+      {/* [dev] 후에 관심파티 목록 리스트로 연결되도록 링크 수정 */}
+      <Link to="/party" style={{ textDecoration: 'none' }}>
         <div className="button">
           <FontAwesomeIcon icon={ faBookmark } className="icon" /> 관심 파티
         </div>  

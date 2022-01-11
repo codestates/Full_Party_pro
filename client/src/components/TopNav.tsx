@@ -4,9 +4,10 @@ import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faBell } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
+import { AppState } from '../reducers';
 
-export const NavContainer = styled.header`
+export const NavContainer = styled.nav`
   width: 100vw;
   height: 60px;
 
@@ -56,6 +57,7 @@ export const NavContainer = styled.header`
       position: fixed;
       right: 25px;
       top: 17px;
+      z-index: 950;
 
       border-radius: 100%;
       border: 1px solid white;
@@ -92,7 +94,7 @@ export const NavContainer = styled.header`
 export default function TopNav () {
 
   const isLoggedIn = useSelector(
-    ({ userReducer }) => userReducer.isLoggedIn
+    (state: AppState) => state.userReducer.isLoggedIn
   );
 
   // const [isSearchBarOn, setIsSearchBarOn] = useState(true);
@@ -113,7 +115,7 @@ export default function TopNav () {
             <FontAwesomeIcon icon={ faSearch } className="icon" /> 
           </Link>
           <Link 
-            to="/mypage" 
+            to="/notification" 
             style={{ width: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#777', textDecoration: 'none' }}
           >
             <div id="notification"></div>
