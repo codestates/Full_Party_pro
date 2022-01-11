@@ -4,7 +4,7 @@ import sequelize from './index';
 interface TagAttributes {
   id: number;
   name: string;
-  partyId: number;
+  partyId: object;
 };
 
 export default class Tag extends Model<TagAttributes> {

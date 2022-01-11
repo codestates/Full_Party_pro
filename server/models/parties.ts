@@ -10,7 +10,7 @@ interface PartiesAttributes {
   startDate: Date;
   endDate: Date;
   partyState: number;
-  leaderId: number;
+  leaderId: object;
   isOnline: boolean;
   privateLink: string;
   region: string;

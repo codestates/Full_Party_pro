@@ -3,8 +3,8 @@ import sequelize from './index';
 
 interface WaitingQueueAttributes {
   id: number;
-  userId: number;
-  partyId: number;
+  userId: object;
+  partyId: object;
   message: string;
 };
 

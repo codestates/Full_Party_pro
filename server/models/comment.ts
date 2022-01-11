@@ -3,8 +3,8 @@ import sequelize from './index';
 
 interface CommentAttributes {
   id: number;
-  userId: number;
-  partyId: number;
+  userId: object;
+  partyId: object;
   content: string;
 };
 
@@ -50,7 +50,7 @@ Comment.init(
     allowNull: false
   },
   content: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false
   }
 },

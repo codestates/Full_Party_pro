@@ -3,8 +3,8 @@ import sequelize from './index';
 
 interface UserPartyAttributes {
   id: number;
-  userId: number;
-  partyId: number;
+  userId: object;
+  partyId: object;
   message: string;
   isReviewed: boolean;
 };

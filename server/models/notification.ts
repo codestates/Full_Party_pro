@@ -3,8 +3,8 @@ import sequelize from './index';
 
 interface NotificationAttributes {
   id: number;
-  userId: number;
-  partyId: number;
+  userId: object;
+  partyId: object;
   content: string;
   isRead: boolean;
 };

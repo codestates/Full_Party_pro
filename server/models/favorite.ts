@@ -3,8 +3,8 @@ import sequelize from './index';
 
 interface FavoriteAttributes {
   id: number;
-  userId: number;
-  partyId: number;
+  userId: object;
+  partyId: object;
 };
 
 export default class Favorite extends Model<FavoriteAttributes> {

@@ -3,8 +3,8 @@ import sequelize from './index';
 
 interface SubCommentAttributes {
   id: number;
-  userId: number;
-  commentId: number;
+  userId: object;
+  commentId: object;
   content: string;
 };
 
@@ -50,7 +50,7 @@ SubComment.init(
     allowNull: false
   },
   content: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false
   }
 },
