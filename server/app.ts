@@ -7,10 +7,11 @@
 // require("express-async-errors");
 import https from "https";
 import fs from "fs";
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import config from "./config";
+import sequelize from "./models";
 // import express_async_errors from "express-async-errors"; // module not found
 
 import authRouter from "./router/auth";
@@ -48,7 +49,7 @@ app.use("/notification", notificationRouter);
 app.use((req, res) => {
   res.status(400).json({ message: "Invalid request" });
 });
-app.use((err: any, req: Request, res: Response, next: any) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ message: `Something went wrong: ${err}` });
 });
 
@@ -61,7 +62,12 @@ if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
   const credentials = { key: privateKey, cert: certificate };
 
   server = https.createServer(credentials, app);
-  server.listen(HTTPS_PORT, () => console.log('https server runnning'));
+  server.listen(HTTPS_PORT, async () => {
+    console.log('https server runnning');
+    await sequelize.authenticate()
+      .then(async () => console.log("DB connection success"))
+      .catch(error => console.log(error))
+  });
 } else {
   server = app.listen(HTTPS_PORT, () => console.log('http server runnning'));
 }
