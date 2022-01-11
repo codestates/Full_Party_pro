@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "local-start": "nodemon --exec ts-node -T app.ts",
     "deploy-start": "ts-node app.ts",
-		"create-db": "ts-node ./migrations/create-db.ts",
-		"migrate-db": "ts-node ./migrations/create-table/*.ts"
+    "create-db": "ts-node ./migrations/create-db.ts",
+    "migrate-db": "ts-node ./migrations/create-table/*.ts"
   },
   "author": "",
   "license": "ISC",
@@ -21,7 +21,6 @@
     "express-async-errors": "^3.1.1",
     "fs": "^0.0.1-security",
     "https": "^1.0.0",
-    "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
     "sequelize": "^7.0.0-alpha.4",
@@ -33,6 +32,7 @@
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
+    "@types/jsonwebtoken": "^8.5.6",
     "@types/node": "^17.0.8",
     "@types/sequelize": "^4.28.11",
     "@types/validator": "^13.7.1",

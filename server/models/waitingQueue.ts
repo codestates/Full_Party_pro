@@ -1,14 +1,14 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface WaitingQueueAttributes {
-  id: number;
+export interface WaitingQueueAttributes {
+  id?: number;
   userId: object;
   partyId: object;
   message: string;
 };
 
-export default class WaitingQueue extends Model<WaitingQueueAttributes> {
+export class WaitingQueue extends Model<WaitingQueueAttributes> {
   public readonly id!: number;
   public userId!: number;
   public partyId!: number;

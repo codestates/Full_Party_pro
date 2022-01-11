@@ -1,20 +1,20 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface NotificationAttributes {
-  id: number;
+export interface NotificationAttributes {
+  id?: number;
   userId: object;
   partyId: object;
   content: string;
   isRead: boolean;
 };
 
-export default class Notification extends Model<NotificationAttributes> {
+export class Notification extends Model<NotificationAttributes> {
   public readonly id!: number;
   public userId!: number;
   public partyId!: number;
   public content!: string;
-  public isRead!: Boolean;
+  public isRead!: boolean;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 

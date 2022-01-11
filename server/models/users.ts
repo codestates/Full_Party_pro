@@ -1,12 +1,12 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface UsersAttributes {
-  id: number;
+export interface UsersAttributes {
+  id?: number;
   userName: string;
   password: string;
   profileImage: string;
-  birth: string;
+  birth: Date;
   gender: string;
   mobile: string;
   email: string;
@@ -14,7 +14,7 @@ interface UsersAttributes {
   exp: number;
 };
 
-export default class Users extends Model<UsersAttributes> {
+export class Users extends Model<UsersAttributes> {
   public readonly id!: number;
   public userName!: string;
   public password!: string;

@@ -1,10 +1,3 @@
-// const https = require("https");
-// const fs = require("fs");
-// const express = require("express");
-// const cors = require("cors");
-// const cookieParser = require("cookie-parser");
-// const config = require("./config");
-// require("express-async-errors");
 import https from "https";
 import fs from "fs";
 import express, { Request, Response, NextFunction } from "express";
@@ -63,7 +56,7 @@ if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
 
   server = https.createServer(credentials, app);
   server.listen(HTTPS_PORT, async () => {
-    console.log('https server runnning');
+    console.log(`https server running in ${HTTPS_PORT}`);
     await sequelize.authenticate()
       .then(async () => console.log("DB connection success"))
       .catch(error => console.log(error))

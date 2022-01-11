@@ -1,14 +1,14 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface SubCommentAttributes {
-  id: number;
+export interface SubCommentAttributes {
+  id?: number;
   userId: object;
   commentId: object;
   content: string;
 };
 
-export default class SubComment extends Model<SubCommentAttributes> {
+export class SubComment extends Model<SubCommentAttributes> {
   public readonly id!: number;
   public userId!: number;
   public commentId!: number;

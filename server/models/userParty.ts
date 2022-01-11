@@ -1,15 +1,15 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface UserPartyAttributes {
-  id: number;
+export interface UserPartyAttributes {
+  id?: number;
   userId: object;
   partyId: object;
   message: string;
   isReviewed: boolean;
 };
 
-export default class UserParty extends Model<UserPartyAttributes> {
+export class UserParty extends Model<UserPartyAttributes> {
   public readonly id!: number;
   public userId!: number;
   public partyId!: number;
