@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
@@ -192,7 +192,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments }: Props) {
   );
 
   // [dev] 메시지 등록 권한을 위해 임시로 설정한 유저 아이디, 나중에 리덕스에서 userId 불러오는 코드로 바꾸기
-  const userId = 14;
+  const userId = 1;
 
   const [commentIdx, setCommentIdx] = useState(-1);
   const [isCommentOpen, setIsCommentOpen] = useState(false);

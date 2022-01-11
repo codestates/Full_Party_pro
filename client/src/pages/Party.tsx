@@ -311,7 +311,7 @@ export default function Party () {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const [isLeader, setIsLeader] = useState(false);
+  const [isLeader, setIsLeader] = useState(true);
   const [isMember, setIsMember] = useState(true);
   const [isWaiting, setIsWaiting] = useState(false);
 
