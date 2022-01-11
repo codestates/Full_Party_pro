@@ -13,9 +13,7 @@ interface PartiesAttributes {
   leaderId: {
     type: any,
     references: {
-      model: {
-        tableName: string,
-      },
+      model: object,
       key: string,
     };
     allowNull: boolean;
