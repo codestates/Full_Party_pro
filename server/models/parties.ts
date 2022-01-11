@@ -10,14 +10,7 @@ interface PartiesAttributes {
   startDate: Date;
   endDate: Date;
   partyState: number;
-  leaderId: {
-    type: any,
-    references: {
-      model: object,
-      key: string,
-    };
-    allowNull: boolean;
-  };
+  leaderId: number;
   isOnline: boolean;
   privateLink: string;
   region: string;
@@ -85,9 +78,7 @@ Parties.init(
   leaderId: {
     type: DataTypes.INTEGER,
     references: {
-      model: {
-        tableName: "users"
-      },
+      model: "users",
       key: "id",
     },
     allowNull: false
