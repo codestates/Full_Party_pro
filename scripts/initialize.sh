@@ -1,7 +1,7 @@
 #!/bin/bash
 cd /home/ubuntu/Full_Party_pro/server
 npm install
-npm install pm2@latest -g
+npm install -g pm2@latest
 sudo apt-get update
 sudo apt-get install authbind
 sudo touch /etc/authbind/byport/443
