@@ -7,11 +7,15 @@ class options implements Options{
    dialect!: 'mysql';
    username!: string;
    password!: string;
+   host!: string;
+   port!: number;
 }
 
 const createDBOptions = new options();
 createDBOptions.username = config.development.username;
 createDBOptions.password = config.development.password;
+createDBOptions.host = config.development.host;
+createDBOptions.port = config.development.port;
 createDBOptions.dialect = 'mysql';
 
 let dbName = config.development.database;
