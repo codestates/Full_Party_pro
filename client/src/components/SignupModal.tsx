@@ -55,7 +55,7 @@ export const ModalView = styled.div`
 `
 
 export const UserImage = styled.div`
-  width: 100%
+  width: 100%;
   display: flex;
 
   justify-content: center;
@@ -88,7 +88,7 @@ export const UserImage = styled.div`
 export const UserID = styled.table`
   width: 100%;
   text-align: center;
-  margin 5vh 0;
+  margin: 5vh 0;
 
   .label {
     padding-right: 20px;
@@ -114,18 +114,18 @@ export const UserID = styled.table`
 `
 
 export const UserInfo = styled.table`
-width: 100%;
-text-align: center;
-margin 5vh 0;
+  width: 100%;
+  text-align: center;
+  margin: 5vh 0;
 
-.label {
-  padding-right: 20px;
-  white-space: nowrap;
+  .label {
+    padding-right: 20px;
+    white-space: nowrap;
 
-  font-family: "DungGeunMo";
-  font-size: 14px;
-  font-weight: medium;
-}
+    font-family: "DungGeunMo";
+    font-size: 14px;
+    font-weight: medium;
+  }
 
 input {
   width: 40vw;
@@ -248,7 +248,7 @@ export const DummyBtn = styled.div`
   width: 90px;
   height: 40px;
 
-  background-image: white
+  background-image: white;
   border: none;
 `
 

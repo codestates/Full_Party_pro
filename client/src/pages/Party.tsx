@@ -13,7 +13,9 @@ import PartyJoinModal from '../components/PartyJoinModal';
 import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
 
-import Map from '../components/Map';
+//[dev]
+import PartyMap from '../components/PartyMap';
+import ModulePartyMap from '../components/ModulePartyMap';
 import MemberList from '../components/MemberList';
 import QnA from '../components/QnA';
 
@@ -104,6 +106,12 @@ export const PartyContainer = styled.div`
         line-height: 2rem;
       }
     }
+
+    .mapDesc {
+      padding: 0 30px;
+      font-size: 0.8rem;
+      color: #777;
+    }
   }
 `;
 
@@ -160,6 +168,8 @@ export const FavAndTag = styled.section`
 
     margin: 0 2vw;
 
+    overflow-x: auto;
+
     .tag {
       max-width: 180px;
 
@@ -189,7 +199,6 @@ export const FavAndTag = styled.section`
 `;
 
 export const TimeandLocation = styled.section`
-  /* display: flex; */
   padding: 0 30px;
 
   color: #777;
@@ -292,7 +301,7 @@ export default function Party () {
     (state: AppState) => state.userReducer.isLoggedIn
   );
 
-  // [dev] 유저 모달 메시지 수정 권한을 위해 임시로 설정한 유저 아이디
+  // [dev] 유저 모달 메시지 수정 권한을 위해 임시로 설정한 유저 아이디, 나중에 리덕스에서 userId 불러오는 코드로 바꾸기
   const userId = 1;
 
   const { partyId, name, image, memberLimit, partyState, privateLink, content, region, startDate, endDate, favorite, tag, location, isOnline, isReviewed, leaderId, members, waitingQueue, comments } = dummyParty;
@@ -542,17 +551,32 @@ export default function Party () {
               <div className="icon"><FontAwesomeIcon icon={ faGlobe } /></div>
               {isMember? 
                 <a href={location}>{location}</a>
-              : "이 모임은 온라인으로 진행되는 모임입니다." }
+              : "이 퀘스트는 온라인으로 진행되는 퀘스트입니다." }
             </div>
           : null}
         </TimeandLocation>
 
         {/* 지도 */}
+        {/* {!isOnline? 
+          <div className="mapDesc">
+            <PartyMap
+              isMember={isMember}
+              location={location}
+              image={image}
+            />  
+            {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null}
+          </div> 
+        : null} */}
+
         {!isOnline? 
-          <Map
-            isMember={isMember}
-            location={location}
-          />
+          <div className="mapDesc">
+            <ModulePartyMap
+              isMember={isMember}
+              location={location}
+              image={image}
+            />  
+            {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null}
+          </div> 
         : null}
 
         {/* 파티원과 대기자 리스트 */}
@@ -589,7 +613,9 @@ export default function Party () {
 
         {/* 문의 게시판 */}
         <QnA 
+          partyId={partyId}
           isLeader={isLeader}
+          leaderId={leaderId}
           comments={comments}
         />
 
@@ -649,6 +675,7 @@ export default function Party () {
           userId={userId}
           leaderId={leaderId}
           isLeader={isLeader}
+          isMember={isMember}
           from={from}
           userInfo={userInfo}
         /> 
