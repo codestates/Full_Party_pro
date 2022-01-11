@@ -10,7 +10,16 @@ interface PartiesAttributes {
   startDate: Date;
   endDate: Date;
   partyState: number;
-  leaderId: object;
+  leaderId: {
+    type: any;
+    references: {
+      model: {
+        tableName: string;
+      };
+      key: string;
+    };
+    allowNull: boolean;
+  };
   isOnline: boolean;
   privateLink: string;
   region: string;
