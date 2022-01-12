@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "local-start": "nodemon --exec ts-node -T app.ts",
     "deploy-start": "ts-node app.ts",
-    "create-db": "ts-node ./migrations/create-db.ts",
-    "migrate-db": "ts-node ./migrations/create-table/*.ts"
+    "db:create": "ts-node ./migrations/create-db.ts",
+    "db:migrate": "ts-node ./migrations/create-table/*.ts"
   },
   "author": "",
   "license": "ISC",

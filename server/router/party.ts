@@ -1,19 +1,24 @@
 import express from "express";
 const router = express.Router();
-import { getPartyInfo, dismissParty, createSubcomment, createComment, deleteComment, deleteSubcomment, enqueue, dequeue, modifyMessage, approveMember, quitParty, fullParty, completeParty, reviewMembers } from "../controllers/party";
+import {
+  getPartyInfo, dismissParty, createSubComment, createComment, deleteComment, deleteSubComment, enqueue, 
+  dequeue, modifyMessage, approveMember, quitParty, fullParty, completeParty, reviewMembers, reParty, modifyPartyInfo
+} from "../controllers/party";
 
 router.get("/:partyId", getPartyInfo);
+router.patch("/edit/:partyId", modifyPartyInfo);
 router.delete("/:partyId", dismissParty);
-router.post("/:commentId/subcomment", createSubcomment);
+router.post("/:commentId/subComment", createSubComment);
 router.post("/:partyId/comment", createComment);
-router.delete("/:partyId/comment", deleteComment);
-router.delete("/subcomment/:subcommentId", deleteSubcomment);
+router.delete("/comment/:commentId", deleteComment);
+router.delete("/subComment/:subCommentId", deleteSubComment);
 router.post("/enqueued", enqueue);
 router.patch("/message", modifyMessage);
 router.post("/approval", approveMember);
-router.delete("/dequeued/:partyId/:userId", dequeue);
-router.delete("/quit/:partyId/:userId", quitParty);
+router.delete("/dequeued/:partyId/:action/:userId", dequeue);
+router.delete("/quit/:partyId/:action/:userId", quitParty);
 router.patch("/fullParty", fullParty);
+router.patch("/reparty", reParty);
 router.patch("/completed", completeParty);
 router.patch("/review", reviewMembers);
 

@@ -4,10 +4,13 @@ import sequelize from './index';
 export interface NotificationAttributes {
   id?: number;
   userId: number;
-  partyId: number;
+  partyId?: number;
   content: string;
   isRead: boolean;
-  userName: string;
+  userName?: string;
+  partyName?: string;
+  commentId?: number;
+  level?: number;
 };
 
 export class Notification extends Model<NotificationAttributes> {
@@ -17,6 +20,8 @@ export class Notification extends Model<NotificationAttributes> {
   public content!: string;
   public isRead!: boolean;
   public userName!: string;
+  public commentId!: number;
+  public level!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -44,12 +49,7 @@ Notification.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
-    onDelete: "CASCADE",
-    references: {
-      model: "parties",
-      key: "id"
-    },
-    allowNull: false
+    allowNull: true
   },
   content: {
     type: DataTypes.STRING,
@@ -61,6 +61,18 @@ Notification.init(
   },
   userName: {
     type: DataTypes.STRING,
+    allowNull: true
+  },
+  partyName: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  commentId: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  level: {
+    type: DataTypes.INTEGER,
     allowNull: true
   }
 },
