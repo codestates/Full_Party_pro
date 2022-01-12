@@ -2,10 +2,13 @@
   "name": "full_party_pro",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "local-start": "nodemon --exec ts-node -T app.ts",
+    "deploy-start": "ts-node app.ts",
+		"create-db": "ts-node ./migrations/create-db.ts",
+		"migrate-db": "ts-node ./migrations/create-table/*.ts"
   },
   "author": "",
   "license": "ISC",
@@ -21,9 +24,19 @@
     "jsonwebtoken": "^8.5.1",
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
-    "sequelize": "^7.0.0-alpha.4"
+    "sequelize": "^7.0.0-alpha.4",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
   },
   "devDependencies": {
+    "@types/bluebird": "^3.5.36",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/node": "^17.0.8",
+    "@types/sequelize": "^4.28.11",
+    "@types/validator": "^13.7.1",
+    "nodemon": "^2.0.15",
     "sequelize-cli": "^6.3.0"
   }
 }
