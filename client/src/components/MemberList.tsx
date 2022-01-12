@@ -56,7 +56,7 @@ export const MemberListContainer = styled.div`
       }
 
       .nameplate {
-        width: 80px;
+        width: 100px;
         font-size: 1rem;
       } 
     }

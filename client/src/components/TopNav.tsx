@@ -97,6 +97,10 @@ export default function TopNav () {
     (state: AppState) => state.userReducer.isLoggedIn
   );
 
+  const isBadgeOn = useSelector(
+    (state: AppState) => state.notifyReducer.isBadgeOn
+  );
+
   // const [isSearchBarOn, setIsSearchBarOn] = useState(true);
 
   return (
@@ -118,7 +122,7 @@ export default function TopNav () {
             to="/notification" 
             style={{ width: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#777', textDecoration: 'none' }}
           >
-            <div id="notification"></div>
+            {isBadgeOn ? <div id="notification" /> : null}
             <FontAwesomeIcon icon={ faBell } className="icon" />
           </Link>
         </div>

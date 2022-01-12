@@ -7,7 +7,7 @@ import { faFlag, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 import { AppState } from '../reducers';
 
-import DeleteModal from '../components/DeleteModal';
+import CommentDeleteModal from './CommentDeleteModal';
 
 export const QnAContainer = styled.section`
 
@@ -201,7 +201,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments }: Props) {
   const [isEditMode, setIsEditMode] = useState(false);
   const [newComment, setNewComment] = useState({comment: "", subcomment: ""});
 
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isCommentDeleteModalOpen, setIsCommentDeleteModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState({});
 
   function editHandler(event: React.MouseEvent<HTMLButtonElement>): void {
@@ -237,9 +237,9 @@ export default function QnA ({ partyId, isLeader, leaderId, comments }: Props) {
     console.log("서브코멘트를 등록합니다.");
   }
 
-  function deleteModalHandler(event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId:number): void {
+  function commentDeleteModalHandler(event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId:number): void {
     setCommentToDelete({ idx: idx, commentId: commentId })
-    setIsDeleteModalOpen(!isDeleteModalOpen);
+    setIsCommentDeleteModalOpen(!isCommentDeleteModalOpen);
   }
 
   if(comments.length <= 0){
@@ -305,7 +305,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments }: Props) {
                           {isLeader ?
                             <button
                               className="delete"
-                              onClick={(e) => deleteModalHandler(e, idx, subcomment.id)}
+                              onClick={(e) => commentDeleteModalHandler(e, idx, subcomment.id)}
                             >
                               <FontAwesomeIcon icon={ faTrashAlt } />
                             </button>
@@ -334,7 +334,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments }: Props) {
                           {subcomment.userId === userId ?
                             <button
                               className="delete"
-                              onClick={(e) => deleteModalHandler(e, idx, subcomment.id)}
+                              onClick={(e) => commentDeleteModalHandler(e, idx, subcomment.id)}
                             >
                               <FontAwesomeIcon icon={ faTrashAlt } />
                             </button>
@@ -366,9 +366,9 @@ export default function QnA ({ partyId, isLeader, leaderId, comments }: Props) {
         )}
       </Comments>
 
-      {isDeleteModalOpen? 
-        <DeleteModal 
-          deleteModalHandler={deleteModalHandler}
+      {isCommentDeleteModalOpen? 
+        <CommentDeleteModal 
+          commentDeleteModalHandler={commentDeleteModalHandler}
           commentToDelete={commentToDelete}
         /> 
       : null}

@@ -12,6 +12,7 @@ import UserInfoModal from '../components/UserInfoModal';
 import PartyJoinModal from '../components/PartyJoinModal';
 import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
+import PartyCancelModal from '../components/PartyCancelModal';
 
 import PartyMap from '../components/ModulePartyMap';
 import MemberList from '../components/MemberList';
@@ -37,80 +38,6 @@ export const PartyContainer = styled.div`
   .favorite {
     color: #fa3e7d;
   }
-
-  main {
-    
-    section {
-      margin-bottom: 10px;
-    }
-
-    header {
-      .thumbnail {
-        width: 100%;
-        max-height: 50vh;
-      }
-
-      .titleContainer {
-
-        width: 100%;
-
-        margin: 20px 0;
-        padding: 0 20px;
-
-        #partyState {
-          color: #777;
-          margin-bottom: 5px;
-        }
-
-        .titleAndChat {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-
-          font-size: 20pt;
-          font-weight: bold;
-
-          #title {
-            display: flex;
-            align-items: center;
-            white-space: pre-wrap;
-
-            width: 70vw;
-          }
-
-          .privateLink {
-            width: 50px;
-            height: 50px;
-
-            border: 1px solid #d5d5d5;
-            border-radius: 100%;
-            background-color: white;
-
-            font-size: 1.2rem;
-            color: #000;
-
-            margin: 0 2vw;
-          } 
-        }
-      }
-    }
-
-    .contentContainer {
-      border-top: 1px solid #d5d5d5;
-
-      .content {
-        padding: 30px 30px 10px 30px;
-        font-size: 1.2rem;
-        line-height: 2rem;
-      }
-    }
-
-    .mapDesc {
-      padding: 0 30px;
-      font-size: 0.8rem;
-      color: #777;
-    }
-  }
 `;
 
 export const CVBtns = styled.div`
@@ -118,6 +45,10 @@ export const CVBtns = styled.div`
 
   width: 100%;
   padding: 20px;
+
+  @media screen and (min-width: 1000px) {
+    width: 70%;
+  }
 
   .flexBox {
     display: flex;
@@ -140,6 +71,79 @@ export const CVBtns = styled.div`
     button {
       margin-left: 10px;
     }
+  }
+`
+
+export const Main = styled.section`
+  section {
+    margin-bottom: 10px;
+  }
+
+  header {
+    .thumbnail {
+      width: 100%;
+      max-height: 50vh;
+    }
+
+    .titleContainer {
+
+      width: 100%;
+
+      margin: 20px 0;
+      padding: 0 20px;
+
+      #partyState {
+        color: #777;
+        margin-bottom: 5px;
+      }
+
+      .titleAndChat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        font-size: 20pt;
+        font-weight: bold;
+
+        #title {
+          display: flex;
+          align-items: center;
+          white-space: pre-wrap;
+
+          width: 70vw;
+        }
+
+        .privateLink {
+          width: 50px;
+          height: 50px;
+
+          border: 1px solid #d5d5d5;
+          border-radius: 100%;
+          background-color: white;
+
+          font-size: 1.2rem;
+          color: #000;
+
+          margin: 0 2vw;
+        } 
+      }
+    }
+  }
+
+  .contentContainer {
+    border-top: 1px solid #d5d5d5;
+
+    .content {
+      padding: 30px 30px 10px 30px;
+      font-size: 1.2rem;
+      line-height: 2rem;
+    }
+  }
+
+  .mapDesc {
+    padding: 0 30px;
+    font-size: 0.8rem;
+    color: #777;
   }
 `
 
@@ -315,11 +319,21 @@ export default function Party () {
   const [isMember, setIsMember] = useState(true);
   const [isWaiting, setIsWaiting] = useState(false);
 
+  //[dev] 모달 관련 코드 객체 하나로 합쳐보기
+  // const [isModalOpen, setIsModalOpen] = useState({
+  //   userInfoModal: false,
+  //   partyJoinModal: false,
+  //   signinModal: false,
+  //   reviewModal: false,
+  //   partyCancelModal: false,
+  // })
+
   const [isWaitingListOpen, setIsWaitingListOpen] = useState(false);
   const [isUserInfoModalOpen, setIsUserInfoModalOpen] = useState(false);
   const [isPartyJoinModalOpen, setIsPartyJoinModalOpen] = useState(false);
   const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen]  = useState(false);
+  const [isPartyCancelModalOpen, setIsPartyCancelModalOpen]  = useState(false);
 
   const [from, setFrom] = useState("");
   const [userInfo, setUserInfo] = useState({});
@@ -358,8 +372,8 @@ export default function Party () {
         imageUrl: image,
         // [dev] url 파티 인덱스 포함한 path로 수정해야 합니다.
         link: {
-          mobileWebUrl: 'http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party',
-          webUrl: 'http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party',
+          mobileWebUrl: `http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party/${partyId}`,
+          webUrl: `http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party/${partyId}`,
         },
       },
       social: { 
@@ -380,11 +394,12 @@ export default function Party () {
   }
 
   function userInfoModalHandler(event: React.MouseEvent<HTMLDivElement>, from: string, listIdx: number): void {
+   
+    setFrom(from);
+  
     if(from === "members") {
-      setFrom("members");
       setUserInfo(members[listIdx]);
     } else {
-      setFrom("waitingQueue");
       setUserInfo(waitingQueue[listIdx]);
     }
     setIsUserInfoModalOpen(!isUserInfoModalOpen);
@@ -400,6 +415,11 @@ export default function Party () {
 
   function reviewModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
     setIsReviewModalOpen(!isReviewModalOpen);
+  }
+
+  function partyCancelModalHandler(event: React.MouseEvent<HTMLButtonElement>, from: string): void {
+    setFrom(from);
+    setIsPartyCancelModalOpen(!isPartyCancelModalOpen);
   }
 
   function cancelHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -461,7 +481,7 @@ export default function Party () {
         </div>
       </CVBtns>
 
-      <main>
+      <Main>
 
         {/* 썸네일과 타이틀, 채팅방 링크 */}
         <header>
@@ -624,12 +644,12 @@ export default function Party () {
 
           {/* 대기중 */}
           {isWaiting ? 
-            <button onClick={cancelHandler}>가입 신청 취소</button>
+            <button onClick={(e) => partyCancelModalHandler(e, "cancel")}>가입 신청 취소</button>
           : null}
 
           {/* 파티원 */}
           {!isLeader && isMember ? 
-            <button onClick={quitHandler}>파티 탈퇴</button> 
+            <button onClick={(e) => partyCancelModalHandler(e, "quit")}>파티 탈퇴</button> 
           : null}
 
           {/* 파티장 */}
@@ -639,13 +659,13 @@ export default function Party () {
             <button onClick={editHandler}>정보 수정</button> 
           : null}
           {isLeader && partyState === 0 && memberLimit > members.length ? 
-            <button onClick={fullPartyHandler}>모집 완료</button> 
+            <button onClick={(e) => partyCancelModalHandler(e, "fullParty")}>모집 완료</button> 
           : null}
           {isLeader && partyState === 1 && memberLimit > members.length ? 
             <button onClick={rePartyHandler}>모집 재개</button> 
           : null}
           {isLeader ? 
-            <button onClick={dismissHandler}>파티 해산</button>
+            <button onClick={(e) => partyCancelModalHandler(e, "dismiss")}>파티 해산</button>
           : null}
           {isLeader && ( partyState === 1 || memberLimit === members.length ) ? 
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
@@ -654,7 +674,7 @@ export default function Party () {
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
           : null}
         </PartyStateBtns>
-      </main>
+      </Main>
 
       {isUserInfoModalOpen? 
         <UserInfoModal 
@@ -679,6 +699,16 @@ export default function Party () {
           reviewModalHandler={reviewModalHandler}
           members={members.filter((member) => member.id !== userId)}
           leaderId={leaderId}
+        /> 
+      : null}
+      {isPartyCancelModalOpen? 
+        <PartyCancelModal 
+          from={from}
+          partyCancelModalHandler={partyCancelModalHandler}
+          cancelHandler={cancelHandler}
+          quitHandler={quitHandler}
+          fullPartyHandler={fullPartyHandler}
+          dismissHandler={dismissHandler}
         /> 
       : null}
       {isSigninModalOpen? <SigninModal signinModalHandler={signinModalHandler} /> : null}
