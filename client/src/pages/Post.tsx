@@ -11,12 +11,6 @@ import axios from 'axios';
 import { RootReducerType } from '../store/store'
 import userReducer from '../reducers/userReducer';
 
-declare global {
-  interface Window {
-    kakao: any;
-  }
-}
-
 export const PostContainer = styled.div`
   width: 100%;
   position: absolute;
@@ -181,11 +175,11 @@ export const PostCard = styled.div`
 `
 
 export const TagInput = styled.div`
-  margin 1.5vh 0.5vh;
+  margin: 1.5vh 0.5vh;
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
-  min-heihgt: 30px;
+  min-height: 30px;
   width: 95%;
   border-bottom: 1px solid #d5d5d5;
 
@@ -223,7 +217,7 @@ export const TagInput = styled.div`
   > .tag-input {
     flex: 1;
     border: none;
-    heigth: 46px;
+    height: 46px;
     font-size: 14px;
     padding: 4px 0 0 0;
     :focus {

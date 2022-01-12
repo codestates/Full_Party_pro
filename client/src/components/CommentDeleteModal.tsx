@@ -84,16 +84,16 @@ export const CloseBtn = styled.button`
 `
 
 type Props = {
-  deleteModalHandler: Function,
+  commentDeleteModalHandler: Function,
   commentToDelete: { [key: string] : number },
 }
 
-const DeleteModal = ({ deleteModalHandler, commentToDelete }: Props) => {
+const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete }: Props) => {
 
   const { idx, commentId } = commentToDelete;
 
   const closeModal =() => {
-    deleteModalHandler();
+    commentDeleteModalHandler();
   }
 
   function deleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -106,7 +106,7 @@ const DeleteModal = ({ deleteModalHandler, commentToDelete }: Props) => {
       console.log("대댓글을 삭제합니다.")
     }
 
-    deleteModalHandler();
+    commentDeleteModalHandler();
   }
 
   return(
@@ -129,4 +129,4 @@ const DeleteModal = ({ deleteModalHandler, commentToDelete }: Props) => {
   )
 }
 
-export default DeleteModal;
+export default CommentDeleteModal;
