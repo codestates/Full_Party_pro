@@ -3,8 +3,8 @@ import sequelize from './index';
 
 export interface WaitingQueueAttributes {
   id?: number;
-  userId: object;
-  partyId: object;
+  userId: number;
+  partyId: number;
   message: string;
 };
 
@@ -31,6 +31,7 @@ WaitingQueue.init(
   },
   userId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"
@@ -39,6 +40,7 @@ WaitingQueue.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "parties",
       key: "id"

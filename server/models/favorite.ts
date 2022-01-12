@@ -29,6 +29,7 @@ Favorite.init(
   },
   userId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"
@@ -37,6 +38,7 @@ Favorite.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "parties",
       key: "id",

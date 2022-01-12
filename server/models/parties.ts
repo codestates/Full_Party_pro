@@ -77,6 +77,7 @@ Parties.init(
   },
   leaderId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"

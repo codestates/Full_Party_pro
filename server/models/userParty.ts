@@ -3,8 +3,8 @@ import sequelize from './index';
 
 export interface UserPartyAttributes {
   id?: number;
-  userId: object;
-  partyId: object;
+  userId: number;
+  partyId: number;
   message: string;
   isReviewed: boolean;
 };
@@ -33,6 +33,7 @@ UserParty.init(
   },
   userId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"
@@ -41,6 +42,7 @@ UserParty.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "parties",
       key: "id"

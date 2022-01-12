@@ -3,10 +3,11 @@ import sequelize from './index';
 
 export interface NotificationAttributes {
   id?: number;
-  userId: object;
-  partyId: object;
+  userId: number;
+  partyId: number;
   content: string;
   isRead: boolean;
+  userName: string;
 };
 
 export class Notification extends Model<NotificationAttributes> {
@@ -15,6 +16,7 @@ export class Notification extends Model<NotificationAttributes> {
   public partyId!: number;
   public content!: string;
   public isRead!: boolean;
+  public userName!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -33,6 +35,7 @@ Notification.init(
   },
   userId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"
@@ -41,6 +44,7 @@ Notification.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "parties",
       key: "id"
@@ -54,6 +58,10 @@ Notification.init(
   isRead: {
     type: DataTypes.BOOLEAN,
     allowNull: false
+  },
+  userName: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
 },
 {

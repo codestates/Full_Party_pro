@@ -8,9 +8,25 @@ import { Tag, TagAttributes } from "../../models/tag";
 import { Comment, CommentAttributes } from "../../models/comment";
 import { SubComment, SubCommentAttributes } from "../../models/subComment";
 
-interface localParty extends Parties {
+interface LocalParty extends Parties {
   favorite?: boolean;
   members?: object[];
+};
+
+interface PartyInfo extends Parties {
+  favorite?: number;
+  tag?: Tag[];
+  members?: object[]
+};
+
+interface Comments extends Comment {
+  userName?: string;
+  profileImage?: string;
+};
+
+interface SubComments extends SubComment {
+  userName?: string;
+  profileImage?: string;
 };
 
 export const findUser = async (prop: object, attributes: string[] = [ "id" ]) => {
@@ -24,7 +40,7 @@ export const findUser = async (prop: object, attributes: string[] = [ "id" ]) =>
 export const createUser = async (userInfo: UsersAttributes) => {
   const user = await findUser({ email: userInfo.email });
   if (user) return false;
-  return await Users.create({ ...userInfo, exp: 10 });
+  return await Users.create({ ...userInfo, exp: 25, level: 1 });
 };
 
 export const checkFavorite = async (userId: number, partyId: number) => {
@@ -33,6 +49,14 @@ export const checkFavorite = async (userId: number, partyId: number) => {
     attributes: [ "id" ]
   });
   return favorite;
+};
+
+export const countFavorite = async (partyId: number) => {
+  const favorite = await Favorite.findAll({
+    where: { partyId },
+    raw: true
+  });
+  return favorite.length;
 };
 
 export const invertFavorite = async (userId: number, partyId: number) => {
@@ -72,7 +96,7 @@ export const getParticipatingParty = async (userId: number) => {
   return party;
 };
 
-export const getMembers = async (partyId: number) => {
+export const getMembers = async (partyId: number, attributes: string[] = [ "id", "profileImage" ]) => {
   const memberIdArr: UserParty[] = await UserParty.findAll({
     where: { partyId },
     attributes: [ "userId" ],
@@ -82,7 +106,8 @@ export const getMembers = async (partyId: number) => {
   for (let i = 0; i < memberIdArr.length; i++) {
     const member = await Users.findOne({
       where: { id: memberIdArr[i].userId },
-      attributes: [ "id", "profileImage" ]
+      attributes,
+      raw: true
     });
     members.push(member);
   }
@@ -106,8 +131,8 @@ export const getNotification = async (userId: number) => {
   return notifications;
 };
 
-export const getLocalParty = async (userId: number,region: string) => {
-  const partyList: localParty[] = await Parties.findAll({
+export const getLocalParty = async (userId: number, region: string) => {
+  const partyList: LocalParty[] = await Parties.findAll({
     where: { region, partyState: 0 },
     attributes: { exclude: [ "partyState", "isOnline", "privateLink", "region", "createdAt", "updatedAt" ] },
     raw: true
@@ -122,7 +147,125 @@ export const getLocalParty = async (userId: number,region: string) => {
   return localParties;
 };
 
-export const createNewParty = async (userId: number, partyInfo: PartiesAttributes) => {
+export const createTag = async (tag: Tag[], partyId: number) => {
+  for (let i = 0; i < tag.length; i++) {
+    await Tag.create({ name: String(tag[i]), partyId });
+  }
+};
+
+export const getTag = async (partyId: number) => {
+  const tagArr = await Tag.findAll({
+    where: { partyId },
+    attributes: [ "name" ],
+    raw: true
+  });
+  const tag = tagArr.map(item => item.name);
+  return tag;
+};
+
+export const createNewParty = async (userId: number, partyInfo: PartyInfo) => {
   const newParty = await Parties.create({ ...partyInfo, partyState: 0, leaderId: userId });
+  if (partyInfo.tag) await createTag(partyInfo.tag, newParty.id);
   return { partyId: newParty.id, location: newParty.location };
 };
+
+export const getMessageAndJoinDate = async (userId: number, partyId: number) => {
+  const messageAndJoinDate = await UserParty.findOne({
+    where: { userId, partyId },
+    attributes: [ "message", "createdAt" ],
+    raw: true
+  });
+  return messageAndJoinDate;
+};
+
+export const getPartyInformation = async (partyId: number) => {
+  const party: PartyInfo | null = await Parties.findOne({
+    where: { id: partyId },
+    attributes: { exclude: [ "createdAt", "updatedAt" ] },
+    raw: true
+  });
+  const favoriteCount = await countFavorite(partyId);
+  const tag = await getTag(partyId);
+  const members = await getMembers(partyId, [ "id", "userName", "profileImage", "exp" ]);
+  for (let i = 0; i < members.length; i++) {
+    const infoFromUserParty = await getMessageAndJoinDate(members[i].id, partyId);
+    members[i].message = infoFromUserParty?.message;
+    members[i].joinDate = infoFromUserParty?.createdAt;
+  }
+  const partyInfo = { ...party, favorite: favoriteCount, tag, members };
+  return partyInfo;
+};
+
+export const getSubComment = async (commentId: number) => {
+  const subComments: SubComments[] = await SubComment.findAll({
+    where: { commentId },
+    attributes: { exclude: [ "commentId", "updatedAt" ] },
+    raw: true
+  });
+  for (let i = 0; i < subComments.length; i++) {
+    const userInfo = await Users.findOne({
+      where: { id: subComments[i].userId },
+      attributes: [ "userName", "profileImage" ],
+      raw: true
+    });
+    subComments[i].userName = userInfo?.userName;
+    subComments[i].profileImage = userInfo?.profileImage;
+  }
+  return subComments;
+};
+
+export const getComment = async (partyId: number) => {
+  const comments: Comments[] = await Comment.findAll({
+    where: { partyId },
+    attributes: { exclude: [ "partyId", "updatedAt" ] },
+    raw: true
+  });
+  for (let i = 0; i < comments.length; i++) {
+    const userInfo = await Users.findOne({
+      where: { id: comments[i].userId },
+      attributes: [ "userName", "profileImage" ],
+      raw: true
+    });
+    comments[i].userName = userInfo?.userName;
+    comments[i].profileImage = userInfo?.profileImage;
+  }
+  return comments;
+};
+
+export const compileComments = async (partyId: number) => {
+  const completedComment = [];
+  const comments = await getComment(partyId);
+  for (let i = 0; i < comments.length; i++) {
+    const subComments = await getSubComment(comments[i].id);
+    completedComment[i] = { comment: { ...comments[i] }, subComments };
+  }
+  return completedComment;
+};
+
+export const createNotification = async (content: string, userId: number, partyId: number, userName: string = "") => {
+  await Notification.create({ userId, partyId, content, isRead: false, userName });
+};
+
+export const getLeaderId = async (partyId: number) => {
+  const leaderId = await Parties.findOne({
+    where: { id: partyId },
+    attributes: [ "leaderId" ],
+    raw: true
+  });
+  return leaderId?.leaderId;
+};
+
+export const createUserParty = async (userId: number, partyId: number, message: string) => {
+  const newUserParty = await WaitingQueue.create({ userId, partyId, message });
+  const leaderId = await getLeaderId(partyId);
+  const user = await findUser({ id: userId }, [ 'userName' ]);
+  if (leaderId) await createNotification("apply", leaderId, partyId, user?.userName);
+  return newUserParty;
+};
+
+// export const deleteParty = async (partyId: number) => {
+  
+//   await Parties.destroy({
+//     where: { id: partyId }
+//   });
+// };

@@ -1,9 +1,9 @@
 import express from "express";
 const router = express.Router();
-import { getPartyInfo, deleteParty, createSubcomment, createComment, deleteComment, deleteSubcomment, enqueue, dequeue, modifyMessage, approveMember, quitParty, fullParty, completeParty, reviewMembers } from "../controllers/party";
+import { getPartyInfo, dismissParty, createSubcomment, createComment, deleteComment, deleteSubcomment, enqueue, dequeue, modifyMessage, approveMember, quitParty, fullParty, completeParty, reviewMembers } from "../controllers/party";
 
 router.get("/:partyId", getPartyInfo);
-router.delete("/:partyId", deleteParty);
+router.delete("/:partyId", dismissParty);
 router.post("/:commentId/subcomment", createSubcomment);
 router.post("/:partyId/comment", createComment);
 router.delete("/:partyId/comment", deleteComment);

@@ -12,6 +12,7 @@ export interface UsersAttributes {
   email: string;
   region: string;
   exp: number;
+  level: number;
 };
 
 export class Users extends Model<UsersAttributes> {
@@ -25,6 +26,7 @@ export class Users extends Model<UsersAttributes> {
   public email!: string;
   public region!: string;
   public exp!: number;
+  public level!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -74,6 +76,10 @@ Users.init(
     allowNull: false
   },
   exp: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  level: {
     type: DataTypes.INTEGER,
     allowNull: false
   }

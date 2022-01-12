@@ -4,7 +4,7 @@ import sequelize from './index';
 export interface TagAttributes {
   id?: number;
   name: string;
-  partyId: object;
+  partyId: number;
 };
 
 export class Tag extends Model<TagAttributes> {
@@ -33,6 +33,7 @@ Tag.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "parties",
       key: "id"
