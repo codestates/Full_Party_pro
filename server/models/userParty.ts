@@ -1,15 +1,15 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface UserPartyAttributes {
-  id: number;
-  userId: object;
-  partyId: object;
+export interface UserPartyAttributes {
+  id?: number;
+  userId: number;
+  partyId: number;
   message: string;
   isReviewed: boolean;
 };
 
-export default class UserParty extends Model<UserPartyAttributes> {
+export class UserParty extends Model<UserPartyAttributes> {
   public readonly id!: number;
   public userId!: number;
   public partyId!: number;
@@ -33,6 +33,7 @@ UserParty.init(
   },
   userId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"
@@ -41,6 +42,7 @@ UserParty.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "parties",
       key: "id"

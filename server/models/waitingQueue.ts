@@ -1,14 +1,14 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface WaitingQueueAttributes {
-  id: number;
-  userId: object;
-  partyId: object;
+export interface WaitingQueueAttributes {
+  id?: number;
+  userId: number;
+  partyId: number;
   message: string;
 };
 
-export default class WaitingQueue extends Model<WaitingQueueAttributes> {
+export class WaitingQueue extends Model<WaitingQueueAttributes> {
   public readonly id!: number;
   public userId!: number;
   public partyId!: number;
@@ -31,6 +31,7 @@ WaitingQueue.init(
   },
   userId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"
@@ -39,6 +40,7 @@ WaitingQueue.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "parties",
       key: "id"

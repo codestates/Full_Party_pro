@@ -26,4 +26,4 @@ console.log(`======Create DataBase : ${dbName}======`);
 
 dbCreateSequelize.getQueryInterface().createDatabase(dbName)
   .then(() => console.log("✅ db create success!"))
-  .catch((error) => console.log("❗️error in create db : ", error))
+  .catch((error) => console.log("❗️ error in create db : ", error))

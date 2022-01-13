@@ -43,11 +43,13 @@ export default function Favorite () {
 
   if(!isLoggedIn){
     return <Navigate to="/" />
+  } else if(isLoading){
+    return <Loading />
   }
 
   if(favoriteList.length <= 0){
     //[dev] 없을 때 렌더링
-    return (<div>관심파티가 없어용</div>)
+    return (<div>관심파티가 없습니다.</div>)
   }
 
   return (

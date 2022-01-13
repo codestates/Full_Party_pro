@@ -1,8 +1,8 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface PartiesAttributes {
-  id: number;
+export interface PartiesAttributes {
+  id?: number;
   name: string;
   image: string;
   memberLimit: number;
@@ -17,7 +17,7 @@ interface PartiesAttributes {
   location: string;
 };
 
-export default class Parties extends Model<PartiesAttributes> {
+export class Parties extends Model<PartiesAttributes> {
   public readonly id!: number;
   public name!: string;
   public image!: string;
@@ -77,6 +77,7 @@ Parties.init(
   },
   leaderId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"
@@ -98,7 +99,7 @@ Parties.init(
   location: {
     type: DataTypes.STRING,
     allowNull: false
-  },
+  }
 },
 {
   modelName : 'Parties',
