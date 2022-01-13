@@ -76,7 +76,7 @@ export const invertFavorite = async (userId: number, partyId: number) => {
 export const getLeadingParty = async (userId: number) => {
   const leadingParty = await Parties.findAll({
     where: { leaderId: userId },
-    attributes: [ "id", "name", "image", "startDate", "endDate", "location" ]
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ]
   });
   return leadingParty;
 };
@@ -90,7 +90,7 @@ export const getParticipatingParty = async (userId: number) => {
   for (let i = 0; i < partyIdArr.length; i++) {
     party[i] = await Parties.findOne({
       where: { id: partyIdArr[i].partyId },
-      attributes: [ "id", "name", "image", "startDate", "endDate", "location" ]
+      attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ]
     });
   }
   return party;
@@ -137,15 +137,16 @@ export const checkIsRead = async (userId: number) => {
 export const getLocalParty = async (userId: number, region: string) => {
   const partyList: LocalParty[] = await Parties.findAll({
     where: { region, partyState: 0 },
-    attributes: { exclude: [ "partyState", "isOnline", "privateLink", "region", "createdAt", "updatedAt" ] },
+    attributes: { exclude: [ "partyState", "privateLink", "createdAt", "updatedAt" ] },
     raw: true
   });
   const localParties: any[] = [];
   for (let i = 0; i < partyList.length; i++) {
     const partyId = partyList[i].id;
     const members = await getMembers(partyId);
+    const tag = await getTag(partyId);
     if (await checkFavorite(userId, partyId)) localParties[i] = { ...partyList[i], favorite: true, members };
-    else localParties[i] = { ...partyList[i], favorite: false, members };
+    else localParties[i] = { ...partyList[i], favorite: false, members, tag };
   }
   return localParties;
 };

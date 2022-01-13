@@ -1,39 +1,84 @@
 import { Request, Response } from "express";
-import { internalServerError } from "./functions/utility";
+import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 
 export const getUserInfo = async (req: Request, res: Response) => {
-  return res.status(200).json({ message: "getUserInfo" });
+  try {
+    return SuccessfulResponse(res, { message: "" });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  }
 }
 
 export const withdrawUser = async (req: Request, res: Response) => {
-  return res.status(200).json({ message: "withdrawUser" });
+  try {
+    return SuccessfulResponse(res, { message: "" });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  }
 }
 
 export const getRecruitingParty = async (req: Request, res: Response) => {
-  return res.status(200).json({ message: "getRecruitingParty" });
+  try {
+    return SuccessfulResponse(res, { message: "" });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  }
 }
 
 export const getParticipatingParty = async (req: Request, res: Response) => {
-  return res.status(200).json({ message: "getParticipatingParty" });
+  try {
+    return SuccessfulResponse(res, { message: "" });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  }
 }
 
 export const getCompletedParty = async (req: Request, res: Response) => {
-  return res.status(200).json({ message: "getCompletedParty" });
+  try {
+    return SuccessfulResponse(res, { message: "" });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  }
 }
 
 export const getFavoriteParty = async (req: Request, res: Response) => {
-  return res.status(200).json({ message: "getFavoriteParty" });
+  try {
+    return SuccessfulResponse(res, { message: "" });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  }
 }
 
 export const getUserProfile = async (req: Request, res: Response) => {
-  return res.status(200).json({ message: "getUserProfile" });
+  try {
+    return SuccessfulResponse(res, { message: "" });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  }
 }
 
 export const verifyUser = async (req: Request, res: Response) => {
-  return res.status(200).json({ message: "verifyUser" });
+  try {
+    return SuccessfulResponse(res, { message: "" });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  }
 }
 
 export const modifyUserInfo = async (req: Request, res: Response) => {
-  return res.status(200).json({ message: "modifyUserInfo" });
+  try {
+    return SuccessfulResponse(res, { message: "" });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  }
 }

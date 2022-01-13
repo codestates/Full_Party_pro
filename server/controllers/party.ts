@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { internalServerError } from "./functions/utility";
+import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 import { 
   getPartyInformation, compileComments, createWaitingQueue, deleteWaitingQueue, createNotification, 
@@ -14,30 +14,29 @@ export const getPartyInfo = async (req: Request, res: Response) => {
     const { partyId } = req.params;
     const partyInfo = await getPartyInformation(Number(partyId));
     const comments = await compileComments(Number(partyId));
-    return res.status(200).json({ message: "Party Information Loaded", partyInfo, comments });
+    return SuccessfulResponse(res, { message: "Party Information Loaded", partyInfo, comments });
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
-// API: 바디에 파티 아이디 넣고 유저 아이디 뺴기
 export const modifyPartyInfo = async (req: Request, res: Response) => {
   try {
     const { partyId, partyInfo } = req.body;
     const updated = await updatePartyInformation(partyId, partyInfo);
     const editedPartyInfo = await getPartyInformation(partyId);
-    if (updated) return res.status(200).json({
+    if (updated) return SuccessfulResponse(res, {
       message: "Successfully Edited",
       partyInfo: {
         partyId: editedPartyInfo.id,
         location: editedPartyInfo.location
       }
     });
-    return res.status(400).json({ message: "Bad Request" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -45,11 +44,11 @@ export const enqueue = async (req: Request, res: Response) => {
   try {
     const { userId, partyId, message } = req.body;
     const created = await createWaitingQueue(userId, partyId, message);
-    if (created) return res.status(200).json({ message: "Enqueued Successfully" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (created) return SuccessfulResponse(res, { message: "Enqueued Successfully" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -66,11 +65,11 @@ export const dequeue = async (req: Request, res: Response) => {
       };
       await createNotification(notificationInfo);
     }
-    if (deleted) return res.status(200).json({ message: "Dequeued Successfully" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (deleted) return SuccessfulResponse(res, { message: "Dequeued Successfully" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -88,11 +87,11 @@ export const approveMember = async (req: Request, res: Response) => {
       isRead: false
     };
     await createNotification(notificationInfo);
-    if (created && deleted) return res.status(200).json({ message: "Accepted Successfully" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (created && deleted) return SuccessfulResponse(res, { message: "Accepted Successfully" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -100,11 +99,11 @@ export const dismissParty = async (req: Request, res: Response) => {
   try {
     const { partyId } = req.params;
     const deleted = await deleteParty(Number(partyId));
-    if (deleted) return res.status(200).json({ message: "Successfully Broke Up" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (deleted) return SuccessfulResponse(res, { message: "Successfully Broke Up" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -135,11 +134,11 @@ export const quitParty = async (req: Request, res: Response) => {
       };
       await createNotification(notificationInfo);
     }
-    if (deleted) return res.status(200).json({ message: "Quit Successfully" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (deleted) return SuccessfulResponse(res, { message: "Quit Successfully" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -147,11 +146,11 @@ export const fullParty = async (req: Request, res: Response) => {
   try {
     const { partyId } = req.body;
     const updated = await updatePartyState(partyId, 1);
-    if (updated) return res.status(200).json({ message: "FULL PARTY!" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (updated) return SuccessfulResponse(res, { message: "FULL PARTY!" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -159,11 +158,11 @@ export const reParty = async (req: Request, res: Response) => {
   try {
     const { partyId } = req.body;
     const updated = await updatePartyState(partyId, 0);
-    if (updated) return res.status(200).json({ message: "reparty..." });
-    return res.status(400).json({ message: "Bad Request" });
+    if (updated) return SuccessfulResponse(res, { message: "Recruiting Again" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -183,11 +182,11 @@ export const createComment = async (req: Request, res: Response) => {
       isRead: false,
     };
     await createNotification(notificationInfo);
-    if (comment) return res.status(200).json({ message: "Successfully Posted" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (comment) return SuccessfulResponse(res, { message: "Successfully Posted" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -222,11 +221,11 @@ export const createSubComment = async (req: Request, res: Response) => {
       };
       await createNotification(notificationInfo);
     }
-    if (subComment) return res.status(200).json({ message: "Successfully Posted" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (subComment) return SuccessfulResponse(res, { message: "Successfully Posted" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -234,11 +233,11 @@ export const deleteComment = async (req: Request, res: Response) => {
   try {
     const { commentId } = req.params;
     const deleted = await removeComment(Number(commentId));
-    if (deleted) return res.status(200).json({ message: "Successfully Deleted" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (deleted) return SuccessfulResponse(res, { message: "Successfully Deleted" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -246,11 +245,11 @@ export const deleteSubComment = async (req: Request, res: Response) => {
   try {
     const { subCommentId } = req.params;
     const deleted = await removeSubComment(Number(subCommentId));
-    if (deleted) return res.status(200).json({ message: "Successfully Deleted" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (deleted) return SuccessfulResponse(res, { message: "Successfully Deleted" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -258,11 +257,11 @@ export const modifyMessage = async (req: Request, res: Response) => {
   try {
     const { userId, partyId, message } = req.body;
     const updated = await updateUserParty(userId, partyId, false, message);
-    if (updated) return res.status(200).json({ message: "Message Edited" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (updated) return SuccessfulResponse(res, { message: "Message Edited" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -274,11 +273,11 @@ export const completeParty = async (req: Request, res: Response) => {
     const members = await getMembers(partyId, [ "id" ]);
     const memberIdArr = members.map((item): { userId: number } => ({ userId: item.id }));
     await createNotificationsAtOnce("complete", memberIdArr, partyId, "", party.name);
-    if (updated) return res.status(200).json({ message: "Quest Clear!" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (updated) return SuccessfulResponse(res, { message: "Quest Clear!" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -287,10 +286,10 @@ export const reviewMembers = async (req: Request, res: Response) => {
     const { partyId, userId, exp } = req.body;
     const updatedUserParty = await updateUserParty(userId, partyId, true);
     const updatedExp = await updateExpAtOnce(exp);
-    if (updatedUserParty && updatedExp) return res.status(200).json({ message: "Review Updated Successfully" });
-    return res.status(400).json({ message: "Bad Request" });
+    if (updatedUserParty && updatedExp) return SuccessfulResponse(res, { message: "Review Updated Successfully" });
+    return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };

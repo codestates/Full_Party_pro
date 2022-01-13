@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { internalServerError } from "./functions/utility";
+import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 import { createNotification, findUser, getPartyInformation, invertFavorite } from './functions/sequelize';
 import { NotificationAttributes } from "../models/notification";
@@ -20,11 +20,11 @@ export const handleFavorite = async (req: Request, res: Response) => {
         isRead: false
       };
       await createNotification(notificationInfo);
-      return res.status(200).json({ message: "Like selected" });
+      return SuccessfulResponse(res, { message: "Like selected" })
     }
-    else return res.status(200).json({ message: "Like canceled" });
+    else return FailedResponse(res, 200, "Like canceled");
   }
   catch (error) {
-    internalServerError(res, error);
+    return InternalServerError(res, error);
   }
 }
