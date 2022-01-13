@@ -3,14 +3,12 @@ import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquare, faCheckSquare } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 
 import Loading from '../components/Loading';
 import PartySlide from '../components/PartySlide';
-import QuestCard from '../components/QuestCard';
-import LocalMap from '../components/LocalMap';
+import LocalQuest from '../components/LocalQuest';
+import EmptyCard from '../components/EmptyCard';
 
 // [dev] 더미데이터: 서버 통신되면 삭제
 import dummyList from '../static/dummyList';
@@ -36,26 +34,6 @@ export const ListContainer = styled.div`
         display: flex;
         justify-content: center;
       }
-
-      .filter {
-        font-weight: normal;
-        font-size: 1rem;
-
-        display: flex;
-        margin-top: 10px;
-
-        .options {
-          margin-right: 10px;
-        }
-
-        input[type="checkbox"] {
-           display: none;
-        }
-
-        .icon {
-          margin-right: 8px;
-        }
-      }
     } 
   }
 `
@@ -69,30 +47,11 @@ export default function List () {
   const { myParty, localParty } = dummyList;
 
   const [isLoading, setIsLoading] = useState(true);
-  const [partyList, setPartyList] = useState(localParty.map(local => local).reverse());
-  const [checked, setChecked] = useState({ online: true, offline: true });
-
-  function checkboxHandler(event: React.ChangeEvent<HTMLInputElement>) {
-    if((checked.online || event.target.checked) && (checked.offline || event.target.checked)){
-      setChecked({ ...checked, [event.target.id]: event.target.checked });
-    }
-  }
 
   useEffect(() => {
-    // [dev]
-    // api call: 파티 정보 불러오기
+    // [dev] 서버통신
     setIsLoading(false);
   }, [])
-
-  useEffect(() => {
-    if(checked.online && checked.offline){
-      setPartyList(localParty.map(local => local).reverse());
-    } else if(checked.online){
-      setPartyList(localParty.filter(local => local.isOnline).reverse());
-    } else {
-      setPartyList(localParty.filter(local => !local.isOnline).reverse())
-    }
-  }, [checked])
 
   if(!isLoggedIn){
     return <Navigate to="/" />
@@ -102,61 +61,19 @@ export default function List () {
 
   return (
     <ListContainer>
-      <section className="listSection">
-        <header className="listHeader">
-          내 파티의 최근 소식
-        </header>
-        <main>
-          {myParty.length <= 0 ? 
-            "[dev] 파티 없을 때 렌더링 필요"
-          :  <PartySlide myParty={myParty} /> }
-        </main>
-      </section>
-      <section className="listSection">
-        <header className="listHeader">
-          내 주변의 퀘스트
-          <div className="filter">
-            <div className="options">
-              <input 
-                type="checkbox"
-                id="online"
-                checked={checked.online}
-                onChange={checkboxHandler}
-              /> 
-              <label htmlFor="online">
-                <FontAwesomeIcon 
-                  icon={ checked.online? faCheckSquare : faSquare } 
-                  style={{ color: "#50C9C3" }}
-                  className="icon"
-                />온라인 퀘스트
-              </label>
-            </div>
-            <div className="options">
-              <input 
-                type="checkbox" 
-                id="offline"
-                checked={checked.offline}
-                onChange={checkboxHandler}
-              /> 
-              <label htmlFor="offline">
-                <FontAwesomeIcon 
-                  icon={ checked.offline? faCheckSquare : faSquare } 
-                  style={{ color: "#50C9C3" }}
-                  className="icon"
-                />오프라인 퀘스트
-              </label> 
-            </div>
-          </div>
-        </header>
-        {checked.offline ? <LocalMap localParty={localParty.filter(local => !local.isOnline)} /> : null}
-        {/* [dev] 로컬 파티 없을 때 렌더링 */}
-        {localParty.length <= 0 ? 
-          "[dev] 파티 없을 때 렌더링 필요"
-        : <>
-            {partyList.map((party, idx) => <QuestCard key={idx} party={party} />)}
-          </>  
-        }
-      </section>
+      {myParty.length > 0 ?
+        <section className="listSection">
+          <header className="listHeader">
+            내 파티의 최근 소식
+          </header>
+          <main>
+            <PartySlide myParty={myParty} />
+          </main>
+        </section>
+      : null}
+      {localParty.length > 0 ?
+        <LocalQuest localParty={localParty} />
+        : <EmptyCard />}
     </ListContainer>
   );
 }

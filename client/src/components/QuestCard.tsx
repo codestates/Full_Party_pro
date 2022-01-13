@@ -27,11 +27,38 @@ export const QuestCardContainer = styled.div`
     font-family: 'silkScreenBold';
 
     margin-bottom: 10px;
+
+    .rightWrapper {
+      display: flex;
+
+      button.tag {
+        max-width: 100px;
+
+        height: 20px;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        background-color: #fff;
+        border: none;
+        color: #777;
+
+        margin: 0 2px;
+      }
+
+      @media screen and (max-width: 540px) {
+        button.tag {
+          max-width: 50px;
+        }
+      }
+    }
   }
 
   .favorite {
 
     margin: 0 5px;
+    margin-left: 5px;
 
     font-size: 1.2rem;
 
@@ -145,7 +172,7 @@ type Props = {
 
 export default function QuestCard ({ party }: Props) {
 
-  const { id, name, image, memberLimit, content, startDate, endDate, leaderId, favorite, isOnline, region, location, members } = party;
+  const { id, name, image, memberLimit, content, startDate, endDate, leaderId, favorite, tag, isOnline, region, location, members } = party;
 
   const navigate = useNavigate();
 
@@ -176,11 +203,23 @@ export default function QuestCard ({ party }: Props) {
         <div>
           Quest 
         </div>
-        <div onClick={(e) => favoriteHandler(e)}>
-          <FontAwesomeIcon 
-            icon={favorite ? faHeart : blankFaHeart} 
-            className="favorite" 
-          /> 
+        <div className="rightWrapper">
+          <div className="tagContainer">
+            { tag.map((t: string, idx: number) => 
+              <button 
+                key={idx} 
+                className="tag" 
+              >
+                #{t}
+              </button>
+            )}
+          </div>
+          <div onClick={(e) => favoriteHandler(e)}>
+            <FontAwesomeIcon 
+              icon={favorite ? faHeart : blankFaHeart} 
+              className="favorite" 
+            /> 
+          </div>  
         </div>
       </header>
 

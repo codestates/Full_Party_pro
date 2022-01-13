@@ -60,26 +60,30 @@ export const NotificationContainer = styled.div`
     .icon {
       font-size: 0.9rem;
       margin-right: 7px;
+
+      &.horn {
+        color: #b90e0a;
+      }
+
+      &.heart {
+        color: #fa3e7d;
+      }
+
+      &.level, &.star {
+        color: #f9c80a;
+      }
+
+      &.scroll {
+        color: #a1785c;
+      }
     }
 
-    .horn {
-      color: #b90e0a;
-    }
-
-    .heart {
-      color: #fa3e7d;
-    }
-
-    .level, .star {
-      color: #f9c80a;
-    }
-
-    .scroll {
-      color: #a1785c;
+    .content {
+      word-break: keep-all;
     }
 
     .time {
-      max-width: 50px;
+      min-width: 50px;
       text-align: right;
       font-size: 0.8rem;
       color: #777;
@@ -206,7 +210,7 @@ export default function Notification () {
                     <div className="partyNameContainer">
                       [<div className="partyName">{noti.partyName}</div>]
                     </div>
-                    <div>{noti.userName? noti.userName : null}{message[noti.content]}</div> 
+                    <div className="content">{noti.userName? noti.userName : null}{message[noti.content]}</div> 
                   </div> 
                 </div>
                 <div className="time">{timeForToday(noti.createdAt)}</div>
