@@ -148,7 +148,7 @@ export default function List () {
             </div>
           </div>
         </header>
-        {/* {checked.offline ? <LocalMap localParty={localParty.filter(local => !local.isOnline)} /> : null} */}
+        {checked.offline ? <LocalMap localParty={localParty.filter(local => !local.isOnline)} /> : null}
         {/* [dev] 로컬 파티 없을 때 렌더링 */}
         {localParty.length <= 0 ? 
           "[dev] 파티 없을 때 렌더링 필요"
