@@ -19,6 +19,7 @@ import initialize from './config/initialize';
 import { AppState } from './reducers';
 import SigninModal from './components/SigninModal';
 import SignupModal from './components/SignupModal';
+import { RootReducerType } from './store/store'
 
 declare global {
   interface Window {
@@ -39,6 +40,7 @@ export default function App() {
   );
 
   const { Kakao } = window;
+  const modalReducer = useSelector((state: RootReducerType) => state.modalReducer)
 
   useEffect(() => {
     if(!Kakao.isInitialized()){
@@ -50,9 +52,21 @@ export default function App() {
     <BrowserRouter>
       <div className="App">
         <main>
-          {/* <SigninModal signinModalHandler={signinModalHandler} /> */}
-          {/* <SignupModal /> */}
           <TopNav />
+          {(() => {
+            if(modalReducer.isModal) {
+              if(modalReducer.modalType === 'signin') {
+                return (
+                  <SigninModal signinModalHandler={signinModalHandler} />
+                )
+              }
+              else if(modalReducer.modalType === 'signup') {
+                return (
+                  <SignupModal />
+                )
+              }
+            }
+          })()}
           <section className="features">
             <Routes>
               <Fragment>
