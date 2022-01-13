@@ -22,7 +22,7 @@ export const getPartyList = async (req: Request, res: Response) => {
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};
 
 export const createParty = async (req: Request, res: Response) => {
   try {
@@ -33,4 +33,4 @@ export const createParty = async (req: Request, res: Response) => {
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};

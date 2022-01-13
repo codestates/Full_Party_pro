@@ -27,4 +27,14 @@ export const handleFavorite = async (req: Request, res: Response) => {
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};
+
+
+export const getFavoriteParty = async (req: Request, res: Response) => {
+  try {
+    return SuccessfulResponse(res, { message: "" });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  }
+};

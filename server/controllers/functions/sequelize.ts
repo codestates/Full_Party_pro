@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { Users, UsersAttributes } from "../../models/users";
 import { Parties, PartiesAttributes } from "../../models/parties";
 import { UserParty, UserPartyAttributes } from "../../models/userParty";
@@ -159,7 +160,7 @@ export const getLocalParty = async (userId: number, region: string) => {
     const partyId = partyList[i].id;
     const members = await getMembers(partyId);
     const tag = await getTag(partyId);
-    if (await checkFavorite(userId, partyId)) localParties[i] = { ...partyList[i], favorite: true, members };
+    if (await checkFavorite(userId, partyId)) localParties[i] = { ...partyList[i], favorite: true, members, tag };
     else localParties[i] = { ...partyList[i], favorite: false, members, tag };
   }
   return localParties;
@@ -417,9 +418,10 @@ export const getPartyId = async (commentId: number) => {
   return party?.partyId;
 };
 
-export const updateUserParty = async (userId: number, partyId: number, isReviewed: boolean, message: string = "6afdg46d5f") => {
+export const updateUserParty = async (userId: number, partyId: number, isReviewed: boolean,
+  message: string = "6a@#$fdaf@#gdsf$%af&*(;vj;*(sdlkfjkag46d5f") => {
   let updated: [number, UserParty[]];
-  if (message === "6afdg46d5f") {
+  if (message === "6a@#$fdaf@#gdsf$%af&*(;vj;*(sdlkfjkag46d5f") {
     updated = await UserParty.update({ isReviewed }, {
       where: { userId, partyId }
     });
@@ -478,18 +480,96 @@ export const updateExpAtOnce = async (exp: { userId: number, exp: number }[]) =>
   return true;
 };
 
-export const searchParties = async (key: string, hashTag: boolean, region: string) => {
-  // 해시태그 검색
+export const searchPartiesByTagName = async (tagName: string, region: string, userId: number) => {
   const tagResult = await Tag.findAll({
-    where: { name: key },
+    where: { 
+      name: {
+        [Op.like]: `%${tagName}%`
+      }
+    },
     attributes: [ "partyId" ],
     raw: true
   });
-  if (!hashTag) {
-    const keywordResult = await Parties.findAll({
-
-    });
+  const partyIdArr = tagResult.map(item => item.partyId);
+  const partyList = await Parties.findAll({
+    where: { id: partyIdArr, partyState: 0, region },
+    attributes: { exclude: [ "partyState", "isOnline", "privateLink", "createdAt", "updatedAt" ] },
+    raw: true
+  });
+  let searchResult = [];
+  for (let i = 0; i < partyList.length; i++) {
+    const partyId = partyList[i].id;
+    const members = await getMembers(partyId);
+    const tag = await getTag(partyId);
+    if (await checkFavorite(userId, partyId)) searchResult[i] = { ...partyList[i], favorite: true, members, tag };
+    else searchResult[i] = { ...partyList[i], favorite: false, members, tag };
   }
+  return searchResult;
 };
 
-// 검색할 때 리전과 로케이션을 어떻게 활용할 것인지 : 리전만 사용
+export const searchPartiesByKeyword = async (keyword: string, region: string, userId: number) => {
+  const tagResult = await searchPartiesByTagName(keyword, region, userId);
+  const tagResultPartyIdArr = tagResult.map(item => item.id);
+  const partyList = await Parties.findAll({
+    where: {
+      name: {
+        [Op.like]: `%${keyword}%`
+      },
+      id: {
+        [Op.notIn]: tagResultPartyIdArr
+      },
+      partyState: 0,
+      region
+    },
+    attributes: { exclude: [ "partyState", "isOnline", "privateLink", "createdAt", "updatedAt" ] },
+    raw: true
+  });
+  let keywordResult = [];
+  for (let i = 0; i < partyList.length; i++) {
+    const partyId = partyList[i].id;
+    const members = await getMembers(partyId);
+    const tag = await getTag(partyId);
+    if (await checkFavorite(userId, partyId)) keywordResult[i] = { ...partyList[i], favorite: true, members, tag };
+    else keywordResult[i] = { ...partyList[i], favorite: false, members, tag };
+  }
+  return [ ...keywordResult, ...tagResult ];
+};
+
+export const findLeadingParty = async (userId: number) => {
+  const leadingParty = await Parties.findAll({
+    where: { leaderId: userId, partyState: [ 0, 1 ] },
+    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    raw: true
+  });
+  return leadingParty;
+};
+
+export const findParticipatingParty = async (userId: number) => {
+  const partyIds = await UserParty.findAll({
+    where: { userId },
+    attributes: [ "partyId" ],
+    raw: true
+  });
+  const partyIdArr = partyIds.map(item => item.partyId);
+  const participatingParty = await Parties.findAll({
+    where: { id: partyIdArr, partyState: [ 0, 1 ] },
+    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    raw: true
+  });
+  return participatingParty;
+};
+
+export const findCompletedParty = async (userId: number) => {
+  const userParty = await UserParty.findAll({
+    where: { userId },
+    attributes: [ "partyId" ],
+    raw: true
+  });
+  let partyIdArr = userParty.map(item => item.partyId);
+  const completedParty = await Parties.findAll({
+    where: { [Op.or]: [ { leaderId: userId }, { id: partyIdArr } ], partyState: 2 },
+    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    raw: true
+  });
+  return completedParty;
+};

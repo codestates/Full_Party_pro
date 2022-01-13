@@ -1,7 +1,7 @@
 import { UsersAttributes } from './../models/users';
 import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { deleteUser, findUser, getNotification, updateUser } from "./functions/sequelize";
+import { deleteUser, findCompletedParty, findLeadingParty, findParticipatingParty, findUser, getNotification, updateUser } from "./functions/sequelize";
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 
 // API: 레벨 추가 필요
@@ -20,7 +20,7 @@ export const getUserInfo = async (req: Request, res: Response) => {
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};
 
 export const withdrawUser = async (req: Request, res: Response) => {
   try {
@@ -32,43 +32,41 @@ export const withdrawUser = async (req: Request, res: Response) => {
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};
 
+// 메세지가 빠져있음 아래 세 개
 export const getRecruitingParty = async (req: Request, res: Response) => {
   try {
-    return SuccessfulResponse(res, { message: "" });
+    const { userId } = req.params;
+    const myParty = await findLeadingParty(Number(userId));
+    return SuccessfulResponse(res, { message: "Loaded Successfully", myParty });
   }
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};
 
 export const getParticipatingParty = async (req: Request, res: Response) => {
   try {
-    return SuccessfulResponse(res, { message: "" });
+    const { userId } = req.params;
+    const myParty = await findParticipatingParty(Number(userId));
+    return SuccessfulResponse(res, { message: "Loaded Successfully", myParty });
   }
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};
 
 export const getCompletedParty = async (req: Request, res: Response) => {
   try {
-    return SuccessfulResponse(res, { message: "" });
+    const { userId } = req.params;
+    const myParty = await findCompletedParty(Number(userId));
+    return SuccessfulResponse(res, { message: "Loaded Successfully", myParty });
   }
   catch (error) {
     return InternalServerError(res, error);
   }
-}
-
-export const getFavoriteParty = async (req: Request, res: Response) => {
-  try {
-    return SuccessfulResponse(res, { message: "" });
-  }
-  catch (error) {
-    return InternalServerError(res, error);
-  }
-}
+};
 
 export const getUserProfile = async (req: Request, res: Response) => {
   try {
@@ -80,7 +78,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};
 
 // API: 바디에 id를 userId로
 export const verifyUser = async (req: Request, res: Response) => {
@@ -93,7 +91,7 @@ export const verifyUser = async (req: Request, res: Response) => {
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};
 
 // name ~ mobile
 // API: id -> userId
@@ -109,4 +107,4 @@ export const modifyUserInfo = async (req: Request, res: Response) => {
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};

@@ -12,4 +12,4 @@ export const getNotifications = async (req: Request, res: Response) => {
   catch (error) {
     return InternalServerError(res, error);
   }
-}
+};
