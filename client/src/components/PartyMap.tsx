@@ -1,6 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import styled from 'styled-components';
+
+import { Map, MapMarker, CustomOverlayMap, Circle } from 'react-kakao-maps-sdk';
 
 export const MapContainer = styled.section`
 
@@ -92,117 +94,84 @@ export default function PartyMap ({ isMember, location, image }: Props) {
 
   const { kakao } = window;
 
-  useEffect(() => {
-    const container = document.getElementById('map');
-    const options = {
-      center: new kakao.maps.LatLng(127.024761, 37.496562),
-      level: 4,
-    };
+  const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
+  const { lat, lng } = coords;
 
-    const map = new kakao.maps.Map(container, options);
+  const level = (isMember ? 4 : 5);
+  const zoomable = (isMember ? true : false);
+
+  useEffect(() => {
+
     const geocoder = new kakao.maps.services.Geocoder();
 
     geocoder.addressSearch(location, function(result: any, status: any) {
       if (status === kakao.maps.services.Status.OK) {
-        const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-        const { La, Ma } = coords;
-
-        const infoWindow = isMember ? ( 
-          '<div class="infoWindow">' +
-          `  <a href="https://map.kakao.com/link/map/퀘스트장소,${Ma.toFixed(6)},${La.toFixed(6)}" target="_blank">` +
-          '    <span class="title">퀘스트 장소</span>' +
-          '  </a>' +
-          '</div>' ) : (
-            '<div class="infoWindow">' +
-            `  <a href="javascript:void(0)">` +
-            '    <span class="title">퀘스트 장소</span>' +
-            '  </a>' +
-            '</div>'
-          )
-
-        if(isMember){
-
-          const imageSrc = 'img/mapMarker.png',    
-          imageSize = new kakao.maps.Size(50, 50),
-          imageOption = { offset: new kakao.maps.Point(24.15, 69) };
-            
-          const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
-
-          const marker = new kakao.maps.Marker({
-            map: map,
-            position: coords,
-            image: markerImage,
-          });
-
-          marker.setMap(map);
-
-          const partyImg = `<div class="partyImg" style="background: url(${image}); background-size: cover;">`;
-
-          const infoWindowOverlay = new kakao.maps.CustomOverlay({
-            map: map,
-            position: coords,
-            content: infoWindow,
-            yAnchor: 1 
-          });
-
-          const partyImgOverlay = new kakao.maps.CustomOverlay({
-            map: map,
-            position: coords,
-            content: partyImg,
-            yAnchor: 2.4
-          });
-
-          const mapCenter = new kakao.maps.LatLng(Ma + 0.001, La - 0.0001);
-
-          map.setCenter(mapCenter);
-
-        } else {
-
-          const circle = new kakao.maps.Circle({
-            center : coords,  // 원의 중심좌표 입니다 
-            radius: 800, // 미터 단위의 원의 반지름입니다 
-            strokeWeight: 1, // 선의 두께입니다 
-            strokeColor: '##50C9C3', // 선의 색깔입니다
-            strokeOpacity: 0.5, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-            fillColor: '#50C9C3', // 채우기 색깔입니다
-            fillOpacity: 0.4  // 채우기 불투명도 입니다   
-          }); 
-
-          circle.setMap(map); 
-
-          const infoWindowPosition = new kakao.maps.LatLng(Ma - 0.002, La - 0.0001);
-
-          const infoWindowOverlay = new kakao.maps.CustomOverlay({
-            map: map,
-            position: infoWindowPosition,
-            content: infoWindow,
-          });
-
-          const mapCenter = new kakao.maps.LatLng(Ma + 0.001, La - 0.0001);
-          map.setCenter(mapCenter);
-        }
-      } 
-    }); 
-
-    if(!isMember){
-      map.setLevel(5);
-      map.setZoomable(false);
-    }
-
-    kakao.maps.event.addListener(map, 'zoom_changed', function() {
-      const level = map.getLevel();
-      if( level > 6 ){
-        map.setLevel(6);
+        const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
+        const { La, Ma } = coordinates;
+        setCoords({ lat: Ma, lng: La });
       }
     });
-  }, [])
-    
+
+  }, [location]);
+
   return (
     <MapContainer>
-      <div id="map" style={{ 
-        minWidth: "90vw", 
-        height: "250px",
-      }} />
+      <Map
+        center={{ lat: lat + 0.001, lng: lng - 0.0001 }}
+        style={{ width: "100%", height: "250px" }}
+        level={level}
+        zoomable={zoomable}
+        onZoomChanged={(map) => map.setLevel(map.getLevel() > 7 ? 7 : map.getLevel())}
+      >
+        {isMember ?
+          <>
+            <MapMarker
+              position={coords}
+              image={{
+                src: "../img/mapMarker.png",
+                size: { width: 50, height: 50 },
+                options: { offset: { x: 24.15, y: 69 } },
+              }}
+            />
+            <CustomOverlayMap
+              position={coords}
+              yAnchor={2.4}
+            >
+              <div className="partyImg" style={{background: `url(${image})`, backgroundSize: "cover"}} />
+            </CustomOverlayMap>
+          </>
+        : 
+          <Circle
+            center={coords}
+            radius={800}
+            strokeWeight={1}
+            strokeColor={"#50C9C3"}
+            strokeOpacity={0.5}
+            fillColor={"#50C9C3"}
+            fillOpacity={0.4}
+          />
+        }
+        <CustomOverlayMap
+          position={isMember ? coords : { lat: lat - 0.002, lng: lng - 0.0001}}
+          yAnchor={1}
+        >
+          <div className="infoWindow">
+            {isMember ? 
+              <a
+                href={`https://map.kakao.com/link/map/퀘스트장소,${lat},${lng}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="title">퀘스트 장소</span>
+              </a>
+            : 
+              <a href="#" onClick={e => e.preventDefault()}>
+                <span className="title">퀘스트 장소</span>
+              </a>
+            }
+          </div>
+        </CustomOverlayMap>
+      </Map>
     </MapContainer>
   )
 }

@@ -60,8 +60,7 @@ export default function BottomNav () {
           <FontAwesomeIcon icon={ faPlusCircle } className="icon" /> 파티 개설
         </div>  
       </Link>
-      {/* [dev] 후에 관심파티 목록 리스트로 연결되도록 링크 수정 */}
-      <Link to="/party" style={{ textDecoration: 'none' }}>
+      <Link to="/favorite" style={{ textDecoration: 'none' }}>
         <div className="button">
           <FontAwesomeIcon icon={ faBookmark } className="icon" /> 관심 파티
         </div>  

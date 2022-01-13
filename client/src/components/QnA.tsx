@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
@@ -182,10 +182,11 @@ type Props = {
   partyId: number,
   isLeader: boolean,
   leaderId: number,
-  comments: Array<{ [key: string]: any }>
+  comments: Array<{ [key: string]: any }>,
+  findComment: number,
 };
 
-export default function QnA ({ partyId, isLeader, leaderId, comments }: Props) {
+export default function QnA ({ partyId, isLeader, leaderId, comments, findComment }: Props) {
 
   const isLoggedIn = useSelector(
     (state: AppState) => state.userReducer.isLoggedIn
@@ -241,6 +242,14 @@ export default function QnA ({ partyId, isLeader, leaderId, comments }: Props) {
     setCommentToDelete({ idx: idx, commentId: commentId })
     setIsCommentDeleteModalOpen(!isCommentDeleteModalOpen);
   }
+
+  useEffect(() => {
+    if(findComment >= 0){
+      const idx = comments.findIndex((comment) => comment.comment.id === findComment);
+      setCommentIdx(idx);
+      setIsCommentOpen(true);
+    }
+  }, [findComment])
 
   if(comments.length <= 0){
     return (

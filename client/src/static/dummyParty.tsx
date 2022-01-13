@@ -9,8 +9,8 @@ const dummyParty = {
     location: "경기도 수원시 장안구 정자동 111 101호",
     // location: "http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/",
     isOnline: false,
-    startDate: "2021-12-24",
-    endDate: "2021-12-25",
+    startDate: new Date('12/24/2021'),
+    endDate: new Date('12/25/2021'),
     favorite: 12,
     // [dev] 이 부분은 임시입니다.
     isFavorite: true,
