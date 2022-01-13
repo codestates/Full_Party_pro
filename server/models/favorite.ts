@@ -1,13 +1,13 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface FavoriteAttributes {
-  id: number;
-  userId: object;
-  partyId: object;
+export interface FavoriteAttributes {
+  id?: number;
+  userId: number;
+  partyId: number;
 };
 
-export default class Favorite extends Model<FavoriteAttributes> {
+export class Favorite extends Model<FavoriteAttributes> {
   public readonly id!: number;
   public userId!: number;
   public partyId!: number;
@@ -29,6 +29,7 @@ Favorite.init(
   },
   userId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"
@@ -37,6 +38,7 @@ Favorite.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "parties",
       key: "id",

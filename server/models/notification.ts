@@ -1,20 +1,27 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface NotificationAttributes {
-  id: number;
-  userId: object;
-  partyId: object;
+export interface NotificationAttributes {
+  id?: number;
+  userId: number;
+  partyId?: number;
   content: string;
   isRead: boolean;
+  userName?: string;
+  partyName?: string;
+  commentId?: number;
+  level?: number;
 };
 
-export default class Notification extends Model<NotificationAttributes> {
+export class Notification extends Model<NotificationAttributes> {
   public readonly id!: number;
   public userId!: number;
   public partyId!: number;
   public content!: string;
-  public isRead!: Boolean;
+  public isRead!: boolean;
+  public userName!: string;
+  public commentId!: number;
+  public level!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -33,6 +40,7 @@ Notification.init(
   },
   userId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"
@@ -41,11 +49,7 @@ Notification.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
-    references: {
-      model: "parties",
-      key: "id"
-    },
-    allowNull: false
+    allowNull: true
   },
   content: {
     type: DataTypes.STRING,
@@ -54,6 +58,22 @@ Notification.init(
   isRead: {
     type: DataTypes.BOOLEAN,
     allowNull: false
+  },
+  userName: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  partyName: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  commentId: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  level: {
+    type: DataTypes.INTEGER,
+    allowNull: true
   }
 },
 {

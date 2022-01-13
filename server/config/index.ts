@@ -6,7 +6,7 @@ const importer = (key: any, defaultValue: any = undefined) => {
   return value;
 }
 
-const index = {
+export default {
   database: {
     host: importer("DATABASE_HOST"),
     port: importer("DATABASE_PORT"),
@@ -15,7 +15,6 @@ const index = {
     name: importer("DATABASE_NAME"),
   },
   port: parseInt(importer("HTTPS_PORT", 8080), 10),
-  cors: { allowedOrigin: importer("CORS_ALLOW_ORIGIN") }
+  cors: { allowedOrigin: importer("CORS_ALLOW_ORIGIN") },
+  accessSecret: importer("ACCESS_SECRET")
 }
-
-export default index;
