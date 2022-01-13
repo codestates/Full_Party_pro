@@ -43,6 +43,20 @@ export const createUser = async (userInfo: UsersAttributes) => {
   return await Users.create({ ...userInfo, exp: 25, level: 1 });
 };
 
+export const updateUser = async (userId: number, userInfo: UsersAttributes) => {
+  const updated = await Users.update(userInfo, {
+    where: { id: userId }
+  });
+  return updated;
+};
+
+export const deleteUser = async (userId: number) => {
+  const deleted = await Users.destroy({
+    where: { id: userId }
+  });
+  return deleted;
+};
+
 export const checkFavorite = async (userId: number, partyId: number) => {
   const favorite = await Favorite.findOne({
     where: { userId, partyId },
@@ -463,3 +477,19 @@ export const updateExpAtOnce = async (exp: { userId: number, exp: number }[]) =>
   }
   return true;
 };
+
+export const searchParties = async (key: string, hashTag: boolean, region: string) => {
+  // 해시태그 검색
+  const tagResult = await Tag.findAll({
+    where: { name: key },
+    attributes: [ "partyId" ],
+    raw: true
+  });
+  if (!hashTag) {
+    const keywordResult = await Parties.findAll({
+
+    });
+  }
+};
+
+// 검색할 때 리전과 로케이션을 어떻게 활용할 것인지 : 리전만 사용
