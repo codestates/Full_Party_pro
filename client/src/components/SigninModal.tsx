@@ -7,6 +7,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
+import { modalChanger } from '../actions/modal';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -82,7 +83,7 @@ export const ModalView = styled.div`
     margin: 1.5vh 0;
   }
 
-  .toSignupHL {
+  .signupModalBtn {
     color: #56C596;
   }
 
@@ -125,10 +126,6 @@ const SigninModal = ({ signinModalHandler }: Props) => {
       [name]: value
     })
   }
-  
-  const closeModal =() => {
-    signinModalHandler();
-  }
 
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
 
@@ -136,11 +133,19 @@ const SigninModal = ({ signinModalHandler }: Props) => {
     dispatch(fetchUserdata(userInfo))
   }
 
+  const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    dispatch(modalChanger(e.currentTarget.className))
+  }
+
+  const signupModal = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+    dispatch(modalChanger(e.currentTarget.className))
+  }
+
   return(
     <ModalContainer>
       <ModalBackdrop>
         <ModalView>
-          <CloseBtn className='closeBtn' onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
+          <CloseBtn><div className='closeModalBtn' onClick={(e) => closeModal(e)}><FontAwesomeIcon icon={faTimes} /></div></CloseBtn>
           <div className='header'>
             <div>Sign in</div>
             <div>1st player</div>
@@ -166,20 +171,13 @@ const SigninModal = ({ signinModalHandler }: Props) => {
           {signinReducer.success === false ? <div className='notUser'>입력하신 아이디 혹은 비밀번호가 유효하지 않습니다</div> : <span />}
           <div className='footer'>
             <button className='signinBtn' onClick={handleSignin}>
-              Press Button
+              Press Start
             </button>
             <section className='toSignup'>
               아직 풀팟의 파티원이 아니세요?<br />
-              지금 바로 <span className='toSignupHL'>회원가입</span> 하세요 🥳
+              지금 바로 <span className='signupModalBtn' onClick={(e) => signupModal(e)}>회원가입</span> 하세요 🥳
             </section>
           </div>
-          <fieldset>
-            <div>리덕스 확인용</div>
-            <div>id: {signinReducer.userInfo?.id}</div>
-            <div>name: {signinReducer.userInfo?.name}</div>
-            <div>userImage: {signinReducer.userInfo?.userImage}</div>
-            <div>success: {String(signinReducer.success)}</div>
-          </fieldset>
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>

@@ -6,8 +6,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { faSadTear } from '@fortawesome/free-regular-svg-icons';
 import { Link, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
+import { RootReducerType } from '../store/store';
+import { searchParty } from '../actions/search';
 
 export const SearchContainer = styled.div`
   background-color: #fafafa;
@@ -21,6 +23,7 @@ export const SearchBar = styled.div`
   width: 100%;
   height: 9vh;
   display: flex;
+  margin: 0 auto;
 
   justify-content: center;
   align-items: center;
@@ -39,25 +42,13 @@ export const SearchBar = styled.div`
 
   .faSearch {
     position: absolute;
-    left: 85%;
+    left 86%;
 
     color: #888;
   }
-`
 
-export const RadioBox = styled.div`
-  color: #888;
-  position: absolute;
-  left: 12%;
-  bottom: 82%;
-
-  .radio {
-    margin: 5px;
-    color: black;
-  }
-
-  .txt {
-    margin-right: 10px;
+  @media screen and (min-width: 500px) {
+    width: 1280px;
   }
 `
 
@@ -65,8 +56,13 @@ export const SearchContent = styled.div`
   width: 100%;
   height: 100vh;
   display: flex;
+  margin: 0 auto;
 
   padding-top: 16px;
+
+  @media screen and (min-width: 500px) {
+    width: 1280px;
+  }
 `
 
 export const NoQuest = styled.div`
@@ -74,6 +70,7 @@ export const NoQuest = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
 
   align-items: center;
 
@@ -100,38 +97,21 @@ export const NoQuest = styled.div`
 `
 
 export default function Search () {
-
+  const dispatch = useDispatch()
   const [word, setWord] = useState('')
-  const [searchBy, setSearchBy] = useState('byName')
-  const [isQuest, setIsQuest] = useState(false)
+  const [isSearch, setIsSearch] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value)
   }
 
-  const searchQuest = () => {
-    console.log(searchBy)
-    if(searchBy === 'byName') {
-      axios.get(`http://localhost:3000/search?keyword=${word}`)
-      .then((res) => {
-        console.log(res.data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-    } else {
-      axios.get(`http://localhost:3000/search?tagName=${word}`)
-      .then((res) => {
-        console.log(res.data)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-    }
-  }
+  const searchReducer = useSelector((state: RootReducerType) => state.searchReducer)
+  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
+  const searchRegion = signinReducer.userInfo?.region
 
-  const handleSearchBy = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchBy(e.target.value)
+  const searchQuest = () => {
+    dispatch(searchParty(word, searchRegion))
+    setIsSearch(true)
   }
 
   const isLoggedIn = useSelector(
@@ -151,40 +131,38 @@ export default function Search () {
           onChange={(e) => handleInputChange(e)}
           placeholder='Search...'
         ></input>
-        <FontAwesomeIcon icon={faSearch} className='faSearch' onClick={searchQuest}/>
+        <div className='faSearch' onClick={searchQuest}>
+          <FontAwesomeIcon icon={faSearch} />
+        </div>
       </SearchBar>
-      <RadioBox>
-        <input
-          className='radio'
-          type='radio'
-          name='searchBy'
-          value='byName'
-          onChange={(e) => handleSearchBy(e)}
-          checked
-        />
-        <span className='txt'>이름으로 검색</span>
-        <input
-          className='radio'
-          type='radio' 
-          name='searchBy'
-          value='byTag'
-          onChange={(e) => handleSearchBy(e)}
-        />
-        <span className='txt'>태그로 검색</span>
-      </RadioBox>
       <SearchContent>
-        {isQuest ? <div>여기에 퀘스트카드 렌더링</div> :
-        <NoQuest>
-          <FontAwesomeIcon icon={faSadTear} className='faSadTear' />
-          <div className='noQuestMsg'>
-            <div>주변에 퀘스트가 없어요!</div>
-            <div>직접
-              <Link to='/post' style={{ textDecoration: 'none' }}>
-                <span className='makeQ'> 퀘스트</span>
-              </Link>
-              를 만들어 파티를 모집해 보세요!</div>
-          </div>
-        </NoQuest>}
+        {(() => {
+          if(!isSearch) {
+            return (
+              <div>검색안험</div>
+            )
+          }
+          else if(isSearch && searchReducer.parties.length !== 0) {
+            return(
+              <div>여기에 퀘스트카드 렌더링</div>
+            )
+          }
+          else if(isSearch && searchReducer.parties.length === 0) {
+            return(
+              <NoQuest>
+                <FontAwesomeIcon icon={faSadTear} className='faSadTear' />
+                <div className='noQuestMsg'>
+                  <div>주변에 퀘스트가 없어요!</div>
+                  <div>직접
+                    <Link to='/post' style={{ textDecoration: 'none' }}>
+                      <span className='makeQ'> 퀘스트</span>
+                    </Link>
+                    를 만들어 파티를 모집해 보세요!</div>
+                </div>
+              </NoQuest>
+            )
+          }
+        })()}
       </SearchContent>
     </SearchContainer>
   );

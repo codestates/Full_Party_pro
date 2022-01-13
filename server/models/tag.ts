@@ -1,13 +1,13 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface TagAttributes {
-  id: number;
+export interface TagAttributes {
+  id?: number;
   name: string;
-  partyId: object;
+  partyId: number;
 };
 
-export default class Tag extends Model<TagAttributes> {
+export class Tag extends Model<TagAttributes> {
   public readonly id!: number;
   public name!: string;
   public partyId!: number;
@@ -33,6 +33,7 @@ Tag.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "parties",
       key: "id"

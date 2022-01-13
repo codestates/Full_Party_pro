@@ -1,14 +1,14 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from './index';
 
-interface CommentAttributes {
-  id: number;
-  userId: object;
-  partyId: object;
+export interface CommentAttributes {
+  id?: number;
+  userId: number;
+  partyId: number;
   content: string;
 };
 
-export default class Comment extends Model<CommentAttributes> {
+export class Comment extends Model<CommentAttributes> {
   public readonly id!: number;
   public userId!: number;
   public partyId!: number;
@@ -31,6 +31,7 @@ Comment.init(
   },
   userId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "users",
       key: "id"
@@ -39,6 +40,7 @@ Comment.init(
   },
   partyId: {
     type: DataTypes.INTEGER,
+    onDelete: "CASCADE",
     references: {
       model: "parties",
       key: "id"
