@@ -314,7 +314,6 @@ export default function Mypage () {
 
   return (
     <MypageContainer>
-<<<<<<< HEAD
       <MypageHeader>
         <div className='profileImage'></div>
         {/* 이미지 연결이 되면 주석 풀어준 뒤 border는 없애주세요
@@ -583,9 +582,6 @@ export default function Mypage () {
           })()}
         </fieldset>
       </MypartyCards>
-=======
-      <div>마이페이지</div>
->>>>>>> 1b30b02dc9de3d61ef2aeadb6bc9314bbac1fad6
     </MypageContainer>
   );
 }

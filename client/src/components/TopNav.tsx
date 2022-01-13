@@ -99,16 +99,13 @@ export default function TopNav () {
     (state: AppState) => state.userReducer.isLoggedIn
   );
 
-<<<<<<< HEAD
-  const handleModal = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    dispatch(modalChanger(e.currentTarget.className))
-  }
-
-=======
   const isBadgeOn = useSelector(
     (state: AppState) => state.notifyReducer.isBadgeOn
   );
->>>>>>> 1b30b02dc9de3d61ef2aeadb6bc9314bbac1fad6
+
+  const handleModal = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    dispatch(modalChanger(e.currentTarget.className))
+  }
 
   // const [isSearchBarOn, setIsSearchBarOn] = useState(true);
 

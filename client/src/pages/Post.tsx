@@ -8,13 +8,14 @@ import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 
 import axios from 'axios';
-import Map from '../components/Map';
+// import Map from '../components/Map';
 import { RootReducerType } from '../store/store'
 import userReducer from '../reducers/userReducer';
 
 export const PostContainer = styled.div`
   width: 100%;
   position: absolute;
+  left: 0;
   background-color: #d5d5d5;
 
   z-index: 1000;
@@ -201,7 +202,7 @@ export const TagInput = styled.div`
       list-style: none;
       border-radius: 6px;
       margin: 0 8px 8px 0;
-      background: #4000x7;
+      background: #4000c7;
       > .tagIcon {
         display: block;
         width: 16px;
@@ -426,10 +427,10 @@ export default function Post () {
           </div>
           {isOnline === false ? 
           <div id='map' className='map'>
-            <Map
+            {/* <Map
               isMember={false}
               location={partyInfo.region}
-            />
+            /> */}
           </div>
           :
           <input 
