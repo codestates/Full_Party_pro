@@ -11,7 +11,7 @@ export const NavContainer = styled.nav`
   width: 100vw;
   height: 60px;
 
-  padding-left: 10px;
+  padding: 0 15px;
 
   position: fixed;
   left: 0;
@@ -26,7 +26,7 @@ export const NavContainer = styled.nav`
   overflow: hidden;
 
   #logo {
-    width: 130px;
+    margin-left: 5px;
 
     font-size: 1.5rem;
     font-weight: bold;
@@ -36,12 +36,10 @@ export const NavContainer = styled.nav`
   }
 
   .userMenu {
-    width: 120px;
-    height: 100%;
+    width: 100px;
     text-align: center;
     
     display: flex;
-    padding-right: 10px;
 
     color: #777;
     font-size: 12pt;
@@ -55,7 +53,7 @@ export const NavContainer = styled.nav`
       height: 10px;
 
       position: fixed;
-      right: 25px;
+      right: 27px;
       top: 17px;
       z-index: 950;
 

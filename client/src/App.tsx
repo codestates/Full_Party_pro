@@ -49,7 +49,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="App">
-        <main>
+        <main className="view">
           {/* <SigninModal signinModalHandler={signinModalHandler} /> */}
           {/* <SignupModal /> */}
           <TopNav />
@@ -58,7 +58,9 @@ export default function App() {
               <Fragment>
                 <Route path="/" element={<Home />} />
                 <Route path="/list" element={<List />} />
-                <Route path="/party" element={<Party />} />
+                <Route path="/party/:partyId" element={<Party />}>
+                  <Route path=":commentId" element={<Party />} />
+                </Route>
                 <Route path="/post" element={<Post />} /> 
                 <Route path="/search" element={<Search />} />
                 <Route path="/notification" element={<Notification />} />

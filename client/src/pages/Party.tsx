@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
@@ -14,7 +14,7 @@ import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
 import PartyCancelModal from '../components/PartyCancelModal';
 
-import PartyMap from '../components/ModulePartyMap';
+import PartyMap from '../components/PartyMap';
 import MemberList from '../components/MemberList';
 import QnA from '../components/QnA';
 
@@ -110,7 +110,7 @@ export const Main = styled.section`
           align-items: center;
           white-space: pre-wrap;
 
-          width: 70vw;
+          max-width: 80%;
         }
 
         .privateLink {
@@ -299,9 +299,15 @@ export const PartyStateBtns = styled.section`
 
 export default function Party () {
 
+  const params = useParams();
+  const navigate = useNavigate();
+  const commentRef = useRef<HTMLElement>(null);
+
   const isLoggedIn = useSelector(
     (state: AppState) => state.userReducer.isLoggedIn
   );
+
+  const { Kakao } = window;
 
   // [dev] 유저 모달 메시지 수정 권한을 위해 임시로 설정한 유저 아이디, 나중에 리덕스에서 userId 불러오는 코드로 바꾸기
   const userId = 1;
@@ -316,7 +322,7 @@ export default function Party () {
   const [isLoading, setIsLoading] = useState(true);
 
   const [isLeader, setIsLeader] = useState(true);
-  const [isMember, setIsMember] = useState(true);
+  const [isMember, setIsMember] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
 
   //[dev] 모달 관련 코드 객체 하나로 합쳐보기
@@ -337,17 +343,15 @@ export default function Party () {
 
   const [from, setFrom] = useState("");
   const [userInfo, setUserInfo] = useState({});
+  const [findComment, setFindComment] = useState(-1);
+  
+  function formatDate(timestamp: Date){
+    const date = timestamp.getDate();
+    const month = timestamp.getMonth() + 1;
+    const year = timestamp.getFullYear();
 
-  const navigate = useNavigate();
-
-  const { Kakao } = window;
-
-  useEffect(() => {
-    // [dev]
-    // api call: 파티 정보 불러오고, 리더, 멤버에 따라 상태 변경
-    // then => 로딩 상태 false로
-    setIsLoading(false);
-  }, [])
+    return year + "/" + month + "/" + date;
+  }
 
   function favoriteHandler(event: React.MouseEvent<HTMLButtonElement>) {
     // [dev] 서버 통신 후에는 setIsFavorite 삭제하기
@@ -385,8 +389,8 @@ export default function Party () {
   }
 
   function tagSearchHandler(tag: string) {
-    // [dev]
     console.log(tag + "를 검색합니다.");
+    navigate(`../search/${tag}`);
   }
 
   function waitingListHandler(event: React.MouseEvent<HTMLDivElement>): void {
@@ -452,6 +456,21 @@ export default function Party () {
     console.log("파티를 해산합니다.");
   }
 
+  useEffect(() => {
+    // [dev]
+    // params라는 변수에 파티 아이디가 저장되어있음.
+    // api call: params로 파티 정보 불러오고, 리더, 멤버에 따라 상태 변경
+    // then => 로딩 상태 false로
+    if(params.commentId){
+      setFindComment(Number(params.commentId));
+      if(commentRef.current){
+        commentRef.current.scrollIntoView();
+      }
+    }
+
+    setIsLoading(false);
+  }, [params])
+
   if(isLoading) {
     return <Loading />
   }
@@ -508,7 +527,7 @@ export default function Party () {
               <div id="title">{ name }</div>
               {isMember? 
                 <button className="privateLink">
-                  <a href={ privateLink } target="_blank" style={{ color: "#000" }}>
+                  <a href={ privateLink } target="_blank" rel="noreferrer" style={{ color: "#000" }}>
                     <FontAwesomeIcon icon={ faComments } className="icon" />
                   </a>
                 </button>
@@ -561,7 +580,7 @@ export default function Party () {
             </div>
             <div className="details">
               <div className="icon"><FontAwesomeIcon icon={ faCalendarAlt } /></div>
-              { startDate } ~ { endDate }
+              { formatDate(startDate) } ~ { formatDate(endDate) }
             </div>
           </div>
           {isOnline ?
@@ -619,13 +638,16 @@ export default function Party () {
         : null}
 
         {/* 문의 게시판 */}
-        <QnA 
-          partyId={partyId}
-          isLeader={isLeader}
-          leaderId={leaderId}
-          comments={comments}
-        />
-
+        <section id="qna" ref={commentRef}>
+          <QnA 
+            partyId={partyId}
+            isLeader={isLeader}
+            leaderId={leaderId}
+            comments={comments}
+            findComment={findComment}
+          /> 
+        </section>
+        
         <PartyStateBtns>
           {/* 비로그인 상태 */}
           {!isLoggedIn ?

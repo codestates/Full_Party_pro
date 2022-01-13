@@ -110,6 +110,7 @@ export default function Notification () {
     "accept": "파티 가입이 승인됐습니다.",
     "deny": "파티 가입이 거절됐습니다.",
     "expel": "파티에서 추방당했습니다.",
+    "quit": "님이 파티에서 탈퇴했습니다.",
     "favorite": "님이 퀘스트에 관심을 보입니다.",
     "complete": "퀘스트를 클리어했습니다!",
     "fullparty": "파티원 모집이 완료됐습니다. 퀘스트를 진행해보세요!",
@@ -117,6 +118,7 @@ export default function Notification () {
     "dismiss": "파티가 해산됐습니다.",
     "question": "님의 퀘스트 문의가 도착했습니다.",
     "answer": "퀘스트 문의에 대한 답변이 도착했습니다.",
+    "reply": "님의 답변에 대한 재문의가 도착했습니다.",
     "levelup": "로 레벨이 올랐습니다!"
   };
 
@@ -152,6 +154,25 @@ export default function Notification () {
     return <Navigate to="/" />
   }
 
+  if(notification.length <= 0){
+    return (<NotificationContainer>
+      <div className="notificationList">
+        <div className="contentWrapper">
+          <div className="iconContainer">
+            <FontAwesomeIcon icon={ faScroll } className="icon scroll" />
+          </div>
+          <div className="titleContainer">
+            <div className="partyNameContainer">
+              <div>아직 메시지가 없습니다.</div>
+            </div>
+            <div>주변의 퀘스트를 둘러보고 파티에 참여해보세요!</div> 
+          </div> 
+        </div>
+        <div className="time">{timeForToday(new Date())}</div>
+      </div>
+    </NotificationContainer>)
+  }
+
   return (
     <NotificationContainer>
       {notification.map((noti, idx) => {
@@ -170,14 +191,14 @@ export default function Notification () {
         } else {
           return (
             //[dev] 파티 아이디로 링크 연결해야함
-            <Link to="/party" style={{ textDecoration: 'none' }} key={idx}>
+            <Link to={`/party/${noti.partyId}${noti.commentId ? `/${noti.commentId}` : ""}`} style={{ textDecoration: 'none' }} key={idx}>
               <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
                 <div className="contentWrapper">
                   <div className="iconContainer">
                     {noti.content === "favorite" ? <FontAwesomeIcon icon={ faHeart } className="icon heart" /> : null}
                     {noti.content === "complete" ? <FontAwesomeIcon icon={ faStar } className="icon star" /> : null }
-                    {noti.content === "question" || noti.content === "answer" ? <FontAwesomeIcon icon={ faScroll } className="icon scroll" /> : null }
-                    {noti.content !== "favorite" && noti.content !== "complete" && noti.content !== "question" && noti.content !== "answer" ? 
+                    {noti.content === "question" || noti.content === "answer"|| noti.content === "reply" ? <FontAwesomeIcon icon={ faScroll } className="icon scroll" /> : null }
+                    {noti.content !== "favorite" && noti.content !== "complete" && noti.content !== "question" && noti.content !== "answer" && noti.content !== "reply" ?  
                       <FontAwesomeIcon icon={ faBullhorn } className="icon horn" /> 
                     : null}
                   </div>
