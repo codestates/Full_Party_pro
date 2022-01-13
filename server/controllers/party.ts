@@ -269,10 +269,6 @@ export const completeParty = async (req: Request, res: Response) => {
   try {
     const { partyId } = req.body;
     const updated = await updatePartyState(partyId, 2);
-    const party = await getPartyInformation(partyId);
-    const members = await getMembers(partyId, [ "id" ]);
-    const memberIdArr = members.map((item): { userId: number } => ({ userId: item.id }));
-    await createNotificationsAtOnce("complete", memberIdArr, partyId, "", party.name);
     if (updated) return SuccessfulResponse(res, { message: "Quest Clear!" });
     return FailedResponse(res, 400, "Bad Request");
   }

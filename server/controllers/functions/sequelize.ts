@@ -374,8 +374,11 @@ export const updatePartyState = async (partyId: number, partyState: number) => {
     where: { id: partyId }
   });
   let notificationContent;
-  if (partyState === 1) notificationContent = "fullparty";
-  else if (partyState === 0) notificationContent = "reparty";
+  switch (partyState) {
+    case 0: notificationContent = "reparty"; break;
+    case 1: notificationContent = "fullparty"; break;
+    case 2: notificationContent = "complete"; break;
+  }
   const party = await getPartyInformation(partyId);
   const relatedUsers = await getRelatedUsers(partyId);
   await createNotificationsAtOnce(String(notificationContent), relatedUsers, partyId, "", party?.name);
