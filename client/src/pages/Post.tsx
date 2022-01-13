@@ -8,6 +8,7 @@ import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 
 import axios from 'axios';
+import Map from '../components/Map';
 import { RootReducerType } from '../store/store'
 import userReducer from '../reducers/userReducer';
 
@@ -316,15 +317,15 @@ export default function Post () {
     }))
   }
 
-  useEffect(() => {
-    let container = document.getElementById('map');
-    let options = {
-      center: new window.kakao.maps.LatLng(33.450701, 126.570667),
-      level: 3
-    };
+  // useEffect(() => {
+  //   let container = document.getElementById('map');
+  //   let options = {
+  //     center: new window.kakao.maps.LatLng(33.450701, 126.570667),
+  //     level: 3
+  //   };
 
-    let map = new window.kakao.maps.Map(container, options);
-  },[isOnline])
+  //   let map = new window.kakao.maps.Map(container, options);
+  // },[isOnline])
 
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
 
@@ -429,18 +430,20 @@ export default function Post () {
             <span className={isOnline === true ? 'isOnline' : 'isOnline unFocus'} onClick={(e) => {handleIsOnline(e)}}>직접 입력</span>
           </div>
           </div>
-          {isOnline === false ?
-          <div id='map' className='map'></div>
+          {isOnline === false ? 
+          <div id='map' className='map'>
+            <Map
+              isMember={false}
+              location={partyInfo.region}
+            />
+          </div>
           :
-          <fieldset>
           <input 
             name='region'
             type='text'
             value={partyInfo.region}
             onChange={(e) => {handleInputChange(e)}}
           />
-          <div id='map' className='hidden'></div>
-          </fieldset>
           }
         </fieldset>
         <fieldset>

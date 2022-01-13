@@ -4,6 +4,10 @@ import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { RootReducerType } from '../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserdata } from '../actions/signin';
+import { modalChanger } from '../actions/modal';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -253,6 +257,7 @@ export const DummyBtn = styled.div`
 `
 
 const SignupModal = () => {
+  const dispatch = useDispatch()
   const [userInfo, setUserInfo] = useState({
     profileImage: '',
     email: '',
@@ -439,10 +444,6 @@ const SignupModal = () => {
     }
   }
 
-  const closeModal = () => {
-    console.log('모달창이 닫힌다네')
-  }
-
   const handleIdxPlus = () => {
     if(index < 4) {
       setIndex(index + 1)
@@ -454,11 +455,15 @@ const SignupModal = () => {
     }
   }
 
+  const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    dispatch(modalChanger(e.currentTarget.className))
+  }
+
   return(
     <ModalContainer>
       <ModalBackdrop>
         <ModalView>
-          <CloseBtn className='closeBtn' onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
+          <CloseBtn><div className='closeModalBtn' onClick={(e) => closeModal(e)}><FontAwesomeIcon icon={faTimes} /></div></CloseBtn>
           <div className='header'>
             <div>Sign Up</div>
           </div>
