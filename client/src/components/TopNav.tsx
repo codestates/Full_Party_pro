@@ -1,17 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 
+import { RootReducerType } from '../store/store';
+import { modalChanger } from '../actions/modal';
+
 export const NavContainer = styled.nav`
   width: 100vw;
   height: 60px;
 
-  padding-left: 10px;
+  padding: 0 15px;
 
   position: fixed;
   left: 0;
@@ -26,7 +29,7 @@ export const NavContainer = styled.nav`
   overflow: hidden;
 
   #logo {
-    width: 130px;
+    margin-left: 5px;
 
     font-size: 1.5rem;
     font-weight: bold;
@@ -36,12 +39,10 @@ export const NavContainer = styled.nav`
   }
 
   .userMenu {
-    width: 120px;
-    height: 100%;
+    width: 100px;
     text-align: center;
     
     display: flex;
-    padding-right: 10px;
 
     color: #777;
     font-size: 12pt;
@@ -55,7 +56,7 @@ export const NavContainer = styled.nav`
       height: 10px;
 
       position: fixed;
-      right: 25px;
+      right: 27px;
       top: 17px;
       z-index: 950;
 
@@ -92,10 +93,19 @@ export const NavContainer = styled.nav`
 `;
 
 export default function TopNav () {
+  const dispatch = useDispatch()
 
   const isLoggedIn = useSelector(
     (state: AppState) => state.userReducer.isLoggedIn
   );
+
+  const isBadgeOn = useSelector(
+    (state: AppState) => state.notifyReducer.isBadgeOn
+  );
+
+  const handleModal = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    dispatch(modalChanger(e.currentTarget.className))
+  }
 
   // const [isSearchBarOn, setIsSearchBarOn] = useState(true);
 
@@ -118,13 +128,13 @@ export default function TopNav () {
             to="/notification" 
             style={{ width: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#777', textDecoration: 'none' }}
           >
-            <div id="notification"></div>
+            {isBadgeOn ? <div id="notification" /> : null}
             <FontAwesomeIcon icon={ faBell } className="icon" />
           </Link>
         </div>
       : <div className="menu">
-          <button>로그인</button>
-          <button>회원가입</button>
+          <button className='signinModalBtn' onClick={(e) => handleModal(e)}>로그인</button>
+          <button className='signupModalBtn' onClick={(e) => handleModal(e)}>회원가입</button>
         </div> 
       }
     </NavContainer>

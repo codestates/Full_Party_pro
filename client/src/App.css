@@ -6,3 +6,9 @@
   
   transition: all 0.2s ease;
 }
+
+@media screen and (min-width: 1000px) {
+  main.view {
+    padding: 0 15%;
+  }
+}

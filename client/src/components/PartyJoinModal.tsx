@@ -109,7 +109,7 @@ const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
 
   function joinHandler(event: React.MouseEvent<HTMLButtonElement>) {
     // [dev] message, userId, partyId 서버로 전송
-    console.log(message);
+    console.log(message, userId, partyId);
     console.log("가입을 신청합니다.");
   }
 

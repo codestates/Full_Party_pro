@@ -9,8 +9,8 @@ const dummyParty = {
     location: "경기도 수원시 장안구 정자동 111 101호",
     // location: "http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/",
     isOnline: false,
-    startDate: "2021-12-24",
-    endDate: "2021-12-25",
+    startDate: new Date('12/24/2021'),
+    endDate: new Date('12/25/2021'),
     favorite: 12,
     // [dev] 이 부분은 임시입니다.
     isFavorite: true,
@@ -101,21 +101,21 @@ const dummyParty = {
         isReviewed: false,
       }
     ],
-    // waitingQueue: [ {
-    //     id: 11,
-    //     name: "주디",
-    //     profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/3/32/Pompom_NH.png",
-    //     level: 3,
-    //     message: "주딘데요",
-    //   }, {
-    //     id: 12,
-    //     name: "아잠만",
-    //     profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/6/66/Weber_NH.png",
-    //     level: 0,
-    //     message: "잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만",
-    //   }
-    // ],
-    waitingQueue: [],
+    waitingQueue: [ {
+        id: 11,
+        name: "주디",
+        profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/3/32/Pompom_NH.png",
+        level: 3,
+        message: "주딘데요",
+      }, {
+        id: 12,
+        name: "아잠만",
+        profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/6/66/Weber_NH.png",
+        level: 0,
+        message: "잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만잠깐만",
+      }
+    ],
+    // waitingQueue: [],
     // comments: [],
     comments: [
       {
@@ -142,7 +142,7 @@ const dummyParty = {
             userName: "앤",
             profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/9/93/Maelle_NH.png",
             content: "인원이 많아져도 같나요?",
-            createdAt: "2021-12-19"
+            createdAt: "2021-12-25"
           },
         ]
       },

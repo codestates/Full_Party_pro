@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
@@ -12,10 +12,9 @@ import UserInfoModal from '../components/UserInfoModal';
 import PartyJoinModal from '../components/PartyJoinModal';
 import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
+import PartyCancelModal from '../components/PartyCancelModal';
 
-//[dev]
 import PartyMap from '../components/PartyMap';
-import ModulePartyMap from '../components/ModulePartyMap';
 import MemberList from '../components/MemberList';
 import QnA from '../components/QnA';
 
@@ -39,80 +38,6 @@ export const PartyContainer = styled.div`
   .favorite {
     color: #fa3e7d;
   }
-
-  main {
-    
-    section {
-      margin-bottom: 10px;
-    }
-
-    header {
-      .thumbnail {
-        width: 100%;
-        max-height: 50vh;
-      }
-
-      .titleContainer {
-
-        width: 100%;
-
-        margin: 20px 0;
-        padding: 0 20px;
-
-        #partyState {
-          color: #777;
-          margin-bottom: 5px;
-        }
-
-        .titleAndChat {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-
-          font-size: 20pt;
-          font-weight: bold;
-
-          #title {
-            display: flex;
-            align-items: center;
-            white-space: pre-wrap;
-
-            width: 70vw;
-          }
-
-          .privateLink {
-            width: 50px;
-            height: 50px;
-
-            border: 1px solid #d5d5d5;
-            border-radius: 100%;
-            background-color: white;
-
-            font-size: 1.2rem;
-            color: #000;
-
-            margin: 0 2vw;
-          } 
-        }
-      }
-    }
-
-    .contentContainer {
-      border-top: 1px solid #d5d5d5;
-
-      .content {
-        padding: 30px 30px 10px 30px;
-        font-size: 1.2rem;
-        line-height: 2rem;
-      }
-    }
-
-    .mapDesc {
-      padding: 0 30px;
-      font-size: 0.8rem;
-      color: #777;
-    }
-  }
 `;
 
 export const CVBtns = styled.div`
@@ -120,6 +45,10 @@ export const CVBtns = styled.div`
 
   width: 100%;
   padding: 20px;
+
+  @media screen and (min-width: 1000px) {
+    width: 70%;
+  }
 
   .flexBox {
     display: flex;
@@ -142,6 +71,79 @@ export const CVBtns = styled.div`
     button {
       margin-left: 10px;
     }
+  }
+`
+
+export const Main = styled.section`
+  section {
+    margin-bottom: 10px;
+  }
+
+  header {
+    .thumbnail {
+      width: 100%;
+      max-height: 50vh;
+    }
+
+    .titleContainer {
+
+      width: 100%;
+
+      margin: 20px 0;
+      padding: 0 20px;
+
+      #partyState {
+        color: #777;
+        margin-bottom: 5px;
+      }
+
+      .titleAndChat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        font-size: 20pt;
+        font-weight: bold;
+
+        #title {
+          display: flex;
+          align-items: center;
+          white-space: pre-wrap;
+
+          max-width: 80%;
+        }
+
+        .privateLink {
+          width: 50px;
+          height: 50px;
+
+          border: 1px solid #d5d5d5;
+          border-radius: 100%;
+          background-color: white;
+
+          font-size: 1.2rem;
+          color: #000;
+
+          margin: 0 2vw;
+        } 
+      }
+    }
+  }
+
+  .contentContainer {
+    border-top: 1px solid #d5d5d5;
+
+    .content {
+      padding: 30px 30px 10px 30px;
+      font-size: 1.2rem;
+      line-height: 2rem;
+    }
+  }
+
+  .mapDesc {
+    padding: 0 30px;
+    font-size: 0.8rem;
+    color: #777;
   }
 `
 
@@ -297,9 +299,15 @@ export const PartyStateBtns = styled.section`
 
 export default function Party () {
 
+  const params = useParams();
+  const navigate = useNavigate();
+  const commentRef = useRef<HTMLElement>(null);
+
   const isLoggedIn = useSelector(
     (state: AppState) => state.userReducer.isLoggedIn
   );
+
+  const { Kakao } = window;
 
   // [dev] 유저 모달 메시지 수정 권한을 위해 임시로 설정한 유저 아이디, 나중에 리덕스에서 userId 불러오는 코드로 바꾸기
   const userId = 1;
@@ -314,28 +322,36 @@ export default function Party () {
   const [isLoading, setIsLoading] = useState(true);
 
   const [isLeader, setIsLeader] = useState(true);
-  const [isMember, setIsMember] = useState(true);
+  const [isMember, setIsMember] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
+
+  //[dev] 모달 관련 코드 객체 하나로 합쳐보기
+  // const [isModalOpen, setIsModalOpen] = useState({
+  //   userInfoModal: false,
+  //   partyJoinModal: false,
+  //   signinModal: false,
+  //   reviewModal: false,
+  //   partyCancelModal: false,
+  // })
 
   const [isWaitingListOpen, setIsWaitingListOpen] = useState(false);
   const [isUserInfoModalOpen, setIsUserInfoModalOpen] = useState(false);
   const [isPartyJoinModalOpen, setIsPartyJoinModalOpen] = useState(false);
   const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen]  = useState(false);
+  const [isPartyCancelModalOpen, setIsPartyCancelModalOpen]  = useState(false);
 
   const [from, setFrom] = useState("");
   const [userInfo, setUserInfo] = useState({});
+  const [findComment, setFindComment] = useState(-1);
+  
+  function formatDate(timestamp: Date){
+    const date = timestamp.getDate();
+    const month = timestamp.getMonth() + 1;
+    const year = timestamp.getFullYear();
 
-  const navigate = useNavigate();
-
-  const { Kakao } = window;
-
-  useEffect(() => {
-    // [dev]
-    // api call: 파티 정보 불러오고, 리더, 멤버에 따라 상태 변경
-    // then => 로딩 상태 false로
-    setIsLoading(false);
-  }, [])
+    return year + "/" + month + "/" + date;
+  }
 
   function favoriteHandler(event: React.MouseEvent<HTMLButtonElement>) {
     // [dev] 서버 통신 후에는 setIsFavorite 삭제하기
@@ -360,8 +376,8 @@ export default function Party () {
         imageUrl: image,
         // [dev] url 파티 인덱스 포함한 path로 수정해야 합니다.
         link: {
-          mobileWebUrl: 'http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party',
-          webUrl: 'http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party',
+          mobileWebUrl: `http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party/${partyId}`,
+          webUrl: `http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party/${partyId}`,
         },
       },
       social: { 
@@ -373,8 +389,8 @@ export default function Party () {
   }
 
   function tagSearchHandler(tag: string) {
-    // [dev]
     console.log(tag + "를 검색합니다.");
+    navigate(`../search/${tag}`);
   }
 
   function waitingListHandler(event: React.MouseEvent<HTMLDivElement>): void {
@@ -382,11 +398,12 @@ export default function Party () {
   }
 
   function userInfoModalHandler(event: React.MouseEvent<HTMLDivElement>, from: string, listIdx: number): void {
+   
+    setFrom(from);
+  
     if(from === "members") {
-      setFrom("members");
       setUserInfo(members[listIdx]);
     } else {
-      setFrom("waitingQueue");
       setUserInfo(waitingQueue[listIdx]);
     }
     setIsUserInfoModalOpen(!isUserInfoModalOpen);
@@ -402,6 +419,11 @@ export default function Party () {
 
   function reviewModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
     setIsReviewModalOpen(!isReviewModalOpen);
+  }
+
+  function partyCancelModalHandler(event: React.MouseEvent<HTMLButtonElement>, from: string): void {
+    setFrom(from);
+    setIsPartyCancelModalOpen(!isPartyCancelModalOpen);
   }
 
   function cancelHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -434,6 +456,21 @@ export default function Party () {
     console.log("파티를 해산합니다.");
   }
 
+  useEffect(() => {
+    // [dev]
+    // params라는 변수에 파티 아이디가 저장되어있음.
+    // api call: params로 파티 정보 불러오고, 리더, 멤버에 따라 상태 변경
+    // then => 로딩 상태 false로
+    if(params.commentId){
+      setFindComment(Number(params.commentId));
+      if(commentRef.current){
+        commentRef.current.scrollIntoView();
+      }
+    }
+
+    setIsLoading(false);
+  }, [params])
+
   if(isLoading) {
     return <Loading />
   }
@@ -463,7 +500,7 @@ export default function Party () {
         </div>
       </CVBtns>
 
-      <main>
+      <Main>
 
         {/* 썸네일과 타이틀, 채팅방 링크 */}
         <header>
@@ -490,7 +527,7 @@ export default function Party () {
               <div id="title">{ name }</div>
               {isMember? 
                 <button className="privateLink">
-                  <a href={ privateLink } style={{ color: "#000" }}>
+                  <a href={ privateLink } target="_blank" rel="noreferrer" style={{ color: "#000" }}>
                     <FontAwesomeIcon icon={ faComments } className="icon" />
                   </a>
                 </button>
@@ -543,7 +580,7 @@ export default function Party () {
             </div>
             <div className="details">
               <div className="icon"><FontAwesomeIcon icon={ faCalendarAlt } /></div>
-              { startDate } ~ { endDate }
+              { formatDate(startDate) } ~ { formatDate(endDate) }
             </div>
           </div>
           {isOnline ?
@@ -557,20 +594,9 @@ export default function Party () {
         </TimeandLocation>
 
         {/* 지도 */}
-        {/* {!isOnline? 
-          <div className="mapDesc">
-            <PartyMap
-              isMember={isMember}
-              location={location}
-              image={image}
-            />  
-            {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null}
-          </div> 
-        : null} */}
-
         {!isOnline? 
           <div className="mapDesc">
-            <ModulePartyMap
+            <PartyMap
               isMember={isMember}
               location={location}
               image={image}
@@ -612,13 +638,16 @@ export default function Party () {
         : null}
 
         {/* 문의 게시판 */}
-        <QnA 
-          partyId={partyId}
-          isLeader={isLeader}
-          leaderId={leaderId}
-          comments={comments}
-        />
-
+        <section id="qna" ref={commentRef}>
+          <QnA 
+            partyId={partyId}
+            isLeader={isLeader}
+            leaderId={leaderId}
+            comments={comments}
+            findComment={findComment}
+          /> 
+        </section>
+        
         <PartyStateBtns>
           {/* 비로그인 상태 */}
           {!isLoggedIn ?
@@ -637,12 +666,12 @@ export default function Party () {
 
           {/* 대기중 */}
           {isWaiting ? 
-            <button onClick={cancelHandler}>가입 신청 취소</button>
+            <button onClick={(e) => partyCancelModalHandler(e, "cancel")}>가입 신청 취소</button>
           : null}
 
           {/* 파티원 */}
           {!isLeader && isMember ? 
-            <button onClick={quitHandler}>파티 탈퇴</button> 
+            <button onClick={(e) => partyCancelModalHandler(e, "quit")}>파티 탈퇴</button> 
           : null}
 
           {/* 파티장 */}
@@ -652,13 +681,13 @@ export default function Party () {
             <button onClick={editHandler}>정보 수정</button> 
           : null}
           {isLeader && partyState === 0 && memberLimit > members.length ? 
-            <button onClick={fullPartyHandler}>모집 완료</button> 
+            <button onClick={(e) => partyCancelModalHandler(e, "fullParty")}>모집 완료</button> 
           : null}
           {isLeader && partyState === 1 && memberLimit > members.length ? 
             <button onClick={rePartyHandler}>모집 재개</button> 
           : null}
           {isLeader ? 
-            <button onClick={dismissHandler}>파티 해산</button>
+            <button onClick={(e) => partyCancelModalHandler(e, "dismiss")}>파티 해산</button>
           : null}
           {isLeader && ( partyState === 1 || memberLimit === members.length ) ? 
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
@@ -667,7 +696,7 @@ export default function Party () {
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
           : null}
         </PartyStateBtns>
-      </main>
+      </Main>
 
       {isUserInfoModalOpen? 
         <UserInfoModal 
@@ -692,6 +721,16 @@ export default function Party () {
           reviewModalHandler={reviewModalHandler}
           members={members.filter((member) => member.id !== userId)}
           leaderId={leaderId}
+        /> 
+      : null}
+      {isPartyCancelModalOpen? 
+        <PartyCancelModal 
+          from={from}
+          partyCancelModalHandler={partyCancelModalHandler}
+          cancelHandler={cancelHandler}
+          quitHandler={quitHandler}
+          fullPartyHandler={fullPartyHandler}
+          dismissHandler={dismissHandler}
         /> 
       : null}
       {isSigninModalOpen? <SigninModal signinModalHandler={signinModalHandler} /> : null}
