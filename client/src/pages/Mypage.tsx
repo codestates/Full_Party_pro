@@ -253,16 +253,14 @@ export default function Mypage () {
     const verify = await axios.post('http://localhost3000/user/verification', {
       userInfo: {
         id: signinReducer.userInfo?.id,
-        //이메일을 보내야돼? 비번만 확인하면 되자너
         password: nowPwd
+        //API확인해주세요 (email제외)
       }
     })
     if(verify.data.message === "User Identified") {
-      //patch 바디 왜그래...
       const res = await axios.patch('http://localhost3000/user/profile', {
         userInfo: {
           userName: name,
-          //여기 왜 갑자기 userName? 그냥 name으로 하면?
           password: password,
           birth: birth,
           gender: gender,
@@ -283,7 +281,7 @@ export default function Mypage () {
       const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/${signinReducer.userInfo?.id}`)
       const userInfo = res.data.userInfo
       setBasicInfo({
-        name: userInfo.name,
+        name: userInfo.userName,
         profileImage: userInfo.profileImage,
         region: userInfo.region,
         level: userInfo.region
@@ -301,12 +299,12 @@ export default function Mypage () {
     setIsLoading(false)
   },[])
 
-  // const isLoggedIn = useSelector(
-  //   (state: AppState) => state.userReducer.isLoggedIn
-  // );
-  // if(!isLoggedIn){
-  //   return <Navigate to="/" />
-  // }
+  const isLoggedIn = useSelector(
+    (state: AppState) => state.signinReducer.isLogin
+  );
+  if(!isLoggedIn){
+    return <Navigate to="/" />
+  }
 
   if(isLoading) {
     return <Loading />

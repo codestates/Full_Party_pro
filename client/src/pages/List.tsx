@@ -41,7 +41,7 @@ export const ListContainer = styled.div`
 export default function List () {
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+    (state: AppState) => state.signinReducer.isLogin
   );
 
   const { userInfo, myParty, localParty } = dummyList;
