@@ -207,7 +207,7 @@ export default function Mypage () {
     //기본값을 axios로 받아온 값으로 설정할 것.
     nowPwd: ''
   })
-  const [isChange, setIsChange] = useState(false)
+  const [isChange, setIsChange] = useState(true)
   const [curTab, setCurTab] = useState(0)
 
   let today: any = new Date();

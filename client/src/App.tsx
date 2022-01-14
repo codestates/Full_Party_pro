@@ -1,7 +1,10 @@
 import React, { useEffect, useState, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import './App.css';
+
+import { useSelector } from 'react-redux';
+import { AppState } from './reducers';
+import { RootReducerType } from './store/store';
 
 import Home from './pages/Home';
 import List from './pages/List';
@@ -14,12 +17,10 @@ import Mypage from './pages/Mypage';
 
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
-
-import initialize from './config/initialize';
-import { AppState } from './reducers';
 import SigninModal from './components/SigninModal';
 import SignupModal from './components/SignupModal';
-import { RootReducerType } from './store/store'
+
+import initialize from './config/initialize';
 
 declare global {
   interface Window {
@@ -53,23 +54,13 @@ export default function App() {
       <div className="App">
         <main className="view">
           <TopNav />
-          {(() => {
-            if(modalReducer.isModal) {
-              if(modalReducer.modalType === 'signin') {
-                return (
-                  <SigninModal signinModalHandler={signinModalHandler} />
-                )
-              }
-              else if(modalReducer.modalType === 'signup') {
-                return (
-                  <SignupModal />
-                )
-              }
-            }
-          })()}
+          {modalReducer.isModal && modalReducer.modalType === 'signin' ? <SigninModal signinModalHandler={signinModalHandler} /> :  null}
+          {modalReducer.isModal && modalReducer.modalType === 'signup' ? <SignupModal /> :  null}
           <section className="features">
             <Routes>
               <Fragment>
+                {/* [dev] 로그인창 구현되고 나면 첫줄 주석활성화시키고 아래 두 줄 지우기 */}
+                {/* <Route path="/" element={isLoggedIn ? <List /> : <Home />} /> */}
                 <Route path="/" element={<Home />} />
                 <Route path="/list" element={<List />} />
                 <Route path="/party/:partyId" element={<Party />}>
