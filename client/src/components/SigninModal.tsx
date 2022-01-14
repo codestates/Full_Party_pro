@@ -168,7 +168,7 @@ const SigninModal = ({ signinModalHandler }: Props) => {
               onChange={(e) => handleInput(e)}
             />
           </fieldset>
-          {signinReducer.success === false ? <div className='notUser'>입력하신 아이디 혹은 비밀번호가 유효하지 않습니다</div> : <span />}
+          {signinReducer.isLogin === false ? <div className='notUser'>입력하신 아이디 혹은 비밀번호가 유효하지 않습니다</div> : <span />}
           <div className='footer'>
             <button className='signinBtn' onClick={handleSignin}>
               Press Start

@@ -3,9 +3,9 @@ import { Dispatch } from 'redux'
 import Party from '../pages/Party';
 import { SearchDispatchType, SEARCH_BY_KEYWORD, SEARCH_BY_TAG } from "./searchType";
 
-export const searchParty = (searchBy: string, region?: string) => async (dispatch: Dispatch<SearchDispatchType>) => {
+export const searchParty = (word: string, region?: string, searchBy?: string) => async (dispatch: Dispatch<SearchDispatchType>) => {
   if(searchBy === 'byKeyword') {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?keyword=${searchBy}&region=${region}`)
+    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?keyword=${word}&region=${region}`)
     const party = res.data.result
 
     dispatch({
@@ -16,7 +16,7 @@ export const searchParty = (searchBy: string, region?: string) => async (dispatc
     })
   }
   else if(searchBy === 'byTag') {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?tagName=${searchBy}&region=${region}`)
+    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?tagName=${word}&region=${region}`)
     const party = res.data.result
 
     dispatch({
