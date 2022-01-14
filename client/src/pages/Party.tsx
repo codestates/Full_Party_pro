@@ -304,7 +304,7 @@ export default function Party () {
   const commentRef = useRef<HTMLElement>(null);
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+    (state: AppState) => state.signinReducer.isLogin
   );
 
   const { Kakao } = window;

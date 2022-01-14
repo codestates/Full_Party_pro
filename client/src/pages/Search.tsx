@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import axios from 'axios';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -110,12 +109,23 @@ export default function Search () {
   const searchRegion = signinReducer.userInfo?.region
 
   const searchQuest = () => {
-    dispatch(searchParty(word, searchRegion))
+    dispatch(searchParty(word, searchRegion, 'byKeyword'))
     setIsSearch(true)
   }
+  const enterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if(e.key === 'Enter') {
+      searchQuest()
+    }
+  }
+  //태그 검색 요청이 들어오면 이걸 실행해 주세요
+  const searchTag = (tag: string) => {
+    dispatch(searchParty(tag, searchRegion, 'byTag'))
+    setIsSearch(true)
+  }
+  //--------------------------------//
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+    (state: AppState) => state.signinReducer.isLogin
   );
 
   if(!isLoggedIn){
@@ -129,9 +139,11 @@ export default function Search () {
           name='word'
           value={word}
           onChange={(e) => handleInputChange(e)}
+          onKeyUp={(e) => enterKey(e)}
           placeholder='Search...'
         ></input>
         <div className='faSearch' onClick={searchQuest}>
+          {/* 검색 결과를 가져온 뒤 스토어에 저장합니다. */}
           <FontAwesomeIcon icon={faSearch} />
         </div>
       </SearchBar>
@@ -139,6 +151,7 @@ export default function Search () {
         {(() => {
           if(!isSearch) {
             return (
+              // 나중에 내용 지워주세요
               <div>검색안험</div>
             )
           }

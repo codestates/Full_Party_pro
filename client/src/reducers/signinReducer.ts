@@ -1,12 +1,12 @@
 import { SIGNIN_FAIL, SIGNIN_SUCCESS, UserInfo, UserInfoDispatchType } from "../actions/signinType";
 
 interface InitialState {
-  success?: boolean | null
+  isLogin?: boolean | null
   userInfo?: UserInfo
 }
 
 const initialState: InitialState = {
-  success: null,
+  isLogin: true,
   userInfo: {
     id: 0,
     name: '김리덕스',
@@ -20,14 +20,14 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
     case SIGNIN_FAIL:
       return {
         ...state,
-        success: false
+        isLogin: false
       }
 
     case SIGNIN_SUCCESS:
       const { id, name, userImage, region } = action.payload
       return {
         ...state,
-        success: true,
+        isLogin: true,
         userInfo: {
           id,
           name,
