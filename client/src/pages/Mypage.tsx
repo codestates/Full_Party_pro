@@ -133,6 +133,18 @@ export const MypartyCards = styled.div`
     .focus {
       color: black;
     }
+    .join {
+      cursor: pointer;
+    }
+    .recruite {
+      cursor: pointer;
+    }
+    .favorite {
+      cursor: pointer;
+    }
+    .complete {
+      cursor: pointer;
+    }
   }
 `
 

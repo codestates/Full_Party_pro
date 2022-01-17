@@ -393,6 +393,12 @@ export default function Party () {
     navigate(`../search/${tag}`);
   }
 
+  // function temp(tag: string) {
+  //   console.log(tag+"를 검색합니다.");
+    
+  //   navigate(`../search`)
+  // }
+
   function waitingListHandler(event: React.MouseEvent<HTMLDivElement>): void {
     setIsWaitingListOpen(!isWaitingListOpen);
   }
