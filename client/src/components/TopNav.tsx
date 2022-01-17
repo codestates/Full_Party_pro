@@ -98,7 +98,7 @@ export default function TopNav () {
   const dispatch = useDispatch()
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

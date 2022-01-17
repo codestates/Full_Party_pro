@@ -1,31 +1,39 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { faSadTear } from '@fortawesome/free-regular-svg-icons';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
 import { RootReducerType } from '../store/store';
 import { searchParty } from '../actions/search';
-import QuestCard from '../components/QuestCard';
 
+import LocalQuest from '../components/LocalQuest';
+import EmptyCard from '../components/EmptyCard';
+
+// [dev] 더미데이터
 import dummyList from '../static/dummyList';
 
 export const SearchContainer = styled.div`
-  background-color: #fafafa;
   width: 100%;
   height: 100%;
 
   margin: 60px 0;
+  padding: 20px 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `
 
 export const SearchBar = styled.div`
   width: 100%;
-  height: 9vh;
+  height: 40px;
+
   display: flex;
-  margin: 0 auto;
+  margin: 15px 0;
 
   justify-content: center;
   align-items: center;
@@ -34,33 +42,37 @@ export const SearchBar = styled.div`
     width: 90%;
     max-width: 1100px;
     height: 5vh;
-    padding: 0px 12px;
+    padding: 0px 20px;
 
     border: 1px solid #d5d5d5;
     border-radius: 20px;
 
-    font-size: 20px;
+    font-size: 1.1rem;
   }
 
   .faSearch {
     position: absolute;
-    left: 86%;
+    right: 10%;
 
     color: #888;
+    cursor: pointer;
+  }
+
+  @media screen and (min-width: 650px) {
+    .faSearch {
+      right: 8%;
+    }
   }
 
   @media screen and (min-width: 1000px) {
     .faSearch {
-      left: 79%;
+      right: 20%;
     }
   }
 `
 
 export const SearchContent = styled.div`
-  width: 100%;
-  min-height: 75vh;
-  display: flex;
-  margin: 0 auto;
+  padding: 16px 1%;
 
   padding-top: 16px;
 
@@ -73,76 +85,80 @@ export const SearchContent = styled.div`
     .resultLabel {
       font-size: 1.7rem;
       font-weight: bold;
+
+      margin-bottom: 15px;
     }
   }
-`
 
-export const NoQuest = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
+  .tag {
+    padding: 8px 15px;
+    margin: 0 10px 15px 0;
 
-  align-items: center;
+    font-size: 0.8rem;
 
-  .faSadTear {
-    width: 80px;
-    height: 80px;
-    margin-top: 25vh;
-    margin-bottom: 3vh;
+    background-color: #fff;
+    border-radius: 20px;
+    border: 1px solid #d5d5d5;
+    color: #777;
 
-    color: grey;
+    cursor: pointer;
   }
 
-  .noQuestMsg {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    color: grey;
-
-    .makeQ {
-      color: #56C596;
-    }
+  @media screen and (min-width: 700px) {
+    padding: 16px 4%;
   }
 `
 
 export default function Search () {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const [word, setWord] = useState('')
-  const [isSearch, setIsSearch] = useState(false)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const params = useParams();
+
+  const isLoggedIn = useSelector(
+    (state: AppState) => state.signinReducer.isLoggedIn
+  );
+
+  const searchReducer = useSelector((state: RootReducerType) => state.searchReducer);
+  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
+  const searchRegion = signinReducer.userInfo?.region;
+
+  const [word, setWord] = useState('');
+  const [isSearch, setIsSearch] = useState(false);
+
+  //[dev] 더미데이터입니다.
+  const [tag, setTag] = useState(['태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333'])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value)
   }
-
-  const searchReducer = useSelector((state: RootReducerType) => state.searchReducer)
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
-  const searchRegion = signinReducer.userInfo?.region
 
   const searchQuest = () => {
     dispatch(searchParty(word, searchRegion, 'byKeyword'))
     setIsSearch(true)
     navigate(`/search/${word}`)
   }
+ 
   const enterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if(e.key === 'Enter') {
       searchQuest()
     }
   }
+
+  function hashtagHandler(tag: string){
+    setWord(tag);
+    dispatch(searchParty(tag, searchRegion, 'byTag'));
+    setIsSearch(true);
+  }
+
   useEffect(() => {
-    let preUrl = window.location.pathname
-    if(preUrl.slice(0,12) === '/search/tag/'){
-      const tag = window.location.search
-      dispatch(searchParty(tag, searchRegion, 'byTag'))
-      setIsSearch(true)
+    if(params.tag){
+      const tag = params.tag;
+      setWord(tag);
+      dispatch(searchParty(tag, searchRegion, 'byTag'));
+      setIsSearch(true);
     }
   },[])
 
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
-  );
   if(!isLoggedIn){
     return <Navigate to="/" />
   }
@@ -155,8 +171,8 @@ export default function Search () {
           value={word}
           onChange={(e) => handleInputChange(e)}
           onKeyUp={(e) => enterKey(e)}
-          placeholder='Search...'
-        ></input>
+          placeholder='검색어를 입력해주세요'
+        />
         <div className='faSearch' onClick={searchQuest}>
           {/* 검색 결과를 가져온 뒤 스토어에 저장합니다. */}
           <FontAwesomeIcon icon={faSearch} />
@@ -166,40 +182,43 @@ export default function Search () {
         {(() => {
           if(!isSearch) {
             return (
-              //기본화면 카드 렌더링 테스트용
               <div className='result'>
                 <div className='resultLabel'>
-                  검색 결과
+                  인기 태그
                 </div>
-              {dummyList.localParty.map((party, idx) => <QuestCard key={idx} party={party} />)}
+                <div className='hashtag'>
+                  {tag.map((t, idx) => 
+                    <button 
+                      key={idx} 
+                      className="tag" 
+                      onClick={() => hashtagHandler(t)}
+                      style={isLoggedIn ? { cursor: "pointer" } : { cursor: "default" }}
+                      disabled={!isLoggedIn}
+                    >
+                      #{t}
+                    </button>
+                  )}
+                </div>
               </div>
-              //여기까지 테스트용
-              //<div /> //테스트 완료시 해당 div만 남길 것
+              //[dev]기본화면 카드 렌더링 테스트용
+              // <div className='result'>
+              //   <div className='resultLabel'>
+              //     검색 결과
+              //   </div>
+              // {dummyList.localParty.map((party, idx) => <QuestCard key={idx} party={party} />)}
+              // </div>
             )
           }
           else if(isSearch && searchReducer.parties.length !== 0) {
             return(
               <div className='result'>
-                <div className='resultLabel'>
-                  검색 결과
-                </div>
-                {searchReducer.parties.map((party, idx) => <QuestCard key={idx} party={party} />)}
+                <LocalQuest location={searchRegion} localParty={searchReducer.parties} /> 
               </div>
             )
           }
           else if(isSearch && searchReducer.parties.length === 0) {
-            return(
-              <NoQuest>
-                <FontAwesomeIcon icon={faSadTear} className='faSadTear' />
-                <div className='noQuestMsg'>
-                  <div>주변에 퀘스트가 없어요!</div>
-                  <div>직접
-                    <Link to='/post' style={{ textDecoration: 'none' }}>
-                      <span className='makeQ'> 퀘스트</span>
-                    </Link>
-                    를 만들어 파티를 모집해 보세요!</div>
-                </div>
-              </NoQuest>
+            return (
+              <EmptyCard from="search" />
             )
           }
         })()}

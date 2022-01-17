@@ -33,7 +33,7 @@ export const FavoriteContainer = styled.div`
 export default function Favorite () {
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const [isLoading, setIsLoading] = useState(true);
