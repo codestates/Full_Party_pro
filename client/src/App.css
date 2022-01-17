@@ -8,7 +8,7 @@
 }
 
 @media screen and (min-width: 1000px) {
-  main.view {
+  section.features {
     padding: 0 15%;
   }
 }

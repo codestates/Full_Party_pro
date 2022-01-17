@@ -41,7 +41,7 @@ export const SearchBar = styled.div`
 
   .faSearch {
     position: absolute;
-    left 86%;
+    left: 86%;
 
     color: #888;
   }

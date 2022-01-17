@@ -14,6 +14,7 @@ import Search from './pages/Search';
 import Notification from './pages/Notification';
 import Favorite from './pages/Favorite';
 import Mypage from './pages/Mypage';
+import NotFound from './pages/NotFound';
 
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
@@ -52,6 +53,13 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="App">
+        {!isLoggedIn? 
+          <Routes>
+            <Fragment>
+              <Route path="/" element={<Home />} />
+            </Fragment>
+          </Routes>
+        : null}
         <main className="view">
           <TopNav />
           {modalReducer.isModal && modalReducer.modalType === 'signin' ? <SigninModal signinModalHandler={signinModalHandler} /> :  null}
@@ -59,9 +67,8 @@ export default function App() {
           <section className="features">
             <Routes>
               <Fragment>
-                {/* [dev] 로그인창 구현되고 나면 첫줄 주석활성화시키고 아래 두 줄 지우기 */}
-                {/* <Route path="/" element={isLoggedIn ? <List /> : <Home />} /> */}
-                <Route path="/" element={<Home />} />
+                {isLoggedIn ? <Route path="/" element={<List />} /> : null}
+                {/* [dev] 로그인 기능 완성되면 아랫줄 지우기 */}
                 <Route path="/list" element={<List />} />
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
@@ -71,6 +78,7 @@ export default function App() {
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/favorite" element={<Favorite />} />
                 <Route path="/mypage" element={<Mypage />} />
+                <Route path="*" element={<NotFound />} />
               </Fragment>
             </Routes>
           </section>
