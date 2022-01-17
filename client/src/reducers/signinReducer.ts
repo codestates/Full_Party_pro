@@ -8,10 +8,11 @@ interface InitialState {
 const initialState: InitialState = {
   isLoggedIn: false,
   userInfo: {
-    id: 0,
+    id: 1,
     userName: '귀오미',
     profileImage: 'https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png',
     region: '경기도 수원시',
+    signupType: "general"
   }
 }
 
@@ -24,7 +25,7 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
       }
 
     case SIGNIN_SUCCESS:
-      const { id, userName, profileImage, region } = action.payload
+      const { id, userName, profileImage, region, signupType } = action.payload
       return {
         ...state,
         isLoggedIn: true,
@@ -33,6 +34,7 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
           userName,
           profileImage,
           region,
+          signupType
         }
       }
 

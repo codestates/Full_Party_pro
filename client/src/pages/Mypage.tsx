@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 
 import styled from 'styled-components';
@@ -10,6 +10,7 @@ import { faMapMarkerAlt, faCrown } from '@fortawesome/free-solid-svg-icons';
 import { RootReducerType } from '../store/store';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
+import { SIGNIN_FAIL } from '../actions/signinType';
 
 export const MypageContainer = styled.div`
   width: 100%;
@@ -200,6 +201,8 @@ export const InfoTable = styled.table`
 `
 
 export default function Mypage () {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true)
   const [isInfoLoading, setIsInfoLoading] = useState(true)
   const [basicInfo, setBasicInfo] = useState({
@@ -223,7 +226,7 @@ export default function Mypage () {
   const [curTab, setCurTab] = useState(0)
 
   let today: any = new Date();
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
+  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
 
   //전환시 기본 정보 입력하게 하기 위해선 다중연산 필요(로딩창 구현)
   const handleIsChange = async () => {
@@ -286,6 +289,19 @@ export default function Mypage () {
       }
     }
   }
+
+  const handleSignOut = async () => {
+    const accessToken = document.cookie.slice(6);
+    const signupType = signinReducer.userInfo?.signupType;
+    await axios.post("https://localhost:443/signout", {
+      accessToken, signupType
+    });
+    dispatch({
+      type: SIGNIN_FAIL
+    });
+    document.cookie = "token=" + "";
+    navigate("/");
+  };
 
   //페이지 진입시 로딩
   useEffect(() => {
@@ -553,6 +569,7 @@ export default function Mypage () {
           개인 정보 수정
         </button>
         }
+        <button onClick={handleSignOut}>로그아웃</button>
       </MypageInfo>
       <MypartyCards>
         <div className='subject'>내 파티</div>
