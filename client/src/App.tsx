@@ -38,7 +38,7 @@ export default function App() {
   }
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const { Kakao } = window;
@@ -55,7 +55,7 @@ export default function App() {
       <div className="App">
         <main className="view">
           <TopNav />
-          {modalReducer.isModal && modalReducer.modalType === 'signin' ? <SigninModal signinModalHandler={signinModalHandler} /> :  null}
+          {modalReducer.isModal && modalReducer.modalType === 'signin' ? <SigninModal /> :  null}
           {modalReducer.isModal && modalReducer.modalType === 'signup' ? <SignupModal /> :  null}
           <section className="features">
             <Routes>
@@ -64,10 +64,11 @@ export default function App() {
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
                 </Route>
-                <Route path="/post" element={<Post />} /> 
+                <Route path="/post" element={<Post />} />
+                <Route path="/post/:partyInfo" element={<Post />} /> 
                 <Route path="/search" element={<Search />} />
                 <Route path="/search/:keyword" element={<Search />} />
-                <Route path="/search/tag/:keyword" element={<Search />} />
+                <Route path="/search/tag/:tag" element={<Search />} />
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/favorite" element={<Favorite />} />
                 <Route path="/mypage" element={<Mypage />} />

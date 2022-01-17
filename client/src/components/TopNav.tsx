@@ -98,7 +98,7 @@ export default function TopNav () {
   const dispatch = useDispatch()
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const handleSignOut = async () => {
@@ -141,6 +141,7 @@ export default function TopNav () {
       : <div className="menu">
           <button className='signinModalBtn' onClick={(e) => handleModal(e)}>로그인</button>
           <button className='signupModalBtn' onClick={(e) => handleModal(e)}>회원가입</button>
+          {/* [dev] 로그아웃 버튼 마이페이지로 옮기기 */}
           <button onClick={handleSignOut}>로그아웃</button>
         </div> 
       }

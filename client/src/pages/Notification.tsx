@@ -94,7 +94,7 @@ export const NotificationContainer = styled.div`
 export default function Notification () {
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const isBadgeOn = useSelector(

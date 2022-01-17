@@ -316,8 +316,8 @@ export const Footer = styled.footer`
 
 function Home () {
   const dispatch = useDispatch();
-  const isLogIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+  const isLoggedin = useSelector(
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
   const signinReducer = useSelector(
     (state: AppState) => state.signinReducer
