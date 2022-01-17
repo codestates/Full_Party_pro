@@ -390,7 +390,7 @@ export default function Party () {
 
   function tagSearchHandler(tag: string) {
     console.log(tag + "를 검색합니다.");
-    navigate(`../search/${tag}`);
+    navigate(`../search/tag/${tag}`);
   }
 
   // function temp(tag: string) {

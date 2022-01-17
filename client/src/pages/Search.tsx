@@ -1,14 +1,17 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { faSadTear } from '@fortawesome/free-regular-svg-icons';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
 import { RootReducerType } from '../store/store';
 import { searchParty } from '../actions/search';
+import QuestCard from '../components/QuestCard';
+
+import dummyList from '../static/dummyList';
 
 export const SearchContainer = styled.div`
   background-color: #fafafa;
@@ -41,14 +44,14 @@ export const SearchBar = styled.div`
 
   .faSearch {
     position: absolute;
-    left 86%;
+    left: 86%;
 
     color: #888;
   }
 
   @media screen and (min-width: 1000px) {
     .faSearch {
-      left 79%;
+      left: 79%;
     }
   }
 `
@@ -60,6 +63,18 @@ export const SearchContent = styled.div`
   margin: 0 auto;
 
   padding-top: 16px;
+
+  .result {
+    width: 100%;
+    height: 100%;
+
+    padding: 0 30px;
+
+    .resultLabel {
+      font-size: 1.7rem;
+      font-weight: bold;
+    }
+  }
 `
 
 export const NoQuest = styled.div`
@@ -94,6 +109,7 @@ export const NoQuest = styled.div`
 
 export default function Search () {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [word, setWord] = useState('')
   const [isSearch, setIsSearch] = useState(false)
 
@@ -108,23 +124,25 @@ export default function Search () {
   const searchQuest = () => {
     dispatch(searchParty(word, searchRegion, 'byKeyword'))
     setIsSearch(true)
+    navigate(`/search/${word}`)
   }
   const enterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if(e.key === 'Enter') {
       searchQuest()
     }
   }
-  //태그 검색 요청이 들어오면 이걸 실행해 주세요
-  const searchTag = (tag: string) => {
-    dispatch(searchParty(tag, searchRegion, 'byTag'))
-    setIsSearch(true)
-  }
-  //--------------------------------//
+  useEffect(() => {
+    let preUrl = window.location.pathname
+    if(preUrl.slice(0,12) === '/search/tag/'){
+      const tag = window.location.search
+      dispatch(searchParty(tag, searchRegion, 'byTag'))
+      setIsSearch(true)
+    }
+  },[])
 
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLogin
   );
-
   if(!isLoggedIn){
     return <Navigate to="/" />
   }
@@ -132,7 +150,6 @@ export default function Search () {
   return (
     <SearchContainer>
       <SearchBar>
-        {/* <div>{keyword}</div> */}
         <input
           name='word'
           value={word}
@@ -149,12 +166,25 @@ export default function Search () {
         {(() => {
           if(!isSearch) {
             return (
-              <div />
+              //기본화면 카드 렌더링 테스트용
+              <div className='result'>
+                <div className='resultLabel'>
+                  검색 결과
+                </div>
+              {dummyList.localParty.map((party, idx) => <QuestCard key={idx} party={party} />)}
+              </div>
+              //여기까지 테스트용
+              //<div /> //테스트 완료시 해당 div만 남길 것
             )
           }
           else if(isSearch && searchReducer.parties.length !== 0) {
             return(
-              <div>여기에 퀘스트카드 렌더링</div>
+              <div className='result'>
+                <div className='resultLabel'>
+                  검색 결과
+                </div>
+                {searchReducer.parties.map((party, idx) => <QuestCard key={idx} party={party} />)}
+              </div>
             )
           }
           else if(isSearch && searchReducer.parties.length === 0) {
