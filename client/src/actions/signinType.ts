@@ -6,6 +6,7 @@ export type UserInfo = {
   userName: string
   profileImage: string
   region: string
+  signupType: string
 }
 
 export interface signinFailDispatch{

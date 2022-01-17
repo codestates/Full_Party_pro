@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import { ImGoogle } from "react-icons/im";
 // const dotenv = require('dotenv').config();
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -100,6 +101,19 @@ export const ModalView = styled.div`
   }
 `
 
+const Button = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  min-height: 3rem;
+  font-size: 1rem;
+  border: 1.5px solid var(--color-maingreen--100);
+  * {
+    font-size: 0.5rem;
+  }
+`;
+
 export const CloseBtn = styled.button`
   width: 100%;
   text-align: right;
@@ -150,12 +164,19 @@ const SigninModal = ({ signinModalHandler }: Props) => {
   //   return String(code);
   // };
 
+  const handleSignGoogle = () => {
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`
+    window.location.assign(url);
+  };
+
+
+  
   const handleKakao = async () => {
     // console.log(process.env.REACT_APP_KAKAO_REST_API_KEY);
     // console.log(process.env.REACT_APP_REDIRECT_URI);
-    // window.location.assign(
-    //   `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`
-    // );
+    window.location.assign(
+      `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`
+    );
   };
 
   return(
@@ -202,6 +223,15 @@ const SigninModal = ({ signinModalHandler }: Props) => {
               아직 풀팟의 파티원이 아니세요?<br />
               지금 바로 <span className='signupModalBtn' onClick={(e) => signupModal(e)}>회원가입</span> 하세요 🥳
             </section>
+            <Button
+              className="google"
+              background-Color={"var(--color-black)"}
+              color={"#4384f3 !important"}
+              onClick={handleSignGoogle}
+            >
+              <ImGoogle fontSize="0.5rem" />
+              로그인
+            </Button>
           </div>
         </ModalView>
       </ModalBackdrop>

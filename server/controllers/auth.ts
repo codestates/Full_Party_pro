@@ -4,6 +4,7 @@ import { InternalServerError, SuccessfulResponse, FailedResponse } from "./funct
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 import { findUser, createUser } from "./functions/sequelize";
 import qs from "qs";
+import google from "../config"
 
 export const signin = async (req: Request, res: Response) => {
   try {
@@ -18,20 +19,22 @@ export const signin = async (req: Request, res: Response) => {
 };
 
 export const signout = async (req: Request, res: Response) => {
-  try {
-    const { accessToken } = req.body;
-    const response = await axios({
-      method: "POST",
-      url: "https://kapi.kakao.com/v1/user/logout",
-      headers: {
-        "Authorization": `Bearer ${accessToken}`
-      }
-    })
-    return SuccessfulResponse(res, { message: "You Have Successfully Signed Out" });
-  }
-  catch (error) {
-    return InternalServerError(res, error);
-  }
+  // try {
+  //   // const { accessToken } = req.body;
+  //   // const response = await axios({
+  //   //   method: "POST",
+  //   //   url: "https://kapi.kakao.com/v1/user/logout",
+  //   //   headers: {
+  //   //     "Authorization": `Bearer ${accessToken}`
+  //   //   }
+  //   // })
+  //   // return SuccessfulResponse(res, { message: "You Have Successfully Signed Out" });
+  //   clearCookie(res);
+  //   return SuccessfulResponse(res, { message: "You Have Successfully Signed Out" });
+  // }
+  // catch (error) {
+  //   return InternalServerError(res, error);
+  // }
 };
 
 export const signup = async (req: Request, res: Response) => {
@@ -50,8 +53,58 @@ export const guest = async (req: Request, res: Response) => {
   return SuccessfulResponse(res, { message: "3" });
 };
 
-export const google = async (req: Request, res: Response) => {
-  return SuccessfulResponse(res, { message: "4" });
+export const googleSignIn = async (req: Request, res: Response) => {
+  try {
+    let code = req.body.authorizationCode 
+    if ( code[1] === "/" ) {
+      code = code.replace("/", "%2F") 
+    }
+    console.log(code[1])
+    const { authorizationCode } = req.body;
+    const { googleClientId, googleClientSecret } = google.google;
+    const params = {
+      code: authorizationCode,
+      client_id: googleClientId,
+      client_secret: googleClientSecret,
+      redirect_uri: process.env.REACT_APP_REDIRECT_URI,
+      grant_type: "authorization_code",
+    };
+
+    const axiosResponse = await axios({
+      method: "post",
+      url: "https://oauth2.googleapis.com/token",
+      params,
+    });
+
+    const { access_token: accessToken } = axiosResponse.data;
+    const profileResponse = await axios({
+      method: "get",
+      url: "https://www.googleapis.com/oauth2/v2/userinfo",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log(profileResponse)
+    const { name, email, picture } = profileResponse.data;
+    const checkUser = await findUser({ email });
+    if (!checkUser) {
+      await createUser({
+        userName: name,
+        profileImage: picture,
+        email,
+        gender: "unidentified",
+        birth: new Date("11/11/2222"),
+        region: "unidentified",
+        mobile: "unidentified",
+        exp: 25,
+        level: 1
+      });
+    }
+    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region" ]);
+    return SuccessfulResponse(res, { message: "You have successfully signed in with Google Account", userInfo: { ...userInfo, accessToken} });
+  } catch (error) {
+    InternalServerError(res, error);
+  }
 };
 
 export const kakao = async (req: Request, res: Response) => {
@@ -96,7 +149,7 @@ export const kakao = async (req: Request, res: Response) => {
       });
     }
     const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region" ]);
-    return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo: { ...userInfo, accessToken} });
+    return SuccessfulResponse(res, { message: "You have successfully signed in with Kakao Account", userInfo: { ...userInfo, accessToken} });
   }
   catch (error) {
     InternalServerError(res, error);

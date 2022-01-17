@@ -102,9 +102,9 @@ export default function TopNav () {
   );
 
   const handleSignOut = async () => {
-  //   const response = await axios.post("https://localhost:443/signout", {
-  //     accessToken
-  //   });
+    // const response = await axios.post("https://localhost:443/signout", {
+    //   accessToken
+    // });
   };
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

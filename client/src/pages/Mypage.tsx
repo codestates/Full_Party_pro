@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 
 import styled from 'styled-components';
@@ -200,6 +200,8 @@ export const InfoTable = styled.table`
 `
 
 export default function Mypage () {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(true)
   const [isInfoLoading, setIsInfoLoading] = useState(true)
   const [basicInfo, setBasicInfo] = useState({
@@ -287,6 +289,19 @@ export default function Mypage () {
     }
   }
 
+  const handleSignOut = async () => {
+    const accessToken = document.cookie.slice(6);
+    const signupType = signinReducer.userInfo?.signupType;
+    await axios.post("https://localhost:443/signout", {
+      accessToken, signupType
+    });
+    dispatch({
+      type: SIGNIN_FAIL
+    });
+    document.cookie = "token=" + "";
+    navigate("/");
+  };
+
   //페이지 진입시 로딩
   useEffect(() => {
     const fetchBasicInfo = async () => {
@@ -303,7 +318,7 @@ export default function Mypage () {
     fetchBasicInfo()
     setIsLoading(false)
   },[])
-
+  
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLogin
   );
@@ -584,6 +599,9 @@ export default function Mypage () {
             }
           })()}
         </fieldset>
+        <button onClick={handleSignOut}>
+          로그아웃
+        </button>
       </MypartyCards>
     </MypageContainer>
   );
