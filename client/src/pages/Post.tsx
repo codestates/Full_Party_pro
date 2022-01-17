@@ -291,22 +291,29 @@ export default function Post () {
     privateLink: '',
     content: ''
   });
-  const [isError, setIsError] = useState({
-    isName: false,
-    isStrDate: false,
-    isEndDate: false,
-    isContent: false,
-    isPrivateLink: false,
-    isRegion: false,
-    isAxios: false,
-
-    nameMsg: '',
-    strDateMsg:'',
-    endDateMsg: '',
-    contentMsg: '',
-    privateLinkMsg: '',
-    regionMsg: '',
-    axiosMsg: ''
+  const [isName, setIsName] = useState({
+    err: false,
+    msg: ''
+  })
+  const [isStrDate, setIsStrDate] = useState({
+    err: false,
+    msg: ''
+  })
+  const [isEndDate, setIsEndDate] = useState({
+    err: false,
+    msg: ''
+  })
+  const [isContent, setIsContent] = useState({
+    err: false,
+    msg: ''
+  })
+  const [isPLink, setIsPLink] = useState({
+    err: false,
+    msg: ''
+  })
+  const [isRegion, setIsRegion] = useState({
+    err: false,
+    msg: ''
   })
   const [tags, setTags] = useState<string[]>([]);
   const [inputTxt, setInputTxt] = useState('');
@@ -320,6 +327,37 @@ export default function Post () {
       ...partyInfo,
       [name]: value
     })
+
+    if(partyInfo.name !== '') {
+      setIsName({
+        err: false,
+        msg: ''
+      })
+    }
+    if(partyInfo.startDate !== '') {
+      setIsStrDate({
+        err: false,
+        msg: ''
+      })
+    }
+    if(partyInfo.endDate !== '') {
+      setIsEndDate({
+        err: false,
+        msg: ''
+      })
+    }
+    if(partyInfo.region !== '') {
+      setIsRegion({
+        err: false,
+        msg: ''
+      })
+    }
+    if(partyInfo.privateLink !== '') {
+      setIsPLink({
+        err: false,
+        msg: ''
+      })
+    }
   }
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const {name, value} = e.target
@@ -328,6 +366,12 @@ export default function Post () {
       ...partyInfo,
       [name]: value
     })
+    if(partyInfo.content !== '') {
+      setIsContent({
+        err: false,
+        msg: ''
+      })
+    }
   }
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const {name, value} = e.target
@@ -381,14 +425,52 @@ export default function Post () {
 
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
   
-  const createParty = async () => {
-    if(!isError.isName || !isError.isStrDate || !isError.isEndDate || !isError.isContent || !isError.isRegion || !isError.isPrivateLink) {
-      setIsError({
-        ...isError,
-        isAxios: true,
-        axiosMsg: '입력 정보를 확인해 주십시오'
+  const createParty = () => {
+    if(partyInfo.name === '') {
+      setIsName({
+        err: true,
+        msg: '파티 이름을 입력해 주십시오'
       })
-    } else {
+    }
+    if(partyInfo.startDate === '') {
+      setIsStrDate({
+        err: true,
+        msg: '시작일을 선택해 주십시오'
+      })
+    }
+    if(partyInfo.endDate === '') {
+      setIsEndDate({
+        err: true,
+        msg: '마감일을 선택해 주십시오'
+      })
+    }
+    if(partyInfo.content === '') {
+      setIsContent({
+        err: true,
+        msg: '파티 내용을 입력해 주십시오'
+      })
+    }
+    if(partyInfo.region === '') {
+      setIsRegion({
+        err: true,
+        msg: '지역을 선택해 주십시오'
+      })
+    }
+    if(partyInfo.privateLink === '') {
+      setIsPLink({
+        err: true,
+        msg: '연락처를 입력해 주십시오'
+      })
+    }
+
+    else {
+      postParty()
+    }
+  }
+
+  const postParty = async () => {
+    if(!isName.err || !isStrDate.err || !isEndDate.err || !isContent.err || !isRegion.err || !isPLink.err) {
+      console.log('응애')
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/list/create`, {
         userId: signinReducer.userInfo?.id,
         partyInfo: {
@@ -458,8 +540,8 @@ export default function Post () {
             maxLength={30}
             onChange={(e) => {handleInputChange(e)}}
           />
-          {isError.isName ?
-          <div className='error'>{isError.nameMsg}</div> : null}
+          {isName.err ?
+          <div className='error'>{isName.msg}</div> : null}
         </fieldset>
         <fieldset>
           <div className='label'>퀘스트 기간</div>
@@ -471,8 +553,8 @@ export default function Post () {
             value={partyInfo.startDate}
             onChange={(e) => {handleInputChange(e)}}
           /><br />
-          {isError.isStrDate ?
-          <div className='error'>{isError.strDateMsg}</div> : null}
+          {isStrDate.err ?
+          <div className='error'>{isStrDate.msg}</div> : null}
           <span className='endDate'>마감일</span><br />
           <input
             name='endDate'
@@ -481,8 +563,8 @@ export default function Post () {
             value={partyInfo.endDate}
             onChange={(e) => {handleInputChange(e)}}
           />
-          {isError.isEndDate ?
-          <div className='error'>{isError.endDateMsg}</div> : null}
+          {isEndDate.err ?
+          <div className='error'>{isEndDate.msg}</div> : null}
         </fieldset>
         <fieldset>
           <div className='label'>파티 정원</div>
@@ -532,8 +614,8 @@ export default function Post () {
             onChange={(e) => {handleInputChange(e)}}
           />
           }
-          {isError.isRegion ?
-          <div className='error'>{isError.regionMsg}</div> : null}
+          {isRegion.err ?
+          <div className='error'>{isRegion.msg}</div> : null}
         </fieldset>
         <fieldset>
           <div className='label'>오픈 채팅방 링크</div>
@@ -544,8 +626,8 @@ export default function Post () {
             value={partyInfo.privateLink}
             onChange={(e) => {handleInputChange(e)}}
           />
-          {isError.isPrivateLink ?
-          <div className='error'>{isError.privateLinkMsg}</div> : null}
+          {isPLink.err ?
+          <div className='error'>{isPLink.msg}</div> : null}
         </fieldset>
         <fieldset>
           <div className='label'>태그</div>
@@ -580,11 +662,10 @@ export default function Post () {
             value={partyInfo.content}
             onChange={(e) => {handleTextareaChange(e)}}
           />
-          {isError.isContent ?
-          <div className='error'>{isError.contentMsg}</div> : null}
+          {isContent.err ?
+          <div className='error'>{isContent.msg}</div> : null}
         </fieldset>
         <div className='btn'>
-          <div className='error checkMsg'>{isError.axiosMsg}</div>
           <Button onClick={createParty}>QUEST</Button>
         </div>
       </PostCard>

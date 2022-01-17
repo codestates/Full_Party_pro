@@ -1,11 +1,14 @@
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 import { Dispatch } from 'redux'
 import Party from '../pages/Party';
+import { AppState } from '../reducers';
 import { SearchDispatchType, SEARCH_BY_KEYWORD, SEARCH_BY_TAG } from "./searchType";
 
 export const searchParty = (word: string, region?: string, searchBy?: string) => async (dispatch: Dispatch<SearchDispatchType>) => {
+  const userId = useSelector((state: AppState) => state.signinReducer.userInfo?.id)
   if(searchBy === 'byKeyword') {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?keyword=${word}&region=${region}`)
+    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?keyword=${word}&region=${region}&userId=${userId}`)
     const party = res.data.result
 
     dispatch({
@@ -16,7 +19,7 @@ export const searchParty = (word: string, region?: string, searchBy?: string) =>
     })
   }
   else if(searchBy === 'byTag') {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?tagName=${word}&region=${region}`)
+    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?tagName=${word}&region=${region}&userId=${userId}`)
     const party = res.data.result
 
     dispatch({
