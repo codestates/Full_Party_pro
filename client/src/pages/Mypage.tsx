@@ -133,6 +133,18 @@ export const MypartyCards = styled.div`
     .focus {
       color: black;
     }
+    .join {
+      cursor: pointer;
+    }
+    .recruite {
+      cursor: pointer;
+    }
+    .favorite {
+      cursor: pointer;
+    }
+    .complete {
+      cursor: pointer;
+    }
   }
 `
 
@@ -277,7 +289,8 @@ export default function Mypage () {
 
   //페이지 진입시 로딩
   useEffect(() => {
-    async function fetchBasicInfo() {
+    const fetchBasicInfo = async () => {
+      console.log('기본정보를 가져옵니다.')
       const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/${signinReducer.userInfo?.id}`)
       const userInfo = res.data.userInfo
       setBasicInfo({
@@ -287,15 +300,7 @@ export default function Mypage () {
         level: userInfo.region
       })
     }
-    // const res = axios.get(`http://localhost:3000/user/${signinReducer.userInfo?.id}`)
-    // const userInfo = res.data.userInfo
-    // setBasicInfo({
-    //   name: userInfo.name,
-    //   profileImage: userInfo.profileImage,
-    //   region: userInfo.region,
-    //   level: userInfo.region
-    // }) 통신으로 기본 데이터 받아오기
-
+    fetchBasicInfo()
     setIsLoading(false)
   },[])
 
