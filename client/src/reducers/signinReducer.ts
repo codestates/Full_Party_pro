@@ -1,17 +1,17 @@
 import { SIGNIN_FAIL, SIGNIN_SUCCESS, UserInfo, UserInfoDispatchType } from "../actions/signinType";
 
 interface InitialState {
-  isLogin?: boolean | null
-  userInfo?: UserInfo
+  isLoggedIn?: boolean | null
+  userInfo: UserInfo
 }
 
 const initialState: InitialState = {
-  isLogin: false,
+  isLoggedIn: false,
   userInfo: {
     id: 1,
-    userName: '김리덕스',
-    profileImage: '김리덕스프사',
-    region: '노원구',
+    userName: '귀오미',
+    profileImage: 'https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png',
+    region: '경기도 수원시',
     signupType: "general"
   }
 }
@@ -21,14 +21,15 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
     case SIGNIN_FAIL:
       return {
         ...state,
-        isLogin: false
+        isLoggedIn: false
       }
 
     case SIGNIN_SUCCESS:
       const { id, userName, profileImage, region, signupType } = action.payload
+      console.log(action.payload)
       return {
         ...state,
-        isLogin: true,
+        isLoggedIn: true,
         userInfo: {
           id,
           userName,

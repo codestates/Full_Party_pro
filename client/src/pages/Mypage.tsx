@@ -343,9 +343,9 @@ export default function Mypage () {
     fetchBasicInfo()
     setIsLoading(false)
   },[])
-
+  
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
   if(!isLoggedIn){
     return <Navigate to="/" />
@@ -626,6 +626,9 @@ export default function Mypage () {
             }
           })()}
         </fieldset>
+        <button onClick={handleSignOut}>
+          로그아웃
+        </button>
       </MypartyCards>
     </MypageContainer>
   );

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+
 import styled from 'styled-components';
 import axios from 'axios';
+import { ImGoogle } from "react-icons/im";
 // const dotenv = require('dotenv').config();
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -9,7 +11,6 @@ import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
-import { useEffect } from 'react';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -22,10 +23,9 @@ export const ModalContainer = styled.div`
 `;
 
 export const ModalBackdrop = styled.div`
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  background-color: rgba(169, 169, 169, 0.7);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.4);
 
   display: flex;
   justify-content: center;
@@ -34,89 +34,163 @@ export const ModalBackdrop = styled.div`
 
 export const ModalView = styled.div`
   width: 80%;
-  max-width: 600px;
-  position: absolute;
+  max-width: 350px;
+  max-height: 90vh;
+  overflow: auto;
 
-  border-radius: 20px;
+  border-radius: 30px;
   background-color: white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 
-  padding: 3vh;
+  padding: 30px;
   text-align: center;
 
-  .header {
+
+  header {
     font-size: 25px;
-    margin: 1.5vh 0;
+    line-height: 28px;
+    margin-bottom: 15px;
 
     font-family: 'SilkscreenBold';
   }
+  
+  .inputSection {
 
-  fieldset {
-    border: none;
-    margin: 1.5vh 0;
+    margin-bottom: 10px;
+
+    fieldset {
+      border: none;
+      margin: 15px 0;
+
+      .label {
+        font-family: 'SilkscreenRegular';
+        margin: 5px 0;
+      }
+
+      input {
+        width: 80%;
+        height: 30px;
+
+        border: none;
+        border-bottom: 1px solid #d5d5d5;
+
+        text-align: center;
+      }
+    }
   }
-
-  .label {
-    margin: 0.5vh 0;
-
-    font-family: 'SilkscreenRegular';
-  }
-
-  input {
-    width: 80%;
-    height: 4vh;
-
-    border: 1px solid #d5d5d5;
-    border-radius: 20px;
-
-    text-align: center;
-  }
+  
 
   .signinBtn {
     width: 80%;
-    height: 5vh;
+    height: 50px;
 
     border: none;
     border-radius: 20px;
-    background-image: linear-gradient(to right, #329D9C 20%, #56C596 100%);
+    background-color: #50C9C3;
     color: white;
 
     font-family: 'SilkscreenBold';
     font-size: 15px;
-    margin: 1.5vh 0;
+  
+    margin: 10px 0 15px 0;
   }
 
   .signupModalBtn {
-    color: #56C596;
+    color: #50C9C3;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
   }
 
   .toSignup {
-    font-size: 13px;
+    font-size: 0.8rem;
+    margin: 10px 0 20px 0;
   }
 
   .notUser{
-    color: red;
-    font-size: 9px;
+    display: none;
+
+    color: #f34508;
+    font-size: 10px;
+
+    margin: 25px 0 10px 0;
+  }
+
+  .oauthBtns {
+    padding: 0 5%;
+
+    .oauthLabel {
+      display: flex;
+      align-items: center;
+
+      font-size: 0.8rem;
+      margin-bottom: 15px;
+
+      hr {
+        flex-grow: 1;
+        height: 1px;
+        border: none;
+        background-color: #d5d5d5;
+        margin: 0 10px;
+      }
+    }
+
+    .oauth {
+      width: 50px;
+      height: 50px;
+      border-radius: 100%;
+      border: none;
+
+      margin: 0 10px;
+      padding-top: 2px;
+
+      img {
+        width: 25px;
+        height: 25px;
+      }
+
+      &.kakao {
+        background-color: #FEE500;
+      }
+
+      &.google {
+        background-color: white;
+        border: 1px solid #e0e0e0;
+      }
+    }
   }
 `
+
+const Button = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  min-height: 3rem;
+  font-size: 1rem;
+  border: 1.5px solid var(--color-maingreen--100);
+  * {
+    font-size: 0.5rem;
+  }
+`;
 
 export const CloseBtn = styled.button`
   width: 100%;
   text-align: right;
 
   cursor: pointer;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 
   background-color: white;
   border: none;
 `
 
-type Props = {
-  signinModalHandler: Function,
-}
+const SigninModal = () => {
 
-const SigninModal = ({ signinModalHandler }: Props) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
+
   const [userInfo, setUserInfo] = useState({
     email: '',
     password: ''
@@ -130,8 +204,6 @@ const SigninModal = ({ signinModalHandler }: Props) => {
     })
   }
 
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
-
   const handleSignin = () => {
     dispatch(fetchUserdata(userInfo))
   }
@@ -144,51 +216,66 @@ const SigninModal = ({ signinModalHandler }: Props) => {
     dispatch(modalChanger(e.currentTarget.className))
   }
 
+  const handleSignGoogle = () => {
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`;
+    window.location.assign(url);
+  };
+
+  const handleSignKakao = () => {
+    const url = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`;
+    window.location.assign(url);
+  };
+
   return(
     <ModalContainer>
       <ModalBackdrop>
         <ModalView>
           <CloseBtn><div className='closeModalBtn' onClick={(e) => closeModal(e)}><FontAwesomeIcon icon={faTimes} /></div></CloseBtn>
-          <div className='header'>
-            <div>Sign in</div>
-            <div>1st player</div>
-          </div>
-          <fieldset>
-            <div className='label'>email</div>
-            <input
-              type='text'
-              name='email'
-              value={userInfo.email}
-              onChange={(e) => handleInput(e)}
-            />
-          </fieldset>
-          <fieldset>
-            <div className='label'>password</div>
-            <input
-              type='text'
-              name='password'
-              value={userInfo.password}
-              onChange={(e) => handleInput(e)}
-            />
-          </fieldset>
-          {signinReducer.isLogin === false ? <div className='notUser'>입력하신 아이디 혹은 비밀번호가 유효하지 않습니다</div> : <span />}
-          <div className='footer'>
+          <header>
+            start
+            <br />1 player
+          </header>
+          <section className="inputSection">
+            <fieldset>
+              <div className='label'>email</div>
+              <input
+                type='text'
+                name='email'
+                value={userInfo.email}
+                onChange={(e) => handleInput(e)}
+              />
+            </fieldset>
+            <fieldset>
+              <div className='label'>password</div>
+              <input
+                type='text'
+                name='password'
+                value={userInfo.password}
+                onChange={(e) => handleInput(e)}
+              />
+            </fieldset>
+          </section>
+          {signinReducer.isLoggedIn === false ? <div className='notUser'>입력하신 아이디 혹은 비밀번호가 유효하지 않습니다.</div> : <span />}
+          <footer>
             <button className='signinBtn' onClick={handleSignin}>
               Press Start
             </button>
-          <div>
-            <a 
-              href={`https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`}>
-              <button>
-                카카오 로그인
-              </button>
-            </a>
-          </div>
             <section className='toSignup'>
               아직 풀팟의 파티원이 아니세요?<br />
               지금 바로 <span className='signupModalBtn' onClick={(e) => signupModal(e)}>회원가입</span> 하세요 🥳
             </section>
-          </div>
+            <div className="oauthBtns">
+              <div className="oauthLabel">
+                <hr /> OR <hr />
+              </div>
+              <button onClick={handleSignKakao} className="oauth kakao">
+                <img src="img/kakao_symbol.svg" />
+              </button>
+              <button onClick={handleSignGoogle} className="oauth google">
+                <img src="img/google_symbol.svg" />
+              </button>
+            </div>
+          </footer>
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>

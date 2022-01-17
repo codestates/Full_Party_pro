@@ -41,7 +41,7 @@ export const ListContainer = styled.div`
 export default function List () {
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const { userInfo, myParty, localParty } = dummyList;
@@ -73,7 +73,7 @@ export default function List () {
       : null}
       {localParty.length > 0 ?
         <LocalQuest location={userInfo.location} localParty={localParty} />
-        : <EmptyCard />}
+        : <EmptyCard from="list" />}
     </ListContainer>
   );
 }

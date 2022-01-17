@@ -42,6 +42,7 @@ export const ModalView = styled.div`
 
   .title {
     margin-bottom: 20px;
+    line-height: 1.7rem;
   }
 
   .buttons {
@@ -101,7 +102,8 @@ const PostCancelModal = ({ postCancelHandler, backToPage }: Props) => {
         <ModalView onClick={(e) => e.stopPropagation()}>
           <CloseBtn onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
           <div className="title">
-            파티 생성을 취소하시겠습니까?
+            페이지를 이동하시면
+            <br />지금까지 작업하신 내용은 전부 사라집니다.
           </div>
           <div className="buttons">
             <button 

@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare, faCheckSquare } from '@fortawesome/free-solid-svg-icons';
 
-import EmptyCard from '../components/EmptyCard';
 import QuestCard from '../components/QuestCard';
 import LocalMap from '../components/LocalMap';
 
