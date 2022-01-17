@@ -321,11 +321,13 @@ function Home () {
 
   useEffect(() => {
     let response;
+    const accessToken = document.cookie.slice(6);
+    const signupType = signinReducer.userInfo?.signupType;
     const requestKeepLoggedIn = async () => {
-      response = await axios.post("https://localhost:443/keeping", { accessToken: document.cookie.slice(6) });
+      response = await axios.post("https://localhost:443/keeping", { accessToken, signupType });
       return response;
     };
-    if (document.cookie) {
+    if (accessToken) {
       requestKeepLoggedIn().then((res) => {
         dispatch({
           type: SIGNIN_SUCCESS,
