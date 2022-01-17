@@ -9,9 +9,9 @@ const initialState: InitialState = {
   isLogin: false,
   userInfo: {
     id: 0,
-    name: '김리덕스',
-    userImage: '김리덕스프사',
-    region: '노원구'
+    userName: '김리덕스',
+    profileImage: '김리덕스프사',
+    region: '노원구',
   }
 }
 
@@ -24,15 +24,15 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
       }
 
     case SIGNIN_SUCCESS:
-      const { id, name, userImage, region } = action.payload
+      const { id, userName, profileImage, region } = action.payload
       return {
         ...state,
         isLogin: true,
         userInfo: {
           id,
-          name,
-          userImage,
-          region
+          userName,
+          profileImage,
+          region,
         }
       }
 

@@ -4,13 +4,12 @@ import { InternalServerError, SuccessfulResponse, FailedResponse } from "./funct
 import { deleteUser, findCompletedParty, findLeadingParty, findParticipatingParty, findUser, getNotification, updateUser } from "./functions/sequelize";
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 
-// API: 레벨 추가 필요
 export const getUserInfo = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "region", "exp", "level" ]);
     const notifications = await getNotification(Number(userId));
-    if (userInfo && notifications) return SuccessfulResponse(res, { 
+    if (userInfo && notifications) return SuccessfulResponse(res, {
       message: "Loaded Successfully",
       userInfo,
       notifications
@@ -80,7 +79,6 @@ export const getUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-// API: 바디에 id를 userId로
 export const verifyUser = async (req: Request, res: Response) => {
   try {
     const { userId, email, password } = req.body.userInfo;
@@ -93,9 +91,6 @@ export const verifyUser = async (req: Request, res: Response) => {
   }
 };
 
-// name ~ mobile
-// API: id -> userId
-// API: email 빼고, userName, birth, gender, region, mobile
 export const modifyUserInfo = async (req: Request, res: Response) => {
   try {
     const { userId, password, userName, birth, gender, region, mobile, profileImage } = req.body.userInfo;

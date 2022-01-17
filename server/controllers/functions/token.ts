@@ -21,8 +21,8 @@ export const verifyAccessToken = (token: string) => {
   }
 };
 
-export const setCookie = (res: Response, token: string | null) => {
-  res.cookie("jwt", token, {
+export const setCookie = (res: Response, type: string, token: string | null) => {
+  res.cookie(type, token, {
     secure: true,
     sameSite: "none",
     httpOnly: true

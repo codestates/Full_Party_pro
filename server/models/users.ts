@@ -4,7 +4,7 @@ import sequelize from './index';
 export interface UsersAttributes {
   id?: number;
   userName: string;
-  password: string;
+  password?: string;
   profileImage: string;
   birth: Date;
   gender: string;
@@ -49,7 +49,7 @@ Users.init(
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   profileImage: {
     type: DataTypes.STRING,

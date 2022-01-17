@@ -33,7 +33,8 @@ interface SubComments extends SubComment {
 export const findUser = async (prop: object, attributes: string[] = [ "id" ]) => {
   const user = await Users.findOne({
     where: { ...prop },
-    attributes
+    attributes,
+    raw: true
   });
   return user;
 };
@@ -333,7 +334,7 @@ export const getRelatedUsers = async (partyId: number) => {
   return [ ...waitingQueue, ...userParty ];
 };
 
-export const createNotificationsAtOnce = async (content: string, receivers: { userId: number }[], 
+export const createNotificationsAtOnce = async (content: string, receivers: { userId: number }[],
   partyId: number, userName: string = "", partyName: string = "") => {
   for (let i = 0; i < receivers.length; i++) {
     const notificationInfo: NotificationAttributes = {
@@ -485,7 +486,7 @@ export const updateExpAtOnce = async (exp: { userId: number, exp: number }[]) =>
 
 export const searchPartiesByTagName = async (tagName: string, region: string, userId: number) => {
   const tagResult = await Tag.findAll({
-    where: { 
+    where: {
       name: {
         [Op.like]: `%${tagName}%`
       }

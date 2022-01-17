@@ -322,7 +322,7 @@ export default function Mypage () {
         {/* 이미지 연결이 되면 주석 풀어준 뒤 border는 없애주세요
         <img className='profileImage' src={basicInfo.profileImage} /> */}
         <p className='mainProfile'>
-          <div className='userName'>{signinReducer.userInfo?.name}{basicInfo.name}</div>
+          <div className='userName'>{signinReducer.userInfo?.userName}{basicInfo.name}</div>
           <div>
             <FontAwesomeIcon icon={faMapMarkerAlt} className='mapMarker'/><span className='text'>지역정보를 받아옵니다{basicInfo.region}</span>
           </div>
