@@ -158,30 +158,11 @@ const SigninModal = ({ signinModalHandler }: Props) => {
     dispatch(modalChanger(e.currentTarget.className))
   }
 
-<<<<<<< HEAD
-  // const getCode = () => {
-  //   const code = new URL(window.location.href).searchParams.get("code");
-
-  //   return String(code);
-  // };
-
   const handleSignGoogle = () => {
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`
     window.location.assign(url);
   };
 
-
-  
-  const handleKakao = async () => {
-    // console.log(process.env.REACT_APP_KAKAO_REST_API_KEY);
-    // console.log(process.env.REACT_APP_REDIRECT_URI);
-    window.location.assign(
-      `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`
-    );
-  };
-
-=======
->>>>>>> d7f25c652d9e07137df907f61d5b0909b2852a33
   return(
     <ModalContainer>
       <ModalBackdrop>

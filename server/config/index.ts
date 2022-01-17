@@ -20,5 +20,9 @@ export default {
   google: {
     googleClientId: importer("GOOGLE_CLIENT_ID"),
     googleClientSecret: importer("GOOGLE_CLIENT_SECRET"),
-  }
+  },
+  kakao: {
+    kakaoClientId: importer("KAKAO_CLIENT_ID"),
+    kakaoClientSecret: importer("KAKAO_CLIENT_SECRET"),
+  },
 }

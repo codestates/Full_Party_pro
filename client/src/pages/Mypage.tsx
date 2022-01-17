@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-import { useSelector, useDispatch } from 'react-redux';
-=======
 import { useDispatch, useSelector } from 'react-redux';
->>>>>>> d7f25c652d9e07137df907f61d5b0909b2852a33
 import axios from 'axios';
 
 import styled from 'styled-components';
@@ -205,13 +201,8 @@ export const InfoTable = styled.table`
 `
 
 export default function Mypage () {
-<<<<<<< HEAD
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-=======
   const navigate = useNavigate();
   const dispatch = useDispatch();
->>>>>>> d7f25c652d9e07137df907f61d5b0909b2852a33
   const [isLoading, setIsLoading] = useState(true)
   const [isInfoLoading, setIsInfoLoading] = useState(true)
   const [basicInfo, setBasicInfo] = useState({
