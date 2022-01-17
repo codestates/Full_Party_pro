@@ -158,6 +158,7 @@ const SigninModal = ({ signinModalHandler }: Props) => {
     dispatch(modalChanger(e.currentTarget.className))
   }
 
+<<<<<<< HEAD
   // const getCode = () => {
   //   const code = new URL(window.location.href).searchParams.get("code");
 
@@ -179,6 +180,8 @@ const SigninModal = ({ signinModalHandler }: Props) => {
     );
   };
 
+=======
+>>>>>>> d7f25c652d9e07137df907f61d5b0909b2852a33
   return(
     <ModalContainer>
       <ModalBackdrop>

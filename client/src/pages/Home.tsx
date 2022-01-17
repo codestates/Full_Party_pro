@@ -321,9 +321,16 @@ function Home () {
 
   useEffect(() => {
     let response;
+<<<<<<< HEAD
     const accessToken = document.cookie.slice(6)
     const requestKeepLoggedIn = async () => {
       response = await axios.post("https://localhost:443/keeping", { accessToken });
+=======
+    const accessToken = document.cookie.slice(6);
+    const signupType = signinReducer.userInfo?.signupType;
+    const requestKeepLoggedIn = async () => {
+      response = await axios.post("https://localhost:443/keeping", { accessToken, signupType });
+>>>>>>> d7f25c652d9e07137df907f61d5b0909b2852a33
       return response;
     };
     if (accessToken) {
