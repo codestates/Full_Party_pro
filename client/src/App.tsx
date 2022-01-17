@@ -1,7 +1,10 @@
 import React, { useEffect, useState, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 import './App.css';
+
+import { useSelector } from 'react-redux';
+import { AppState } from './reducers';
+import { RootReducerType } from './store/store';
 
 import Home from './pages/Home';
 import List from './pages/List';
@@ -11,15 +14,14 @@ import Search from './pages/Search';
 import Notification from './pages/Notification';
 import Favorite from './pages/Favorite';
 import Mypage from './pages/Mypage';
+import NotFound from './pages/NotFound';
 
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
-
-import initialize from './config/initialize';
-import { AppState } from './reducers';
 import SigninModal from './components/SigninModal';
 import SignupModal from './components/SignupModal';
-import { RootReducerType } from './store/store'
+
+import initialize from './config/initialize';
 
 declare global {
   interface Window {
@@ -51,36 +53,34 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="App">
+        {!isLoggedIn? 
+          <Routes>
+            <Fragment>
+              <Route path="/" element={<Home />} />
+            </Fragment>
+          </Routes>
+        : null}
         <main className="view">
           <TopNav />
-          {(() => {
-            if(modalReducer.isModal) {
-              if(modalReducer.modalType === 'signin') {
-                return (
-                  <SigninModal signinModalHandler={signinModalHandler} />
-                )
-              }
-              else if(modalReducer.modalType === 'signup') {
-                return (
-                  <SignupModal />
-                )
-              }
-            }
-          })()}
+          {modalReducer.isModal && modalReducer.modalType === 'signin' ? <SigninModal signinModalHandler={signinModalHandler} /> :  null}
+          {modalReducer.isModal && modalReducer.modalType === 'signup' ? <SignupModal /> :  null}
           <section className="features">
             <Routes>
               <Fragment>
-                <Route path="/" element={<Home />} />
+                {isLoggedIn ? <Route path="/" element={<List />} /> : null}
+                {/* [dev] 로그인 기능 완성되면 아랫줄 지우기 */}
                 <Route path="/list" element={<List />} />
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
                 </Route>
                 <Route path="/post" element={<Post />} /> 
                 <Route path="/search" element={<Search />} />
-                {/* <Route path="/search:/keyword" element={<Search />} /> */}
+                <Route path="/search/:keyword" element={<Search />} />
+                <Route path="/search/tag/:keyword" element={<Search />} />
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/favorite" element={<Favorite />} />
                 <Route path="/mypage" element={<Mypage />} />
+                <Route path="*" element={<NotFound />} />
               </Fragment>
             </Routes>
           </section>

@@ -34,6 +34,7 @@ export const ModalBackdrop = styled.div`
 
 export const ModalView = styled.div`
   width: 80%;
+  max-width: 600px;
   position: absolute;
 
   border-radius: 20px;
@@ -62,7 +63,7 @@ export const ModalView = styled.div`
   }
 
   input {
-    width: 60vw;
+    width: 80%;
     height: 4vh;
 
     border: 1px solid #d5d5d5;
@@ -72,7 +73,7 @@ export const ModalView = styled.div`
   }
 
   .signinBtn {
-    width: 60vw;
+    width: 80%;
     height: 5vh;
 
     border: none;

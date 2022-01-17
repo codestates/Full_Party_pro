@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faBullhorn, faScroll, faTrophy, faStar } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faBullhorn, faScroll, faTrophy, faStar, faBellSlash } from '@fortawesome/free-solid-svg-icons';
 
 import { AppState } from '../reducers';
 
@@ -69,7 +69,7 @@ export const NotificationContainer = styled.div`
         color: #fa3e7d;
       }
 
-      &.level, &.star {
+      &.level, &.star, &.bell {
         color: #f9c80a;
       }
 
@@ -163,7 +163,7 @@ export default function Notification () {
       <div className="notificationList">
         <div className="contentWrapper">
           <div className="iconContainer">
-            <FontAwesomeIcon icon={ faScroll } className="icon scroll" />
+            <FontAwesomeIcon icon={ faBellSlash } className="icon bell" />
           </div>
           <div className="titleContainer">
             <div className="partyNameContainer">
@@ -172,7 +172,6 @@ export default function Notification () {
             <div>주변의 퀘스트를 둘러보고 파티에 참여해보세요!</div> 
           </div> 
         </div>
-        <div className="time">{timeForToday(new Date())}</div>
       </div>
     </NotificationContainer>)
   }

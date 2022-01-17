@@ -44,7 +44,7 @@ export default function List () {
     (state: AppState) => state.signinReducer.isLogin
   );
 
-  const { myParty, localParty } = dummyList;
+  const { userInfo, myParty, localParty } = dummyList;
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -72,7 +72,7 @@ export default function List () {
         </section>
       : null}
       {localParty.length > 0 ?
-        <LocalQuest localParty={localParty} />
+        <LocalQuest location={userInfo.location} localParty={localParty} />
         : <EmptyCard />}
     </ListContainer>
   );

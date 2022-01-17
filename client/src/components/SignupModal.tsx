@@ -32,6 +32,7 @@ export const ModalBackdrop = styled.div`
 
 export const ModalView = styled.div`
   width: 80%;
+  max-width: 600px;
   position: absolute;
 
   border-radius: 20px;
@@ -106,6 +107,7 @@ export const UserID = styled.table`
 
   input {
     width: 40vw;
+    max-width: 450px;
     height: 3vh;
 
     border: none;
@@ -134,6 +136,7 @@ export const UserInfo = styled.table`
 
 input {
   width: 40vw;
+  max-width: 450px;
   height: 3vh;
   text-align: center;
 
@@ -145,6 +148,7 @@ input {
 
 select {
   width: 40vw;
+  max-width: 450px;
   height: 3vh;
 
   background-color: white;
@@ -420,7 +424,7 @@ const SignupModal = () => {
       })
     }
     else {
-      axios.post('http://localhost:3000',{
+      axios.post(`${process.env.REACT_APP_API_URL}`,{
         userInfo: {
           email: userInfo.email,
           password: userInfo.password,
