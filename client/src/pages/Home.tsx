@@ -11,6 +11,10 @@ import "../../node_modules/aos/dist/aos.css";
 
 export const HomeContainer = styled.div`
 
+  position: absolute;
+
+  width: 100vw;
+  left: 0;
   margin-top: 40px;
   overflow: hidden;
 
