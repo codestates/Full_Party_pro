@@ -7,7 +7,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 
-import { RootReducerType } from '../store/store';
 import { modalChanger } from '../actions/modal';
 
 export const NavContainer = styled.nav`
