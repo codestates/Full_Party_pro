@@ -16,5 +16,13 @@ export default {
   },
   port: parseInt(importer("HTTPS_PORT", 8080), 10),
   cors: { allowedOrigin: importer("CORS_ALLOW_ORIGIN") },
-  accessSecret: importer("ACCESS_SECRET")
+  accessSecret: importer("ACCESS_SECRET"),
+  google: {
+    googleClientId: importer("GOOGLE_CLIENT_ID"),
+    googleClientSecret: importer("GOOGLE_CLIENT_SECRET"),
+  },
+  kakao: {
+    kakaoClientId: importer("KAKAO_CLIENT_ID"),
+    kakaoClientSecret: importer("KAKAO_CLIENT_SECRET"),
+  },
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import styled from 'styled-components';
 import axios from 'axios';
+import { ImGoogle } from "react-icons/im";
 // const dotenv = require('dotenv').config();
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -160,6 +161,19 @@ export const ModalView = styled.div`
   }
 `
 
+const Button = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  min-height: 3rem;
+  font-size: 1rem;
+  border: 1.5px solid var(--color-maingreen--100);
+  * {
+    font-size: 0.5rem;
+  }
+`;
+
 export const CloseBtn = styled.button`
   width: 100%;
   text-align: right;
@@ -202,6 +216,13 @@ const SigninModal = () => {
     dispatch(modalChanger(e.currentTarget.className))
   }
 
+<<<<<<< HEAD
+  const handleSignGoogle = () => {
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`
+    window.location.assign(url);
+  };
+
+=======
   // const getCode = () => {
   //   const code = new URL(window.location.href).searchParams.get("code");
 
@@ -224,6 +245,7 @@ const SigninModal = () => {
 
   }
 
+>>>>>>> f60d215e3d8f224aa54642f3ab2a46c88c30aa09
   return(
     <ModalContainer>
       <ModalBackdrop>
@@ -262,6 +284,18 @@ const SigninModal = () => {
               아직 풀팟의 파티원이 아니세요?<br />
               지금 바로 <span className='signupModalBtn' onClick={(e) => signupModal(e)}>회원가입</span> 하세요 🥳
             </section>
+<<<<<<< HEAD
+            <Button
+              className="google"
+              background-Color={"var(--color-black)"}
+              color={"#4384f3 !important"}
+              onClick={handleSignGoogle}
+            >
+              <ImGoogle fontSize="0.5rem" />
+              로그인
+            </Button>
+          </div>
+=======
             <div className="oauthBtns">
               <div className="oauthLabel">
                 <hr /> OR <hr />
@@ -274,6 +308,7 @@ const SigninModal = () => {
               </button>
             </div>
           </footer>
+>>>>>>> f60d215e3d8f224aa54642f3ab2a46c88c30aa09
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
