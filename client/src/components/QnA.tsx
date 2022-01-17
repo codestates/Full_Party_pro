@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-
+import signinReducer from '../reducers/signinReducer';
 import { AppState } from '../reducers';
 
 import CommentDeleteModal from './CommentDeleteModal';
@@ -189,7 +189,7 @@ type Props = {
 export default function QnA ({ partyId, isLeader, leaderId, comments, findComment }: Props) {
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+    (state: AppState) => state.signinReducer.isLogin
   );
 
   // [dev] 메시지 등록 권한을 위해 임시로 설정한 유저 아이디, 나중에 리덕스에서 userId 불러오는 코드로 바꾸기

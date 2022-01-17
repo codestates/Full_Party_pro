@@ -4,11 +4,12 @@ import { InternalServerError, SuccessfulResponse, FailedResponse } from "./funct
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 import { findUser, createUser } from "./functions/sequelize";
 import qs from "qs";
+import { Users } from "../models/users";
 
 export const signin = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    const userInfo = await findUser({ email, password }, [ "id", "profileImage", "userName", "region" ]);
+    const userInfo = await findUser({ email, password }, [ "id", "profileImage", "userName", "region", "signupType" ]);
     if (!userInfo) return FailedResponse(res, 401, "Unauthorized User");
     return SuccessfulResponse(res, { message: "You Have Successfully Signed In", userInfo });
   }
@@ -19,14 +20,25 @@ export const signin = async (req: Request, res: Response) => {
 
 export const signout = async (req: Request, res: Response) => {
   try {
-    const { accessToken } = req.body;
-    const response = await axios({
-      method: "POST",
-      url: "https://kapi.kakao.com/v1/user/logout",
-      headers: {
-        "Authorization": `Bearer ${accessToken}`
-      }
-    })
+    const { accessToken, signupType } = req.body;
+    if (signupType === "gereral") {
+      
+    }
+    else if (signupType === "kakao") {
+      const response = await axios({
+        method: "POST",
+        url: "https://kapi.kakao.com/v1/user/logout",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`
+        }
+      });
+    }
+    else if (signupType === "google") {
+      
+    }
+    else if (signupType === "guest") {
+
+    }
     return SuccessfulResponse(res, { message: "You Have Successfully Signed Out" });
   }
   catch (error) {
@@ -37,7 +49,7 @@ export const signout = async (req: Request, res: Response) => {
 export const signup = async (req: Request, res: Response) => {
   try {
     const { userInfo } = req.body;
-    const result = await createUser(userInfo);
+    const result = await createUser({ ...userInfo, signupType: "general" });
     if (result) return SuccessfulResponse(res, { message: "Welcome!" });
     return FailedResponse(res, 409, "Already Signed Up");
   }
@@ -71,6 +83,7 @@ export const kakao = async (req: Request, res: Response) => {
         code: authorizationCode
       }
     });
+
     const accessToken = response.data.access_token;
     const userInfoFromKakao = await axios({
       method: "GET",
@@ -79,6 +92,7 @@ export const kakao = async (req: Request, res: Response) => {
         "Authorization": `Bearer ${accessToken}`
       }
     });
+
     const { nickname, profile_image } = userInfoFromKakao.data.properties;
     const { email, gender } = userInfoFromKakao.data.kakao_account;
     const checkUser = await findUser({ email });
@@ -92,10 +106,11 @@ export const kakao = async (req: Request, res: Response) => {
         region: "KAKAO",
         mobile: "KAKAO",
         exp: 25,
-        level: 1
+        level: 1,
+        signupType: "kakao"
       });
     }
-    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region" ]);
+    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
     return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo: { ...userInfo, accessToken} });
   }
   catch (error) {
@@ -105,17 +120,28 @@ export const kakao = async (req: Request, res: Response) => {
 
 export const keepLoggedIn = async (req: Request, res: Response) => {
   try {
-    const { accessToken } = req.body;
-    const userInfoFromKakao = await axios({
-      method: "GET",
-      url: "https://kapi.kakao.com/v2/user/me",
-      headers: {
-        "Authorization": `Bearer ${accessToken}`
-      }
-    });
-    const { email } = userInfoFromKakao.data.kakao_account;
-    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region" ]);
-    SuccessfulResponse(res, { message: "SUCCESS KEEPING", userInfo });
+    const { accessToken, signupType } = req.body;
+    if (signupType === "general") {
+
+    }
+    else if (signupType === "kakao") {
+      const userInfoFromKakao = await axios({
+        method: "GET",
+        url: "https://kapi.kakao.com/v2/user/me",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`
+        }
+      });
+      const { email } = userInfoFromKakao.data.kakao_account;
+      const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
+      SuccessfulResponse(res, { message: "Keep Logged in", userInfo });
+    }
+    else if (signupType === "google") {
+
+    }
+    else if (signupType === "guest") {
+
+    }
   }
   catch (error) {
     InternalServerError(res, error);
