@@ -1,5 +1,6 @@
 const dummyList = {
   // "myParty": [],
+  "userInfo": { "location": "경기도 수원시 장안구 정자동 111" },
   "myParty": [
     {
       "id": 1,
@@ -68,10 +69,11 @@ const dummyList = {
       "endDate": new Date('12/25/2021'),
       "leaderId": 1,
       "favorite": true,
-      "tag": ["이웃wrqrqrqrqwrqwr", "효자손qrqrqwrqwrqr", "도와주세요qrqrqwrqwrr"],
+      "tag": ["이웃", "효자손", "도와주세요"],
       "isOnline": false,
       "region": "경기도 수원시",
-      "location": "경기도 수원시 장안구 정자동 111 101호",
+      "location": "경기도 수원시 장안구 정자동 111",
+      "latlng": {lat: 37.2884656931288, lng: 126.990616107101},
       "members": [
         {
           id: 1,
@@ -116,8 +118,8 @@ const dummyList = {
           "id": 4,
           "profileImage": "https://static.wikia.nocookie.net/animalcrossing/images/e/ec/Scoot_NH.png"
         }, {
-          "id": 1,
-          "profileImage": "https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png"
+          "id": 5,
+          "profileImage": "https://static.wikia.nocookie.net/animalcrossing/images/6/66/Joey_NH.png"
         },
       ]
     }, {
@@ -130,7 +132,7 @@ const dummyList = {
       "endDate": new Date('1/1/2022'),
       "leaderId": 12,
       "favorite": true,
-      "tag": ["해돋이", "새해"],
+      "tag": ["해돋이ㅂㄱㅂㅈㄱㅂㄱㅈㄱㅂㄲㅂㅈㄱ", "새해ㅈㅂㄱㅂㅈㄲㄱㅂㅈㄱㅂㄱㅂㄱㅂㄱ"],
       "isOnline": true,
       "region": "경기도 수원시",
       "location": "www.Netflix.com",
@@ -142,31 +144,29 @@ const dummyList = {
       ]
     }, {
       "id": 4,
-      "name": "테스트 파티",
-      "image": "https://img.theqoo.net/flOqo",
+      "name": "더미 파티",
+      "image": "https://i.redd.it/k1hyxx55mi351.jpg",
       "memberLimit": 7,
       "content": "테스트",
       "startDate": new Date('12/24/2021'),
       "endDate": new Date('12/25/2021'),
-      "leaderId": 1,
+      "leaderId": 2,
       "favorite": true,
-      "tag": ["아무나 오세요"],
+      "tag": ["아무나", "오세요"],
       "isOnline": false,
       "region": "경기도 수원시",
-      "location": "경기 수원시 장안구 정자동 323-21",
+      "location": "경기 수원시 팔달구 일월로 50",
+      "latlng": {lat: 37.2878291286377, lng: 126.978878045673},
       "members": [
         {
-          id: 1,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png",
-        }, {
           id: 2,
           profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/b/b8/Deena_NH.png",
         }, {
+          id: 1,
+          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png",
+        }, {
           id: 3,
           profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/6/6b/Pate_NH.png",
-        }, {
-          id: 4,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/e/ec/Scoot_NH.png",
         }
       ]
     }

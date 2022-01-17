@@ -25,32 +25,50 @@ export const LocalQuestContainer = styled.section`
     }
   } 
 
-  .filter {
+  .listOptions {
     font-weight: normal;
     font-size: 1rem;
 
     display: flex;
+    justify-content: space-between;
     margin: 15px 0;
 
-    .options {
-      margin-right: 10px;
-    }
+    .filter {
+      display: flex;
 
-    input[type="checkbox"] {
-      display: none;
-    }
+      .options {
+        margin-right: 10px;
+      }
 
-    .icon {
-      margin-right: 8px;
+      input[type="checkbox"] {
+        display: none;
+      }
+
+      .icon {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  @media screen and (max-width: 699px) {
+
+    .listOptions{
+      flex-direction: column-reverse;
+      margin: 7px 0;
+
+      .filter {
+        margin-top: 5px;
+      }
     }
   }
 `;
 
 type Props = {
+  location: string,
   localParty: Array<{ [key: string]: any }>
 };
 
-export default function LocalQuest ({ localParty }: Props) {
+export default function LocalQuest ({ location, localParty }: Props) {
 
   const [partyList, setPartyList] = useState(localParty.map(local => local).reverse());
   const [checked, setChecked] = useState({ online: true, offline: true });
@@ -75,40 +93,48 @@ export default function LocalQuest ({ localParty }: Props) {
     <LocalQuestContainer>
       <header className="listHeader">
           내 주변의 퀘스트
-          <div className="filter">
-            <div className="options">
-              <input 
-                type="checkbox"
-                id="online"
-                checked={checked.online}
-                onChange={checkboxHandler}
-              /> 
-              <label htmlFor="online">
-                <FontAwesomeIcon 
-                  icon={ checked.online? faCheckSquare : faSquare } 
-                  style={{ color: "#50C9C3" }}
-                  className="icon"
-                />온라인 퀘스트
-              </label>
+          <div className="listOptions">
+            <div className="filter">
+              <div className="options">
+                <input 
+                  type="checkbox"
+                  id="online"
+                  checked={checked.online}
+                  onChange={checkboxHandler}
+                /> 
+                <label htmlFor="online">
+                  <FontAwesomeIcon 
+                    icon={ checked.online? faCheckSquare : faSquare } 
+                    style={{ color: "#50C9C3" }}
+                    className="icon"
+                  />온라인 퀘스트
+                </label>
+              </div>
+              <div className="options">
+                <input 
+                  type="checkbox" 
+                  id="offline"
+                  checked={checked.offline}
+                  onChange={checkboxHandler}
+                /> 
+                <label htmlFor="offline">
+                  <FontAwesomeIcon 
+                    icon={ checked.offline? faCheckSquare : faSquare } 
+                    style={{ color: "#50C9C3" }}
+                    className="icon"
+                  />오프라인 퀘스트
+                </label> 
+              </div>
             </div>
-            <div className="options">
-              <input 
-                type="checkbox" 
-                id="offline"
-                checked={checked.offline}
-                onChange={checkboxHandler}
-              /> 
-              <label htmlFor="offline">
-                <FontAwesomeIcon 
-                  icon={ checked.offline? faCheckSquare : faSquare } 
-                  style={{ color: "#50C9C3" }}
-                  className="icon"
-                />오프라인 퀘스트
-              </label> 
-            </div>
+            {checked.offline?
+              <div>
+                <b>현재 위치:</b> {location}
+              </div>
+            : null}
           </div>
+         
         </header> 
-        {checked.offline ? <LocalMap localParty={localParty.filter(local => !local.isOnline)} /> : null}
+        {checked.offline ? <LocalMap location={location} localParty={localParty.filter(local => !local.isOnline)} /> : null}
         {partyList.map((party, idx) => <QuestCard key={idx} party={party} />)}
     </LocalQuestContainer>
   );
