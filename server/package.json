@@ -8,7 +8,7 @@
     "local-start": "nodemon --exec ts-node -T app.ts",
     "deploy-start": "ts-node app.ts",
     "db:create": "ts-node ./migrations/create-db.ts",
-    "db:migrate": "ts-node ./migrations/create-table.ts"
+    "db:migrate": "ts-node ./migrations/create-tables.ts"
   },
   "author": "",
   "license": "ISC",

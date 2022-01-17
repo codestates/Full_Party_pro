@@ -3,8 +3,8 @@ export const SIGNIN_FAIL = 'SIGNIN_FAIL'
 
 export type UserInfo = {
   id: number
-  name: string
-  userImage: string
+  userName: string
+  profileImage: string
   region: string
 }
 
