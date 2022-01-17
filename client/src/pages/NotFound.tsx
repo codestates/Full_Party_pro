@@ -5,9 +5,10 @@ import styled from 'styled-components';
 
 export const Container = styled.section`
   width: 100%;
-  height: 90vh;
+  height: 98vh;
 
-  margin: 60px 0;
+  padding-top: 60px 0;
+  overflow: hidden;
 
   display: flex;
   flex-direction: column;
@@ -49,18 +50,13 @@ export const Container = styled.section`
 
     margin-top: 25px;
     margin-bottom: 0;
-
-    &:hover {
-    background-color: #50C9C3;
-    color: white;
-    }
   }
 `;
 
 export default function NotFound () {
 
   const navigate = useNavigate();
-  
+   
   return (
     <Container>
       <header>

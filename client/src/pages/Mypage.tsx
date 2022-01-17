@@ -321,7 +321,7 @@ export default function Mypage () {
   },[])
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
   if(!isLoggedIn){
     return <Navigate to="/" />

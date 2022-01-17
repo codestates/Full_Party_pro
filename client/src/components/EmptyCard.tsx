@@ -42,11 +42,6 @@ export const CardContainer = styled.section`
 
       margin-top: 25px;
       margin-bottom: 0;
-
-      &:hover {
-        background-color: #50C9C3;
-        color: white;
-      }
     }
   }
 
@@ -63,20 +58,31 @@ export const CardContainer = styled.section`
   }
 `;
 
-export default function EmptyCard () {
+type Props = {
+  from: string,
+}
+
+export default function EmptyCard ({ from } : Props) {
 
   const navigate = useNavigate();
   
   return (
     <CardContainer>
-      <header className="listHeader">
-        내 주변의 퀘스트
-      </header>
+      {from === "list" ?
+        <header className="listHeader">
+          내 주변의 퀘스트
+        </header>
+      : null}
       <main className="postMsgContainer">
-        <div className="postMsg">
-          아직 이 지역에 모집중인 퀘스트가 없어요.
-          <br />직접 파티를 만들고 <b>파티원</b>을 찾아보세요! 🧚
-        </div>
+        {from === "list" ?
+          <div className="postMsg">
+            아직 이 지역에 모집중인 퀘스트가 없어요.
+            <br />직접 파티를 만들고 <b>파티원</b>을 찾아보세요! 🧚
+          </div>
+        :  <div className="postMsg" style={{ margin: "50px 0 15px 0" }}>
+            찾으시는 퀘스트가 없어요.
+            <br />직접 파티를 만들어 <b>파티원</b>을 찾아보세요! 🧚
+          </div>}
         <button id="post" onClick={() => navigate('../post')}>press start</button>    
       </main>
     </CardContainer>
