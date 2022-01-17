@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
 import { RootReducerType } from '../store/store';
 import { searchParty } from '../actions/search';
+import axios from 'axios';
 
 export const SearchContainer = styled.div`
   background-color: #fafafa;
