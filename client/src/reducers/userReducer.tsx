@@ -8,7 +8,7 @@ import { LOGIN_USER, REGISTER_USER } from "../actions/index";
 //   [key: string]: any  
 // }
 
-const initialState = { isLoggedIn: true };
+const initialState = { isLoggedIn: false };
 
 function userReducer(state = initialState, action: { type: string; payload: object; }) {
 

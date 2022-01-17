@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+// const dotenv = require('dotenv').config();
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -8,6 +9,7 @@ import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
+import { useEffect } from 'react';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -117,7 +119,7 @@ const SigninModal = ({ signinModalHandler }: Props) => {
   const [userInfo, setUserInfo] = useState({
     email: '',
     password: ''
-  })
+  });
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target
@@ -140,6 +142,20 @@ const SigninModal = ({ signinModalHandler }: Props) => {
   const signupModal = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
   }
+
+  // const getCode = () => {
+  //   const code = new URL(window.location.href).searchParams.get("code");
+
+  //   return String(code);
+  // };
+
+  const handleKakao = async () => {
+    // console.log(process.env.REACT_APP_KAKAO_REST_API_KEY);
+    // console.log(process.env.REACT_APP_REDIRECT_URI);
+    // window.location.assign(
+    //   `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`
+    // );
+  };
 
   return(
     <ModalContainer>
@@ -173,6 +189,14 @@ const SigninModal = ({ signinModalHandler }: Props) => {
             <button className='signinBtn' onClick={handleSignin}>
               Press Start
             </button>
+          <div>
+            <a 
+              href={`https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`}>
+              <button>
+                카카오 로그인
+              </button>
+            </a>
+          </div>
             <section className='toSignup'>
               아직 풀팟의 파티원이 아니세요?<br />
               지금 바로 <span className='signupModalBtn' onClick={(e) => signupModal(e)}>회원가입</span> 하세요 🥳
