@@ -321,31 +321,39 @@ function Home () {
 
   useEffect(() => {
     let response;
-    const accessToken = document.cookie.slice(6);
-    const signupType = signinReducer.userInfo?.signupType;
-    const requestKeepLoggedIn = async () => {
-      response = await axios.post("https://localhost:443/keeping", { accessToken, signupType });
-      return response;
-    };
-    if (accessToken) {
-      requestKeepLoggedIn().then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
+    if (document.cookie) {
+      const cookie = document.cookie.split("; ");
+      const accessToken = cookie[0].replace("token=", "");
+      const signupType = cookie[1].replace("signupType=", "");
+      const requestKeepLoggedIn = async () => {
+        response = await axios.post("https://localhost:443/keeping", { accessToken, signupType });
+        return response;
+      };
+      if (accessToken) {
+        console.log(signupType);
+        requestKeepLoggedIn().then((res) => {
+          console.log(res.data);
+          dispatch({
+            type: SIGNIN_SUCCESS,
+            payload: res.data.userInfo
+          });
         });
-      });
+      }
     }
     else if (new URL(window.location.href).searchParams.get("code")) handleKakaoLogin();
   }, []);
 
   const handleKakaoLogin = async () => {
     const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post("https://localhost:443/kakao", { authorizationCode });
+    const response = await axios.post("https://localhost:443/kakao", { authorizationCode }, {
+      withCredentials: true
+    });
     dispatch({
       type: SIGNIN_SUCCESS,
       payload: response.data.userInfo
     });
     document.cookie = "token=" + response.data.userInfo.accessToken;
+    document.cookie = "signupType=kakao";
   };
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => {

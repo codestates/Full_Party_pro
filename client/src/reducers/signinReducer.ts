@@ -8,7 +8,7 @@ interface InitialState {
 const initialState: InitialState = {
   isLogin: false,
   userInfo: {
-    id: 0,
+    id: 1,
     userName: '김리덕스',
     profileImage: '김리덕스프사',
     region: '노원구',

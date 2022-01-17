@@ -29,7 +29,8 @@ export const signout = async (req: Request, res: Response) => {
         method: "POST",
         url: "https://kapi.kakao.com/v1/user/logout",
         headers: {
-          "Authorization": `Bearer ${accessToken}`
+          "Authorization": `Bearer ${accessToken}`,
+          "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
         }
       });
     }
@@ -99,7 +100,7 @@ export const kakao = async (req: Request, res: Response) => {
     if (!checkUser) {
       await createUser({
         userName: nickname,
-        profileImage: profile_image,
+        profileImage: profile_image ? profile_image : null,
         email,
         gender: gender === "male" ? "M" : "F",
         birth: new Date("11/11/2222"),
@@ -122,7 +123,7 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
   try {
     const { accessToken, signupType } = req.body;
     if (signupType === "general") {
-
+      
     }
     else if (signupType === "kakao") {
       const userInfoFromKakao = await axios({
@@ -137,7 +138,7 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
       SuccessfulResponse(res, { message: "Keep Logged in", userInfo });
     }
     else if (signupType === "google") {
-
+      
     }
     else if (signupType === "guest") {
 

@@ -206,7 +206,7 @@ export default function Mypage () {
   const [isLoading, setIsLoading] = useState(true)
   const [isInfoLoading, setIsInfoLoading] = useState(true)
   const [basicInfo, setBasicInfo] = useState({
-    name: '',
+    userName: '',
     profileImage: '',
     region: '',
     level: ''
@@ -265,7 +265,7 @@ export default function Mypage () {
   const submitInfo = async () => {
     const { name, password, confirm, birth, gender, region, mobile, nowPwd } = changeInfo
 
-    const verify = await axios.post('http://localhost3000/user/verification', {
+    const verify = await axios.post('https://localhost:443/user/verification', {
       userInfo: {
         id: signinReducer.userInfo?.id,
         password: nowPwd
@@ -273,7 +273,7 @@ export default function Mypage () {
       }
     })
     if(verify.data.message === "User Identified") {
-      const res = await axios.patch('http://localhost3000/user/profile', {
+      const res = await axios.patch('https://localhost:443/user/profile', {
         userInfo: {
           userName: name,
           password: password,
@@ -291,26 +291,50 @@ export default function Mypage () {
   }
 
   const handleSignOut = async () => {
-    const accessToken = document.cookie.slice(6);
-    const signupType = signinReducer.userInfo?.signupType;
+    const cookie = document.cookie.split("; ");
+    const accessToken = cookie[0].replace("token=", "");
+    const signupType = cookie[1].replace("signupType=", "");
     await axios.post("https://localhost:443/signout", {
       accessToken, signupType
     });
     dispatch({
       type: SIGNIN_FAIL
     });
-    document.cookie = "token=" + "";
+    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
     navigate("/");
+  };
+
+  const handleWithdrawal = async () => {
+    const cookie = document.cookie.split("; ");
+    const accessToken = cookie[0].replace("token=", "");
+    const signupType = cookie[1].replace("signupType=", "");
+    const userId = signinReducer.userInfo?.id;
+    await axios.delete(`https://localhost:443/user/${userId}/${signupType}`,{
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    document.cookie = "token=;";
+    document.cookie = "signupType=;";
+    navigate("http://localhost:3000");
   };
 
   //페이지 진입시 로딩
   useEffect(() => {
     const fetchBasicInfo = async () => {
-      console.log('기본정보를 가져옵니다.')
-      const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/${signinReducer.userInfo?.id}`)
-      const userInfo = res.data.userInfo
+      const cookie = document.cookie.split("; ");
+      const accessToken = cookie[0].replace("token=", "");
+      const signupType = cookie[1].replace("signupType=", "");
+      const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}/${signupType}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        },
+        withCredentials: true
+      });
+      const userInfo = res.data.userInfo;
       setBasicInfo({
-        name: userInfo.userName,
+        userName: userInfo.userName,
         profileImage: userInfo.profileImage,
         region: userInfo.region,
         level: userInfo.region
@@ -338,7 +362,7 @@ export default function Mypage () {
         {/* 이미지 연결이 되면 주석 풀어준 뒤 border는 없애주세요
         <img className='profileImage' src={basicInfo.profileImage} /> */}
         <p className='mainProfile'>
-          <div className='userName'>{signinReducer.userInfo?.userName}{basicInfo.name}</div>
+          <div className='userName'>{basicInfo.userName}</div>
           <div>
             <FontAwesomeIcon icon={faMapMarkerAlt} className='mapMarker'/><span className='text'>지역정보를 받아옵니다{basicInfo.region}</span>
           </div>
@@ -570,6 +594,7 @@ export default function Mypage () {
         </button>
         }
         <button onClick={handleSignOut}>로그아웃</button>
+        <button onClick={handleWithdrawal}>회원탈퇴</button>
       </MypageInfo>
       <MypartyCards>
         <div className='subject'>내 파티</div>

@@ -29,8 +29,8 @@ export const setCookie = (res: Response, type: string, token: string | null) => 
   });
 };
 
-export const clearCookie = (res: Response) => {
-  res.clearCookie("jwt", {
+export const clearCookie = (res: Response, type: string) => {
+  res.clearCookie(type, {
     secure: true,
     sameSite: "none",
     httpOnly: true
