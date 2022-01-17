@@ -4,7 +4,7 @@ import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "./signinType"
 
 export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<UserInfoDispatchType>) => {
   try {
-    const res = await axios.post(`http://localhost:3000/signin`, userInfo)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/signin`, userInfo)
     const data = res.data
 
     dispatch({

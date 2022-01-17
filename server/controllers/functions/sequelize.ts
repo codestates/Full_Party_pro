@@ -33,7 +33,8 @@ interface SubComments extends SubComment {
 export const findUser = async (prop: object, attributes: string[] = [ "id" ]) => {
   const user = await Users.findOne({
     where: { ...prop },
-    attributes
+    attributes,
+    raw: true
   });
   return user;
 };

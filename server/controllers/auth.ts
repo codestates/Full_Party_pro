@@ -5,7 +5,6 @@ import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "
 import { findUser, createUser } from "./functions/sequelize";
 import qs from "qs";
 
-
 export const signin = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -97,44 +96,28 @@ export const kakao = async (req: Request, res: Response) => {
       });
     }
     const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region" ]);
-    return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo });
+    return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo: { ...userInfo, accessToken} });
   }
   catch (error) {
     InternalServerError(res, error);
   }
 };
 
-/**
- * 카카오 로그인
- * 1. 프론트 -> 카카오 : 인증 코드 요청
- * 2. 카카오 -> 프론트 : 인증 코드 전달
- * 3. 프론트 -> 백엔드 : 인증 코드 전송                                  #
- * 4. 백엔드 -> 카카오 : 인증 코드로 토큰 요청                             #
- * 5. 카카오 -> 백엔드 : 토큰 전달
- * 6. 백엔드 내       : 카카오에서 받은 토큰으로 우리 사이트 전용 토큰 발행      #
- * 7. 백엔드 -> 프론트 : 우리 사이트 전용 토큰 전송                         #
- * 8. 프론트 내       : 토큰을 로컬 스토리지에 저장해서 자동 로그인 구현
- */
-
-/**
- *
-  {
-    "grant_type": "authorization_code",
-    "client_id": "dfdae48bc5a2f6e1f3326d50455762b3",
-    "redirect_uri": "http://localhost:443",
-    "code": "eHYGMf3Vm2V5IbA0frZ1qfvdsgJwgZcv"
-  };
- */
-
-/**
- * 1. 출생연도 => 배제
- * 2. 전화번호 => 배제
- * 3. 주소    => "주소 입력이 필요합니다. 마이페이지에서 주소를 입력해주세요"
- */
-
-/**
- * 출생연도, 전화번호 들어가는 창
- * - 마이페이지 프로필
- * - 회원가입 모달
- */
-
+export const keepLoggedIn = async (req: Request, res: Response) => {
+  try {
+    const { accessToken } = req.body;
+    const userInfoFromKakao = await axios({
+      method: "GET",
+      url: "https://kapi.kakao.com/v2/user/me",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`
+      }
+    });
+    const { email } = userInfoFromKakao.data.kakao_account;
+    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region" ]);
+    SuccessfulResponse(res, { message: "SUCCESS KEEPING", userInfo });
+  }
+  catch (error) {
+    InternalServerError(res, error);
+  }
+};

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-
+import { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AppState } from '../reducers';
@@ -19,13 +19,28 @@ export const HomeContainer = styled.div`
 
 function Home () {
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+  const isLogIn = useSelector(
+    (state: AppState) => state.signinReducer.isLogin
+  );
+  const signinReducer = useSelector(
+    (state: AppState) => state.signinReducer
   );
 
   useEffect(() => {
-    if (new URL(window.location.href).searchParams.get("code") ) handleKakaoLogin();
-    
+    let response;
+    const requestKeepLoggedIn = async () => {
+      response = await axios.post("https://localhost:443/keeping", { accessToken: document.cookie.slice(6) });
+      return response;
+    };
+    if (document.cookie) {
+      requestKeepLoggedIn().then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+      });
+    }
+    else if (new URL(window.location.href).searchParams.get("code")) handleKakaoLogin();
   }, []);
 
   const handleKakaoLogin = async () => {
@@ -33,14 +48,14 @@ function Home () {
     const response = await axios.post("https://localhost:443/kakao", { authorizationCode });
     dispatch({
       type: SIGNIN_SUCCESS,
-      payload: response.data
+      payload: response.data.userInfo
     });
-    console.log(response);
+    document.cookie = "token=" + response.data.userInfo.accessToken;
   };
 
-  if(isLoggedIn){
-    return <Navigate to="/list" />
-  }
+  // if(isLogIn){
+  //   return <Navigate to="/list" />
+  // }
 
   return (
     <HomeContainer>
@@ -48,6 +63,5 @@ function Home () {
     </HomeContainer>
   );
 }
-
 
 export default Home;

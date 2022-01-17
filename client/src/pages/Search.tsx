@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import axios from 'axios';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -42,32 +41,29 @@ export const SearchBar = styled.div`
 
   .faSearch {
     position: absolute;
-    left 86%;
+    left: 86%;
 
     color: #888;
   }
 
-  @media screen and (min-width: 500px) {
-    width: 1280px;
+  @media screen and (min-width: 1000px) {
+    .faSearch {
+      left: 79%;
+    }
   }
 `
 
 export const SearchContent = styled.div`
   width: 100%;
-  height: 100vh;
+  min-height: 75vh;
   display: flex;
   margin: 0 auto;
 
   padding-top: 16px;
-
-  @media screen and (min-width: 500px) {
-    width: 1280px;
-  }
 `
 
 export const NoQuest = styled.div`
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
@@ -110,12 +106,23 @@ export default function Search () {
   const searchRegion = signinReducer.userInfo?.region
 
   const searchQuest = () => {
-    dispatch(searchParty(word, searchRegion))
+    dispatch(searchParty(word, searchRegion, 'byKeyword'))
     setIsSearch(true)
   }
+  const enterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if(e.key === 'Enter') {
+      searchQuest()
+    }
+  }
+  //태그 검색 요청이 들어오면 이걸 실행해 주세요
+  const searchTag = (tag: string) => {
+    dispatch(searchParty(tag, searchRegion, 'byTag'))
+    setIsSearch(true)
+  }
+  //--------------------------------//
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+    (state: AppState) => state.signinReducer.isLogin
   );
 
   if(!isLoggedIn){
@@ -125,13 +132,16 @@ export default function Search () {
   return (
     <SearchContainer>
       <SearchBar>
+        {/* <div>{keyword}</div> */}
         <input
           name='word'
           value={word}
           onChange={(e) => handleInputChange(e)}
+          onKeyUp={(e) => enterKey(e)}
           placeholder='Search...'
         ></input>
         <div className='faSearch' onClick={searchQuest}>
+          {/* 검색 결과를 가져온 뒤 스토어에 저장합니다. */}
           <FontAwesomeIcon icon={faSearch} />
         </div>
       </SearchBar>
@@ -139,7 +149,7 @@ export default function Search () {
         {(() => {
           if(!isSearch) {
             return (
-              <div>검색안험</div>
+              <div />
             )
           }
           else if(isSearch && searchReducer.parties.length !== 0) {

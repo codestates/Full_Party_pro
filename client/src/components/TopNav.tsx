@@ -97,11 +97,7 @@ export default function TopNav () {
   const dispatch = useDispatch()
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
-  );
-
-  const isBadgeOn = useSelector(
-    (state: AppState) => state.notifyReducer.isBadgeOn
+    (state: AppState) => state.signinReducer.isLogin
   );
 
   const handleSignOut = async () => {
@@ -113,6 +109,10 @@ export default function TopNav () {
   const handleModal = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
   }
+
+  const isBadgeOn = useSelector(
+    (state: AppState) => state.notifyReducer.isBadgeOn
+  );
 
   // const [isSearchBarOn, setIsSearchBarOn] = useState(true);
 

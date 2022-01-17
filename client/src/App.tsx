@@ -36,7 +36,7 @@ export default function App() {
   }
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+    (state: AppState) => state.signinReducer.isLogin
   );
 
   const { Kakao } = window;
@@ -77,13 +77,14 @@ export default function App() {
                 </Route>
                 <Route path="/post" element={<Post />} /> 
                 <Route path="/search" element={<Search />} />
+                {/* <Route path="/search:/keyword" element={<Search />} /> */}
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/favorite" element={<Favorite />} />
                 <Route path="/mypage" element={<Mypage />} />
               </Fragment>
             </Routes>
           </section>
-          {isLoggedIn? <BottomNav /> : null}
+          {isLoggedIn ? <BottomNav /> : null}
         </main>
       </div>
     </BrowserRouter>
