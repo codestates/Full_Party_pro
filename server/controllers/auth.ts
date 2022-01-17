@@ -34,7 +34,6 @@ export const signout = async (req: Request, res: Response) => {
           "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
         }
       });
-      console.log(response.data)
     }
     else if (signupType === "google") {
       
@@ -114,7 +113,6 @@ export const googleSignIn = async (req: Request, res: Response) => {
       });
     }
     const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
-    console.log(userInfo)
     return SuccessfulResponse(res, { message: "You have successfully signed in with Google Account", userInfo: { ...userInfo, accessToken} });
   } catch (error) {
     InternalServerError(res, error);
@@ -124,7 +122,6 @@ export const googleSignIn = async (req: Request, res: Response) => {
 export const kakao = async (req: Request, res: Response) => {
   try {
     const { authorizationCode } = req.body;
-    console.log(authorizationCode)
     const response = await axios({
       method: "POST",
       url: "https://kauth.kakao.com/oauth/token",
@@ -147,7 +144,6 @@ export const kakao = async (req: Request, res: Response) => {
         "Authorization": `Bearer ${accessToken}`
       }
     });
-    console.log(userInfoFromKakao)
     const { nickname, profile_image } = userInfoFromKakao.data.properties;
     const { email, gender } = userInfoFromKakao.data.kakao_account;
     const checkUser = await findUser({ email });
@@ -166,7 +162,6 @@ export const kakao = async (req: Request, res: Response) => {
       });
     }
     const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
-    console.log(userInfo)
     return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo: { ...userInfo, accessToken} });
   }
   catch (error) {
@@ -176,7 +171,6 @@ export const kakao = async (req: Request, res: Response) => {
 
 export const keepLoggedIn = async (req: Request, res: Response) => {
   try {
-    console.log('1111111111111111111', req.body)
     const { accessToken, signupType } = req.body;
     if (signupType === "general") {
       

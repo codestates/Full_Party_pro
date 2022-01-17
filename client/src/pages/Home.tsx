@@ -333,18 +333,16 @@ function Home () {
         response = await axios.post("https://localhost:443/keeping", { accessToken, signupType });
         return response;
       };
-      if (accessToken) {
-        console.log(signupType);
-        requestKeepLoggedIn().then((res) => {
-          console.log(res.data);
-          dispatch({
-            type: SIGNIN_SUCCESS,
-            payload: res.data.userInfo
-          });
+      console.log(signupType);
+      requestKeepLoggedIn().then((res) => {
+        console.log(res.data);
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
         });
-      }
+      });
     }
-    else if (new URL(window.location.href).searchParams.get("code")) handleKakaoLogin();
+    if (new URL(window.location.href).searchParams.get("code")) handleKakaoLogin();
   }, []);
 
   const handleGoogleLogin = async () => {

@@ -7,40 +7,14 @@ import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "
 
 export const getUserInfo = async (req: Request, res: Response) => {
   try {
-    const { userId, signupType } = req.params;
-    const accessToken = req.headers.authorization?.slice(6);
+    const { userId } = req.params;
     const notifications = await getNotification(Number(userId));
-    if (signupType === "gereral") {
-      
-    }
-    else if (signupType === "kakao") {
-      try {
-        const userInfoFromKakao = await axios({
-          method: "GET",
-          url: "https://kapi.kakao.com/v2/user/me",
-          headers: {
-            "Authorization": `Bearer ${accessToken}`,
-            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-          }
-        });
-        const { email } = userInfoFromKakao.data.kakao_account;
-        const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "exp", "level", "signupType" ]);
-        if (userInfo && notifications) return SuccessfulResponse(res, {
-          message: "Loaded Successfully",
-          userInfo,
-          notifications
-        });
-      }
-      catch (error) {
-        // console.log(error);
-      }
-    }
-    else if (signupType === "google") {
-      
-    }
-    else if (signupType === "guest") {
-
-    }
+      const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "region", "exp", "level", "signupType" ]);
+      if (userInfo && notifications) return SuccessfulResponse(res, {
+        message: "Loaded Successfully",
+        userInfo,
+        notifications
+      });
     return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {

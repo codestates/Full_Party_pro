@@ -324,12 +324,9 @@ export default function Mypage () {
   useEffect(() => {
     const fetchBasicInfo = async () => {
       const cookie = document.cookie.split("; ");
-      const accessToken = cookie[0].replace("token=", "");
+      const accessToken = cookie[0].replace("token=", "").slice(1);
       const signupType = cookie[1].replace("signupType=", "");
-      const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}/${signupType}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        },
+      const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
         withCredentials: true
       });
       const userInfo = res.data.userInfo;
