@@ -271,10 +271,10 @@ const SigninModal = () => {
               <div className="oauthLabel">
                 <hr /> OR <hr />
               </div>
-              <button onClick={googleLoginHandler} className="oauth kakao">
+              <button onClick={kakaoLoginHandler} className="oauth kakao">
                 <img src="img/kakao_symbol.svg" />
               </button>
-              <button onClick={kakaoLoginHandler} className="oauth google">
+              <button onClick={googleLoginHandler} className="oauth google">
                 <img src="img/google_symbol.svg" />
               </button>
             </div>
