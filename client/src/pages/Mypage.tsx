@@ -268,14 +268,14 @@ export default function Mypage () {
   const dispatch = useDispatch();
 
   const [basicInfo, setBasicInfo] = useState({
-    name: '기본이름',
+    userName: '기본이름',
     profileImage: '기본이미지',
     region: '기본지역',
     level: '넘버타입',
     exp: '넘버타입'
   })
   const [changeInfo, setChangeInfo] = useState({
-    name: '',
+    userName: '',
     profileImage: '',
     password: '',
     confirm: '',
@@ -310,7 +310,7 @@ export default function Mypage () {
       const userInfo = res.data.userInfo
       setChangeInfo({
         ...changeInfo,
-        name: userInfo.userName,
+        userName: userInfo.userName,
         birth: userInfo.birth,
         region: userInfo.region,
         gender: userInfo.gender,
@@ -371,7 +371,7 @@ export default function Mypage () {
   }
 
   const submitInfo = async () => {
-    const { name, profileImage, password, confirm, birth, gender, region, mobile, nowPwd } = changeInfo
+    const { userName, profileImage, password, confirm, birth, gender, region, mobile, nowPwd } = changeInfo
     if(password !== confirm) {
       setWrongConfirm({
         ...wrongConfirm,
@@ -380,7 +380,7 @@ export default function Mypage () {
       return;
     }
 
-    const verify = await axios.post(`${process.env.REACT_APP_API_URL}/user/verification`, {
+    const verify = await axios.post('https://localhost:443/user/verification', {
       userInfo: {
         id: signinReducer.userInfo?.id,
         password: nowPwd
@@ -388,10 +388,10 @@ export default function Mypage () {
       }
     })
     if(verify.data.message === "User Identified") {
-      const res = await axios.patch('http://localhost3000/user/profile', {
+      const res = await axios.patch('https://localhost:443/user/profile', {
         userInfo: {
           profileImage: profileImage,
-          userName: name,
+          userName: userName,
           password: password,
           birth: birth,
           gender: gender,
@@ -423,26 +423,47 @@ export default function Mypage () {
     setParties(myParty)
   }
   const handleSignOut = async () => {
-    const accessToken = document.cookie.slice(6);
-    const signupType = signinReducer.userInfo?.signupType;
+    const cookie = document.cookie.split("; ");
+    const accessToken = cookie[0].replace("token=", "");
+    const signupType = cookie[1].replace("signupType=", "");
     await axios.post("https://localhost:443/signout", {
       accessToken, signupType
     });
     dispatch({
       type: SIGNIN_FAIL
     });
-    document.cookie = "token=" + "";
+    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
+    navigate("/");
+  };
+
+  const handleWithdrawal = async () => {
+    const cookie = document.cookie.split("; ");
+    const accessToken = cookie[0].replace("token=", "");
+    const signupType = cookie[1].replace("signupType=", "");
+    const userId = signinReducer.userInfo?.id;
+    await axios.delete(`https://localhost:443/user/${userId}/${signupType}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+    document.cookie = "token=;";
+    document.cookie = "signupType=;";
     navigate("/");
   };
 
   //페이지 진입시 로딩
   useEffect(() => {
     const fetchBasicInfo = async () => {
-      console.log('기본정보를 가져옵니다.')
-      const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/${signinReducer.userInfo?.id}`)
-      const userInfo = res.data.userInfo
+      const cookie = document.cookie.split("; ");
+      const accessToken = cookie[0].replace("token=", "").slice(1);
+      const signupType = cookie[1].replace("signupType=", "");
+      const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
+        withCredentials: true
+      });
+      const userInfo = res.data.userInfo;
       setBasicInfo({
-        name: userInfo.userName,
+        userName: userInfo.userName,
         profileImage: userInfo.profileImage,
         region: userInfo.region,
         level: userInfo.region,
@@ -472,7 +493,7 @@ export default function Mypage () {
         {/* 이미지 연결이 되면 주석 풀어준 뒤 border는 없애주세요
         <img className='profileImage' src={basicInfo.profileImage} /> */}
         <p className='mainProfile'>
-          <div className='userName'>{basicInfo.name}</div>
+          <div className='userName'>{basicInfo.userName}</div>
           <div>
             <FontAwesomeIcon icon={faMapMarkerAlt} className='mapMarker'/><span className='text'>{basicInfo.region}</span>
           </div>
@@ -495,8 +516,8 @@ export default function Mypage () {
                       <td className='label'>닉네임</td>
                       <td>
                         <input
-                          name='name'
-                          value={changeInfo.name}
+                          name='userName'
+                          value={changeInfo.userName}
                           onChange={(e) => handleInputChange(e)}
                         ></input>
                       </td>
@@ -615,6 +636,7 @@ export default function Mypage () {
                 >
                   로그아웃
                 </button>
+                <button onClick={handleWithdrawal}>회원탈퇴</button>
               </section>
             )}
         })()}
@@ -650,9 +672,6 @@ export default function Mypage () {
             }
           })()}
         </fieldset>
-        <button onClick={handleSignOut}>
-          로그아웃
-        </button>
       </MypartyCards>
     </MypageContainer>
   );
