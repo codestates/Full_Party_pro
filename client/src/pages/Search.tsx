@@ -121,6 +121,7 @@ export default function Search () {
   const searchReducer = useSelector((state: RootReducerType) => state.searchReducer);
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
   const searchRegion = signinReducer.userInfo?.region;
+  const searchUserId = signinReducer.userInfo?.id
 
   const [word, setWord] = useState('');
   const [isSearch, setIsSearch] = useState(false);
@@ -133,7 +134,7 @@ export default function Search () {
   }
 
   const searchQuest = () => {
-    dispatch(searchParty(word, searchRegion, 'byKeyword'))
+    dispatch(searchParty(word, searchUserId, searchRegion, 'byKeyword'))
     setIsSearch(true)
     navigate(`/search/${word}`)
   }
@@ -146,7 +147,7 @@ export default function Search () {
 
   function hashtagHandler(tag: string){
     setWord(tag);
-    dispatch(searchParty(tag, searchRegion, 'byTag'));
+    dispatch(searchParty(tag, searchUserId, searchRegion, 'byTag'));
     setIsSearch(true);
   }
 
@@ -154,7 +155,7 @@ export default function Search () {
     if(params.tag){
       const tag = params.tag;
       setWord(tag);
-      dispatch(searchParty(tag, searchRegion, 'byTag'));
+      dispatch(searchParty(tag, searchUserId, searchRegion, 'byTag'));
       setIsSearch(true);
     }
   },[])
