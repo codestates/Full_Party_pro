@@ -6,6 +6,7 @@ import {
 } from "../controllers/auth";
 
 router.post("/signin", signin);
+router.post("/guest", guest);
 router.post("/signout", signout);
 router.post("/signup", signup);
 router.post("/guest", guest);

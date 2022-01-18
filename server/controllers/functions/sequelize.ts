@@ -191,7 +191,14 @@ export const getTag = async (partyId: number) => {
 
 export const createNewParty = async (userId: number, partyInfo: PartyInfo) => {
   const newParty = await Parties.create({ ...partyInfo, partyState: 0, leaderId: userId });
-  await UserParty.create({ userId, partyId: partyInfo.id, message: "", isReviewed: false });
+  const withoutTag = partyInfo;
+  delete withoutTag.tag;
+  const party = await Parties.findOne({
+    where: { ...withoutTag },
+    attributes: [ "id" ],
+    raw: true
+  })
+  await UserParty.create({ userId, partyId: Number(party?.id), message: "", isReviewed: false });
   if (partyInfo.tag) await createTag(partyInfo.tag, newParty.id);
   return { partyId: newParty.id, location: newParty.location };
 };

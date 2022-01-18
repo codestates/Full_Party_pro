@@ -20,10 +20,8 @@ import dummyList from '../static/dummyList';
 export const SearchContainer = styled.div`
   width: 100%;
   height: 100%;
-
   margin: 60px 0;
   padding: 20px 0;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -32,39 +30,30 @@ export const SearchContainer = styled.div`
 export const SearchBar = styled.div`
   width: 100%;
   height: 40px;
-
   display: flex;
   margin: 15px 0;
-
   justify-content: center;
   align-items: center;
-
   input {
     width: 90%;
     max-width: 1100px;
     height: 5vh;
     padding: 0px 20px;
-
     border: 1px solid #d5d5d5;
     border-radius: 20px;
-
     font-size: 1.1rem;
   }
-
   .faSearch {
     position: absolute;
     right: 10%;
-
     color: #888;
     cursor: pointer;
   }
-
   @media screen and (min-width: 650px) {
     .faSearch {
       right: 8%;
     }
   }
-
   @media screen and (min-width: 1000px) {
     .faSearch {
       right: 20%;
@@ -74,37 +63,27 @@ export const SearchBar = styled.div`
 
 export const SearchContent = styled.div`
   padding: 16px 1%;
-
   padding-top: 16px;
-
   .result {
     width: 100%;
     height: 100%;
-
     padding: 0 30px;
-
     .resultLabel {
       font-size: 1.7rem;
       font-weight: bold;
-
       margin-bottom: 15px;
     }
   }
-
   .tag {
     padding: 8px 15px;
     margin: 0 10px 15px 0;
-
     font-size: 0.8rem;
-
     background-color: #fff;
     border-radius: 20px;
     border: 1px solid #d5d5d5;
     color: #777;
-
     cursor: pointer;
   }
-
   @media screen and (min-width: 700px) {
     padding: 16px 4%;
   }
@@ -137,13 +116,6 @@ export default function Search () {
     }
   }
 
-  // const searchQuest = async () => {
-  //   dispatch(await searchParty(userId, word, searchRegion, 'byKeyword'))
-  //   setIsSearch(true)
-  //   navigate(`/search/${word}`)
-  // }
-
-  //이 코드가 먹히면 search 관련 Redux 자료들을 삭제해 주세요
   const searchQuest = () => {
     navigate(`../search/keyword/${word}`)
   }
@@ -157,7 +129,7 @@ export default function Search () {
       const tag = params.tag;
       setWord(tag);
       (async () => {
-        const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?tagName=${word}&region=${searchRegion}&userId=${userId}`)
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${word}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
         const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
         let partyArr = [];
@@ -170,7 +142,7 @@ export default function Search () {
       const keyword = params.keyword;
       setWord(keyword);
       (async () => {
-        const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?keyword=${word}&region=${searchRegion}&userId=${userId}`)
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${word}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
         const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
         let partyArr = [];

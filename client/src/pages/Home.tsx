@@ -334,11 +334,11 @@ function Home () {
       const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
       let response;
       const requestKeepLoggedIn = async () => {
-        response = await axios.post("https://localhost:443/keeping", {}, { 
+        response = await axios.post("https://localhost:443/keeping", {}, {
           headers: {
-            access_token: accessToken, 
-            signup_type: signupType 
-          } 
+            access_token: accessToken,
+            signup_type: signupType
+          }
         });
         return response;
       };
@@ -364,7 +364,6 @@ function Home () {
       type: SIGNIN_SUCCESS,
       payload: response.data.userInfo
     });
-    document.cookie = "token=" + response.data.userInfo.accessToken;
     document.cookie = "signupType=google";
   };
 
@@ -377,7 +376,6 @@ function Home () {
       type: SIGNIN_SUCCESS,
       payload: response.data.userInfo
     });
-    document.cookie = "token=" + response.data.userInfo.accessToken;
     document.cookie = "signupType=kakao";
   };
 

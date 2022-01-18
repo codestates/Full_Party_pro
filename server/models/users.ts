@@ -75,7 +75,7 @@ Users.init(
   },
   region: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   exp: {
     type: DataTypes.INTEGER,

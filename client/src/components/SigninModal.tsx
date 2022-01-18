@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
 import { CLOSE_MODAL } from '../actions/modalType';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -223,7 +224,7 @@ const SigninModal = () => {
   }
 
   const googleLoginHandler = () => {
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`;
     window.location.assign(url);
   };
 
@@ -231,6 +232,23 @@ const SigninModal = () => {
     const url = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`;
     window.location.assign(url);
   };
+  
+  const guestLoginHandler = async () => {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/guest`, {}, {
+      withCredentials: true
+    });
+    const payload = response.data.userInfo;
+    console.log(payload);
+    dispatch({
+      type: SIGNIN_SUCCESS,
+      payload
+    });
+    dispatch({
+      type: CLOSE_MODAL
+    });
+    document.cookie = "signupType=guest";
+  }
+  
 
   return(
     <ModalContainer>
@@ -265,6 +283,9 @@ const SigninModal = () => {
           <footer>
             <button className='signinBtn' onClick={handleSignin}>
               Press Start
+            </button>
+            <button onClick={guestLoginHandler}>
+              게스트 로그인
             </button>
             <section className='toSignup'>
               아직 풀팟의 파티원이 아니세요?<br />

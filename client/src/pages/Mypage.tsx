@@ -481,7 +481,7 @@ export default function Mypage () {
       const accessToken = cookie[0].replace("token=", "").slice(1);
       const signupType = cookie[1].replace("signupType=", "");
       const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
-        withCredentials: true
+        withCredentials: true,
       });
       const userInfo = res.data.userInfo;
       setBasicInfo({
