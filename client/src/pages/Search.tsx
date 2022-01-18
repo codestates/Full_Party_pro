@@ -149,10 +149,7 @@ export default function Search () {
   }
 
   const hashtagHandler = (tag: string) => {
-    setWord(tag);
-    // dispatch(await searchParty(userId, tag, searchRegion, 'byTag'));
-    // setIsSearch(true);
-    navigate(`/search/tag/${word}`)
+    navigate(`/search/tag/${tag}`)
   }
 
   useEffect(() => {
