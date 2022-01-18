@@ -14,6 +14,10 @@ import "../../node_modules/aos/dist/aos.css";
 
 export const HomeContainer = styled.div`
 
+  position: absolute;
+
+  width: 100vw;
+  left: 0;
   margin-top: 40px;
   overflow: hidden;
 
@@ -312,8 +316,8 @@ export const Footer = styled.footer`
 
 function Home () {
   const dispatch = useDispatch();
-  const isLogIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+  const isLoggedin = useSelector(
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
   const signinReducer = useSelector(
     (state: AppState) => state.signinReducer
@@ -321,11 +325,13 @@ function Home () {
 
   useEffect(() => {
     let response;
+    const accessToken = document.cookie.slice(6);
+    const signupType = signinReducer.userInfo?.signupType;
     const requestKeepLoggedIn = async () => {
-      response = await axios.post("https://localhost:443/keeping", { accessToken: document.cookie.slice(6) });
+      response = await axios.post("https://localhost:443/keeping", { accessToken, signupType });
       return response;
     };
-    if (document.cookie) {
+    if (accessToken) {
       requestKeepLoggedIn().then((res) => {
         dispatch({
           type: SIGNIN_SUCCESS,
@@ -335,6 +341,16 @@ function Home () {
     }
     else if (new URL(window.location.href).searchParams.get("code")) handleKakaoLogin();
   }, []);
+
+  const handleGoogleLogin = async () => {
+    const authorizationCode = new URL(window.location.href).searchParams.get("code");
+    const response = await axios.post("https://localhost:443/google", { authorizationCode });
+    dispatch({
+      type: SIGNIN_SUCCESS,
+      payload: response.data.userInfo
+    });
+    document.cookie = "token=" + response.data.userInfo.accessToken;
+  };
 
   const handleKakaoLogin = async () => {
     const authorizationCode = new URL(window.location.href).searchParams.get("code");

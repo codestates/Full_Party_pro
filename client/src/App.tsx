@@ -38,7 +38,7 @@ export default function App() {
   }
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const { Kakao } = window;
@@ -53,30 +53,22 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="App">
-        {!isLoggedIn? 
-          <Routes>
-            <Fragment>
-              <Route path="/" element={<Home />} />
-            </Fragment>
-          </Routes>
-        : null}
         <main className="view">
           <TopNav />
-          {modalReducer.isModal && modalReducer.modalType === 'signin' ? <SigninModal signinModalHandler={signinModalHandler} /> :  null}
+          {modalReducer.isModal && modalReducer.modalType === 'signin' ? <SigninModal /> :  null}
           {modalReducer.isModal && modalReducer.modalType === 'signup' ? <SignupModal /> :  null}
           <section className="features">
             <Routes>
               <Fragment>
-                {isLoggedIn ? <Route path="/" element={<List />} /> : null}
-                {/* [dev] 로그인 기능 완성되면 아랫줄 지우기 */}
-                <Route path="/list" element={<List />} />
+                <Route path="/" element={isLoggedIn ? <List /> : <Home />} />
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
                 </Route>
-                <Route path="/post" element={<Post />} /> 
+                <Route path="/post" element={<Post />} />
+                <Route path="/post/:partyInfo" element={<Post />} /> 
                 <Route path="/search" element={<Search />} />
                 <Route path="/search/:keyword" element={<Search />} />
-                <Route path="/search/tag/:keyword" element={<Search />} />
+                <Route path="/search/tag/:tag" element={<Search />} />
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/favorite" element={<Favorite />} />
                 <Route path="/mypage" element={<Mypage />} />

@@ -495,7 +495,7 @@ export default function Post () {
   const date = year + '-' + month + '-' + day
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
   if(!isLoggedIn){
     return <Navigate to="/" />

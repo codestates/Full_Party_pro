@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 
 import styled from 'styled-components';
@@ -14,6 +14,7 @@ import PartySlide from '../components/PartySlide';
 
 // [dev] 더미데이터: 서버 통신되면 삭제
 import dummyList from '../static/dummyList';
+import { SIGNIN_FAIL } from '../actions/signinType';
 
 export const MypageContainer = styled.div`
   width: 100%;
@@ -263,6 +264,8 @@ export default function Mypage () {
   //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
   const [isLoading, setIsLoading] = useState(false)
   const [isInfoLoading, setIsInfoLoading] = useState(false)
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [basicInfo, setBasicInfo] = useState({
     name: '기본이름',
@@ -297,7 +300,7 @@ export default function Mypage () {
   const [parties, setParties] = useState([])
 
   let today: any = new Date();
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
+  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
 
   const handleIsChange = async () => {
     if(isChange) {
@@ -419,6 +422,18 @@ export default function Mypage () {
     const myParty = res.data.myParty
     setParties(myParty)
   }
+  const handleSignOut = async () => {
+    const accessToken = document.cookie.slice(6);
+    const signupType = signinReducer.userInfo?.signupType;
+    await axios.post("https://localhost:443/signout", {
+      accessToken, signupType
+    });
+    dispatch({
+      type: SIGNIN_FAIL
+    });
+    document.cookie = "token=" + "";
+    navigate("/");
+  };
 
   //페이지 진입시 로딩
   useEffect(() => {
@@ -438,9 +453,9 @@ export default function Mypage () {
     fetchJoinParty()
     setIsLoading(false)
   },[])
-
+  
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
   if(!isLoggedIn){
     return <Navigate to="/" />
@@ -635,6 +650,9 @@ export default function Mypage () {
             }
           })()}
         </fieldset>
+        <button onClick={handleSignOut}>
+          로그아웃
+        </button>
       </MypartyCards>
     </MypageContainer>
   );

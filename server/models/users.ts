@@ -13,6 +13,7 @@ export interface UsersAttributes {
   region: string;
   exp: number;
   level: number;
+  signupType: string;
 };
 
 export class Users extends Model<UsersAttributes> {
@@ -27,6 +28,7 @@ export class Users extends Model<UsersAttributes> {
   public region!: string;
   public exp!: number;
   public level!: number;
+  public signupType!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -81,6 +83,10 @@ Users.init(
   },
   level: {
     type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  signupType: {
+    type: DataTypes.STRING,
     allowNull: false
   }
 },

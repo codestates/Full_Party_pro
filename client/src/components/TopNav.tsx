@@ -98,14 +98,8 @@ export default function TopNav () {
   const dispatch = useDispatch()
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLogin
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
-
-  const handleSignOut = async () => {
-  //   const response = await axios.post("https://localhost:443/signout", {
-  //     accessToken
-  //   });
-  };
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
@@ -141,7 +135,6 @@ export default function TopNav () {
       : <div className="menu">
           <button className='signinModalBtn' onClick={(e) => handleModal(e)}>로그인</button>
           <button className='signupModalBtn' onClick={(e) => handleModal(e)}>회원가입</button>
-          <button onClick={handleSignOut}>로그아웃</button>
         </div> 
       }
     </NavContainer>
