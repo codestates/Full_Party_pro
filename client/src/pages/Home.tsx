@@ -349,10 +349,9 @@ function Home () {
         });
       });
     }
-    // 구글 로그인 추가 필요 -> URL로 조건 분기
     const address = new URL(window.location.href).searchParams.get("code")
-    if ( address && address[1] !== "/" ) handleKakaoLogin();
-    else if ( address && address[1] === "/" ) handleGoogleLogin();
+    if (address && address[1] !== "/") handleKakaoLogin();
+    else if (address && address[1] === "/") handleGoogleLogin();
   }, []);
 
   const handleGoogleLogin = async () => {
