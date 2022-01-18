@@ -171,7 +171,7 @@ export const kakao = async (req: Request, res: Response) => {
       });
     }
     const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
-    return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo: { ...userInfo, accessToken} });
+    return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo: { ...userInfo, accessToken } });
   }
   catch (error) {
     InternalServerError(res, error);
