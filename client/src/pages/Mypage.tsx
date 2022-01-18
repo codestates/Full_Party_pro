@@ -36,8 +36,8 @@ export const MypageHeader = styled.div`
   justify-content: center;
 
   .profileImage {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     border: 2px solid #cff4d2;
     border-radius: 100%;
   }
@@ -62,7 +62,7 @@ export const MypageHeader = styled.div`
 
   @media screen and (min-width: 500px) {
     justify-content: flex-start;
-    padding: 1vh 22vw;
+    padding: 1vh 15vw;
   }
 `
 
@@ -147,6 +147,77 @@ export const MypageInfo = styled.div`
     }
   }
 `
+export const InfoTable = styled.table`
+  width: 300px;
+  margin: 30px 0 15px 0;
+
+  .label {
+    width: 70px;
+    height: 33px;
+    font-size: 15px;
+    font-family: 'DungGeunMo'; 
+    text-align: center;
+  }
+  input {
+    width: 170px;
+    height: 33px;
+    background-color: white;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #d5d5d5;
+    margin: 10px;
+    padding: 0 2px;
+
+    font-size: 13px;
+    text-align: center;
+  }
+  select {
+    width: 170px;
+    height: 33px;
+    background-color: white;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #d5d5d5;
+    margin: 10px;
+    padding: 0 2px;
+
+    font-size: 13px;
+    text-align: center;
+  }
+
+  @media screen and (min-width: 500px) {
+    width: 600px;
+    margin-left: 12vw;
+
+    select {
+      width: 300px;
+    }
+    input {
+      width: 300px;
+    }
+  }
+`
+
+export const ProgressBar = styled.div<{ exp: number }>`
+  display: inline-block;
+  width: 150px;
+  height: 20px;
+  background-color: #d6d3d3;
+  margin: 2px 5px;
+  border-radius: 20px;
+
+ .bar {
+   display: inline-block;
+   width: ${(props) => props.exp || 0}%;
+   height: 20px;
+   background-color: #cff4d2;
+   border-radius: 20px;
+ }
+
+ @media screen and (min-width: 1000px) {
+   width: 270px;
+ }
+`
 
 export const MypartyCards = styled.div`
   width: 100%;
@@ -207,57 +278,6 @@ export const MypartyCards = styled.div`
   }
 `
 
-export const InfoTable = styled.table`
-  width: 300px;
-  margin: 30px 0 15px 0;
-
-  .label {
-    width: 70px;
-    height: 33px;
-    font-size: 15px;
-    font-family: 'DungGeunMo'; 
-    text-align: center;
-  }
-  input {
-    width: 170px;
-    height: 33px;
-    background-color: white;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid #d5d5d5;
-    margin: 10px;
-    padding: 0 2px;
-
-    font-size: 13px;
-    text-align: center;
-  }
-  select {
-    width: 170px;
-    height: 33px;
-    background-color: white;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid #d5d5d5;
-    margin: 10px;
-    padding: 0 2px;
-
-    font-size: 13px;
-    text-align: center;
-  }
-
-  @media screen and (min-width: 500px) {
-    width: 600px;
-    margin-left: 12vw;
-
-    select {
-      width: 300px;
-    }
-    input {
-      width: 300px;
-    }
-  }
-`
-
 export default function Mypage () {
   // [dev] 더미데이터: 서버 통신되면 삭제
   const { userInfo, myParty, localParty } = dummyList;
@@ -271,9 +291,11 @@ export default function Mypage () {
     userName: '기본이름',
     profileImage: '기본이미지',
     region: '기본지역',
-    level: '넘버타입',
-    exp: '넘버타입'
+    level: 7,
+    exp: 148
   })
+  const expBar = Number( Math.floor(basicInfo.exp % 20) * 5 )
+
   const [changeInfo, setChangeInfo] = useState({
     userName: '',
     profileImage: '',
@@ -489,9 +511,10 @@ export default function Mypage () {
   return (
     <MypageContainer>
       <MypageHeader>
-        <div className='profileImage'></div>
-        {/* 이미지 연결이 되면 주석 풀어준 뒤 border는 없애주세요
-        <img className='profileImage' src={basicInfo.profileImage} /> */}
+        <div className='profileImage'>
+          {/* 이미지 연결이 되면 주석 풀어준 뒤 border는 없애주세요
+          <img className='profileImage' src={basicInfo.profileImage} /> */}
+        </div>
         <p className='mainProfile'>
           <div className='userName'>{basicInfo.userName}</div>
           <div>
@@ -500,6 +523,9 @@ export default function Mypage () {
           <div>
             <FontAwesomeIcon icon={faCrown} className='crown'/><span className='text'>Lv.{basicInfo.level}</span>
           </div>
+          <ProgressBar exp={expBar}>
+            <span className='bar' />
+          </ProgressBar>
         </p>
       </MypageHeader>
       <MypageInfo>
