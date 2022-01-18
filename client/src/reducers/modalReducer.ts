@@ -6,8 +6,8 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  isModal: true,
-  modalType: 'signin'
+  isModal: false,
+  modalType: ''
 }
 
 const modalReducer = (state = initialState, action: IsModalDispatchType): InitialState => {

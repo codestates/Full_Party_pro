@@ -424,14 +424,13 @@ export default function Mypage () {
   }
   const handleSignOut = async () => {
     const cookie = document.cookie.split("; ");
-    const accessToken = cookie[0].replace("token=", "");
-    const signupType = cookie[1].replace("signupType=", "");
+    const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
+    const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
     await axios.post("https://localhost:443/signout", {
-      accessToken, signupType
+      access_token: accessToken, 
+      signup_type: signupType
     });
-    dispatch({
-      type: SIGNIN_FAIL
-    });
+    dispatch({ type: SIGNIN_FAIL });
     document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
     navigate("/");
@@ -439,17 +438,18 @@ export default function Mypage () {
 
   const handleWithdrawal = async () => {
     const cookie = document.cookie.split("; ");
-    const accessToken = cookie[0].replace("token=", "");
-    const signupType = cookie[1].replace("signupType=", "");
+    const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
+    const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
     const userId = signinReducer.userInfo?.id;
     await axios.delete(`https://localhost:443/user/${userId}/${signupType}`, {
       headers: {
-        Authorization: `Bearer ${accessToken}`
+        access_token: accessToken
       }
     });
-    document.cookie = "token=;";
-    document.cookie = "signupType=;";
-    navigate("/");
+    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
+    dispatch({ type: SIGNIN_FAIL });
+    navigate("http://localhost:3000");
   };
 
   //페이지 진입시 로딩
@@ -631,7 +631,7 @@ export default function Mypage () {
                   개인 정보 수정
                 </button>
                 {/* 로그아웃 구현한 함수 넣어주세요 */}
-                <button
+                <button onClick={handleSignOut}
                   className='signoutBtn'
                 >
                   로그아웃
