@@ -145,7 +145,7 @@ export default function Search () {
 
   //이 코드가 먹히면 search 관련 Redux 자료들을 삭제해 주세요
   const searchQuest = () => {
-    navigate(`/search/keyword/${word}`)
+    navigate(`../search/keyword/${word}`)
   }
 
   const hashtagHandler = (tag: string) => {
@@ -183,7 +183,7 @@ export default function Search () {
         setParties(partyArr)
       })();
     }
-  },[])
+  },[params])
   
   if(!isLoggedIn){
     return <Navigate to="/" />
