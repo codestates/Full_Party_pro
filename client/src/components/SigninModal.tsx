@@ -231,7 +231,9 @@ const SigninModal = () => {
   };
   
   const guestLoginHandler = async () => {
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/guest`);
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/guest`, {}, {
+      withCredentials: true
+    });
     const payload = response.data.userInfo;
     console.log(payload);
     dispatch({

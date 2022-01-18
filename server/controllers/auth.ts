@@ -15,9 +15,6 @@ export const signin = async (req: Request, res: Response) => {
     const userInfo = await findUser({ email, password }, [ "id", "profileImage", "userName", "region", "signupType" ]);
     if (!userInfo) return FailedResponse(res, 401, "Unauthorized User");
     const accessToken = generateAccessToken(userInfo);
-    // return res.status(200).setHeader("Set-Cookie", `jwt=${accessToken}; domain=localhost; path=/; SameSite=none; secure=true; httpOnly=true; maxAge=1000 * 60 * 15; signed=true;`)
-    // .setHeader("Acess-Control-Allow-Credentials", "true")
-    // .json({ message: "You Have Successfully Signed In", userInfo });
     setCookie(res, "token", String(accessToken));
     return SuccessfulResponse(res, { message: "You Have Successfully Signed In", userInfo });
   }
@@ -39,8 +36,6 @@ export const signout = async (req: Request, res: Response) => {
           "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
         }
       });
-    }
-    else if (signupType === "google") {
     }
     else if (signupType === "guest") {
       const verification =  verifyAccessToken(String(accessToken));
@@ -80,14 +75,11 @@ export const guest = async (req: Request, res: Response) => {
       signupType: "guest"
     };
     const created = await createUser(userInfo);
-    const guestUserInfo = await findUser({ signupType: "guest" }, [ "id", "userName", "birth", "createdAt", "updatedAt" ]);
+    const guestUserInfo = await findUser({ signupType: "guest" }, [ "id", "userName", "email", "birth", "createdAt", "updatedAt" ]);
     const accessToken = generateAccessToken(guestUserInfo);
-    return res.status(200).setHeader("Set-Cookie", `jwt=${accessToken}; domain=localhost; path=/; SameSite=none; secure=true; httpOnly=true; maxAge=1000 * 60 * 15; signed=true;`)
-      .setHeader("Acess-Control-Allow-Credentials", "true")
-      .json({ message: "You Have Successfully Signed In", userInfo });
-    // setCookie(res, "token", String(accessToken));
-    // if (!created) FailedResponse(res, 400, "Bad Request");
-    // return SuccessfulResponse(res, { message: "You Have Successfully Signed In", userInfo: { ...userInfo, ...guestUserInfo }});
+    if (!created) FailedResponse(res, 400, "Bad Request");
+    setCookie(res, "token", String(accessToken));
+    return SuccessfulResponse(res, { message: "You Have Successfully Signed In", userInfo: { ...userInfo, ...guestUserInfo }});
   }
   catch (error) {
     InternalServerError(res, error);
@@ -101,7 +93,6 @@ export const googleSignIn = async (req: Request, res: Response) => {
       newAuthorization = req.body.authorizationCode.replace("/", "%2F") 
     }
     const { authorizationCode } = req.body;
-
     const { googleClientId, googleClientSecret } = config.google;
     const params = {
       code: authorizationCode,
@@ -110,13 +101,11 @@ export const googleSignIn = async (req: Request, res: Response) => {
       redirect_uri: process.env.REACT_APP_REDIRECT_URI,
       grant_type: "authorization_code",
     };
-
     const axiosResponse = await axios({
       method: "post",
       url: "https://oauth2.googleapis.com/token",
       params,
     });
-
     const { access_token: accessToken } = axiosResponse.data;
     const profileResponse = await axios({
       method: "get",
@@ -143,7 +132,8 @@ export const googleSignIn = async (req: Request, res: Response) => {
       });
     }
     const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
-    return SuccessfulResponse(res, { message: "You have successfully signed in with Google Account", userInfo: { ...userInfo, accessToken} });
+    setCookie(res, "token", String(accessToken));
+    return SuccessfulResponse(res, { message: "You have successfully signed in with Google Account", userInfo });
   } catch (error) {
     InternalServerError(res, error);
   }
@@ -192,7 +182,8 @@ export const kakao = async (req: Request, res: Response) => {
       });
     }
     const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
-    return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo: { ...userInfo, accessToken } });
+    setCookie(res, "token", String(accessToken));
+    return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo });
   }
   catch (error) {
     InternalServerError(res, error);
