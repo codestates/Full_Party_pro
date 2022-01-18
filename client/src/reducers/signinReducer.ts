@@ -6,7 +6,7 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  isLoggedIn: true,
+  isLoggedIn: false,
   userInfo: {
     id: 1,
     userName: '귀오미',
@@ -20,7 +20,13 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
   switch (action.type) {
     case SIGNIN_FAIL:
       return {
-        ...state,
+        userInfo: {
+          id: 0,
+          userName: "",
+          profileImage: "",
+          region: "",
+          signupType: "",
+        },
         isLoggedIn: false
       }
 

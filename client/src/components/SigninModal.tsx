@@ -251,7 +251,7 @@ const SigninModal = () => {
             <fieldset>
               <div className='label'>password</div>
               <input
-                type='text'
+                type='password'
                 name='password'
                 value={userInfo.password}
                 onChange={(e) => handleInput(e)}
