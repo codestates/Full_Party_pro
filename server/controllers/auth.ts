@@ -40,7 +40,6 @@ export const signout = async (req: Request, res: Response) => {
       });
     }
     else if (signupType === "google") {
-      
     }
     else if (signupType === "guest") {
 
