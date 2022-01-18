@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faPlus, faCamera } from '@fortawesome/free-solid-svg-icons';
 import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
+import Loading from './Loading';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -73,21 +74,41 @@ export const UserImage = styled.div`
     font-family: "DungGeunMo";
   }
 
-  .imageBox {
+  .circle {
     width: 140px;
     height: 140px;
+    margin: 0 auto;
+    border-radius: 100% !important;
+    border: 1px solid darkcyan;
+    overflow: hidden;
+
     display: flex;
     justify-content: center;
     align-items: center;
-
-    margin: 0 auto;
-
-    border: 1px solid #444;
-    border-radius: 100%;
   }
-
-  .faPlus {
-    color: grey;
+  .pic {
+    width: 200px;
+    max-height: 200px;
+    display: inline-block;
+    margin: auto;
+  }
+  .imgUpload {
+    display: none;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+`
+export const Camera = styled.div`
+  margin: 10px 0;
+  .faCamera {
+    font-size: 25px;
+    color: #888;
+    transition: all 0.3s
+  }
+  .faCamera:hover {
+    color: black;
   }
 `
 
@@ -262,8 +283,21 @@ export const DummyBtn = styled.div`
 `
 
 const SignupModal = () => {
-  const dispatch = useDispatch()
-  const [userInfo, setUserInfo] = useState({
+  const dispatch = useDispatch();
+  const cameraRef = useRef<any>();
+  const [isLoading, setIsLoading] = useState(false)
+  type Info = {
+    profileImage: any;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    name: string;
+    gender: string;
+    birth: string;
+    mobile: string;
+    region: string;
+  };
+  const [userInfo, setUserInfo] = useState<Info>({
     profileImage: '',
     email: '',
     password: '',
@@ -273,8 +307,7 @@ const SignupModal = () => {
     birth: '',
     mobile: '',
     region: ''
-  })
-
+  });
   const [isError, setIsError] = useState({
     isEmail: false,
     isPassword: false,
@@ -295,9 +328,15 @@ const SignupModal = () => {
     mobileMsg: '',
     regionMsg: '',
     axiosMsg: ''
-  })
+  });
 
   const [index, setIndex] = useState(0)
+  let today = new Date();
+  let year = today.getFullYear();
+  let month = ('0' + (today.getMonth() + 1)).slice(-2);
+  let day = ('0' + today.getDate()).slice(-2);
+  const date = year + '-' + month + '-' + day
+
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const regex={
@@ -407,7 +446,7 @@ const SignupModal = () => {
   }
 
   const handleSignup = () => {
-    const {email, password, name, gender, birth, mobile, region} = userInfo
+    const {profileImage, email, password, name, gender, birth, mobile, region} = userInfo
     const {isEmail, isPassword, isConfirmPassword, isName, isGender, isBirth, isMobile, isRegion} = isError
 
     if(isEmail || isPassword || isConfirmPassword || isName || isGender || isBirth || isMobile || isRegion) {
@@ -426,12 +465,13 @@ const SignupModal = () => {
     else {
       axios.post(`${process.env.REACT_APP_API_URL}`,{
         userInfo: {
-          email: userInfo.email,
-          password: userInfo.password,
-          birth: userInfo.birth,
-          gender: userInfo.gender,
-          mobile: userInfo.mobile,
-          region: userInfo.region
+          profileImage,
+          email,
+          password,
+          birth,
+          gender,
+          mobile,
+          region
         }
       })
       .then((res) => {
@@ -439,10 +479,10 @@ const SignupModal = () => {
           setIsError({
             ...isError,
             isAxios: true,
-            axiosMsg: '이미 가입된 계정입니다'
+            axiosMsg: '이미 가입된 이메일입니다'
           })
         } else {
-          console.log('대충 로그인창으로 보내는 이야기')
+          dispatch(modalChanger('signinModalBtn'))
         }
       })
       .catch((err) => console.log(err))
@@ -464,6 +504,21 @@ const SignupModal = () => {
     dispatch(modalChanger(e.currentTarget.className))
   }
 
+  const handleImgLoad = async (e: any) => {
+    setIsLoading(true)
+    e.preventDefault();
+    let file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('profileImage', file)
+    const res = await axios.post('이미지서버', formData)
+    //res.data.location 에 있는 url을 img의 src로 바꿔야 합니다.
+    setIsLoading(false)
+  }
+  const handleRefClick = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    e.preventDefault();
+    cameraRef.current.click();
+  }
+
   return(
     <ModalContainer>
       <ModalBackdrop>
@@ -472,14 +527,22 @@ const SignupModal = () => {
           <div className='header'>
             <div>Sign Up</div>
           </div>
-          {/* 여기서부터 */}
           {(() => {
             if(index === 0) {
               return (
                 <UserImage>
                   <div className='label'>사진을 선택해 주세요</div>
-                  <div className='imageBox'>
-                    <FontAwesomeIcon icon={faPlus} className='faPlus' />
+                  <div className='imageSelect'>
+                    <div className='circle'>
+                      {isLoading ? <Loading /> : 
+                      <img className='pic' src='img/bubble.png' />}
+                      {/* 초기 src 값은 로고 온걸로 변환해주세요 */}
+                      {/* 로딩이 끝나면 scr 주소를 변경해야 합니다 */}
+                    </div>
+                    <Camera>
+                      <FontAwesomeIcon icon={faCamera} className='faCamera' onClick={(e) => handleRefClick(e)}/>
+                      <input ref={cameraRef} className='imgUpload' id='file' type='file' accept='image/*' name='imgUpload' onChange={handleImgLoad}></input>
+                    </Camera>
                   </div>
                 </UserImage>
               )
@@ -581,6 +644,7 @@ const SignupModal = () => {
                     <input
                       type='date'
                       name='birth'
+                      max={date}
                       value={userInfo.birth}
                       onChange={(e) => handleInputChange(e)}
                     ></input>
@@ -614,8 +678,9 @@ const SignupModal = () => {
             else if(index === 3) {
               return (
                 <UserRegion>
-                  <div>카카오맵 넣어조</div>
-                  <div>지도 찍으면 여기에 상세주소, 여기먼저 작성하면 지도 이동됨</div>
+                  <div id='map'>카카오맵 넣어조</div>
+                  <div>지도 찍으면 input에 상세주소, input 작성하면 지도 이동됨</div>
+                  <input />
                 </UserRegion>
               )
             }

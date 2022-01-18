@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { ImGoogle } from "react-icons/im";
-// const dotenv = require('dotenv').config();
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -11,6 +10,7 @@ import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
+import { CLOSE_MODAL } from '../actions/modalType';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -205,7 +205,10 @@ const SigninModal = () => {
   }
 
   const handleSignin = () => {
-    dispatch(fetchUserdata(userInfo))
+    dispatch(fetchUserdata(userInfo));
+    dispatch({
+      type: CLOSE_MODAL
+    })
   }
 
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -268,10 +271,10 @@ const SigninModal = () => {
               <div className="oauthLabel">
                 <hr /> OR <hr />
               </div>
-              <button onClick={kakaoLoginHandler} className="oauth kakao">
+              <button onClick={googleLoginHandler} className="oauth kakao">
                 <img src="img/kakao_symbol.svg" />
               </button>
-              <button onClick={googleLoginHandler} className="oauth google">
+              <button onClick={kakaoLoginHandler} className="oauth google">
                 <img src="img/google_symbol.svg" />
               </button>
             </div>

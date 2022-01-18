@@ -324,14 +324,24 @@ function Home () {
   );
 
   useEffect(() => {
-    let response;
-    const accessToken = document.cookie.slice(6);
-    const signupType = signinReducer.userInfo?.signupType;
-    const requestKeepLoggedIn = async () => {
-      response = await axios.post("https://localhost:443/keeping", { accessToken, signupType });
-      return response;
-    };
-    if (accessToken) {
+    if (!document.cookie) {
+      document.cookie = "token=temp;";
+      document.cookie = "signupType=temp;";
+    }
+    const cookie = document.cookie.split("; ");
+    if (cookie.length) {
+      const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
+      const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
+      let response;
+      const requestKeepLoggedIn = async () => {
+        response = await axios.post("https://localhost:443/keeping", {}, { 
+          headers: {
+            access_token: accessToken, 
+            signup_type: signupType 
+          } 
+        });
+        return response;
+      };
       requestKeepLoggedIn().then((res) => {
         dispatch({
           type: SIGNIN_SUCCESS,
@@ -339,7 +349,8 @@ function Home () {
         });
       });
     }
-    else if (new URL(window.location.href).searchParams.get("code")) handleKakaoLogin();
+    // 구글 로그인 추가 필요 -> URL로 조건 분기
+    if (new URL(window.location.href).searchParams.get("code")) handleKakaoLogin();
   }, []);
 
   const handleGoogleLogin = async () => {
@@ -354,12 +365,15 @@ function Home () {
 
   const handleKakaoLogin = async () => {
     const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post("https://localhost:443/kakao", { authorizationCode });
+    const response = await axios.post("https://localhost:443/kakao", { authorizationCode }, {
+      withCredentials: true
+    });
     dispatch({
       type: SIGNIN_SUCCESS,
       payload: response.data.userInfo
     });
     document.cookie = "token=" + response.data.userInfo.accessToken;
+    document.cookie = "signupType=kakao";
   };
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => {

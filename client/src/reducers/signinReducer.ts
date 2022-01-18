@@ -6,7 +6,7 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  isLoggedIn: false,
+  isLoggedIn: true,
   userInfo: {
     id: 1,
     userName: '귀오미',
@@ -26,7 +26,6 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
 
     case SIGNIN_SUCCESS:
       const { id, userName, profileImage, region, signupType } = action.payload
-      console.log(action.payload)
       return {
         ...state,
         isLoggedIn: true,
