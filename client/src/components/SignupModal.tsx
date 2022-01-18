@@ -298,6 +298,12 @@ const SignupModal = () => {
   })
 
   const [index, setIndex] = useState(0)
+  let today = new Date();
+  let year = today.getFullYear();
+  let month = ('0' + (today.getMonth() + 1)).slice(-2);
+  let day = ('0' + today.getDate()).slice(-2);
+  const date = year + '-' + month + '-' + day
+
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const regex={
@@ -407,7 +413,7 @@ const SignupModal = () => {
   }
 
   const handleSignup = () => {
-    const {email, password, name, gender, birth, mobile, region} = userInfo
+    const {profileImage, email, password, name, gender, birth, mobile, region} = userInfo
     const {isEmail, isPassword, isConfirmPassword, isName, isGender, isBirth, isMobile, isRegion} = isError
 
     if(isEmail || isPassword || isConfirmPassword || isName || isGender || isBirth || isMobile || isRegion) {
@@ -426,12 +432,13 @@ const SignupModal = () => {
     else {
       axios.post(`${process.env.REACT_APP_API_URL}`,{
         userInfo: {
-          email: userInfo.email,
-          password: userInfo.password,
-          birth: userInfo.birth,
-          gender: userInfo.gender,
-          mobile: userInfo.mobile,
-          region: userInfo.region
+          profileImage,
+          email,
+          password,
+          birth,
+          gender,
+          mobile,
+          region
         }
       })
       .then((res) => {
@@ -439,10 +446,10 @@ const SignupModal = () => {
           setIsError({
             ...isError,
             isAxios: true,
-            axiosMsg: '이미 가입된 계정입니다'
+            axiosMsg: '이미 가입된 이메일입니다'
           })
         } else {
-          console.log('대충 로그인창으로 보내는 이야기')
+          dispatch(modalChanger('signinModalBtn'))
         }
       })
       .catch((err) => console.log(err))
@@ -581,6 +588,7 @@ const SignupModal = () => {
                     <input
                       type='date'
                       name='birth'
+                      max={date}
                       value={userInfo.birth}
                       onChange={(e) => handleInputChange(e)}
                     ></input>
@@ -614,8 +622,9 @@ const SignupModal = () => {
             else if(index === 3) {
               return (
                 <UserRegion>
-                  <div>카카오맵 넣어조</div>
-                  <div>지도 찍으면 여기에 상세주소, 여기먼저 작성하면 지도 이동됨</div>
+                  <div id='map'>카카오맵 넣어조</div>
+                  <div>지도 찍으면 input에 상세주소, input 작성하면 지도 이동됨</div>
+                  <input />
                 </UserRegion>
               )
             }

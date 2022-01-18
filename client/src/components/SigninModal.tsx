@@ -216,36 +216,16 @@ const SigninModal = () => {
     dispatch(modalChanger(e.currentTarget.className))
   }
 
-<<<<<<< HEAD
   const handleSignGoogle = () => {
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`
     window.location.assign(url);
   };
 
-=======
-  // const getCode = () => {
-  //   const code = new URL(window.location.href).searchParams.get("code");
-
-  //   return String(code);
-  // };
-
-  const handleKakao = async () => {
-    // console.log(process.env.REACT_APP_KAKAO_REST_API_KEY);
-    // console.log(process.env.REACT_APP_REDIRECT_URI);
-    // window.location.assign(
-    //   `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`
-    // );
+  const handleSignKakao = () => {
+    const url = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`;
+    window.location.assign(url);
   };
 
-  function kakaoLoginHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    window.location.replace(`https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`);
-  }
-
-  function googleLoginHandler(event: React.MouseEvent<HTMLButtonElement>) {
-
-  }
-
->>>>>>> f60d215e3d8f224aa54642f3ab2a46c88c30aa09
   return(
     <ModalContainer>
       <ModalBackdrop>
@@ -284,31 +264,18 @@ const SigninModal = () => {
               아직 풀팟의 파티원이 아니세요?<br />
               지금 바로 <span className='signupModalBtn' onClick={(e) => signupModal(e)}>회원가입</span> 하세요 🥳
             </section>
-<<<<<<< HEAD
-            <Button
-              className="google"
-              background-Color={"var(--color-black)"}
-              color={"#4384f3 !important"}
-              onClick={handleSignGoogle}
-            >
-              <ImGoogle fontSize="0.5rem" />
-              로그인
-            </Button>
-          </div>
-=======
             <div className="oauthBtns">
               <div className="oauthLabel">
                 <hr /> OR <hr />
               </div>
-              <button onClick={kakaoLoginHandler} className="oauth kakao">
+              <button onClick={handleSignKakao} className="oauth kakao">
                 <img src="img/kakao_symbol.svg" />
               </button>
-              <button onClick={googleLoginHandler} className="oauth google">
+              <button onClick={handleSignGoogle} className="oauth google">
                 <img src="img/google_symbol.svg" />
               </button>
             </div>
           </footer>
->>>>>>> f60d215e3d8f224aa54642f3ab2a46c88c30aa09
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
