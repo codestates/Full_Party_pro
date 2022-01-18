@@ -334,7 +334,7 @@ function Home () {
       const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
       let response;
       const requestKeepLoggedIn = async () => {
-        response = await axios.post("https://localhost:443/keeping", {}, { 
+        response = await axios.post("https://server.fullpartypro.com/keeping", {}, { 
           headers: {
             access_token: accessToken, 
             signup_type: signupType 
@@ -357,7 +357,7 @@ function Home () {
 
   const handleGoogleLogin = async () => {
     const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post("https://localhost:443/google", { authorizationCode }, {
+    const response = await axios.post("https://server.fullpartypro.com/google", { authorizationCode }, {
       withCredentials: true
     });
     dispatch({
@@ -370,7 +370,7 @@ function Home () {
 
   const handleKakaoLogin = async () => {
     const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post("https://localhost:443/kakao", { authorizationCode }, {
+    const response = await axios.post("https://server.fullpartypro.com/kakao", { authorizationCode }, {
       withCredentials: true
     });
     dispatch({
