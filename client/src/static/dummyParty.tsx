@@ -2,7 +2,7 @@ const dummyParty = {
     partyId: 1,
     partyState: 0,
     name: "등 긁어주실 분...",
-    image: "https://pbs.twimg.com/media/Es4KAp3U4AM01nT?format=jpg",
+    image: "../img/defaultThumbnail.png",
     privateLink: "https://open.kakao.com/o/g2ufJhOd",
     content: "등 좀 긁어주세요...",
     region: "경기도 수원시",

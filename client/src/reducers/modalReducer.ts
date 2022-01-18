@@ -6,7 +6,7 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  isModal: true,
+  isModal: false,
   modalType: 'signin'
 }
 
