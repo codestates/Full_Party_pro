@@ -310,14 +310,14 @@ export default function Mypage () {
     const accessToken = cookie[0].replace("token=", "");
     const signupType = cookie[1].replace("signupType=", "");
     const userId = signinReducer.userInfo?.id;
-    await axios.delete(`https://localhost:443/user/${userId}/${signupType}`,{
+    await axios.delete(`https://localhost:443/user/${userId}/${signupType}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
     });
     document.cookie = "token=;";
     document.cookie = "signupType=;";
-    navigate("http://localhost:3000");
+    navigate("/");
   };
 
   //페이지 진입시 로딩

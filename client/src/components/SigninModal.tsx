@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
-
 import styled from 'styled-components';
 import axios from 'axios';
 import { ImGoogle } from "react-icons/im";
-// const dotenv = require('dotenv').config();
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { RootReducerType } from '../store/store';
