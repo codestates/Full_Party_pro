@@ -36,11 +36,9 @@ export const withdrawUser = async (req: Request, res: Response) => {
         }
       });
     }
-    else if (signupType === "google") {
-      
-    }
     else if (signupType === "guest") {
-
+      const verification =  verifyAccessToken(String(accessToken));
+      if (verification && typeof verification !== "string") await deleteUser(verification.id);
     }
     if (deleted) return SuccessfulResponse(res, { message: "Good Bye!" });
     return FailedResponse(res, 400, "Bad Request");
@@ -50,7 +48,6 @@ export const withdrawUser = async (req: Request, res: Response) => {
   }
 };
 
-// 메세지가 빠져있음 아래 세 개
 export const getRecruitingParty = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
