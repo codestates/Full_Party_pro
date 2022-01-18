@@ -121,7 +121,7 @@ export default function Search () {
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
   const searchRegion = signinReducer.userInfo?.region;
   const userId = useSelector((state: AppState) => state.signinReducer.userInfo?.id);
-  const [word, setWord] = useState<string | undefined>('');
+  const [word, setWord] = useState('');
   const [isSearch, setIsSearch] = useState(false);
   const [parties, setParties] = useState<any>([]);
 
@@ -133,9 +133,17 @@ export default function Search () {
   }
   const enterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if(e.key === 'Enter') {
+      document.cookie = `word=${word}`;
       searchQuest()
     }
   }
+
+  const getWord = () => {
+    let cookies = document.cookie.split("; ");
+    const [ target ] = cookies.filter((item: string, i: number) => item.includes("word="));
+    const word = target.slice(5);
+    return word;
+  };
 
   // const searchQuest = async () => {
   //   dispatch(await searchParty(userId, word, searchRegion, 'byKeyword'))
@@ -145,45 +153,55 @@ export default function Search () {
 
   //이 코드가 먹히면 search 관련 Redux 자료들을 삭제해 주세요
   const searchQuest = () => {
-    navigate(`/search/keyword/${word}`)
+    navigate(`../search/keyword/${getWord()}`)
   }
 
   const hashtagHandler = (tag: string) => {
     setWord(tag);
     // dispatch(await searchParty(userId, tag, searchRegion, 'byTag'));
     // setIsSearch(true);
-    navigate(`/search/tag/${word}`)
+    navigate(`../search/tag/${getWord()}`)
   }
 
   useEffect(() => {
-    if(params.tag){
-      const tag = params.tag;
-      setWord(tag);
+    let cookies = document.cookie.split("; ");
+    const [ target ] = cookies.filter((item: string, i: number) => item.includes("word="));
+    const word = target.slice(5);
+    if (!word) document.cookie = "word=temp";
+    // if(params.tag){
+    //   const tag = params.tag;
+    //   setWord(tag);
+    //   (async () => {
+    //     const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${word}&region=${searchRegion}&userId=${userId}`, {
+    //       withCredentials: true
+    //     });
+    //     const partyData = res.data.result;
+    //     const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
+    //     let partyArr = [];
+    //     for(let i = 0; i < partyData.length; i++) {
+    //       partyArr[i] = {...partyData[i], ...parsedLatlng[i]};
+    //     }
+    //     setParties(partyArr);
+    //   })();
+    // } else if (getWord()) {
+      // const keyword = params.keyword;
+      // setWord(keyword);
       (async () => {
-        const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?tagName=${word}&region=${searchRegion}&userId=${userId}`)
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${getWord()}&region=${searchRegion}&userId=${userId}`, {
+          withCredentials: true
+        });
+        console.log("🌈", res);
         const partyData = res.data.result;
         const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
         let partyArr = [];
         for(let i = 0; i < partyData.length; i++) {
-          partyArr[i] = {...partyData[i], ...parsedLatlng[i]};
+          partyArr[i] = {...partyData[i], latlng: parsedLatlng[i]};
         }
         setParties(partyArr)
       })();
-    } else {
-      const keyword = params.keyword;
-      setWord(keyword);
-      (async () => {
-        const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?keyword=${word}&region=${searchRegion}&userId=${userId}`)
-        const partyData = res.data.result;
-        const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
-        let partyArr = [];
-        for(let i = 0; i < partyData.length; i++) {
-          partyArr[i] = {...partyData[i], ...parsedLatlng[i]};
-        }
-        setParties(partyArr)
-      })();
-    }
-  },[])
+    // }
+  // } 
+  }, [ params ]);
   
   if(!isLoggedIn){
     return <Navigate to="/" />

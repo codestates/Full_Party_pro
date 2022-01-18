@@ -173,7 +173,6 @@ type Props = {
 export default function QuestCard ({ party }: Props) {
 
   const { id, name, image, memberLimit, content, startDate, endDate, leaderId, favorite, tag, isOnline, region, location, members } = party;
-
   const navigate = useNavigate();
   function formatDate(timestamp: Date){
     const date = timestamp.getDate();
