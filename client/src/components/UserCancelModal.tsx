@@ -10,6 +10,7 @@ export const ModalContainer = styled.div`
 
   position: fixed;
   left: 0;
+  top: 0;
   z-index: 1000;
 `;
 
@@ -41,7 +42,6 @@ export const ModalView = styled.div`
 
   .title {
     margin-bottom: 20px;
-    line-height: 1.7rem;
   }
 
   .buttons {
@@ -54,11 +54,11 @@ export const ModalView = styled.div`
       margin: 0 5px;
 
       border-radius: 20px;
-      
+
       cursor: pointer;
     }
 
-    .exit {
+    .delete {
       border: none;
       background-color: #50C9C3;
       color: white; 
@@ -86,16 +86,27 @@ export const CloseBtn = styled.button`
 `
 
 type Props = {
-  postCancelHandler: Function
-  backToPage: Function
+  from: string,
+  userCancelHandler: Function,
+  handleSignOut: Function,
+  handleWithdrawal: Function,
 }
 
-const PostCancelModal = ({ postCancelHandler, backToPage }: Props) => {
+const UserCancelModal = ({ from, userCancelHandler, handleSignOut, handleWithdrawal }: Props) => {
 
   const closeModal =() => {
-    postCancelHandler();
+    userCancelHandler();
   }
 
+  function functionController(){
+    if(from === "signout"){
+      handleSignOut();
+    } else if(from === "delete"){
+      handleWithdrawal();
+    } 
+
+    userCancelHandler();
+  }
 
   return(
     <ModalContainer>
@@ -103,13 +114,13 @@ const PostCancelModal = ({ postCancelHandler, backToPage }: Props) => {
         <ModalView onClick={(e) => e.stopPropagation()}>
           <CloseBtn onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
           <div className="title">
-            페이지를 이동하시면
-            <br />지금까지 작업하신 내용은 전부 사라집니다.
+            {from === "signout" ? "로그아웃하시겠습니까?" : null}
+            {from === "delete" ? "풀팟을 탈퇴하시겠습니까?" : null}
           </div>
           <div className="buttons">
             <button 
-              className="exit" 
-              onClick={() => backToPage()}
+              className="delete" 
+              onClick={functionController}
             >
                 확인
             </button>
@@ -123,4 +134,4 @@ const PostCancelModal = ({ postCancelHandler, backToPage }: Props) => {
   )
 }
 
-export default PostCancelModal;
+export default UserCancelModal;

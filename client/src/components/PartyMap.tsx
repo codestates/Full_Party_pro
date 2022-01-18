@@ -137,7 +137,7 @@ export default function PartyMap ({ isMember, location, image }: Props) {
               position={coords}
               yAnchor={2.4}
             >
-              <div className="partyImg" style={{background: `url(${image})`, backgroundSize: "cover"}} />
+              <div className="partyImg" style={{background: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center"}} />
             </CustomOverlayMap>
           </>
         : 

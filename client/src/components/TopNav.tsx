@@ -26,16 +26,18 @@ export const NavContainer = styled.nav`
 
   display: flex;
   justify-content: space-between;
+  align-items: center;
   overflow: hidden;
 
   #logo {
-    margin-left: 5px;
-
-    font-size: 1.5rem;
-    font-weight: bold;
-
     background-color: white;
     border: none;
+
+    cursor: pointer;
+
+    img {
+      height: 45px;
+    }
   }
 
   .userMenu {
@@ -113,7 +115,7 @@ export default function TopNav () {
     <NavContainer>
       <button id="logo">
         <Link to="/" style={{ color: 'black', textDecoration: 'none' }}>
-          Full Party!
+          <img src="img/navLogo.png" alt="logo" />
         </Link>
       </button>
       {isLoggedIn ?

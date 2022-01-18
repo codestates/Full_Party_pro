@@ -44,31 +44,21 @@ export const ModalView = styled.div`
     line-height: 1.7rem;
   }
 
-  .buttons {
+ 
+  button.exit {
+    width: 100px;
+    height: 50px;
+    padding: 10px 20px;
+    
+    margin: 0 5px;
 
-    button {
-      width: 100px;
-      height: 50px;
-      padding: 10px 20px;
-      
-      margin: 0 5px;
+    border-radius: 20px;
+    
+    cursor: pointer;
 
-      border-radius: 20px;
-      
-      cursor: pointer;
-    }
-
-    .exit {
-      border: none;
-      background-color: #50C9C3;
-      color: white; 
-    }
-
-    .cancel {
-      border: 1px solid #50C9C3; 
-      background-color: #fff;
-      color: #50C9C3; 
-    }
+    border: none;
+    background-color: #50C9C3;
+    color: white; 
   }
 `
 
@@ -86,14 +76,13 @@ export const CloseBtn = styled.button`
 `
 
 type Props = {
-  postCancelHandler: Function
-  backToPage: Function
+  errorModalHandler: Function,
 }
 
-const PostCancelModal = ({ postCancelHandler, backToPage }: Props) => {
+const ErrorModal = ({ errorModalHandler }: Props) => {
 
   const closeModal =() => {
-    postCancelHandler();
+    errorModalHandler();
   }
 
 
@@ -103,24 +92,19 @@ const PostCancelModal = ({ postCancelHandler, backToPage }: Props) => {
         <ModalView onClick={(e) => e.stopPropagation()}>
           <CloseBtn onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
           <div className="title">
-            페이지를 이동하시면
-            <br />지금까지 작업하신 내용은 전부 사라집니다.
+            네트워크 오류로 퀘스트 등록에 실패했습니다.
+            <br />다시 시도해주세요.
           </div>
-          <div className="buttons">
-            <button 
-              className="exit" 
-              onClick={() => backToPage()}
-            >
-                확인
-            </button>
-            <button className="cancel" onClick={closeModal}>
-                취소
-            </button>    
-          </div>
+          <button 
+            className="exit" 
+            onClick={closeModal}
+          >
+            확인
+          </button>
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
   )
 }
 
-export default PostCancelModal;
+export default ErrorModal;
