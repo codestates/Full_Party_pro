@@ -350,17 +350,22 @@ function Home () {
       });
     }
     // 구글 로그인 추가 필요 -> URL로 조건 분기
-    if (new URL(window.location.href).searchParams.get("code")) handleKakaoLogin();
+    const address = new URL(window.location.href).searchParams.get("code")
+    if ( address && address[1] !== "/" ) handleKakaoLogin();
+    else if ( address && address[1] === "/" ) handleGoogleLogin();
   }, []);
 
   const handleGoogleLogin = async () => {
     const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post("https://localhost:443/google", { authorizationCode });
+    const response = await axios.post("https://localhost:443/google", { authorizationCode }, {
+      withCredentials: true
+    });
     dispatch({
       type: SIGNIN_SUCCESS,
       payload: response.data.userInfo
     });
     document.cookie = "token=" + response.data.userInfo.accessToken;
+    document.cookie = "signupType=google";
   };
 
   const handleKakaoLogin = async () => {
