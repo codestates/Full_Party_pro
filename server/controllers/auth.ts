@@ -1,8 +1,9 @@
+import { UsersAttributes } from './../models/users';
 import axios from "axios";
 import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
-import { findUser, createUser } from "./functions/sequelize";
+import { findUser, createUser, deleteUser } from "./functions/sequelize";
 import { JwtPayload } from "jsonwebtoken";
 import qs from "qs";
 import config from "../config"
@@ -43,7 +44,8 @@ export const signout = async (req: Request, res: Response) => {
       
     }
     else if (signupType === "guest") {
-
+      const verification =  verifyAccessToken(String(accessToken));
+      if (verification && typeof verification !== "string") await deleteUser(verification.id);
     }
     return SuccessfulResponse(res, { message: "You Have Successfully Signed Out" });
   }
@@ -66,7 +68,27 @@ export const signup = async (req: Request, res: Response) => {
 
 export const guest = async (req: Request, res: Response) => {
   try {
-    return SuccessfulResponse(res, { message: "3" });
+    const userInfo: UsersAttributes = {
+      userName: "Guest",
+      profileImage: "",
+      birth: new Date(),
+      gender: "Guest",
+      mobile: "Guest",
+      email: `Guest${Math.floor(Math.random()*1000)}@fullparty.com`,
+      region: "Guest",
+      exp: 25,
+      level: 1,
+      signupType: "guest"
+    };
+    const created = await createUser(userInfo);
+    const guestUserInfo = await findUser({ signupType: "guest" }, [ "id", "userName", "birth", "createdAt", "updatedAt" ]);
+    const accessToken = generateAccessToken(guestUserInfo);
+    return res.status(200).setHeader("Set-Cookie", `jwt=${accessToken}; domain=localhost; path=/; SameSite=none; secure=true; httpOnly=true; maxAge=1000 * 60 * 15; signed=true;`)
+      .setHeader("Acess-Control-Allow-Credentials", "true")
+      .json({ message: "You Have Successfully Signed In", userInfo });
+    // setCookie(res, "token", String(accessToken));
+    // if (!created) FailedResponse(res, 400, "Bad Request");
+    // return SuccessfulResponse(res, { message: "You Have Successfully Signed In", userInfo: { ...userInfo, ...guestUserInfo }});
   }
   catch (error) {
     InternalServerError(res, error);
@@ -184,7 +206,6 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
     const signupType = req.headers.signup_type;
     if (signupType === "general") {
       const verification = verifyAccessToken(String(accessToken));
-      
       if (!verification) FailedResponse(res, 403, "Invalid access token");
       else if (typeof verification !== "string") {
         const userInfo = await findUser({ id: verification.id }, [ "id", "profileImage", "userName", "region", "signupType" ]);
@@ -202,7 +223,7 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
       });
       const { email } = userInfoFromKakao.data.kakao_account;
       const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
-      SuccessfulResponse(res, { message: "Keep Logged in", userInfo });
+      SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
     }
     else if (signupType === "google") {
       const userInfoFromGoogle = await axios({
@@ -214,10 +235,15 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
       });
       const { email } = userInfoFromGoogle.data;
       const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
-      SuccessfulResponse(res, { message: "Keep Logged in", userInfo });
+      SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
     }
     else if (signupType === "guest") {
-
+      const verification = verifyAccessToken(String(accessToken));
+      if (!verification) FailedResponse(res, 403, "Invalid access token");
+      else if (typeof verification !== "string") {
+        const userInfo = await findUser({ email: verification.email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
+        SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
+      }
     }
   }
   catch (error) {
