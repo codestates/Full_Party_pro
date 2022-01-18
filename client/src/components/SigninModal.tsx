@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+
 import styled from 'styled-components';
 import axios from 'axios';
 import { ImGoogle } from "react-icons/im";
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { RootReducerType } from '../store/store';
@@ -218,7 +220,7 @@ const SigninModal = () => {
   }
 
   const handleSignGoogle = () => {
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`;
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`
     window.location.assign(url);
   };
 
