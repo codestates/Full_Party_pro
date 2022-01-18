@@ -13,6 +13,7 @@ import { searchParty } from '../actions/search';
 
 import LocalQuest from '../components/LocalQuest';
 import EmptyCard from '../components/EmptyCard';
+import Loading from '../components/Loading';
 
 // [dev] 더미데이터
 import dummyList from '../static/dummyList';
@@ -103,6 +104,7 @@ export default function Search () {
   const [word, setWord] = useState<string | undefined>('');
   const [isSearch, setIsSearch] = useState(false);
   const [parties, setParties] = useState<any>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   //[dev] 더미데이터입니다.
   const [tag, setTag] = useState(['태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333'])
@@ -125,37 +127,56 @@ export default function Search () {
   }
 
   useEffect(() => {
+    let isComponentMounted = true;
+    setIsLoading(true);
+
     if(params.tag){
       const tag = params.tag;
-      setWord(tag);
-      (async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${word}&region=${searchRegion}&userId=${userId}`)
+
+      const searchData = async () => {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${tag}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
-        const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
-        let partyArr = [];
-        for(let i = 0; i < partyData.length; i++) {
-          partyArr[i] = {...partyData[i], ...parsedLatlng[i]};
+        const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
+        if (isComponentMounted) {
+          setWord(tag);
+          setParties(parsedData);
         }
-        setParties(partyArr)
-      })();
-    } else {
+      }
+
+      searchData();
+
+      return () => {
+        isComponentMounted = false
+      }
+    } else if(params.keyword){
       const keyword = params.keyword;
-      setWord(keyword);
-      (async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${word}&region=${searchRegion}&userId=${userId}`)
+
+      const searchData = async () => {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${keyword}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
-        const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
-        let partyArr = [];
-        for(let i = 0; i < partyData.length; i++) {
-          partyArr[i] = {...partyData[i], ...parsedLatlng[i]};
+        const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
+        if (isComponentMounted) {
+          setWord(keyword);
+          setParties(parsedData);
         }
-        setParties(partyArr)
-      })();
+      }
+
+      searchData();
+
+      return () => {
+        isComponentMounted = false
+      }
     }
-  },[params])
+  },[params.tag, params.keyword])
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [parties])
   
   if(!isLoggedIn){
     return <Navigate to="/" />
+  } else if(isLoading){
+    return <Loading />
   }
 
   return (
