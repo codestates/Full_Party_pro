@@ -67,7 +67,6 @@ type Props = {
 };
 
 export default function LocalQuest ({ location, localParty }: Props) {
-
   const [partyList, setPartyList] = useState(localParty.map(local => local).reverse());
   const [checked, setChecked] = useState({ online: true, offline: true });
 
@@ -86,7 +85,6 @@ export default function LocalQuest ({ location, localParty }: Props) {
         setPartyList(localParty.filter(local => !local.isOnline).reverse())
     }
   }, [checked])
-  
   return (
     <LocalQuestContainer>
       <header className="listHeader">

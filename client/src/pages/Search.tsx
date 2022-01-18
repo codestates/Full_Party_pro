@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import styled from 'styled-components';
@@ -113,17 +114,16 @@ export default function Search () {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const params = useParams();
-
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
-  );
-
+    );
   const searchReducer = useSelector((state: RootReducerType) => state.searchReducer);
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
   const searchRegion = signinReducer.userInfo?.region;
-
-  const [word, setWord] = useState('');
+  const userId = useSelector((state: AppState) => state.signinReducer.userInfo?.id);
+  const [word, setWord] = useState<string | undefined>('');
   const [isSearch, setIsSearch] = useState(false);
+  const [parties, setParties] = useState<any>([]);
 
   //[dev] 더미데이터입니다.
   const [tag, setTag] = useState(['태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333'])
@@ -131,34 +131,60 @@ export default function Search () {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value)
   }
-
-  const searchQuest = () => {
-    dispatch(searchParty(word, searchRegion, 'byKeyword'))
-    setIsSearch(true)
-    navigate(`/search/${word}`)
-  }
- 
   const enterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if(e.key === 'Enter') {
       searchQuest()
     }
   }
 
-  function hashtagHandler(tag: string){
+  // const searchQuest = async () => {
+  //   dispatch(await searchParty(userId, word, searchRegion, 'byKeyword'))
+  //   setIsSearch(true)
+  //   navigate(`/search/${word}`)
+  // }
+
+  //이 코드가 먹히면 search 관련 Redux 자료들을 삭제해 주세요
+  const searchQuest = () => {
+    navigate(`/search/keyword/${word}`)
+  }
+
+  const hashtagHandler = (tag: string) => {
     setWord(tag);
-    dispatch(searchParty(tag, searchRegion, 'byTag'));
-    setIsSearch(true);
+    // dispatch(await searchParty(userId, tag, searchRegion, 'byTag'));
+    // setIsSearch(true);
+    navigate(`/search/tag/${word}`)
   }
 
   useEffect(() => {
     if(params.tag){
       const tag = params.tag;
       setWord(tag);
-      dispatch(searchParty(tag, searchRegion, 'byTag'));
-      setIsSearch(true);
+      (async () => {
+        const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?tagName=${word}&region=${searchRegion}&userId=${userId}`)
+        const partyData = res.data.result;
+        const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
+        let partyArr = [];
+        for(let i = 0; i < partyData.length; i++) {
+          partyArr[i] = {...partyData[i], ...parsedLatlng[i]};
+        }
+        setParties(partyArr)
+      })();
+    } else {
+      const keyword = params.keyword;
+      setWord(keyword);
+      (async () => {
+        const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/search?keyword=${word}&region=${searchRegion}&userId=${userId}`)
+        const partyData = res.data.result;
+        const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
+        let partyArr = [];
+        for(let i = 0; i < partyData.length; i++) {
+          partyArr[i] = {...partyData[i], ...parsedLatlng[i]};
+        }
+        setParties(partyArr)
+      })();
     }
   },[])
-
+  
   if(!isLoggedIn){
     return <Navigate to="/" />
   }
@@ -180,7 +206,7 @@ export default function Search () {
       </SearchBar>
       <SearchContent>
         {(() => {
-          if(!isSearch) {
+          if(!params.tag && !params.keyword) {
             return (
               <div className='result'>
                 <div className='resultLabel'>
@@ -200,23 +226,16 @@ export default function Search () {
                   )}
                 </div>
               </div>
-              //[dev]기본화면 카드 렌더링 테스트용
-              // <div className='result'>
-              //   <div className='resultLabel'>
-              //     검색 결과
-              //   </div>
-              // {dummyList.localParty.map((party, idx) => <QuestCard key={idx} party={party} />)}
-              // </div>
             )
           }
-          else if(isSearch && searchReducer.parties.length !== 0) {
+          else if(parties.length !== 0) {
             return(
               <div className='result'>
-                <LocalQuest location={searchRegion} localParty={searchReducer.parties} /> 
+                <LocalQuest location={searchRegion} localParty={parties} /> 
               </div>
             )
           }
-          else if(isSearch && searchReducer.parties.length === 0) {
+          else if(parties.length === 0) {
             return (
               <EmptyCard from="search" />
             )

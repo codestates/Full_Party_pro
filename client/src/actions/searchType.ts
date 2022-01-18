@@ -2,7 +2,7 @@ export const SEARCH_BY_KEYWORD = 'SEARCH_BY_KEYWORD'
 export const SEARCH_BY_TAG = 'SEARCH_BY_TAG'
 
 export type Search = {
-  parties: []
+  parties: any[]
 }
 
 export interface searchByKeywordDispatch{

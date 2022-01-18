@@ -67,7 +67,7 @@ export default function App() {
                 <Route path="/post" element={<Post />} />
                 <Route path="/post/:partyInfo" element={<Post />} /> 
                 <Route path="/search" element={<Search />} />
-                <Route path="/search/:keyword" element={<Search />} />
+                <Route path="/search/keyword/:keyword" element={<Search />} />
                 <Route path="/search/tag/:tag" element={<Search />} />
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/favorite" element={<Favorite />} />

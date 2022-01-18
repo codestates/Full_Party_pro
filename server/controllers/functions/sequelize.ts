@@ -17,7 +17,7 @@ interface LocalParty extends Parties {
 interface PartyInfo extends Parties {
   favorite?: number;
   tag?: Tag[];
-  members?: object[]
+  members?: object[];
 };
 
 interface Comments extends Comment {
@@ -191,6 +191,7 @@ export const getTag = async (partyId: number) => {
 
 export const createNewParty = async (userId: number, partyInfo: PartyInfo) => {
   const newParty = await Parties.create({ ...partyInfo, partyState: 0, leaderId: userId });
+  await UserParty.create({ userId, partyId: partyInfo.id, message: "", isReviewed: false });
   if (partyInfo.tag) await createTag(partyInfo.tag, newParty.id);
   return { partyId: newParty.id, location: newParty.location };
 };

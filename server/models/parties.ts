@@ -15,6 +15,7 @@ export interface PartiesAttributes {
   privateLink: string;
   region: string;
   location: string;
+  latlng: string;
 };
 
 export class Parties extends Model<PartiesAttributes> {
@@ -31,6 +32,7 @@ export class Parties extends Model<PartiesAttributes> {
   public privateLink!: string;
   public region!: string;
   public location!: string;
+  public latlng!: string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -97,6 +99,10 @@ Parties.init(
     allowNull: false
   },
   location: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  latlng: {
     type: DataTypes.STRING,
     allowNull: false
   }

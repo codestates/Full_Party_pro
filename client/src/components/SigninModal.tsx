@@ -9,6 +9,7 @@ import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
+import { CLOSE_MODAL } from '../actions/modalType';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -207,7 +208,10 @@ const SigninModal = () => {
   }
 
   const handleSignin = () => {
-    dispatch(fetchUserdata(userInfo))
+    dispatch(fetchUserdata(userInfo));
+    dispatch({
+      type: CLOSE_MODAL
+    })
   }
 
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -218,12 +222,12 @@ const SigninModal = () => {
     dispatch(modalChanger(e.currentTarget.className))
   }
 
-  const handleSignGoogle = () => {
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`;
+  const googleLoginHandler = () => {
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`
     window.location.assign(url);
   };
 
-  const handleSignKakao = () => {
+  const kakaoLoginHandler = () => {
     const url = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`;
     window.location.assign(url);
   };
@@ -250,7 +254,7 @@ const SigninModal = () => {
             <fieldset>
               <div className='label'>password</div>
               <input
-                type='text'
+                type='password'
                 name='password'
                 value={userInfo.password}
                 onChange={(e) => handleInput(e)}
@@ -270,10 +274,10 @@ const SigninModal = () => {
               <div className="oauthLabel">
                 <hr /> OR <hr />
               </div>
-              <button onClick={handleSignKakao} className="oauth kakao">
+              <button onClick={kakaoLoginHandler} className="oauth kakao">
                 <img src="img/kakao_symbol.svg" />
               </button>
-              <button onClick={handleSignGoogle} className="oauth google">
+              <button onClick={googleLoginHandler} className="oauth google">
                 <img src="img/google_symbol.svg" />
               </button>
             </div>

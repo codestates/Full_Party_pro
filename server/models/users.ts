@@ -55,7 +55,7 @@ Users.init(
   },
   profileImage: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   birth: {
     type: DataTypes.DATEONLY,
