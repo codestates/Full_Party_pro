@@ -20,7 +20,13 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
   switch (action.type) {
     case SIGNIN_FAIL:
       return {
-        ...state,
+        userInfo: {
+          id: 0,
+          userName: "",
+          profileImage: "",
+          region: "",
+          signupType: "",
+        },
         isLoggedIn: false
       }
 
