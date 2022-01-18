@@ -1,226 +1,546 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { AppState } from '../reducers';
+import { faPlus, faTimes, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
-import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { AppState } from '../reducers';
+import { RootReducerType } from '../store/store'
+
 import PostMap from '../components/PostMap';
 import PostCancelModal from '../components/PostCancelModal'
-import { RootReducerType } from '../store/store'
+import Slider from 'rc-slider';
+import ErrorModal from '../components/ErrorModal'
 
 export const PostContainer = styled.div`
   width: 100%;
-  background-color: #d5d5d5;
+  background-color: #fff;
   position: absolute;
   left: 0;
 
-  z-index: 999;
+  z-index: 910;
+
+  margin: 60px 0;
+  overflow: hidden;
 `
 
-export const PostCard = styled.div`
-  width: 85%;
-  min-height: 20vh;
-  margin: 30px auto;
-  margin-bottom: 80px;
-  background-color: white;
+export const Navigation = styled.nav`
+  width: 100vw;
+  height: 60px;
 
-  border: none;
-  border-radius: 20px;
-  padding-bottom: 2vh;
+  padding: 0 20px;
 
-  font-family: 'DungGeunMo';
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 920;
 
-  .cardHeader {
-    display: flex;
-    background-color: #50C9C3;
-    border-radius: 20px 20px 0 0;
-    justify-content: space-between;
+  background-color: #fff;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 
-    > .bubbleMsg{
-      display: flex;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
 
-      > .bubble {
-          width: 20px;
-          margin: 0.5vh;
-          margin-left: 15px;
-        }
-      > .headerMsg {
-          color: white;
-          margin: auto 0;
-          margin-left: 8px;
-        }
-    }
-    > .closeBtn {
-      border: none;
-      background: none;
-      margin-right: 15px;
-    }
-  }
+  button {
+    color: #777;
+    font-size: 12pt;
+    font-weight: bold;
 
-  .partyImg {
-    width: 300px;
-    height: 170px;
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
-
-    margin: 1vh auto;
-
-    border: 1px solid silver;
-
-    .img {
-      width: 100%;
-      height: 100%;
-    }
-  }
-
-  fieldset {
+    background-color: white;
     border: none;
-    margin: 2vh;
+    cursor: pointer;
 
-    .regionTitle {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .regionChoice {
-      font-size: 12px;
-      color: black;
-      > .unFocus {
+    &.post {
+      margin-right: 10px;
+
+      &:disabled {
         color: #d5d5d5;
       }
     }
+  }
+`
+
+export const PostCard = styled.div`
+
+  width: 100%;
+  padding: 40px 10%;
+
+  display: flex;
+  flex-direction: column;
+
+  fieldset {
+    border: none;
+    margin-bottom: 30px;
 
     .label {
-      margin: 7px;
-    }
+      margin-bottom: 10px;
+      font-size: 1rem;
+      font-weight: bold;
 
-    .mapContainer {
-      display: flex;
-      flex-direction: column;
-    }
-    .mapDesc {
-      width: 320px;
-      height: 300px;
+      &.content {
+        margin-bottom: 15px;
+        
+        display: flex;
+        align-items: center;
 
-      border: 1px solid black;
-      border-radius: 20px
-    }
-    .mapInput {
-      border: none;
-      border-bottom: 1px solid #d5d5d5;
-      background-color: white;
-      align-self: center;
-
-      margin: 3px 7px;
-      margin-top: 10px;
-      padding-left: 5px;
-
-      width: 80%;
-      height: 20px;
-      :focus {
-        outline: transparent;
+        .error {
+          margin-top: 0;
+          margin-left: 10px;
+          font-weight: normal;
+        }
       }
     }
 
     input {
+      width: 100%;
+      height: 25px;
+
       border: none;
       border-bottom: 1px solid #d5d5d5;
-      background-color: white;
-
-      margin: 3px 7px;
-      padding-left: 5px;
-
-      width: 80%;
-      height: 20px;
-      :focus {
-        outline: transparent;
-      }
-    }
-    select {
-      border: none;
-      border-bottom: 1px solid #d5d5d5;
-      background-color: white;
-
-      margin: 3px 7px;
-
-      width: 80%;
-      height: 20px;
-
-      text-align: center;
-    }
-    textarea {
-      border: 1px solid #d5d5d5;
-      background-color: white;
 
       padding: 5px;
+    }
 
-      width: 95%;
-      height: 80px;
-      :focus {
-        outline: transparent;
+    .details {
+      font-size: 0.8rem;
+      color: #777;
+
+      margin-bottom: 5px;
+    }
+  }
+
+  .basicInfo {
+
+    .imageContainer {
+      img {
+        width: 100%;
       }
     }
-    .strDate{
-      margin-left: 7px;
-      width: 50%;
+
+    .infoContainer {
+      margin-top: 20px;
     }
-    .endDate{
-      margin-left: 7px;
-      width: 50%;
-    }
-    @media screen and (min-width: 600px) {
-      .mapDesc {
-        width: 1000px;
-        height: 400px;
-        margin: 0 auto;
+
+    fieldset {
+      .date {
+        font-size: 0.8rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      input[type=date] {
+        font-family: "-apple-system";
+      }
+
+      div.startDate {
+        margin-bottom: 10px;
       }
     }
   }
 
-  .btn {
-    width: 50%;
-    margin: 0 auto;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  .locationTitle {
+    color: #000;
+
+    button {
+      background-color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+
+      &.unfocused {
+        font-weight: normal;
+        color: #777;
+      }
+    }
+  }
+
+  .mapDesc {
+    width: 100%;
+    height: 250px;
+
+    margin: 20px 0;
+  }
+
+  textarea {
+    width: 100%;
+    height: 300px;
+    padding: 15px;
+
+    border: 1px solid #d5d5d5;
+    font-family: "-apple-system";
   }
 
   .error {
-    font-family: none;
     font-size: 12px;
-    margin: 0 12px;
-    color: red;
-    margin: 2px 0;
+    color: #f34508;
+    margin-top: 8px;
   }
 
-  @media screen and (min-width: 600px) {
-    .partyImg {
-      width: 700px;
-      height: 400px;
+  .btn {
+    width: 100%;
+    display: flex;
+    justify-content: center;
 
-      .img {
-        width: 100%;
-        height: 100%;
-      }
-    }
+    margin: 15px 0;
+  }
+
+  @media screen and (min-width: 790px) {
+    padding: 40px 20%;
   }
 `
 
+export const SliderContainer = styled.div`
+
+  .sign {
+    opacity: 0;
+    position: absolute;
+    margin-left: -11px;
+    top: -39px;
+    z-index: 920;
+    background-color: #50C9C3;
+    color: #fff;
+    width: 28px;
+    height: 28px;
+    border-radius: 28px;
+    -webkit-border-radius: 28px;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    text-align: center;
+
+    &:after {
+      position: absolute;
+      content: '';
+      left: 0;
+      border-radius: 16px;
+      top: 19px;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top-width: 16px;
+      border-top-style: solid;
+      border-top-color: #50C9C3;
+    }
+
+    & > span {
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 28px;
+    }
+  }
+
+  &:hover {
+    .sign {
+      opacity: 1;
+    }
+  }
+
+  .rc-slider {
+    position: relative;
+    height: 14px;
+    padding: 5px 0;
+    width: 100%;
+    border-radius: 6px;
+    touch-action: none;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+
+  .rc-slider * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+
+  .rc-slider-rail {
+    position: absolute;
+    width: 100%;
+    background-color: #e9e9e9;
+    height: 10px;
+    border-radius: 6px;
+  }
+
+  .rc-slider-track {
+    position: absolute;
+    left: 0;
+    height: 10px;
+    border-radius: 6px;
+    background-color: #50C9C3;
+  }
+
+  .rc-slider-handle {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    cursor: -webkit-grab;
+    margin-top: -3px;
+    cursor: grab;
+    border-radius: 50%;
+    border: solid 2px #50C9C3;
+    background-color: #fff;
+    touch-action: pan-x;
+  }
+
+  .rc-slider-handle-dragging.rc-slider-handle-dragging.rc-slider-handle-dragging {
+    border-color: #50C9C3;
+    box-shadow: 0 0 0 5px #50C9C3;
+  }
+
+  .rc-slider-handle:focus {
+    outline: none;
+  }
+
+  .rc-slider-handle-click-focused:focus {
+    border-color: #50C9C3;
+    box-shadow: unset;
+  }
+
+  .rc-slider-handle:hover {
+    border-color: #50C9C3;
+  }
+
+  .rc-slider-handle:active {
+    border-color: #50C9C3;
+    box-shadow: 0 0 5px #50C9C3;
+    cursor: -webkit-grabbing;
+    cursor: grabbing;
+  }
+
+  .rc-slider-mark {
+    position: absolute;
+    top: 18px;
+    left: 0;
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .rc-slider-mark-text {
+    position: absolute;
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    cursor: pointer;
+    color: #999;
+  }
+
+  .rc-slider-mark-text-active {
+    color: #666;
+  }
+
+  .rc-slider-step {
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    background: transparent;
+  }
+
+  .rc-slider-dot {
+    position: absolute;
+    bottom: -2px;
+    margin-left: -4px;
+    width: 8px;
+    height: 8px;
+    border: 2px solid #e9e9e9;
+    background-color: #fff;
+    cursor: pointer;
+    border-radius: 50%;
+    vertical-align: middle;
+  }
+
+  .rc-slider-dot-active {
+    border-color: #50C9C3;
+  }
+
+  .rc-slider-dot-reverse {
+    margin-right: -4px;
+  }
+
+  .rc-slider-disabled {
+    background-color: #e9e9e9;
+  }
+
+  .rc-slider-disabled .rc-slider-track {
+    background-color: #ccc;
+  }
+
+  .rc-slider-disabled .rc-slider-handle,
+  .rc-slider-disabled .rc-slider-dot {
+    border-color: #ccc;
+    box-shadow: none;
+    background-color: #fff;
+    cursor: not-allowed;
+  }
+
+  .rc-slider-disabled .rc-slider-mark-text,
+  .rc-slider-disabled .rc-slider-dot {
+    cursor: not-allowed !important;
+  }
+
+  .rc-slider-vertical {
+    width: 14px;
+    height: 100%;
+    padding: 0 5px;
+  }
+
+  .rc-slider-vertical .rc-slider-rail {
+    height: 100%;
+    width: 4px;
+  }
+
+  .rc-slider-vertical .rc-slider-track {
+    left: 5px;
+    bottom: 0;
+    width: 4px;
+  }
+
+  .rc-slider-vertical .rc-slider-handle {
+    margin-left: -5px;
+    touch-action: pan-y;
+  }
+
+  .rc-slider-vertical .rc-slider-mark {
+    top: 0;
+    left: 18px;
+    height: 100%;
+  }
+
+  .rc-slider-vertical .rc-slider-step {
+    height: 100%;
+    width: 4px;
+  }
+
+  .rc-slider-vertical .rc-slider-dot {
+    left: 2px;
+    margin-bottom: -4px;
+  }
+
+  .rc-slider-vertical .rc-slider-dot:first-child {
+    margin-bottom: -4px;
+  }
+
+  .rc-slider-vertical .rc-slider-dot:last-child {
+    margin-bottom: -4px;
+  }
+
+  .rc-slider-tooltip-zoom-down-enter,
+  .rc-slider-tooltip-zoom-down-appear {
+    animation-duration: 0.3s;
+    animation-fill-mode: both;
+    display: block !important;
+    animation-play-state: paused;
+  }
+
+  .rc-slider-tooltip-zoom-down-leave {
+    animation-duration: 0.3s;
+    animation-fill-mode: both;
+    display: block !important;
+    animation-play-state: paused;
+  }
+
+  .rc-slider-tooltip-zoom-down-enter.rc-slider-tooltip-zoom-down-enter-active,
+  .rc-slider-tooltip-zoom-down-appear.rc-slider-tooltip-zoom-down-appear-active {
+    animation-name: rcSliderTooltipZoomDownIn;
+    animation-play-state: running;
+  }
+
+  .rc-slider-tooltip-zoom-down-leave.rc-slider-tooltip-zoom-down-leave-active {
+    animation-name: rcSliderTooltipZoomDownOut;
+    animation-play-state: running;
+  }
+
+  .rc-slider-tooltip-zoom-down-enter,
+  .rc-slider-tooltip-zoom-down-appear {
+    transform: scale(0, 0);
+    animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .rc-slider-tooltip-zoom-down-leave {
+    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+  }
+
+  @keyframes rcSliderTooltipZoomDownIn {
+    0% {
+      opacity: 0;
+      transform-origin: 50% 100%;
+      transform: scale(0, 0);
+    }
+    100% {
+      transform-origin: 50% 100%;
+      transform: scale(1, 1);
+    }
+  }
+
+  @keyframes rcSliderTooltipZoomDownOut {
+    0% {
+      transform-origin: 50% 100%;
+      transform: scale(1, 1);
+    }
+    100% {
+      opacity: 0;
+      transform-origin: 50% 100%;
+      transform: scale(0, 0);
+    }
+  }
+
+  .rc-slider-tooltip {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    visibility: visible;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+
+  .rc-slider-tooltip * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+
+  .rc-slider-tooltip-hidden {
+    display: none;
+  }
+
+  .rc-slider-tooltip-placement-top {
+    padding: 4px 0 8px 0;
+  }
+
+  .rc-slider-tooltip-inner {
+    padding: 6px 2px;
+    min-width: 24px;
+    height: 24px;
+    font-size: 12px;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    background-color: #6c6c6c;
+    border-radius: 6px;
+    box-shadow: 0 0 4px #d9d9d9;
+  }
+
+  .rc-slider-tooltip-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+  }
+
+  .rc-slider-tooltip-placement-top .rc-slider-tooltip-arrow {
+    bottom: 4px;
+    left: 50%;
+    margin-left: -4px;
+    border-width: 4px 4px 0;
+    border-top-color: #6c6c6c;
+  }
+  
+`
+
 export const TagInput = styled.div`
-  margin: 1.5vh 0.5vh;
-  display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  min-height: 30px;
-  width: 80%;
-  border-bottom: 1px solid #d5d5d5;
 
   > ul {
     display: flex;
@@ -228,46 +548,30 @@ export const TagInput = styled.div`
     padding: 0;
 
     > .tag{
-      width: auto;
-      height: 30px;
+      height: 25px;
       display: flex;
       justify-content: center;
       align-items: center;
-      color: #000;
-      padding: 0 8px;
-      font-size: 14px;
+      color: #fff;
+      padding: 8px;
+      font-size: 0.8rem;
       list-style: none;
       border-radius: 6px;
       margin: 0 8px 8px 0;
       background: #50C9C3;
+
       > .tagIcon {
-        display: block;
-        width: 16px;
-        height: 16px;
-        text-align: center;
-        margin-left: 5px;
-        font-size: 14px;
-        color: #50C9C3;
-        border-radius: 50%;
-        background: #fff;
+        color: #fff;
         cursor: pointer;
+        margin-left: 5px;
       }
     }
   }
-  > .tag-input {
-    flex: 1;
-    border: none;
-    height: 46px;
-    font-size: 14px;
-    padding: 4px 0 0 0;
-    :focus {
-      outline: transparent;
-    }
-  }
+ 
 `
 
 export const Button = styled.button`
-  width: 100%;
+  width: 250px;
   height: 60px;
 
   border: none;
@@ -275,90 +579,148 @@ export const Button = styled.button`
   background-color: #50C9C3;
 
   font-family: 'SilkscreenBold';
-  font-size: 30px;
+  font-size: 1.5rem;
   color: white;
 `
 
 export default function Post () {
   const navigate = useNavigate();
+  const fileRef= useRef();
+
+  const isLoggedIn = useSelector(
+    (state: AppState) => state.signinReducer.isLoggedIn
+  );
+  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
+
   const [partyInfo, setPartyInfo] = useState({
-    image: '',
+    image: 'img/defaultThumbnail.png',
     name: '',
     startDate: '',
     endDate: '',
     memberLimit: 2,
-    region: '',
+    location: '',
+    latlng: { lat: 0, lng: 0 },
     privateLink: '',
     content: ''
   });
+
   const [isName, setIsName] = useState({
     err: false,
     msg: ''
   })
+
   const [isStrDate, setIsStrDate] = useState({
     err: false,
     msg: ''
   })
+
   const [isEndDate, setIsEndDate] = useState({
     err: false,
     msg: ''
   })
+
   const [isContent, setIsContent] = useState({
     err: false,
     msg: ''
   })
+
   const [isPLink, setIsPLink] = useState({
     err: false,
     msg: ''
   })
-  const [isRegion, setIsRegion] = useState({
+
+  const [isLocation, setIsLocation] = useState({
     err: false,
     msg: ''
   })
+
+  const [fixedLocation, setFixedLocation] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [inputTxt, setInputTxt] = useState('');
   const [isOnline, setIsOnline] = useState(false);
+  const [isPosted, setIsPosted] = useState(false);
+
+  const [previewURL, setPreviewURL] = useState('');
+  const [preview, setPreview] = useState(null);
+
   const [cancelModal, setCancelModal] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target
+    
+    const {name, value} = e.target;
 
     setPartyInfo({
       ...partyInfo,
       [name]: value
-    })
+    });
 
-    if(partyInfo.name !== '') {
-      setIsName({
-        err: false,
-        msg: ''
+    if(partyInfo.name) { setIsName({ err: false, msg: ''}) }
+    if(partyInfo.location) { setIsLocation({ err: false, msg: '' }) }
+    if(partyInfo.privateLink) { setIsPLink({ err: false, msg: '' }) }
+    if(partyInfo.content) { setIsContent({ err: false, msg: '' }) }
+  }
+
+  function getCurrentDate() {
+    let newDate = new Date();
+    let date = newDate.getDate();
+    let month = newDate.getMonth() + 1;
+    let year = newDate.getFullYear();
+    
+    return `${year}-${month<10?`0${month}`:`${month}`}-${date}`
+  }
+
+  function validationCheck(){
+    if(partyInfo.startDate > partyInfo.endDate){
+      setIsEndDate({
+        err: true,
+        msg: '종료일이 시작일보다 빠를 수 없습니다.'
       })
-    }
-    if(partyInfo.startDate !== '') {
+    } else {
       setIsStrDate({
         err: false,
-        msg: ''
+        msg: '',
       })
-    }
-    if(partyInfo.endDate !== '') {
+      
       setIsEndDate({
         err: false,
         msg: ''
       })
     }
-    if(partyInfo.region !== '') {
-      setIsRegion({
-        err: false,
-        msg: ''
+
+    if(partyInfo.startDate > partyInfo.endDate){
+      setIsEndDate({
+        err: true,
+        msg: '종료일이 시작일보다 빠를 수 없습니다.'
       })
-    }
-    if(partyInfo.privateLink !== '') {
-      setIsPLink({
+    } else {
+      setIsEndDate({
         err: false,
         msg: ''
       })
     }
   }
+
+  const handleSlider = (value: number) => {
+    setPartyInfo({
+      ...partyInfo,
+      memberLimit: value
+    })
+  }
+
+  const handleCoordsChange = (lat: number, lng: number) => {
+    setPartyInfo({
+      ...partyInfo,
+      latlng: { lat: lat, lng: lng }
+    })
+  }
+
+  const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if(e.code === 'Enter' || e.code === 'Space') {
+      setFixedLocation(partyInfo.location);
+    }
+  }
+
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const {name, value} = e.target
 
@@ -366,6 +728,7 @@ export default function Post () {
       ...partyInfo,
       [name]: value
     })
+
     if(partyInfo.content !== '') {
       setIsContent({
         err: false,
@@ -373,39 +736,24 @@ export default function Post () {
       })
     }
   }
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const {name, value} = e.target
 
-    setPartyInfo({
-      ...partyInfo,
-      [name]: value
-    })
-  }
-
-  const handleIsOnline = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-    if(e.currentTarget.className === 'isOnline' || e.currentTarget.className === 'isOnline unFocus') {
+  const handleIsOnline = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if(e.currentTarget.className === 'isOnline' || e.currentTarget.className === 'isOnline unfocused') {
       setIsOnline(true)
     } else {
       setIsOnline(false)
     }
   }
+
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if(e.code === 'Enter' || e.code === 'Space') {
-      if(tags.includes(inputTxt)) {
-        return;
-      }
-      else if(inputTxt === '') {
-        return;
-      }
-      else if(tags.length >= 3) {
-        return;
-      } 
-      else {
+      if(!tags.includes(inputTxt) && inputTxt && tags.length < 3) {
         setTags([...tags, inputTxt])
         setInputTxt('')
       }
     }
   }
+
   const removeTag = (index: number) => {
     setTags(tags.filter((tag) => {
       return tags.indexOf(tag) !== index
@@ -419,84 +767,115 @@ export default function Post () {
       setCancelModal(true)
     }
   }
+
+  const errorModalHandler = () => {
+    if(isErrorModalOpen) {
+      setIsErrorModalOpen(false);
+    } else{
+      setIsErrorModalOpen(true);
+    }
+  }
+
+
   const backToPage = () => {
     navigate(-1)
   }
-
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
   
   const createParty = () => {
+    const regex = {        
+      url: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
+    };
+
     if(partyInfo.name === '') {
       setIsName({
         err: true,
-        msg: '파티 이름을 입력해 주십시오'
+        msg: '퀘스트 제목을 입력해주세요.'
       })
     }
     if(partyInfo.startDate === '') {
       setIsStrDate({
         err: true,
-        msg: '시작일을 선택해 주십시오'
+        msg: '퀘스트 시작하는 날을 선택해주세요.'
       })
     }
     if(partyInfo.endDate === '') {
       setIsEndDate({
         err: true,
-        msg: '마감일을 선택해 주십시오'
+        msg: '퀘스트가 끝나는 날을 선택해주세요.'
       })
     }
     if(partyInfo.content === '') {
       setIsContent({
         err: true,
-        msg: '파티 내용을 입력해 주십시오'
+        msg: '퀘스트 내용을 입력해주세요.'
       })
     }
-    if(partyInfo.region === '') {
-      setIsRegion({
+    if(partyInfo.location === '') {
+      setIsLocation({
         err: true,
-        msg: '지역을 선택해 주십시오'
-      })
-    }
-    if(partyInfo.privateLink === '') {
-      setIsPLink({
-        err: true,
-        msg: '연락처를 입력해 주십시오'
+        msg: '퀘스트 장소를 입력해주세요.'
       })
     }
 
-    else {
-      postParty()
+    if(partyInfo.privateLink === '') {
+      setIsPLink({
+        err: true,
+        msg: '오픈채팅방 링크를 입력해주세요.'
+      })
+    } else if(!regex.url.test(partyInfo.privateLink)) {
+      setIsPLink({
+        err: true,
+        msg: '유효한 링크를 입력해주세요.'
+      })
+    }
+
+    console.log(partyInfo);
+
+    if(partyInfo.name && partyInfo.startDate && partyInfo.endDate && partyInfo.location && partyInfo.privateLink && regex.url.test(partyInfo.privateLink) && partyInfo.content &&
+      !isName.err && !isStrDate.err && !isEndDate.err && !isContent.err && !isLocation.err && !isPLink.err){
+        setIsPosted(true);
     }
   }
 
   const postParty = async () => {
-    if(!isName.err || !isStrDate.err || !isEndDate.err || !isContent.err || !isRegion.err || !isPLink.err) {
-      console.log('응애')
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/list/create`, {
-        userId: signinReducer.userInfo?.id,
-        partyInfo: {
-          name: partyInfo.name,
-          image: partyInfo.image,
-          memberLimit: partyInfo.memberLimit,
-          region: partyInfo.region,
-          startDate: partyInfo.startDate,
-          endDate: partyInfo.endDate,
-          isOnline: isOnline,
-          privateLink: partyInfo.privateLink,
-          tag: tags
-        }
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/list/create`, {
+      userId: signinReducer.userInfo?.id,
+      partyInfo: {
+        name: partyInfo.name,
+        image: partyInfo.image,
+        memberLimit: partyInfo.memberLimit,
+        // region: isOnline? partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1] : signinReducer.userInfo,
+        location: partyInfo.location,
+        latlng: partyInfo.latlng,
+        startDate: partyInfo.startDate,
+        endDate: partyInfo.endDate,
+        isOnline: isOnline,
+        privateLink: partyInfo.privateLink,
+        tag: tags
+      }
+    })
+
+    return res;
+  }
+
+  useEffect(() => {
+    validationCheck();
+  }, [partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink]);
+
+  useEffect(() => {
+    if(isPosted){
+      postParty()
+      .then((res) => {
+        setIsPosted(false);
+        navigate(`../party/${res.data.newParty.partyId}`);
+      })
+      .catch((err) => {
+        setIsErrorModalOpen(true);
+        setIsPosted(false);
       })
     }
-  }
-  
-  let today = new Date();
-  let year = today.getFullYear();
-  let month = ('0' + (today.getMonth() + 1)).slice(-2);
-  let day = ('0' + today.getDate()).slice(-2);
-  const date = year + '-' + month + '-' + day
+  }, [isPosted])
 
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
   if(!isLoggedIn){
     return <Navigate to="/" />
   }
@@ -504,170 +883,196 @@ export default function Post () {
   return (
     <PostContainer>
       {cancelModal ?
-      <PostCancelModal 
-        postCancelHandler={postCancelHandler}
-        backToPage={backToPage}
-      />
-      :
-      null
-      }
+        <PostCancelModal 
+          postCancelHandler={postCancelHandler}
+          backToPage={backToPage}
+        />
+      : null}
+      {isErrorModalOpen ?
+        <ErrorModal 
+          errorModalHandler={errorModalHandler}
+        />
+      : null}
+      <Navigation>
+        <button className="cancelBtn" onClick={postCancelHandler}>
+          <FontAwesomeIcon icon={ faArrowLeft } className="icon" /> 
+        </button>
+        <div className="partyName">{partyInfo.name}</div>
+        <button className="post" onClick={createParty}>
+          등록
+        </button>
+      </Navigation>
       <PostCard>
-        <header>
-          <div className='cardHeader'>
-            <div className='bubbleMsg'>
-              <img className='bubble' alt='bubble' src='img/bubble.png' />
-              <span className='headerMsg'>파티 개설</span>
-            </div>
-            <button className='closeBtn' onClick={() => postCancelHandler()}>
-              <FontAwesomeIcon icon={ faTimes } className="icon" /> 
-            </button>
+        <section className="basicInfo">
+          <div className="imageContainer">
+            <img className="preview" src={partyInfo.image} alt="thumbnail" />
+            <input
+              className="imageInput" 
+              type="file" 
+              accept="img/*"
+              hidden={true}
+            />
+            <button>UPLOAD</button>
           </div>
-        </header>
-        <fieldset>
-          {/* <div className='label'>파티 대표 사진</div> */}
-        <div className='partyImg'>
-          <FontAwesomeIcon icon={faPlus} className='faPlus' />
-          {/* <img className='img' src={partyInfo.image} /> */}
-        </div>
-        </fieldset>
-        <fieldset>
-          <div className='label'>파티 이름</div>
-          <input
-            name='name'
-            type='text'
-            value={partyInfo.name}
-            placeholder='파티 이름은 30자 까지 가능합니다'
-            maxLength={30}
-            onChange={(e) => {handleInputChange(e)}}
-          />
-          {isName.err ?
-          <div className='error'>{isName.msg}</div> : null}
-        </fieldset>
-        <fieldset>
-          <div className='label'>퀘스트 기간</div>
-          <span className='strDate'>시작일</span><br />
-          <input
-            name='startDate'
-            type='date'
-            min={date}
-            value={partyInfo.startDate}
-            onChange={(e) => {handleInputChange(e)}}
-          /><br />
-          {isStrDate.err ?
-          <div className='error'>{isStrDate.msg}</div> : null}
-          <span className='endDate'>마감일</span><br />
-          <input
-            name='endDate'
-            type='date'
-            min={partyInfo.startDate}
-            value={partyInfo.endDate}
-            onChange={(e) => {handleInputChange(e)}}
-          />
-          {isEndDate.err ?
-          <div className='error'>{isEndDate.msg}</div> : null}
-        </fieldset>
-        <fieldset>
-          <div className='label'>파티 정원</div>
-          <select
-            name='memberLimit'
-            value={partyInfo.memberLimit}
-            onChange={(e) => {handleSelectChange(e)}}
-          >
-            <option value={2} selected>2</option>
-            <option value={3}>3</option>
-            <option value={4}>4</option>
-            <option value={5}>5</option>
-            <option value={6}>6</option>
-            <option value={7}>7</option>
-            <option value={8}>8</option>
-            <option value={9}>9</option>
-            <option value={10}>10</option>
-          </select>
-        </fieldset>
-        <fieldset>
-          <div className='regionTitle'>
-            <div className='label'>퀘스트 장소</div>
-            <div className='regionChoice'>
-              <span className={isOnline === true ? 'unFocus' : ''} onClick={(e) => {handleIsOnline(e)}}>지도에서 보기</span>
-              <span> | </span>
-              <span className={isOnline === true ? 'isOnline' : 'isOnline unFocus'} onClick={(e) => {handleIsOnline(e)}}>직접 입력</span>
-            </div>
+          <div className="infoContainer">
+            <fieldset>
+              <div className='label'>퀘스트 제목</div>
+              <input
+                name='name'
+                type='text'
+                value={partyInfo.name}
+                maxLength={30}
+                onChange={(e) => {handleInputChange(e)}}
+              />
+              {isName.err ?
+              <div className='error'>{isName.msg}</div> : null}
+            </fieldset>
+            <fieldset>
+              <div className='label'>퀘스트 기간</div>
+              <div className="startDate">
+                <div className='date'>시작일</div>
+                <input
+                  name='startDate'
+                  type='date'
+                  className="startDate"
+                  min={getCurrentDate()}
+                  value={partyInfo.startDate}
+                  onChange={(e) => {handleInputChange(e)}}
+                />
+                {isStrDate.err ?
+                <div className='error'>{isStrDate.msg}</div> : null}
+              </div>
+              <div className="endDate">
+                <div className='date'>종료일</div>
+                <input
+                  name='endDate'
+                  type='date'
+                  min={partyInfo.startDate}
+                  value={partyInfo.endDate}
+                  onChange={(e) => {handleInputChange(e)}}
+                />
+                {isEndDate.err ?
+                <div className='error'>{isEndDate.msg}</div> : null}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <div className='label'>파티 정원 <span style={{ fontWeight: "normal" }}>(1/{partyInfo.memberLimit})</span></div>
+              <SliderContainer>
+                <Slider 
+                  min={2}
+                  max={10}
+                  step={1}
+                  value={partyInfo.memberLimit}
+                  onChange={handleSlider}
+                >
+                  <div className="sign" style={{ left: `${(partyInfo.memberLimit)*12.5-26}%` }}>
+                    <span id="value">{partyInfo.memberLimit}</span>
+                  </div>
+                </Slider>
+              </SliderContainer>
+            </fieldset>
+
           </div>
-          {isOnline === false ? 
-          <div className='mapContainer'>
-            <div id='map' className='mapDesc'>
-              <PostMap />
+        </section>
+
+        <section className="infoDetails">
+          <fieldset>
+            <div className='locationTitle'>
+              <div className='label'>퀘스트 장소</div>
+              <div className="details">
+                <button className={isOnline ? 'unfocused' : ''} onClick={(e) => {handleIsOnline(e)}}>오프라인</button>
+                <span> | </span>
+                <button className={isOnline ? 'isOnline' : 'isOnline unfocused'} onClick={(e) => {handleIsOnline(e)}}>온라인</button>
+              </div>
             </div>
-            <input 
-              className='mapInput'
-              name='region'
+            {!isOnline ? 
+              <div className='mapContainer'>
+                <div id='map' className='mapDesc'>
+                  <PostMap 
+                    location={fixedLocation} 
+                    name={partyInfo.name}
+                    image={partyInfo.image} 
+                    handleCoordsChange={handleCoordsChange}
+                  />
+                </div>
+                <input 
+                  className='mapInput'
+                  name='location'
+                  type='text'
+                  value={partyInfo.location}
+                  onChange={(e) => handleInputChange(e)}
+                  onKeyUp={(e) => handleSearchLocation(e)}
+                />
+              </div>
+            :
+              <input 
+                name='location'
+                type='text'
+                value={partyInfo.location}
+                onChange={(e) => {handleInputChange(e)}}
+              />
+            }
+            {isLocation.err ?
+            <div className='error'>{isLocation.msg}</div> : null}
+          </fieldset>
+          <fieldset>
+            <div className='label'>오픈채팅방 링크</div>
+            <div className="details">
+              파티원들간의 소통을 위한 오픈채팅방 링크를 입력해주세요.
+            </div>
+            <input
+              name='privateLink'
               type='text'
-              value={partyInfo.region}
+              value={partyInfo.privateLink}
               onChange={(e) => {handleInputChange(e)}}
             />
-          </div>
-          :
-          <input 
-            name='region'
-            type='text'
-            value={partyInfo.region}
-            onChange={(e) => {handleInputChange(e)}}
-          />
-          }
-          {isRegion.err ?
-          <div className='error'>{isRegion.msg}</div> : null}
-        </fieldset>
-        <fieldset>
-          <div className='label'>오픈 채팅방 링크</div>
-          <input
-            placeholder='파티원에게만 공개되는 정보입니다'
-            name='privateLink'
-            type='text'
-            value={partyInfo.privateLink}
-            onChange={(e) => {handleInputChange(e)}}
-          />
-          {isPLink.err ?
-          <div className='error'>{isPLink.msg}</div> : null}
-        </fieldset>
-        <fieldset>
-          <div className='label'>태그</div>
-          <TagInput>
-            <ul id='tags'>
-              {tags.map((tag, index) => (
-                <li key={index} className='tag'>
-                  <span className='tagTitle'>{tag}</span>
-                  <span className='tagIcon' onClick={() => {removeTag(index)}}>
-                    <FontAwesomeIcon icon={faTimes} />
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <input
-              className='tag-input'
-              name='tagInput'
-              type='text'
-              value={inputTxt}
-              // placeholder='태그는 3개까지 입력가능합니다'
-              placeholder={tags.length === 3 ? '' : '태그는 3개까지 입력가능합니다'}
-              onChange={(e) => setInputTxt(e.target.value)}
-              onKeyUp={(e) => addTag(e)}
+            {isPLink.err ?
+            <div className='error'>{isPLink.msg}</div> : null}
+          </fieldset>
+          <fieldset>
+            <div className='label'>태그</div>
+            <TagInput>
+              <ul id='tags'>
+                {tags.map((tag, index) => (
+                  <li key={index} className='tag'>
+                    <span className='tagTitle'>{tag}</span>
+                    <span className='tagIcon' onClick={() => {removeTag(index)}}>
+                      <FontAwesomeIcon icon={faTimes} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <input
+                className='tag-input'
+                name='tagInput'
+                type='text'
+                maxLength={10}
+                value={inputTxt}
+                placeholder={tags.length === 3 ? '' : '최대 3개까지 추가할 수 있습니다.'}
+                onChange={(e) => setInputTxt(e.target.value)}
+                onKeyUp={(e) => addTag(e)}
+              />
+            </TagInput>
+          </fieldset>
+          <fieldset>
+            <div className='label content'>
+              퀘스트 내용
+              {isContent.err ? <div className='error'>{isContent.msg}</div> : null}  
+            </div>
+            <textarea
+              placeholder='파티원들이 퀘스트 내용을 이해할 수 있도록 자세히 작성해주세요.'
+              name='content'
+              value={partyInfo.content}
+              onChange={(e) => {handleTextareaChange(e)}}
             />
-          </TagInput>
-        </fieldset>
-        <fieldset>
-          <div className='label'>퀘스트 내용</div>
-          <textarea
-            placeholder='모든사람에게 공개되는 정보입니다'
-            name='content'
-            value={partyInfo.content}
-            onChange={(e) => {handleTextareaChange(e)}}
-          />
-          {isContent.err ?
-          <div className='error'>{isContent.msg}</div> : null}
-        </fieldset>
+          </fieldset>
+        </section>
+
         <div className='btn'>
-          <Button onClick={createParty}>QUEST</Button>
+          <Button onClick={createParty} disabled={isPosted}>QUEST</Button>
         </div>
+
       </PostCard>
     </PostContainer>
   );

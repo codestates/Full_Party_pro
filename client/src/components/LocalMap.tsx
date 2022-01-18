@@ -130,7 +130,7 @@ export default function LocalMap ({ location, localParty }: Props) {
             onClick={() => navigate(`../party/${party.id}`)} 
             onMouseOver={() => setIsVisible(true)}
             onMouseOut={() => setIsVisible(false)}
-            style={{background: `url(${party.image})`, backgroundSize: "cover"}} 
+            style={{background: `url(${party.image})`, backgroundSize: "cover", backgroundPosition: "center"}} 
           />
         </CustomOverlayMap>
        

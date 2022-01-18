@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 import styled from 'styled-components';
-import axios from 'axios';
-import { ImGoogle } from "react-icons/im";
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+
 import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
@@ -94,6 +93,8 @@ export const ModalView = styled.div`
     font-size: 15px;
   
     margin: 10px 0 15px 0;
+
+    cursor: pointer;
   }
 
   .signupModalBtn {
@@ -144,6 +145,8 @@ export const ModalView = styled.div`
 
       margin: 0 10px;
       padding-top: 2px;
+
+      cursor: pointer;
 
       img {
         width: 25px;
