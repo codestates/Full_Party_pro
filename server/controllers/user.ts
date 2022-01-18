@@ -25,15 +25,12 @@ export const getUserInfo = async (req: Request, res: Response) => {
 export const withdrawUser = async (req: Request, res: Response) => {
   try {
     const { userId, signupType } = req.params;
-    const accessToken = req.headers.authorization;
+    const accessToken = req.headers.access_token;
     const deleted = await deleteUser(Number(userId));
-    if (signupType === "gereral") {
-      
-    }
-    else if (signupType === "kakao") {
+    if (signupType === "kakao") {
       await axios({
         method: "POST",
-        url: "https://kapi.kakao.com/v1/user/logout",
+        url: "https://kapi.kakao.com/v1/user/unlink",
         headers: {
           "Authorization": `Bearer ${accessToken}`
         }

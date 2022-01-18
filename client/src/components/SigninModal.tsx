@@ -10,6 +10,7 @@ import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
+import { CLOSE_MODAL } from '../actions/modalType';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -204,7 +205,10 @@ const SigninModal = () => {
   }
 
   const handleSignin = () => {
-    dispatch(fetchUserdata(userInfo))
+    dispatch(fetchUserdata(userInfo));
+    dispatch({
+      type: CLOSE_MODAL
+    })
   }
 
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -247,7 +251,7 @@ const SigninModal = () => {
             <fieldset>
               <div className='label'>password</div>
               <input
-                type='text'
+                type='password'
                 name='password'
                 value={userInfo.password}
                 onChange={(e) => handleInput(e)}

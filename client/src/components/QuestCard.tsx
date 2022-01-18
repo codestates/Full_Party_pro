@@ -175,7 +175,6 @@ export default function QuestCard ({ party }: Props) {
   const { id, name, image, memberLimit, content, startDate, endDate, leaderId, favorite, tag, isOnline, region, location, members } = party;
 
   const navigate = useNavigate();
-
   function formatDate(timestamp: Date){
     const date = timestamp.getDate();
     const month = timestamp.getMonth() + 1;
@@ -242,7 +241,7 @@ export default function QuestCard ({ party }: Props) {
                   }
                 </div>
                 <div className="time">
-                  <FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {formatDate(startDate)} ~ {formatDate(endDate)}   
+                  <FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {String(startDate).slice(0, 11)} ~ {String(endDate).slice(0, 11)}   
                 </div>
               </div>
             </div>
