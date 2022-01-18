@@ -38,6 +38,8 @@
     "@types/sequelize": "^4.28.11",
     "@types/validator": "^13.7.1",
     "nodemon": "^2.0.15",
-    "sequelize-cli": "^6.3.0"
+    "sequelize-cli": "^6.3.0",
+    "swagger-jsdoc": "^6.1.0",
+    "swagger-ui-express": "^4.3.0"
   }
 }
