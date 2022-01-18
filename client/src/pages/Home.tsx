@@ -324,24 +324,32 @@ function Home () {
   );
 
   useEffect(() => {
-    let response;
-    if (document.cookie) {
-      const cookie = document.cookie.split("; ");
-      const accessToken = cookie[0].replace("token=", "");
-      const signupType = cookie[1].replace("signupType=", "");
+    if (!document.cookie) {
+      document.cookie = "token=temp;";
+      document.cookie = "signupType=temp;";
+    }
+    const cookie = document.cookie.split("; ");
+    if (cookie.length) {
+      const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
+      const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
+      let response;
       const requestKeepLoggedIn = async () => {
-        response = await axios.post("https://localhost:443/keeping", { accessToken, signupType });
+        response = await axios.post("https://localhost:443/keeping", {}, { 
+          headers: {
+            access_token: accessToken, 
+            signup_type: signupType 
+          } 
+        });
         return response;
       };
-      console.log(signupType);
       requestKeepLoggedIn().then((res) => {
-        console.log(res.data);
         dispatch({
           type: SIGNIN_SUCCESS,
           payload: res.data.userInfo
         });
       });
     }
+    // 구글 로그인 추가 필요 -> URL로 조건 분기
     if (new URL(window.location.href).searchParams.get("code")) handleKakaoLogin();
   }, []);
 

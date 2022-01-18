@@ -17,7 +17,7 @@ interface LocalParty extends Parties {
 interface PartyInfo extends Parties {
   favorite?: number;
   tag?: Tag[];
-  members?: object[]
+  members?: object[];
 };
 
 interface Comments extends Comment {
