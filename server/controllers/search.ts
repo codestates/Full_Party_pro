@@ -3,7 +3,6 @@ import { InternalServerError, SuccessfulResponse, FailedResponse } from "./funct
 import { searchPartiesByKeyword, searchPartiesByTagName } from './functions/sequelize';
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 
-// 유저 아이디 넘겨줘야 favorite 검색이 됨.
 export const searchByTagNameOrKeyword = async (req: Request, res: Response) => {
   try {
     const { tagName, keyword, region, userId } = req.query;

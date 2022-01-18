@@ -8,23 +8,23 @@ import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 
 import axios from 'axios';
-// import Map from '../components/Map';
+import PostMap from '../components/PostMap';
+import PostCancelModal from '../components/PostCancelModal'
 import { RootReducerType } from '../store/store'
-import userReducer from '../reducers/userReducer';
 
 export const PostContainer = styled.div`
   width: 100%;
+  background-color: #d5d5d5;
   position: absolute;
   left: 0;
-  background-color: #d5d5d5;
 
-  z-index: 1000;
+  z-index: 999;
 `
 
 export const PostCard = styled.div`
   width: 85%;
   min-height: 20vh;
-  margin: 3vh auto;
+  margin: 30px auto;
   margin-bottom: 80px;
   background-color: white;
 
@@ -36,7 +36,7 @@ export const PostCard = styled.div`
 
   .cardHeader {
     display: flex;
-    background-color: darkcyan;
+    background-color: #50C9C3;
     border-radius: 20px 20px 0 0;
     justify-content: space-between;
 
@@ -63,15 +63,20 @@ export const PostCard = styled.div`
 
   .partyImg {
     width: 300px;
-    height: 120px;
+    height: 170px;
     display: flex;
 
     justify-content: center;
     align-items: center;
 
-    margin: 3vh auto;
+    margin: 1vh auto;
 
     border: 1px solid silver;
+
+    .img {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   fieldset {
@@ -95,16 +100,32 @@ export const PostCard = styled.div`
       margin: 7px;
     }
 
-    .map {
+    .mapContainer {
+      display: flex;
+      flex-direction: column;
+    }
+    .mapDesc {
       width: 320px;
       height: 300px;
 
       border: 1px solid black;
       border-radius: 20px
     }
-    .hidden {
-      width: 0px;
-      height: 0px;
+    .mapInput {
+      border: none;
+      border-bottom: 1px solid #d5d5d5;
+      background-color: white;
+      align-self: center;
+
+      margin: 3px 7px;
+      margin-top: 10px;
+      padding-left: 5px;
+
+      width: 80%;
+      height: 20px;
+      :focus {
+        outline: transparent;
+      }
     }
 
     input {
@@ -128,7 +149,7 @@ export const PostCard = styled.div`
 
       margin: 3px 7px;
 
-      width: 55%;
+      width: 80%;
       height: 20px;
 
       text-align: center;
@@ -154,7 +175,7 @@ export const PostCard = styled.div`
       width: 50%;
     }
     @media screen and (min-width: 600px) {
-      .map {
+      .mapDesc {
         width: 1000px;
         height: 400px;
         margin: 0 auto;
@@ -166,12 +187,28 @@ export const PostCard = styled.div`
     width: 50%;
     margin: 0 auto;
     border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .error {
+    font-family: none;
+    font-size: 12px;
+    margin: 0 12px;
+    color: red;
+    margin: 2px 0;
   }
 
   @media screen and (min-width: 600px) {
     .partyImg {
       width: 700px;
       height: 400px;
+
+      .img {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 `
@@ -182,7 +219,7 @@ export const TagInput = styled.div`
   align-items: flex-start;
   flex-wrap: wrap;
   min-height: 30px;
-  width: 95%;
+  width: 80%;
   border-bottom: 1px solid #d5d5d5;
 
   > ul {
@@ -202,14 +239,15 @@ export const TagInput = styled.div`
       list-style: none;
       border-radius: 6px;
       margin: 0 8px 8px 0;
-      background: #4000c7;
+      background: #50C9C3;
       > .tagIcon {
         display: block;
         width: 16px;
         height: 16px;
         text-align: center;
+        margin-left: 5px;
         font-size: 14px;
-        color: #4000c7;
+        color: #50C9C3;
         border-radius: 50%;
         background: #fff;
         cursor: pointer;
@@ -234,7 +272,7 @@ export const Button = styled.button`
 
   border: none;
   border-radius: 20px;
-  background-color: darkcyan;
+  background-color: #50C9C3;
 
   font-family: 'SilkscreenBold';
   font-size: 30px;
@@ -248,14 +286,39 @@ export default function Post () {
     name: '',
     startDate: '',
     endDate: '',
-    memberLimit: '',
-    content: '',
+    memberLimit: 2,
+    region: '',
     privateLink: '',
-    region: ''
+    content: ''
   });
+  const [isName, setIsName] = useState({
+    err: false,
+    msg: ''
+  })
+  const [isStrDate, setIsStrDate] = useState({
+    err: false,
+    msg: ''
+  })
+  const [isEndDate, setIsEndDate] = useState({
+    err: false,
+    msg: ''
+  })
+  const [isContent, setIsContent] = useState({
+    err: false,
+    msg: ''
+  })
+  const [isPLink, setIsPLink] = useState({
+    err: false,
+    msg: ''
+  })
+  const [isRegion, setIsRegion] = useState({
+    err: false,
+    msg: ''
+  })
   const [tags, setTags] = useState<string[]>([]);
   const [inputTxt, setInputTxt] = useState('');
   const [isOnline, setIsOnline] = useState(false);
+  const [cancelModal, setCancelModal] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target
@@ -264,6 +327,37 @@ export default function Post () {
       ...partyInfo,
       [name]: value
     })
+
+    if(partyInfo.name !== '') {
+      setIsName({
+        err: false,
+        msg: ''
+      })
+    }
+    if(partyInfo.startDate !== '') {
+      setIsStrDate({
+        err: false,
+        msg: ''
+      })
+    }
+    if(partyInfo.endDate !== '') {
+      setIsEndDate({
+        err: false,
+        msg: ''
+      })
+    }
+    if(partyInfo.region !== '') {
+      setIsRegion({
+        err: false,
+        msg: ''
+      })
+    }
+    if(partyInfo.privateLink !== '') {
+      setIsPLink({
+        err: false,
+        msg: ''
+      })
+    }
   }
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const {name, value} = e.target
@@ -272,6 +366,12 @@ export default function Post () {
       ...partyInfo,
       [name]: value
     })
+    if(partyInfo.content !== '') {
+      setIsContent({
+        err: false,
+        msg: ''
+      })
+    }
   }
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const {name, value} = e.target
@@ -290,7 +390,7 @@ export default function Post () {
     }
   }
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter') {
+    if(e.code === 'Enter' || e.code === 'Space') {
       if(tags.includes(inputTxt)) {
         return;
       }
@@ -312,40 +412,90 @@ export default function Post () {
     }))
   }
 
-  // useEffect(() => {
-  //   let container = document.getElementById('map');
-  //   let options = {
-  //     center: new window.kakao.maps.LatLng(33.450701, 126.570667),
-  //     level: 3
-  //   };
-
-  //   let map = new window.kakao.maps.Map(container, options);
-  // },[isOnline])
-
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
-
-  const createParty = async () => {
-    const res = await axios.post('http://localhost:3000/list/create', {
-      userId: signinReducer.userInfo?.id,
-      partyInfo: {
-        name: partyInfo.name,
-        image: partyInfo.image,
-        memberLimit: partyInfo.memberLimit,
-        content: partyInfo.content,
-        startDate: partyInfo.startDate,
-        endDate: partyInfo.endDate,
-        isOnline: isOnline,
-        privateLink: partyInfo.privateLink,
-        region: partyInfo.region,
-        tag: tags
-      }
-    })
-    
-    console.log(res)
+  const postCancelHandler = () => {
+    if(cancelModal) {
+      setCancelModal(false)
+    } else{
+      setCancelModal(true)
+    }
+  }
+  const backToPage = () => {
+    navigate(-1)
   }
 
+  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer)
+  
+  const createParty = () => {
+    if(partyInfo.name === '') {
+      setIsName({
+        err: true,
+        msg: '파티 이름을 입력해 주십시오'
+      })
+    }
+    if(partyInfo.startDate === '') {
+      setIsStrDate({
+        err: true,
+        msg: '시작일을 선택해 주십시오'
+      })
+    }
+    if(partyInfo.endDate === '') {
+      setIsEndDate({
+        err: true,
+        msg: '마감일을 선택해 주십시오'
+      })
+    }
+    if(partyInfo.content === '') {
+      setIsContent({
+        err: true,
+        msg: '파티 내용을 입력해 주십시오'
+      })
+    }
+    if(partyInfo.region === '') {
+      setIsRegion({
+        err: true,
+        msg: '지역을 선택해 주십시오'
+      })
+    }
+    if(partyInfo.privateLink === '') {
+      setIsPLink({
+        err: true,
+        msg: '연락처를 입력해 주십시오'
+      })
+    }
+
+    else {
+      postParty()
+    }
+  }
+
+  const postParty = async () => {
+    if(!isName.err || !isStrDate.err || !isEndDate.err || !isContent.err || !isRegion.err || !isPLink.err) {
+      console.log('응애')
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/list/create`, {
+        userId: signinReducer.userInfo?.id,
+        partyInfo: {
+          name: partyInfo.name,
+          image: partyInfo.image,
+          memberLimit: partyInfo.memberLimit,
+          region: partyInfo.region,
+          startDate: partyInfo.startDate,
+          endDate: partyInfo.endDate,
+          isOnline: isOnline,
+          privateLink: partyInfo.privateLink,
+          tag: tags
+        }
+      })
+    }
+  }
+  
+  let today = new Date();
+  let year = today.getFullYear();
+  let month = ('0' + (today.getMonth() + 1)).slice(-2);
+  let day = ('0' + today.getDate()).slice(-2);
+  const date = year + '-' + month + '-' + day
+
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
   if(!isLoggedIn){
     return <Navigate to="/" />
@@ -353,6 +503,14 @@ export default function Post () {
   
   return (
     <PostContainer>
+      {cancelModal ?
+      <PostCancelModal 
+        postCancelHandler={postCancelHandler}
+        backToPage={backToPage}
+      />
+      :
+      null
+      }
       <PostCard>
         <header>
           <div className='cardHeader'>
@@ -360,15 +518,18 @@ export default function Post () {
               <img className='bubble' alt='bubble' src='img/bubble.png' />
               <span className='headerMsg'>파티 개설</span>
             </div>
-            <button className='closeBtn' onClick={() => navigate(-1)}>
+            <button className='closeBtn' onClick={() => postCancelHandler()}>
               <FontAwesomeIcon icon={ faTimes } className="icon" /> 
             </button>
           </div>
         </header>
+        <fieldset>
+          {/* <div className='label'>파티 대표 사진</div> */}
         <div className='partyImg'>
           <FontAwesomeIcon icon={faPlus} className='faPlus' />
-          <div>기본 이미지는 뭐로하지</div>
+          {/* <img className='img' src={partyInfo.image} /> */}
         </div>
+        </fieldset>
         <fieldset>
           <div className='label'>파티 이름</div>
           <input
@@ -379,17 +540,22 @@ export default function Post () {
             maxLength={30}
             onChange={(e) => {handleInputChange(e)}}
           />
+          {isName.err ?
+          <div className='error'>{isName.msg}</div> : null}
         </fieldset>
         <fieldset>
           <div className='label'>퀘스트 기간</div>
-          <span className='strDate'>시작일</span>
+          <span className='strDate'>시작일</span><br />
           <input
             name='startDate'
             type='date'
+            min={date}
             value={partyInfo.startDate}
             onChange={(e) => {handleInputChange(e)}}
           /><br />
-          <span className='endDate'>마감일</span>
+          {isStrDate.err ?
+          <div className='error'>{isStrDate.msg}</div> : null}
+          <span className='endDate'>마감일</span><br />
           <input
             name='endDate'
             type='date'
@@ -397,6 +563,8 @@ export default function Post () {
             value={partyInfo.endDate}
             onChange={(e) => {handleInputChange(e)}}
           />
+          {isEndDate.err ?
+          <div className='error'>{isEndDate.msg}</div> : null}
         </fieldset>
         <fieldset>
           <div className='label'>파티 정원</div>
@@ -418,19 +586,25 @@ export default function Post () {
         </fieldset>
         <fieldset>
           <div className='regionTitle'>
-          <div className='label'>퀘스트 장소</div>
-          <div className='regionChoice'>
-            <span className={isOnline === true ? 'unFocus' : ''} onClick={(e) => {handleIsOnline(e)}}>지도에서 보기</span>
-            <span> | </span>
-            <span className={isOnline === true ? 'isOnline' : 'isOnline unFocus'} onClick={(e) => {handleIsOnline(e)}}>직접 입력</span>
-          </div>
+            <div className='label'>퀘스트 장소</div>
+            <div className='regionChoice'>
+              <span className={isOnline === true ? 'unFocus' : ''} onClick={(e) => {handleIsOnline(e)}}>지도에서 보기</span>
+              <span> | </span>
+              <span className={isOnline === true ? 'isOnline' : 'isOnline unFocus'} onClick={(e) => {handleIsOnline(e)}}>직접 입력</span>
+            </div>
           </div>
           {isOnline === false ? 
-          <div id='map' className='map'>
-            {/* <Map
-              isMember={false}
-              location={partyInfo.region}
-            /> */}
+          <div className='mapContainer'>
+            <div id='map' className='mapDesc'>
+              <PostMap />
+            </div>
+            <input 
+              className='mapInput'
+              name='region'
+              type='text'
+              value={partyInfo.region}
+              onChange={(e) => {handleInputChange(e)}}
+            />
           </div>
           :
           <input 
@@ -440,6 +614,8 @@ export default function Post () {
             onChange={(e) => {handleInputChange(e)}}
           />
           }
+          {isRegion.err ?
+          <div className='error'>{isRegion.msg}</div> : null}
         </fieldset>
         <fieldset>
           <div className='label'>오픈 채팅방 링크</div>
@@ -450,6 +626,8 @@ export default function Post () {
             value={partyInfo.privateLink}
             onChange={(e) => {handleInputChange(e)}}
           />
+          {isPLink.err ?
+          <div className='error'>{isPLink.msg}</div> : null}
         </fieldset>
         <fieldset>
           <div className='label'>태그</div>
@@ -469,7 +647,8 @@ export default function Post () {
               name='tagInput'
               type='text'
               value={inputTxt}
-              placeholder='태그는 3개까지 입력가능합니다'
+              // placeholder='태그는 3개까지 입력가능합니다'
+              placeholder={tags.length === 3 ? '' : '태그는 3개까지 입력가능합니다'}
               onChange={(e) => setInputTxt(e.target.value)}
               onKeyUp={(e) => addTag(e)}
             />
@@ -483,6 +662,8 @@ export default function Post () {
             value={partyInfo.content}
             onChange={(e) => {handleTextareaChange(e)}}
           />
+          {isContent.err ?
+          <div className='error'>{isContent.msg}</div> : null}
         </fieldset>
         <div className='btn'>
           <Button onClick={createParty}>QUEST</Button>

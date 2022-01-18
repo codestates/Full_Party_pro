@@ -1,20 +1,20 @@
 import { UsersAttributes } from './../models/users';
 import { Request, Response } from "express";
+import axios from 'axios';
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
 import { deleteUser, findCompletedParty, findLeadingParty, findParticipatingParty, findUser, getNotification, updateUser } from "./functions/sequelize";
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 
-// API: 레벨 추가 필요
 export const getUserInfo = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "region", "exp", "level" ]);
     const notifications = await getNotification(Number(userId));
-    if (userInfo && notifications) return SuccessfulResponse(res, { 
-      message: "Loaded Successfully",
-      userInfo,
-      notifications
-    });
+      const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "region", "exp", "level", "signupType" ]);
+      if (userInfo && notifications) return SuccessfulResponse(res, {
+        message: "Loaded Successfully",
+        userInfo,
+        notifications
+      });
     return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
@@ -24,8 +24,24 @@ export const getUserInfo = async (req: Request, res: Response) => {
 
 export const withdrawUser = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params;
+    const { userId, signupType } = req.params;
+    const accessToken = req.headers.access_token;
     const deleted = await deleteUser(Number(userId));
+    if (signupType === "kakao") {
+      await axios({
+        method: "POST",
+        url: "https://kapi.kakao.com/v1/user/unlink",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`
+        }
+      });
+    }
+    else if (signupType === "google") {
+      
+    }
+    else if (signupType === "guest") {
+
+    }
     if (deleted) return SuccessfulResponse(res, { message: "Good Bye!" });
     return FailedResponse(res, 400, "Bad Request");
   }
@@ -80,7 +96,6 @@ export const getUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-// API: 바디에 id를 userId로
 export const verifyUser = async (req: Request, res: Response) => {
   try {
     const { userId, email, password } = req.body.userInfo;
@@ -93,15 +108,13 @@ export const verifyUser = async (req: Request, res: Response) => {
   }
 };
 
-// name ~ mobile
-// API: id -> userId
-// API: email 빼고, userName, birth, gender, region, mobile
 export const modifyUserInfo = async (req: Request, res: Response) => {
   try {
     const { userId, password, userName, birth, gender, region, mobile, profileImage } = req.body.userInfo;
     const userInfo = { userName, password, birth, gender, region, mobile, profileImage } as UsersAttributes;
     const updated = await updateUser(userId, userInfo);
-    if (updated) return SuccessfulResponse(res, { message: "Successfully Modified" });
+    const updatedUserInfo = await findUser({ id: userId }, [ "userName", "password", "birth", "gender", "region", "mobile", "profileImage" ]);
+    if (updated) return SuccessfulResponse(res, { message: "Successfully Modified", userInfo: updatedUserInfo });
     return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {

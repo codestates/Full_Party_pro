@@ -304,7 +304,7 @@ export default function Party () {
   const commentRef = useRef<HTMLElement>(null);
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const { Kakao } = window;
@@ -390,7 +390,7 @@ export default function Party () {
 
   function tagSearchHandler(tag: string) {
     console.log(tag + "를 검색합니다.");
-    navigate(`../search/${tag}`);
+    navigate(`../search/tag/${tag}`);
   }
 
   function waitingListHandler(event: React.MouseEvent<HTMLDivElement>): void {
@@ -733,7 +733,7 @@ export default function Party () {
           dismissHandler={dismissHandler}
         /> 
       : null}
-      {isSigninModalOpen? <SigninModal signinModalHandler={signinModalHandler} /> : null}
+      {isSigninModalOpen? <SigninModal /> : null}
     </PartyContainer>
   );
 }

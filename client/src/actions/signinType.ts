@@ -3,9 +3,10 @@ export const SIGNIN_FAIL = 'SIGNIN_FAIL'
 
 export type UserInfo = {
   id: number
-  name: string
-  userImage: string
-  region: string
+  userName: string
+  profileImage: string
+  region: string,
+  signupType: string
 }
 
 export interface signinFailDispatch{

@@ -22,32 +22,38 @@ export const FavoriteContainer = styled.div`
     font-size: 1.7rem;
     font-weight: bold;
   }
+
+  .emptyMsg {
+    margin: 20px 0;
+    font-size: 1.1rem;
+    color: #777;
+  }
 `
 
 export default function Favorite () {
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const [isLoading, setIsLoading] = useState(true);
 
-  //[dev] 더미데이터로 렌더링한 것. 서버 통신 되면 삭제.
-  const favoriteList = dummyList.localParty.filter((party) => party.favorite);
+  const [favoriteList, setFavoriteList] = useState<Array<Object>>([]);
 
   useEffect(() => {
     // [dev]
     // api call: 관심파티 리스트 GET 요청
+    
+    // [dev] 더미데이터로 렌더링한 코드
+    const fav = dummyList.localParty.filter((party) => party.favorite);
+    setFavoriteList(fav);
     setIsLoading(false);
   }, [])
 
   if(!isLoggedIn){
     return <Navigate to="/" />
-  }
-
-  if(favoriteList.length <= 0){
-    //[dev] 없을 때 렌더링
-    return (<div>관심파티가 없어용</div>)
+  } else if(isLoading){
+    return <Loading />
   }
 
   return (
@@ -55,7 +61,9 @@ export default function Favorite () {
       <header className="favoriteHeader">
         내가 관심있는 퀘스트
       </header>
-      {favoriteList.map((party, idx) => <QuestCard key={idx} party={party} />)}
+      {favoriteList.length > 0 ?
+        favoriteList.map((party, idx) => <QuestCard key={idx} party={party} />)
+      : <div className="emptyMsg">아직 관심 설정한 퀘스트가 없습니다.</div>}
     </FavoriteContainer>
   );
 }

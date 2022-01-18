@@ -1,7 +1,7 @@
 import { SEARCH_BY_KEYWORD, searchByTagDispatch, Search, SearchDispatchType, SEARCH_BY_TAG } from "../actions/searchType";
 
 interface InitialState {
-  parties: []
+  parties: any[]
 }
 
 const initialState: InitialState = {

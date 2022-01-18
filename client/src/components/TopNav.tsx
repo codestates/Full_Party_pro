@@ -7,8 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 
-import { RootReducerType } from '../store/store';
 import { modalChanger } from '../actions/modal';
+import axios from 'axios';
 
 export const NavContainer = styled.nav`
   width: 100vw;
@@ -84,6 +84,8 @@ export const NavContainer = styled.nav`
       font-size: 12pt;
       font-weight: bold;
 
+      cursor: pointer;
+      
       &:hover {
         border-bottom: 3px solid #50C9C3;
         /* background: linear-gradient(180deg, #fff 95%, #50C9C3 5%); */
@@ -96,18 +98,16 @@ export default function TopNav () {
   const dispatch = useDispatch()
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
-  );
-
-  const isBadgeOn = useSelector(
-    (state: AppState) => state.notifyReducer.isBadgeOn
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
   }
 
-  // const [isSearchBarOn, setIsSearchBarOn] = useState(true);
+  const isBadgeOn = useSelector(
+    (state: AppState) => state.notifyReducer.isBadgeOn
+  );
 
   return (
     <NavContainer>
@@ -116,7 +116,7 @@ export default function TopNav () {
           Full Party!
         </Link>
       </button>
-      {isLoggedIn?
+      {isLoggedIn ?
         <div className="userMenu">
           <Link 
             to="/search" 

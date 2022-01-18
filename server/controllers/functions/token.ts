@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { sign, verify } from "jsonwebtoken";
+import { JwtPayload, sign, verify } from "jsonwebtoken";
 import config from "../../config/index"
 
 export const generateAccessToken = (data: any) => {
@@ -8,31 +8,43 @@ export const generateAccessToken = (data: any) => {
   }
   catch (error) {
     console.log(error);
-    return null;
   }
 };
 
-export const verifyAccessToken = (token: string) => {
+export const verifyAccessToken = (token: string): JwtPayload | string | undefined  => {
   try {
     return verify(token, config.accessSecret);
   }
   catch (error) {
-    return null;
+    console.log(error);
   }
 };
 
-export const setCookie = (res: Response, token: string | null) => {
-  res.cookie("jwt", token, {
-    secure: true,
-    sameSite: "none",
-    httpOnly: true
-  });
+export const setCookie = (res: Response, type: string, token: string | null) => {
+  try {
+    res.cookie(type, token, {
+      domain: "localhost",
+      path: "/",
+      sameSite: "none",
+      secure: true,
+      httpOnly: false,
+      maxAge: 1000 * 60 * 15,
+    });
+  }
+  catch (error) {
+    console.log(error);
+  }
 };
 
-export const clearCookie = (res: Response) => {
-  res.clearCookie("jwt", {
-    secure: true,
-    sameSite: "none",
-    httpOnly: true
-  });
+export const clearCookie = (res: Response, type: string) => {
+  try {
+    res.clearCookie(type, {
+      secure: true,
+      sameSite: "none",
+      httpOnly: true
+    });
+  }
+  catch (error) {
+    console.log(error);
+  }
 };

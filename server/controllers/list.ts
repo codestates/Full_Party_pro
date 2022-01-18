@@ -5,8 +5,8 @@ import { findUser, getLeadingParty, getParticipatingParty, getLocalParty, checkI
 
 export const getPartyList = async (req: Request, res: Response) => {
   try {
-    const { userId, region, location } = req.params;
-    const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage" ]);
+    const { userId, region } = req.params;
+    const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "location" ]);
     const leadingParty = await getLeadingParty(Number(userId));
     const participatingParty = await getParticipatingParty(Number(userId));
     const localParty = await getLocalParty(Number(userId), region);
@@ -27,7 +27,8 @@ export const getPartyList = async (req: Request, res: Response) => {
 export const createParty = async (req: Request, res: Response) => {
   try {
     const { userId, partyInfo } = req.body;
-    const newParty = await createNewParty(Number(userId), partyInfo);
+    const latlng = JSON.stringify(partyInfo.latlng);
+    const newParty = await createNewParty(Number(userId), { ...partyInfo, latlng });
     return SuccessfulResponse(res, { message: "Successfully Created", newParty });
   }
   catch (error) {

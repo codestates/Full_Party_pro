@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faBullhorn, faScroll, faTrophy, faStar } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faBullhorn, faScroll, faTrophy, faStar, faBellSlash } from '@fortawesome/free-solid-svg-icons';
 
 import { AppState } from '../reducers';
 
@@ -60,26 +60,30 @@ export const NotificationContainer = styled.div`
     .icon {
       font-size: 0.9rem;
       margin-right: 7px;
+
+      &.horn {
+        color: #b90e0a;
+      }
+
+      &.heart {
+        color: #fa3e7d;
+      }
+
+      &.level, &.star, &.bell {
+        color: #f9c80a;
+      }
+
+      &.scroll {
+        color: #a1785c;
+      }
     }
 
-    .horn {
-      color: #b90e0a;
-    }
-
-    .heart {
-      color: #fa3e7d;
-    }
-
-    .level, .star {
-      color: #f9c80a;
-    }
-
-    .scroll {
-      color: #a1785c;
+    .content {
+      word-break: keep-all;
     }
 
     .time {
-      max-width: 50px;
+      min-width: 50px;
       text-align: right;
       font-size: 0.8rem;
       color: #777;
@@ -90,7 +94,7 @@ export const NotificationContainer = styled.div`
 export default function Notification () {
 
   const isLoggedIn = useSelector(
-    (state: AppState) => state.userReducer.isLoggedIn
+    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const isBadgeOn = useSelector(
@@ -159,7 +163,7 @@ export default function Notification () {
       <div className="notificationList">
         <div className="contentWrapper">
           <div className="iconContainer">
-            <FontAwesomeIcon icon={ faScroll } className="icon scroll" />
+            <FontAwesomeIcon icon={ faBellSlash } className="icon bell" />
           </div>
           <div className="titleContainer">
             <div className="partyNameContainer">
@@ -168,7 +172,6 @@ export default function Notification () {
             <div>주변의 퀘스트를 둘러보고 파티에 참여해보세요!</div> 
           </div> 
         </div>
-        <div className="time">{timeForToday(new Date())}</div>
       </div>
     </NotificationContainer>)
   }
@@ -206,7 +209,7 @@ export default function Notification () {
                     <div className="partyNameContainer">
                       [<div className="partyName">{noti.partyName}</div>]
                     </div>
-                    <div>{noti.userName? noti.userName : null}{message[noti.content]}</div> 
+                    <div className="content">{noti.userName? noti.userName : null}{message[noti.content]}</div> 
                   </div> 
                 </div>
                 <div className="time">{timeForToday(noti.createdAt)}</div>
