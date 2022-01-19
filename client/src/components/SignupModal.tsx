@@ -372,8 +372,9 @@ const SignupModal = () => {
         isAxios: true,
         axiosMsg: '입력하신 정보가 올바른지 확인해주세요.'
       })
-    } else {
-      axios.post(`${process.env.REACT_APP_API_URL}`,{
+    }
+    else {
+      axios.post(`${process.env.REACT_APP_API_URL}/signup`,{
         userInfo: {
           profileImage,
           email,

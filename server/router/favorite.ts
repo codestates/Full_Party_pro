@@ -3,6 +3,6 @@ const router = express.Router();
 import { handleFavorite, getFavoriteParty } from "../controllers/favorite";
 
 router.post("/:partyId", handleFavorite);
-router.get("/favorite/:userId", getFavoriteParty);
+router.get("/:userId", getFavoriteParty);
 
 export = router;

@@ -164,12 +164,14 @@ export default function PartySlide ({ myParty }: Props) {
 
   const navigate = useNavigate();
 
-  function formatDate(timestamp: Date){
-    const date = timestamp.getDate();
-    const month = timestamp.getMonth() + 1;
-    const year = timestamp.getFullYear();
+  function formatDate(date: Date){
+    // const date = timestamp.getDate();
+    // const month = timestamp.getMonth() + 1;
+    // const year = timestamp.getFullYear();
 
-    return year + "/" + month + "/" + date;
+    // return year + "/" + month + "/" + date;
+
+    return String(date).slice(0, 11);
   }
 
   return (

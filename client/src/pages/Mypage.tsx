@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
+import AWS from 'aws-sdk';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -26,6 +27,18 @@ export const MypageContainer = styled.div`
     font-size: 22px;
     font-family: 'DungGeunMo';
   }
+
+  .imgChange {
+    width: 40%;
+    margin: 0 30%;
+    .imgChangeBtn {
+      width: 100%;
+      height: 30px;
+      border: none;
+      border-radius: 20px;
+      background-color: darkcyan;
+    }
+  }
 `
 
 export const MypageHeader = styled.div`
@@ -36,10 +49,11 @@ export const MypageHeader = styled.div`
   justify-content: center;
 
   .profileImage {
+    display: block;
     width: 120px;
     height: 120px;
-    border: 2px solid #cff4d2;
     border-radius: 100%;
+    overflow: hidden;
   }
 
   .mainProfile {
@@ -286,10 +300,55 @@ export default function Mypage () {
   const [isInfoLoading, setIsInfoLoading] = useState(false)
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const fileRef = useRef<any>();
+  const imgRef=useRef<any>(null);
 
+  AWS.config.update({
+    region: "ap-northeast-2",
+    credentials: new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
+    })
+  })
+  const handleRefClick = (e: any) => {
+    e.preventDefault();
+    fileRef.current.click();
+  }
+  const handleImgLoad = async (e: any) => {
+    setImgLoading(true)
+    let file = e.target.files[0]
+
+    const upload = new AWS.S3.ManagedUpload({
+      params: {
+        Bucket: "teo-img",
+        Key: `${signinReducer.userInfo.id}_profileImage`,
+        Body: file,
+      }
+    })
+    const promise = upload.promise()
+
+    promise.then(
+      function (data) {
+        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
+        setChangeInfo({
+          ...changeInfo,
+          profileImage: data.Location
+        })
+        setBasicInfo({
+          ...basicInfo,
+          profileImage: data.Location
+        })
+        setImgLoading(false)
+      },
+      function (err) {
+        return console.log('오류가 발생했습니다: ', err.message)
+      }
+    )
+  }
+
+  const [imgLoading, setImgLoading] = useState(false)
   const [basicInfo, setBasicInfo] = useState({
     userName: '기본이름',
-    profileImage: '기본이미지',
+    profileImage: '/img/defaultThumbnail.png',
     region: '기본지역',
     level: 7,
     exp: 148
@@ -430,17 +489,17 @@ export default function Mypage () {
 
   //파티 데이터
   const fetchJoinParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/participating/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
   const fetchRecruiteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
   const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/completed/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completed/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
@@ -492,9 +551,9 @@ export default function Mypage () {
         exp: userInfo.exp
       })
     }
-    fetchBasicInfo()
-    fetchJoinParty()
-    setIsLoading(false)
+    fetchBasicInfo();
+    fetchJoinParty();
+    setIsLoading(false);
   },[])
   
   const isLoggedIn = useSelector(
@@ -512,8 +571,13 @@ export default function Mypage () {
     <MypageContainer>
       <MypageHeader>
         <div className='profileImage'>
-          {/* 이미지 연결이 되면 주석 풀어준 뒤 border는 없애주세요
-          <img className='profileImage' src={basicInfo.profileImage} /> */}
+          <img className='profileImage' 
+            src={basicInfo.profileImage}
+            alt='thumbnail'
+            onError={() => {
+              return(imgRef.current.src = '/img/bubble.png')
+            }}
+          />
         </div>
         <p className='mainProfile'>
           <div className='userName'>{basicInfo.userName}</div>
@@ -528,6 +592,28 @@ export default function Mypage () {
           </ProgressBar>
         </p>
       </MypageHeader>
+      <div className='imgChange'>
+        {isChange ? 
+        <div>
+          <button 
+            className='imgChangeBtn'
+            onClick={(e) => handleRefClick(e)
+          }>
+          이미지 수정
+          </button>
+          <input 
+            ref={fileRef}
+            type='file'
+            className='imgInput'
+            id='profileImg'
+            accept='image/*'
+            name='file'
+            hidden={true}
+            onChange={handleImgLoad}
+          />
+        </div>
+        : null }
+      </div>
       <MypageInfo>
         <div className='subject'>프로필</div>
         {(() => {

@@ -28,7 +28,7 @@ export const setCookie = (res: Response, type: string, token: string | null) => 
       sameSite: "none",
       secure: true,
       httpOnly: false,
-      maxAge: 1000 * 60 * 15,
+      maxAge: 1000 * 60 * 60 * 24,
     });
   }
   catch (error) {
