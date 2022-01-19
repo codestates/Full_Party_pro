@@ -14,6 +14,7 @@ import partyRouter from "./router/party";
 import favoriteRouter from "./router/favorite";
 import searchRouter from "./router/search";
 import notificationRouter from "./router/notification";
+import mailVerification from "./router/mailVerification";
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/", authRouter);
+app.use("/mailVerification", mailVerification);
 app.use("/list", listRouter);
 app.use("/user", userRouter);
 app.use("/party", partyRouter);
