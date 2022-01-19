@@ -124,14 +124,12 @@ export default function Search () {
   const hashtagHandler = (tag: string) => {
     navigate(`/search/tag/${tag}`)
   }
-
+  
   useEffect(() => {
     let isComponentMounted = true;
     setIsLoading(true);
-
     if(params.tag){
       const tag = params.tag;
-
       const searchData = async () => {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${tag}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
@@ -141,21 +139,18 @@ export default function Search () {
           setParties(parsedData);
         }
       }
-
       searchData();
     } else if(params.keyword){
       const keyword = params.keyword;
-
       const searchData = async () => {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${keyword}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
-        const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
+        const parsedData = partyData.map((party: any) => ({ ...party, latlng: JSON.parse(party.latlng) }));
         if (isComponentMounted) {
           setWord(keyword);
           setParties(parsedData);
         }
       }
-
       searchData();
     }
 
@@ -167,7 +162,7 @@ export default function Search () {
 
   useEffect(() => {
     setIsLoading(false);
-  }, [parties])
+  }, [ parties ]);
   
   if(!isLoggedIn){
     return <Navigate to="/" />
