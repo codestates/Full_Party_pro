@@ -188,7 +188,7 @@ const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, isMem
   const [isEditMode, setIsEditMode] = useState(false);
   const [newMsg, setNewMsg] = useState(message);
 
-  const formatDate = (date: Date) => String(date).slice(0, 11);
+  const formatDate = (date: String) => date.slice(0, 10);
 
   const closeModal =() => {
     userInfoModalHandler();
