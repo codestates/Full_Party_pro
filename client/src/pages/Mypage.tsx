@@ -11,6 +11,7 @@ import { faMapMarkerAlt, faCrown } from '@fortawesome/free-solid-svg-icons';
 import { RootReducerType } from '../store/store';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
+import UserCancelModal from '../components/UserCancelModal'
 import PartySlide from '../components/PartySlide';
 
 // [dev] 더미데이터: 서버 통신되면 삭제
@@ -101,7 +102,7 @@ export const MypageInfo = styled.div`
   }
 
   .changeInfoBtn {
-    width: 140px;
+    width: 100px;
     height: 30px;
     margin: 25px 0;
 
@@ -111,7 +112,17 @@ export const MypageInfo = styled.div`
     background-color: #cff4d2;
   }
   .signoutBtn {
-    width: 140px;
+    width: 100px;
+    height: 30px;
+    margin: 25px 0;
+
+    border: none;
+    border-radius: 20px;
+    color: #888;
+    background-color: #cff4d2;
+  }
+  .deleteBtn{
+    width: 100px;
     height: 30px;
     margin: 25px 0;
 
@@ -154,6 +165,12 @@ export const MypageInfo = styled.div`
       font-size: 15px;
     }
     .signoutBtn {
+      border-radius: 30px;
+      width: 200px;
+      height: 40px;
+      font-size: 15px;
+    }
+    .deleteBtn {
       border-radius: 30px;
       width: 200px;
       height: 40px;
@@ -296,8 +313,44 @@ export default function Mypage () {
   // [dev] 더미데이터: 서버 통신되면 삭제
   const { userInfo, myParty, localParty } = dummyList;
   //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
-  const [isLoading, setIsLoading] = useState(false)
-  const [isInfoLoading, setIsInfoLoading] = useState(false)
+  const [curTab, setCurTab] = useState(0);
+  const [parties, setParties] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInfoLoading, setIsInfoLoading] = useState(false);
+  //img 상태가 제대로 반영이 안되면 로딩창 넣어주세요
+  const [imgLoading, setImgLoading] = useState(false);
+  const [isChange, setIsChange] = useState(true);
+  const [callModal, setCallModal] = useState<string | null>(null);
+  const [basicInfo, setBasicInfo] = useState({
+    userName: '베이직이름',
+    profileImage: '/img/defaultThumbnail.png',
+    region: '베이직지역',
+    level: 7,
+    exp: 148
+  });
+  const [changeInfo, setChangeInfo] = useState({
+    userName: '',
+    profileImage: '',
+    password: '',
+    confirm: '',
+    birth: '',
+    gender: '',
+    region: '',
+    mobile: '',
+    nowPwd: ''
+  });
+  const [wrongConfirm, setWrongConfirm] = useState({
+    err: false,
+    msg: '비밀번호를 다시 확인해주세요'
+  });
+  const [wrongMobile, setWrongMobile] =useState({
+    err: false,
+    msg: "'-'를 포함하여 입력하세요"
+  });
+
+  const expBar = Number( Math.floor(basicInfo.exp % 20) * 5 );
+  let today: any = new Date();
+  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const fileRef = useRef<any>();
@@ -345,44 +398,6 @@ export default function Mypage () {
     )
   }
 
-  const [imgLoading, setImgLoading] = useState(false)
-  const [basicInfo, setBasicInfo] = useState({
-    userName: '기본이름',
-    profileImage: '/img/defaultThumbnail.png',
-    region: '기본지역',
-    level: 7,
-    exp: 148
-  })
-  const expBar = Number( Math.floor(basicInfo.exp % 20) * 5 )
-
-  const [changeInfo, setChangeInfo] = useState({
-    userName: '',
-    profileImage: '',
-    password: '',
-    confirm: '',
-    birth: '',
-    gender: '',
-    region: '',
-    mobile: '',
-    //기본값을 axios로 받아온 값으로 설정할 것.
-    nowPwd: ''
-  })
-  const [isChange, setIsChange] = useState(true)
-  const [wrongConfirm, setWrongConfirm] = useState({
-    err: false,
-    msg: '비밀번호를 다시 확인해주세요'
-  })
-  const [wrongMobile, setWrongMobile] =useState({
-    err: false,
-    msg: "'-'를 포함하여 입력하세요"
-  })
-
-  const [curTab, setCurTab] = useState(0)
-  const [parties, setParties] = useState([])
-
-  let today: any = new Date();
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
-
   const handleIsChange = async () => {
     if(isChange) {
       setIsChange(false)
@@ -400,6 +415,7 @@ export default function Mypage () {
       setIsInfoLoading(false)
     }
   }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const regex = {
       mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/
@@ -438,6 +454,7 @@ export default function Mypage () {
       [e.target.name]: e.target.value
     })
   }
+
   const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     if(e.currentTarget.value === 0) {
       fetchJoinParty()
@@ -469,20 +486,37 @@ export default function Mypage () {
       }
     })
     if(verify.data.message === "User Identified") {
-      const res = await axios.patch('https://localhost:443/user/profile', {
-        userInfo: {
-          profileImage: profileImage,
-          userName: userName,
-          password: password,
-          birth: birth,
-          gender: gender,
-          region: region,
-          mobile: mobile
+      if(password === '') {
+        const res = await axios.patch('https://localhost:443/user/profile', {
+          userInfo: {
+            profileImage,
+            userName,
+            password: nowPwd,
+            birth,
+            gender,
+            region,
+            mobile
+          }
+        })
+        if(res.data.message === "Successfully Modified") {
+          setIsChange(false)
         }
-      })
-
-      if(res.data.message === "Successfully Modified") {
-        setIsChange(false)
+      } 
+      else if (password !== '') {
+        const res = await axios.patch('https://localhost:443/user/profile', {
+          userInfo: {
+            profileImage: profileImage,
+            userName: userName,
+            password: password,
+            birth: birth,
+            gender: gender,
+            region: region,
+            mobile: mobile
+          }
+        })
+        if(res.data.message === "Successfully Modified") {
+          setIsChange(false)
+        }
       }
     }
   }
@@ -516,7 +550,6 @@ export default function Mypage () {
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
     navigate("/");
   };
-
   const handleWithdrawal = async () => {
     const cookie = document.cookie.split("; ");
     const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
@@ -532,9 +565,24 @@ export default function Mypage () {
     dispatch({ type: SIGNIN_FAIL });
     navigate("http://localhost:3000");
   };
+  const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if(callModal !== null) {
+      setCallModal(null)
+    }
+    else if(callModal === null) {
+      const type = e.currentTarget.className
+      if(type === 'signoutBtn') {
+        setCallModal('signout')
+      }
+      else if(type === 'deleteBtn') {
+        setCallModal('delete')
+      }
+    }
+  };
 
   //페이지 진입시 로딩
   useEffect(() => {
+    setIsLoading(true)
     const fetchBasicInfo = async () => {
       const cookie = document.cookie.split("; ");
       const accessToken = cookie[0].replace("token=", "").slice(1);
@@ -569,6 +617,12 @@ export default function Mypage () {
 
   return (
     <MypageContainer>
+      {callModal === 'signout'?
+      <UserCancelModal from={'signout'} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} />
+      : null}
+      {callModal === 'delete'?
+      <UserCancelModal from={'delete'} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} />
+      : null}
       <MypageHeader>
         <div className='profileImage'>
           <img className='profileImage' 
@@ -743,12 +797,14 @@ export default function Mypage () {
                   개인 정보 수정
                 </button>
                 {/* 로그아웃 구현한 함수 넣어주세요 */}
-                <button onClick={handleSignOut}
+                <button onClick={(e) => userCancelHandler(e)}
                   className='signoutBtn'
                 >
                   로그아웃
                 </button>
-                <button onClick={handleWithdrawal}>회원탈퇴</button>
+                <button onClick={(e) => userCancelHandler(e)}
+                  className='deleteBtn'
+                >회원탈퇴</button>
               </section>
             )}
         })()}
