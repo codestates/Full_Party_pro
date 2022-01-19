@@ -686,7 +686,6 @@ export default function Party () {
           </div>
         </MembersContainer>
 
-        {/* [dev] 대기자 리스트 없을 때를 위한 렌더링 필요 */}
         {isLeader && partyInfo.partyState <= 0 && partyInfo.memberLimit > partyInfo.members.length ? 
           <MembersContainer>
             <div className="members">

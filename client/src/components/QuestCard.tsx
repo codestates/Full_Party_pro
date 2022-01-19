@@ -176,7 +176,7 @@ type Props = {
 export default function QuestCard ({ party }: Props) {
 
   const navigate = useNavigate();
-  const { id, name, memberLimit, startDate, endDate, leaderId, favorite, tag, isOnline, location, members } = party;
+  const { id, name, memberLimit, startDate, endDate, leaderId, favorite, tag, isOnline, region, members } = party;
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
   );
@@ -242,7 +242,7 @@ export default function QuestCard ({ party }: Props) {
                 <div className="location">
                   {isOnline ?
                     <><FontAwesomeIcon icon={ faGlobe } className="icon" /> 온라인 퀘스트</>
-                    : <><FontAwesomeIcon icon={ faMapMarkerAlt } className="icon" /> {location.split(" ")[1] + " " + location.split(" ")[2]}</>
+                    : <><FontAwesomeIcon icon={ faMapMarkerAlt } className="icon" /> {region}</>
                   }
                 </div>
                 <div className="time">

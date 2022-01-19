@@ -73,13 +73,11 @@ export const MapContainer = styled.div`
 
 type Props = {
   location: string,
-  name: string,
   image: string,
-  handleCoordsChange: Function,
-  handleFormatLocationChange: Function
+  handleFormatAddressChange: Function
 }
 
-const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocationChange }: Props) => {
+const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
   
   const { kakao } = window;
 
@@ -100,7 +98,6 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
           const { La, Ma } = coordinates;
           setCoords({ lat: Ma, lng: La });
-          handleCoordsChange(Ma, La);
         }
       });  
     }
@@ -112,8 +109,7 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
     searchAddrFromCoords(coords, function(result: any, status: any) {
       if (status === kakao.maps.services.Status.OK) {
         const address = result[0].address_name;
-        const region = address.split(" ")[0] + " " + address.split(" ")[1];
-        handleFormatLocationChange(region);
+        handleFormatAddressChange(address);
       }   
    });
 
@@ -160,7 +156,7 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
         >
           <div className="infoWindow">
             <div>
-              <span className="title">{name ? name : "퀘스트 장소"}</span>
+              <span className="title">우리 집</span>
             </div>
           </div>
         </CustomOverlayMap>
@@ -169,4 +165,4 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
   )
 }
 
-export default PostMap;
+export default UserMap;
