@@ -327,7 +327,7 @@ export default function Mypage () {
     const promise = upload.promise()
 
     promise.then(
-      function (data) {
+      function (data: any) {
         console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
         setChangeInfo({
           ...changeInfo,
@@ -339,7 +339,7 @@ export default function Mypage () {
         })
         setImgLoading(false)
       },
-      function (err) {
+      function (err: any) {
         return console.log('오류가 발생했습니다: ', err.message)
       }
     )
