@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
+import AWS from 'aws-sdk';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -8,12 +9,13 @@ import { faPlus, faTimes, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 import { useSelector } from 'react-redux';
 import { AppState } from '../reducers';
-import { RootReducerType } from '../store/store'
+import { RootReducerType } from '../store/store';
 
 import PostMap from '../components/PostMap';
-import PostCancelModal from '../components/PostCancelModal'
+import PostCancelModal from '../components/PostCancelModal';
 import Slider from 'rc-slider';
-import ErrorModal from '../components/ErrorModal'
+import ErrorModal from '../components/ErrorModal';
+import Loading from '../components/Loading';
 
 export const PostContainer = styled.div`
   width: 100%;
@@ -119,6 +121,15 @@ export const PostCard = styled.div`
     .imageContainer {
       img {
         width: 100%;
+      }
+      button {
+        width: 50%;
+        height: 27px;
+        border: none;
+        border-radius: 20px;
+        color: white;
+        background-color: #50C9C3;
+        margin: 0 25%;
       }
     }
 
@@ -585,7 +596,15 @@ export const Button = styled.button`
 
 export default function Post () {
   const navigate = useNavigate();
-  const fileRef= useRef();
+  const fileRef = useRef<any>();
+  const imgRef = useRef<any>(null);
+
+  AWS.config.update({
+    region: "ap-northeast-2",
+    credentials: new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
+    })
+  })
 
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
@@ -593,7 +612,7 @@ export default function Post () {
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
 
   const [partyInfo, setPartyInfo] = useState({
-    image: 'img/defaultThumbnail.png',
+    image: 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png',
     name: '',
     startDate: '',
     endDate: '',
@@ -639,12 +658,47 @@ export default function Post () {
   const [inputTxt, setInputTxt] = useState('');
   const [isOnline, setIsOnline] = useState(false);
   const [isPosted, setIsPosted] = useState(false);
+  const [imgLoading, setImgLoading] = useState(false);
+  const [logoImg, setLogoImg] = useState(true)
 
   const [previewURL, setPreviewURL] = useState('');
   const [preview, setPreview] = useState(null);
 
   const [cancelModal, setCancelModal] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+
+  const handleRefClick = (e: any) => {
+    e.preventDefault();
+    fileRef.current.click();
+  }
+  const handleImgLoad = async (e: any) => {
+    setImgLoading(true)
+    let file = e.target.files[0]
+
+    const upload = new AWS.S3.ManagedUpload({
+      params: {
+        Bucket: "teo-img",
+        Key: `${signinReducer.userInfo.id}_${file.name}`,
+        Body: file,
+      }
+    })
+    const promise = upload.promise()
+
+    promise.then(
+      function (data) {
+        console.log("이미지 업로드에 성공했습니다.")
+        console.log("👉🏻 URL: ",data.Location)
+        setPartyInfo({
+          ...partyInfo,
+          image: data.Location
+        })
+        setImgLoading(false)
+      },
+      function (err) {
+        return console.log('오류가 발생했습니다: ', err.message)
+      }
+    )
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     
@@ -905,14 +959,26 @@ export default function Post () {
       <PostCard>
         <section className="basicInfo">
           <div className="imageContainer">
-            <img className="preview" src={partyInfo.image} alt="thumbnail" />
-            <input
-              className="imageInput" 
-              type="file" 
-              accept="img/*"
-              hidden={true}
-            />
-            <button>UPLOAD</button>
+            {imgLoading ? <Loading /> :
+            <div>
+              <img className="preview" src={partyInfo.image} alt="thumbnail"
+                onError={() => {
+                  return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
+                }}
+              />
+              <button onClick={(e) => handleRefClick(e)}>UPLOAD</button>
+              <input 
+                ref={fileRef}
+                type='file'
+                className='imgInput'
+                id='partyImg'
+                accept='image/*'
+                name='file'
+                hidden={true}
+                onChange={handleImgLoad}
+              />
+            </div>
+            }
           </div>
           <div className="infoContainer">
             <fieldset>

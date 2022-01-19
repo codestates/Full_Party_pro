@@ -9,14 +9,10 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
 import { RootReducerType } from '../store/store';
-import { searchParty } from '../actions/search';
 
 import LocalQuest from '../components/LocalQuest';
 import EmptyCard from '../components/EmptyCard';
 import Loading from '../components/Loading';
-
-// [dev] 더미데이터
-import dummyList from '../static/dummyList';
 
 export const SearchContainer = styled.div`
   width: 100%;
@@ -94,8 +90,7 @@ export default function Search () {
   const params = useParams();
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
-    );
-
+  );
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
   const userAddress = signinReducer.userInfo?.address;
   const searchRegion = userAddress.split(" ")[0] + " " + userAddress.split(" ")[1];
@@ -181,7 +176,6 @@ export default function Search () {
           placeholder='검색어를 입력해주세요'
         />
         <div className='faSearch' onClick={searchQuest}>
-          {/* 검색 결과를 가져온 뒤 스토어에 저장합니다. */}
           <FontAwesomeIcon icon={faSearch} />
         </div>
       </SearchBar>
