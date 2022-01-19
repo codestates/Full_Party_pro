@@ -5,7 +5,7 @@ import {
   dequeue, modifyMessage, approveMember, quitParty, fullParty, completeParty, reviewMembers, reParty, modifyPartyInfo
 } from "../controllers/party";
 
-router.get("/:partyId", getPartyInfo);
+router.get("/:partyId/:userId", getPartyInfo);
 router.patch("/edit/:partyId", modifyPartyInfo);
 router.delete("/:partyId", dismissParty);
 router.post("/:commentId/subComment", createSubComment);

@@ -10,14 +10,12 @@ import { NOTIFY } from "../actions/notify";
 
 const initialState = { isBadgeOn: true };
 
-function notifyReducer(state = initialState, action: { type: string; payload: object; }) {
+function notifyReducer(state = initialState, action: { type: string; payload: { isBadgeOn: boolean }; }) {
 
   switch (action.type) {
     case NOTIFY:
       //TODO
-      return { isBadgeOn: true || false };
-
-      break;
+      return { isBadgeOn: action.payload.isBadgeOn };
 
     default:
       return state;

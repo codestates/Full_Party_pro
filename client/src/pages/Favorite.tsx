@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
 import styled from 'styled-components';
 import { AppState } from '../reducers';
-
 import Loading from '../components/Loading';
 import QuestCard from '../components/QuestCard';
-
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyList from '../static/dummyList';
+import axios from 'axios';
 
 export const FavoriteContainer = styled.div`
   width: 100%;
@@ -35,20 +31,23 @@ export default function Favorite () {
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
+  const userId = useSelector(
+    (state: AppState) => state.signinReducer.userInfo.id
+  );
 
-  const [isLoading, setIsLoading] = useState(true);
-
-  const [favoriteList, setFavoriteList] = useState<Array<Object>>([]);
+  const [ isLoading, setIsLoading ] = useState(true);
+  const [ favoriteList, setFavoriteList ] = useState<Array<Object>>([]);
 
   useEffect(() => {
-    // [dev]
-    // api call: 관심파티 리스트 GET 요청
-    
-    // [dev] 더미데이터로 렌더링한 코드
-    const fav = dummyList.localParty.filter((party) => party.favorite);
-    setFavoriteList(fav);
+    (async () => {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/favorite/${userId}`, {
+        withCredentials: true
+      });
+      console.log(response.data.partyList);
+      setFavoriteList(response.data.partyList);
+    })();
     setIsLoading(false);
-  }, [])
+  }, []);
 
   if(!isLoggedIn){
     return <Navigate to="/" />

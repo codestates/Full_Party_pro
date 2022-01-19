@@ -91,7 +91,7 @@ export default function MemberList ({ from, leaderId, members, userInfoModalHand
                 style={{ backgroundImage: `url(${member.profileImage})`, backgroundSize: "cover" }} 
               />
               <div className="nameplate">
-                {member.id === leaderId ? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {member.name}
+                {member.id === leaderId ? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {member.userName}
               </div>
             </div>
           );
