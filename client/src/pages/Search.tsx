@@ -68,7 +68,6 @@ export const SearchContent = styled.div`
   .result {
     width: 100%;
     height: 100%;
-    padding: 0 30px;
     .resultLabel {
       font-size: 1.7rem;
       font-weight: bold;
@@ -91,18 +90,18 @@ export const SearchContent = styled.div`
 `
 
 export default function Search () {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const params = useParams();
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
     );
-  const searchReducer = useSelector((state: RootReducerType) => state.searchReducer);
+
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
-  const searchRegion = signinReducer.userInfo?.region;
+  const userAddress = signinReducer.userInfo?.address;
+  const searchRegion = userAddress.split(" ")[0] + " " + userAddress.split(" ")[1];
   const userId = useSelector((state: AppState) => state.signinReducer.userInfo?.id);
+
   const [word, setWord] = useState<string | undefined>('');
-  const [isSearch, setIsSearch] = useState(false);
   const [parties, setParties] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -144,10 +143,6 @@ export default function Search () {
       }
 
       searchData();
-
-      return () => {
-        isComponentMounted = false
-      }
     } else if(params.keyword){
       const keyword = params.keyword;
 
@@ -162,11 +157,12 @@ export default function Search () {
       }
 
       searchData();
-
-      return () => {
-        isComponentMounted = false
-      }
     }
+
+    return () => {
+      isComponentMounted = false
+    }
+
   },[params.tag, params.keyword])
 
   useEffect(() => {
@@ -221,7 +217,7 @@ export default function Search () {
           else if(parties.length !== 0) {
             return(
               <div className='result'>
-                <LocalQuest location={searchRegion} localParty={parties} /> 
+                <LocalQuest location={userAddress} localParty={parties} /> 
               </div>
             )
           }

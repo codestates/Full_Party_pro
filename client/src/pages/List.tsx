@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
 
 import styled from 'styled-components';
 import { AppState } from '../reducers';
+import { NOTIFY } from '../actions/notify';
 
 import Loading from '../components/Loading';
 import PartySlide from '../components/PartySlide';
@@ -40,16 +42,40 @@ export const ListContainer = styled.div`
 
 export default function List () {
 
+  const dispatch = useDispatch();
+
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
 
-  const { userInfo, myParty, localParty } = dummyList;
+  const userInfo = useSelector(
+    (state: AppState) => state.signinReducer.userInfo
+  );
+
+  const searchRegion = userInfo.address.split(" ")[0] + " " + userInfo.address.split(" ")[1];
+
+  // [dev] 더미데이터
+  // const { userInfo, myParty, localParty } = dummyList;
 
   const [isLoading, setIsLoading] = useState(true);
+  const [ myParty, setMyParty ] = useState([]);
+  const [ localParty, setLocalParty ] = useState([]);
 
   useEffect(() => {
-    // [dev] 서버통신
+    (async () => {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/list/${userInfo.id}/${searchRegion}`, {
+        withCredentials: true
+      });
+      setMyParty(response.data.myParty);
+      setLocalParty(response.data.localParty);
+      dispatch({
+        type: NOTIFY,
+        payload: {
+          isBadgeOn: response.data.notification
+        }
+      });
+      console.log(response.data);
+    })();
     setIsLoading(false);
   }, [])
 
@@ -72,7 +98,7 @@ export default function List () {
         </section>
       : null}
       {localParty.length > 0 ?
-        <LocalQuest location={userInfo.location} localParty={localParty} />
+        <LocalQuest location={userInfo.address} localParty={localParty} />
         : <EmptyCard from="list" />}
     </ListContainer>
   );
