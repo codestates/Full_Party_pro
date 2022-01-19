@@ -463,7 +463,7 @@ const SignupModal = () => {
       })
     }
     else {
-      axios.post(`${process.env.REACT_APP_API_URL}`,{
+      axios.post(`${process.env.REACT_APP_API_URL}/signup`,{
         userInfo: {
           profileImage,
           email,
@@ -541,7 +541,7 @@ const SignupModal = () => {
                     </div>
                     <Camera>
                       <FontAwesomeIcon icon={faCamera} className='faCamera' onClick={(e) => handleRefClick(e)}/>
-                      <input ref={cameraRef} className='imgUpload' id='file' type='file' accept='image/*' name='imgUpload' onChange={handleImgLoad}></input>
+                      <input ref={cameraRef} className='imgUpload' id='file' type='file' accept={`image/${'*'}`} name='imgUpload' onChange={handleImgLoad}></input>
                     </Camera>
                   </div>
                 </UserImage>

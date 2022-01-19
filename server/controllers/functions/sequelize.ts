@@ -150,6 +150,13 @@ export const checkIsRead = async (userId: number) => {
   return false;
 };
 
+export const AddrToRegion = (address: string) => {
+  const splited = address.split(" ");
+  let region = "";
+  splited.map((item: string, i: number) => i < 2 ? region += item : item);
+  return region;
+};
+
 export const getLocalParty = async (userId: number, region: string) => {
   const partyList: LocalParty[] = await Parties.findAll({
     where: { region, partyState: 0 },

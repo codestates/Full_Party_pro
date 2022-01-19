@@ -430,17 +430,17 @@ export default function Mypage () {
 
   //파티 데이터
   const fetchJoinParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/participating/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
   const fetchRecruiteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
   const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/completed/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completed/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
@@ -492,9 +492,9 @@ export default function Mypage () {
         exp: userInfo.exp
       })
     }
-    fetchBasicInfo()
-    fetchJoinParty()
-    setIsLoading(false)
+    fetchBasicInfo();
+    fetchJoinParty();
+    setIsLoading(false);
   },[])
   
   const isLoggedIn = useSelector(

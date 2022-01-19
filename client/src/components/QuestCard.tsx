@@ -176,19 +176,13 @@ export default function QuestCard ({ party }: Props) {
   const navigate = useNavigate();
 
   function formatDate(date: Date){
-    // const date = timestamp.getDate();
-    // const month = timestamp.getMonth() + 1;
-    // const year = timestamp.getFullYear();
-
-    // return year + "/" + month + "/" + date;
-
     return String(date).slice(0, 11);
   }
 
   function favoriteHandler(event: React.MouseEvent<HTMLDivElement>) {
     // [dev] 서버 통신 후에는 setIsFavorite 삭제하기
     event.stopPropagation();
-    console.log("관심파티를 등록합니다");  
+    console.log("관심파티를 등록합니다");
   }
   
   return (

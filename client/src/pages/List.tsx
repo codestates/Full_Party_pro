@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { AppState } from '../reducers';
 
@@ -12,6 +11,8 @@ import EmptyCard from '../components/EmptyCard';
 
 // [dev] 더미데이터: 서버 통신되면 삭제
 import dummyList from '../static/dummyList';
+import axios from 'axios';
+import { NOTIFY } from '../actions/notify';
 
 export const ListContainer = styled.div`
   width: 100%;
@@ -39,19 +40,43 @@ export const ListContainer = styled.div`
 `
 
 export default function List () {
-
+  const dispatch = useDispatch();
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
-
-  const { userInfo, myParty, localParty } = dummyList;
-
-  const [isLoading, setIsLoading] = useState(true);
+  const userInformation = useSelector(
+    (state: AppState) => state.signinReducer.userInfo
+  );
+  
+  const [ isLoading, setIsLoading ] = useState(true);
+  const [ userInfo, setUserInfo ] = useState({
+    id: "",
+    userName: "",
+    profileImage: "",
+    location: ""
+  });
+  const [ myParty, setMyParty ] = useState([]);
+  const [ localParty, setLocalParty ] = useState([]);
+  // const { userInfo, myParty, localParty } = dummyList;
 
   useEffect(() => {
-    // [dev] 서버통신
+    (async () => {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/list/${userInformation.id}/${userInformation.region}`, {
+        withCredentials: true
+      });
+      setUserInfo(response.data.userInfo);
+      setMyParty(response.data.myParty);
+      setLocalParty(response.data.localParty);
+      dispatch({
+        type: NOTIFY,
+        payload: {
+          isBadgeOn: response.data.notification
+        }
+      });
+      console.log(response.data);
+    })();
     setIsLoading(false);
-  }, [])
+  }, []);
 
   if(!isLoggedIn){
     return <Navigate to="/" />

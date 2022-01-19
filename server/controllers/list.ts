@@ -6,7 +6,7 @@ import { findUser, getLeadingParty, getParticipatingParty, getLocalParty, checkI
 export const getPartyList = async (req: Request, res: Response) => {
   try {
     const { userId, region } = req.params;
-    const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "location" ]);
+    const userInfo = await findUser({ id: Number(userId) }, [ "id", "userName", "profileImage", "addresss" ]);
     const leadingParty = await getLeadingParty(Number(userId));
     const participatingParty = await getParticipatingParty(Number(userId));
     const localParty = await getLocalParty(Number(userId), region);
