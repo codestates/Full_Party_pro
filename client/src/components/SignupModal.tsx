@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faPlus, faCamera } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faPlus, faCamera, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
 import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
@@ -101,7 +101,8 @@ export const ModalView = styled.div`
   }
 
   .confirm {
-    margin: 5px 0;
+    margin: 8px 0;
+    font-size: 0.9rem;
   }
 
   .error {
@@ -110,6 +111,41 @@ export const ModalView = styled.div`
 
     margin-top: 5px;
   }
+`
+
+export const MapContainer = styled.section`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 90%;
+
+  .mapTitle {
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-top: 10px;
+  }
+
+  .details {
+    font-size: 0.8rem;
+    color: #777;
+    margin-bottom: 20px;
+  }
+
+  #map {
+    width: 100%;
+    height: 150px;
+  }
+
+  input {
+    width: 100%;
+    height: 25px;
+    border: none;
+    border-bottom: 1px solid #d5d5d5;
+
+    margin: 15px 0;
+  }
+
 `
 
 export const UserImage = styled.div`
@@ -152,6 +188,7 @@ export const UserImage = styled.div`
   }
 `
 
+
 export const CloseBtn = styled.button`
   width: 100%;
   text-align: right;
@@ -177,7 +214,50 @@ export const BtnContainer = styled.section`
     border: none;
     border-radius: 10px;
 
+    background-color: white;
+
     cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .icon {
+      &.left {
+        margin-right: 5px;
+      }
+
+      &.right {
+        margin-left: 5px;
+      }
+    }
+
+    &.request {
+      background-color: #50C9C3;
+      color: #fff;
+    }
+  }
+`
+
+export const ProgressBar = styled.section`
+
+  width: 100%;
+  margin: 15px 0;
+  padding: 0 25px;
+
+  .barContainer {
+    height: 5px;
+    width: 100%;
+    /* border: 1px solid #e9e7e7; */
+    border-radius: 50px;
+    background-color: #e9e7e7;
+  }
+
+  .barFiller {
+    height: 100%;
+    background-color: #50C9C3;
+    border-radius: inherit;
+    text-align: right;
   }
 `
 
@@ -205,7 +285,7 @@ const SignupModal = () => {
     password: '',
     confirmPassword: '',
     name: '',
-    gender: '',
+    gender: 'none',
     birth: '',
     mobile: '',
     address: ''
@@ -218,13 +298,15 @@ const SignupModal = () => {
     isBirth: false,
     isMobile: false,
     isAxios: false,
+    isVerificationCode: false,
 
     emailMsg: '',
     nameMsg: '',
     genderMsg: '',
     birthMsg: '',
     mobileMsg: '',
-    axiosMsg: ''
+    axiosMsg: '',
+    verificationMsg: '',
   });
 
   const [isPassword, setIsPassword] = useState({
@@ -239,6 +321,11 @@ const SignupModal = () => {
 
   const [fixedLocation, setFixedLocation] = useState('');
   const [formatAddress, setFormatAddress] = useState('');
+
+  const [isSent, setIsSent] = useState(true);
+
+  const [inputCode, setInputCode] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     
@@ -356,11 +443,31 @@ const SignupModal = () => {
     }
   }
 
+  // [dev] 이메일 인증 관련 함수
+  const mailVerification = async () => {
+    const res = await axios.post('https://localhost:443/mailVerification/nodemailerTest', { email: userInfo.email });
+    // [dev] 클라이언트에서 코드 생성해서 보내기
+    setIsSent(true);
+    setVerificationCode(res.data.code);
+  }
+
+  function codeVerification() {
+    if(verificationCode === inputCode){
+      setPageIdx(pageIdx + 1);
+    } else {
+      setIsError({
+        ...isError,
+        isVerificationCode: false,
+        verificationMsg: '인증번호가 틀렸습니다.',
+      })
+    }
+  }
+
   const handleSignup = () => {
     const {profileImage, email, password, name, gender, birth, mobile, address} = userInfo
     const {isEmail, isName, isGender, isBirth, isMobile} = isError
 
-    if(!email || !password || !name || !gender || !birth || !mobile || !address) {
+    if(!email || !password || !name || gender === "none" || !birth || !mobile || !address) {
       setIsError({
         ...isError,
         isAxios: true,
@@ -400,14 +507,12 @@ const SignupModal = () => {
     }
   }
 
-  const handleNextPage = () => {
-    if(pageIdx < 3) {
-      setPageIdx(pageIdx + 1)
-    }
-  }
-  const handlePrevPage = () => {
-    if(pageIdx > 0) {
-      setPageIdx(pageIdx - 1)
+  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {    
+    const toGo = (event.currentTarget as HTMLButtonElement).value;
+    if(toGo === "next"){
+      setPageIdx(pageIdx + 1);
+    } else {
+      setPageIdx(pageIdx - 1);
     }
   }
 
@@ -443,6 +548,13 @@ const SignupModal = () => {
           <header>
             <div className="title">Sign Up</div>
           </header>
+
+          <ProgressBar>
+            <div className="barContainer">
+              <div className="barFiller" style={{ width: `${((pageIdx + 1)/5*100)}%` }} />
+            </div>
+          </ProgressBar>
+
           {(() => {
             if(pageIdx === 0) {
               return (
@@ -455,6 +567,39 @@ const SignupModal = () => {
                         name='email'
                         value={userInfo.email}
                         onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isError.emailMsg}</div>
+                    </td>
+                  </tr>
+                  {isSent ?
+                    <tr>
+                      <td className='label'>인증번호</td>
+                      <td className='input'>
+                        <input
+                          type='text'
+                          name='inputCode'
+                          value={inputCode}
+                          onChange={(e) => setInputCode(e.target.value)}
+                        />
+                        <div className='error'>{isError.verificationMsg}</div>
+                      </td>
+                    </tr>
+                  : null}
+                </table>
+              )
+            }
+            else if(pageIdx === 1) {
+              return (
+                <table>
+                  <tr>
+                    <td className='label'>이메일</td>
+                    <td className='input'>
+                      <input 
+                        type='email'
+                        name='email'
+                        value={userInfo.email}
+                        onChange={(e) => handleInputChange(e)}
+                        disabled={true}
                       />
                       <div className='error'>{isError.emailMsg}</div>
                     </td>
@@ -486,7 +631,7 @@ const SignupModal = () => {
                 </table>
               )
             }
-            else if(pageIdx === 1) {
+            else if(pageIdx === 2) {
               return (
                 <table>
                   <tr>
@@ -547,9 +692,13 @@ const SignupModal = () => {
                 </table>
               )
             }
-            else if(pageIdx === 2) {
+            else if(pageIdx === 3) {
               return (
-                <div className='mapContainer'>
+                <MapContainer>
+                  <div className="mapInfo">
+                    <div className="mapTitle">주소</div>
+                    <div className="details">이 위치를 기반으로 퀘스트가 검색됩니다.</div>
+                  </div>
                   <div id='map' className='mapDesc'>
                     <UserMap 
                       location={fixedLocation} 
@@ -559,16 +708,16 @@ const SignupModal = () => {
                   </div>
                   <input 
                     className='mapInput'
-                    name='location'
+                    name='address'
                     type='text'
                     value={userInfo.address}
                     onChange={(e) => handleInputChange(e)}
                     onKeyUp={(e) => handleSearchLocation(e)}
                   />
-                </div>
+                </MapContainer>
               )
             }
-            else if(pageIdx === 3) {
+            else if(pageIdx === 4) {
               return (
                 <>
                   <div className='confirm'>이 정보가 맞나요?</div>
@@ -584,7 +733,7 @@ const SignupModal = () => {
                     </tr>
                     <tr>
                       <td className='label'>젠더</td>
-                      <td className='info'>{userInfo.gender}</td>
+                      <td className='info'>{userInfo.gender === 'none' ? '' : userInfo.gender}</td>
                     </tr>
                     <tr>
                       <td className='label'>생일</td>
@@ -596,7 +745,7 @@ const SignupModal = () => {
                     </tr>
                     <tr>
                       <td className='label'>주소</td>
-                      <td className='info'>{formatAddress}</td>
+                      <td className='info'>{!userInfo.address ? '' : formatAddress}</td>
                     </tr>
                   </table>
                   <div className='error'>{isError.axiosMsg}</div>
@@ -607,26 +756,34 @@ const SignupModal = () => {
 
           {/* [dev] 페이지네이션 버튼 */}
           {(() => {
-            if(pageIdx === 0) {
+            if(pageIdx === 0 || pageIdx === 1) {
               return (
                 <BtnContainer style={{ justifyContent: "flex-end" }}>
-                  <button onClick={handleNextPage}>next</button> 
+                  {!isSent? <button onClick={mailVerification} className="request">인증번호 요청</button> : null}
+                  {isSent? <button onClick={codeVerification} className="request">인증번호 확인</button> : null}
                 </BtnContainer>
               )
             }
-            else if(pageIdx === 3) {
+            else if(pageIdx === 1){
+              return (
+                <BtnContainer style={{ justifyContent: "flex-end" }}>
+                  <button onClick={handlePageChange} value="next">다음 <FontAwesomeIcon icon={faAngleRight} className="icon right" /></button>
+                </BtnContainer> 
+              )
+            }
+            else if(pageIdx === 4) {
               return (
                 <BtnContainer>
-                  <button onClick={handlePrevPage}>prev</button>
-                  <button onClick={handleSignup}>Sign Up</button>
+                  <button onClick={handlePageChange} value="prev"><FontAwesomeIcon icon={faAngleLeft} className="icon left" /> 이전</button>
+                  <button onClick={handleSignup} className="request">완료</button>
                 </BtnContainer>
               )
             }
             else {
               return (
                 <BtnContainer>
-                  <button onClick={handlePrevPage}>prev</button>
-                  <button onClick={handleNextPage}>next</button>
+                  <button onClick={handlePageChange} value="prev"><FontAwesomeIcon icon={faAngleLeft} className="icon left" /> 이전</button>
+                  <button onClick={handlePageChange} value="next">다음 <FontAwesomeIcon icon={faAngleRight} className="icon right" /></button>
                 </BtnContainer>
               )
             }
