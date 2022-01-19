@@ -13,6 +13,7 @@ import PartyJoinModal from '../components/PartyJoinModal';
 import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
 import PartyCancelModal from '../components/PartyCancelModal';
+import PartyEdit from '../components/PartyEdit';
 
 import PartyMap from '../components/PartyMap';
 import MemberList from '../components/MemberList';
@@ -20,10 +21,7 @@ import QnA from '../components/QnA';
 
 import { AppState } from '../reducers';
 
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyParty from '../static/dummyParty';
 import axios from 'axios';
-import signinReducer from '../reducers/signinReducer';
 
 export const PartyContainer = styled.div`
 
@@ -326,7 +324,7 @@ export default function Party () {
   const [isLoading, setIsLoading] = useState(true);
   const [ userState, setUserState ] = useState({
     isLeader: false,
-    isMember:false,
+    isMember: false,
     isWaiting: false
   });
   const { isLeader, isMember, isWaiting } = userState;
@@ -346,6 +344,7 @@ export default function Party () {
   const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen]  = useState(false);
   const [isPartyCancelModalOpen, setIsPartyCancelModalOpen]  = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
 
   const [from, setFrom] = useState("");
   const [userInfo, setUserInfo] = useState({});
@@ -366,7 +365,7 @@ export default function Party () {
     region: "",
     location: "",
     latlng: "",
-    memberLimit: 0,
+    memberLimit: 2,
     isReviewed: false,
     members: [{
       exp: 0,
@@ -376,7 +375,7 @@ export default function Party () {
       profileImage: "",
       userName: ""
     }],
-    tag: [ "" ],
+    tag: [],
     waitingQueue: [{
       id: 0,
       userName: "",
@@ -474,8 +473,7 @@ export default function Party () {
   }
 
   function editHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("현재 파티의 정보를 Props로 보내면서, 파티 생성창으로 이동합니다.");
+    setIsEdit(!isEdit);
   }
 
   function fullPartyHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -710,7 +708,7 @@ export default function Party () {
             partyId={partyInfo.id}
             isLeader={isLeader}
             leaderId={partyInfo.leaderId}
-            comments={comments}
+            comments={comments.reverse()}
             findComment={findComment}
           /> 
         </section>
@@ -799,6 +797,12 @@ export default function Party () {
           fullPartyHandler={fullPartyHandler}
           dismissHandler={dismissHandler}
         /> 
+      : null}
+      {isEdit?
+        <PartyEdit
+          party={partyInfo}
+          editHandler={editHandler}
+        />
       : null}
       {isSigninModalOpen? <SigninModal /> : null}
     </PartyContainer>

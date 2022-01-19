@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AppState } from '../reducers';
 import axios from 'axios';
-import signinReducer from '../reducers/signinReducer';
-import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "../actions/signinType";
+import { SIGNIN_SUCCESS } from "../actions/signinType";
 import { modalChanger } from '../actions/modal';
 import { faClipboardCheck, faMapMarkedAlt, faStreetView, faBirthdayCake, faCodeBranch, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import AOS from "aos";

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 
@@ -31,12 +31,6 @@ declare global {
 }
 
 export default function App() {
-  const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
-
-  function signinModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
-    setIsSigninModalOpen(!isSigninModalOpen);
-  }
-
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
