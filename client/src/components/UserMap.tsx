@@ -17,7 +17,7 @@ export const MapContainer = styled.div`
     border: 1px solid #ccc;
     border-bottom:2px solid #ddd;
 
-    width: 130px;
+    width: 100px;
   }
 
   .infoWindow:nth-of-type(n) {
@@ -46,10 +46,6 @@ export const MapContainer = styled.div`
     padding:10px 15px;
     font-size:14px;
     font-weight:bold;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .infoWindow:after {
@@ -86,8 +82,8 @@ const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
 
   const geocoder = new kakao.maps.services.Geocoder();
 
-  function searchAddrFromCoords(coords: { lat: number, lng: number }, callback: Function) {
-    geocoder.coord2RegionCode(coords.lng, coords.lat, callback);         
+  function searchDetailAddrFromCoords(coords: { lat: number, lng: number }, callback: Function) {
+    geocoder.coord2Address(coords.lng, coords.lat, callback);         
   }
 
   useEffect(() => {
@@ -106,9 +102,15 @@ const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
 
   useEffect(() => {
 
-    searchAddrFromCoords(coords, function(result: any, status: any) {
+    searchDetailAddrFromCoords(coords, function(result: any, status: any) {
       if (status === kakao.maps.services.Status.OK) {
-        const address = result[0].address_name;
+
+        console.log(result);
+        const address = 
+          !!result[0].road_address ? 
+            result[0].road_address.address_name
+          : result[0].address.address_name;
+        console.log(address);
         handleFormatAddressChange(address);
       }   
    });
@@ -131,7 +133,7 @@ const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
   return (
     <MapContainer>
       <Map
-        center={{ lat: lat + 0.001, lng: lng - 0.0001 }}
+        center={{ lat: lat + 0.0012, lng: lng - 0.0001 }}
         style={{ width: "100%", height: "100%" }}
         level={4}
         onZoomChanged={(map) => map.setLevel(map.getLevel() > 7 ? 7 : map.getLevel())}
