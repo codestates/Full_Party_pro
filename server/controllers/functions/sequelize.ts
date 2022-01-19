@@ -106,10 +106,27 @@ export const getParticipatingParty = async (userId: number) => {
   for (let i = 0; i < partyIdArr.length; i++) {
     party[i] = await Parties.findOne({
       where: { id: partyIdArr[i].partyId },
-      attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ]
+      attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ],
+      raw: true
     });
   }
   return party;
+};
+
+
+export const findParticipatingParty = async (userId: number) => {
+  const partyIds = await UserParty.findAll({
+    where: { userId },
+    attributes: [ "partyId" ],
+    raw: true
+  });
+  const partyIdArr = partyIds.map(item => item.partyId);
+  const participatingParty = await Parties.findAll({
+    where: { id: partyIdArr, partyState: [ 0, 1 ] },
+    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    raw: true
+  });
+  return participatingParty;
 };
 
 export const getMembers = async (partyId: number, attributes: string[] = [ "id", "profileImage" ]) => {
@@ -228,7 +245,8 @@ export const getMessageAndJoinDate = async (userId: number, partyId: number) => 
   return messageAndJoinDate;
 };
 
-export const getPartyInformation = async (partyId: number) => {
+export const getPartyInformation = async (partyId: number, userId?: number | undefined) => {
+  console.log("🌈", userId);
   const party: PartyInfo | null = await Parties.findOne({
     where: { id: partyId },
     attributes: { exclude: [ "createdAt", "updatedAt" ] },
@@ -242,8 +260,30 @@ export const getPartyInformation = async (partyId: number) => {
     members[i].message = infoFromUserParty?.message;
     members[i].joinDate = infoFromUserParty?.createdAt;
   }
-  const partyInfo = { ...party, favorite: favoriteCount, tag, members };
-  return partyInfo;
+  const waitingUsers = await WaitingQueue.findAll({
+    where: { partyId },
+    attributes: [ "userId", "message" ],
+    raw: true
+  });
+  const userIdArr = waitingUsers.map((item: { userId: number }) => item.userId);
+  let waitingQueue: any[] = await Users.findAll({
+    where: { id: userIdArr },
+    attributes: [ "id", "userName", "profileImage", "level" ],
+    raw: true
+  });
+  waitingUsers.map((item: any, i: number) => waitingQueue[i] = { ...waitingQueue[i], message: item.message })
+  if (userId) {
+    const checkReviewed = await UserParty.findOne({
+      where: { userId, partyId },
+      attributes: [ "isReviewed" ],
+      raw: true
+    });
+    const isReviewed = checkReviewed?.isReviewed ? true : false;
+    const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed };
+    return partyInfo;
+  }
+  const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed: false };
+    return partyInfo;
 };
 
 export const getSubComment = async (commentId: number) => {
@@ -563,21 +603,6 @@ export const findLeadingParty = async (userId: number) => {
   return leadingParty;
 };
 
-export const findParticipatingParty = async (userId: number) => {
-  const partyIds = await UserParty.findAll({
-    where: { userId },
-    attributes: [ "partyId" ],
-    raw: true
-  });
-  const partyIdArr = partyIds.map(item => item.partyId);
-  const participatingParty = await Parties.findAll({
-    where: { id: partyIdArr, partyState: [ 0, 1 ] },
-    attributes: [ "id", "name", "image", "startDate", "endDate" ],
-    raw: true
-  });
-  return participatingParty;
-};
-
 export const findCompletedParty = async (userId: number) => {
   const userParty = await UserParty.findAll({
     where: { userId },
@@ -591,4 +616,27 @@ export const findCompletedParty = async (userId: number) => {
     raw: true
   });
   return completedParty;
+};
+
+export const findFavoriteParties = async (userId: number) => {
+    const favoritePartyIdArr = await Favorite.findAll({
+    where: { userId },
+    attributes: [ "partyId" ],
+    raw: true
+  });
+  const partyIdArr = favoritePartyIdArr.map((item: { partyId: number }) => item.partyId);
+  const partyList = await Parties.findAll({
+    where: { id: partyIdArr },
+    attributes: { exclude: [ "partyState", "isOnline", "privateLink", "createdAt", "updatedAt" ] },
+    raw: true
+  });
+  const favoriteParties: any[] = [];
+  for (let i = 0; i < partyList.length; i++) {
+    const partyId = partyList[i].id;
+    const members = await getMembers(partyId);
+    const tag = await getTag(partyId);
+    if (await checkFavorite(userId, partyId)) favoriteParties[i] = { ...partyList[i], favorite: true, members, tag };
+    else favoriteParties[i] = { ...partyList[i], favorite: false, members, tag };
+  }
+  return favoriteParties;
 };

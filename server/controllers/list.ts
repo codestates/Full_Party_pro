@@ -6,15 +6,25 @@ import { findUser, getLeadingParty, getParticipatingParty, getLocalParty, checkI
 export const getPartyList = async (req: Request, res: Response) => {
   try {
     const { userId, region } = req.params;
-    const userInfo = await findUser({ id: Number(userId) }, [ "id", "userName", "profileImage", "addresss" ]);
+    const userInfo = await findUser({ id: Number(userId) }, [ "id", "userName", "profileImage", "address" ]);
     const leadingParty = await getLeadingParty(Number(userId));
     const participatingParty = await getParticipatingParty(Number(userId));
     const localParty = await getLocalParty(Number(userId), region);
     const notification = await checkIsRead(Number(userId));
+    let myParty = [ ...leadingParty ];
+    console.log(myParty)
+    // 여기 아래 
+    try {
+
+      participatingParty.map((item: any, i: number) => item.id === myParty[i].id ? item : myParty.push(item));
+    }
+    catch (error) {
+      console.log(error);
+    }
     return SuccessfulResponse(res, {
       message: "Loaded Successfully",
       userInfo,
-      myParty: [ ...leadingParty, ...participatingParty ],
+      myParty,
       localParty,
       notification
     });

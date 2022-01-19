@@ -21,9 +21,8 @@ export const ModalContainer = styled.div`
 `;
 
 export const ModalBackdrop = styled.div`
-  width: 100%;
-  height: 100%;
-  position: absolute;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0,0,0,0.4);
 
   display: flex;
@@ -33,30 +32,22 @@ export const ModalBackdrop = styled.div`
 
 export const ModalView = styled.div`
   width: 80%;
-  max-width: 600px;
-  position: absolute;
+  max-width: 350px;
+  max-height: 90vh;
+  overflow: auto;
 
-  border-radius: 20px;
+  border-radius: 30px;
   background-color: white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 
-  padding: 3vh;
+  padding: 30px;
   text-align: center;
 
-  .header {
+  header {
     font-size: 25px;
-    margin: 1.5vh 0;
+    margin-bottom: 15px;
 
     font-family: 'SilkscreenBold';
-  }
-
-  .btnContainer {
-    width: 100%;
-    display: flex;
-
-    margin-top: 4vh;
-
-    justify-content: space-between;
   }
 `
 
@@ -238,48 +229,23 @@ export const CloseBtn = styled.button`
   background-color: white;
   border: none;
 `
-export const NextBtn = styled.button`
-  width: 90px;
-  height: 40px;
-  text-align: center;
 
-  background-image: linear-gradient(to right, #329D9C 20%, #56C596 100%);
-  border: none;
-  border-radius: 10px;
+export const BtnContainer = styled.section`
+  width: 100%;
+  margin-top: 20px;
 
-  font-family: 'SilkscreenRegular';
-  font-size: 15px;
-`
-export const PrevBtn = styled.button`
-  width: 90px;
-  height: 40px;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
 
-  background-image: linear-gradient(to right, #329D9C 20%, #56C596 100%);
-  border: none;
-  border-radius: 10px;
+  button {
+    width: 90px;
+    height: 40px;
 
-  font-family: 'SilkscreenRegular';
-  font-size: 15px;
-`
-export const SubmitBtn = styled.button`
-width: 90px;
-height: 40px;
-text-align: center;
+    border: none;
+    border-radius: 10px;
 
-background-image: linear-gradient(to right, #329D9C 20%, #56C596 100%);
-border: none;
-border-radius: 10px;
-
-font-family: 'SilkscreenRegular';
-font-size: 15px;
-`
-export const DummyBtn = styled.div`
-  width: 90px;
-  height: 40px;
-
-  background-image: white;
-  border: none;
+    cursor: pointer;
+  }
 `
 
 const SignupModal = () => {
@@ -330,7 +296,7 @@ const SignupModal = () => {
     axiosMsg: ''
   });
 
-  const [index, setIndex] = useState(0)
+  const [pageIdx, setPageIdx] = useState(0)
   let today = new Date();
   let year = today.getFullYear();
   let month = ('0' + (today.getMonth() + 1)).slice(-2);
@@ -489,14 +455,14 @@ const SignupModal = () => {
     }
   }
 
-  const handleIdxPlus = () => {
-    if(index < 4) {
-      setIndex(index + 1)
+  const handleNextPage = () => {
+    if(pageIdx < 4) {
+      setPageIdx(pageIdx + 1)
     }
   }
-  const handleIdxMinus = () => {
-    if(index > 0) {
-      setIndex(index - 1)
+  const handlePrevPage = () => {
+    if(pageIdx > 0) {
+      setPageIdx(pageIdx - 1)
     }
   }
 
@@ -524,11 +490,11 @@ const SignupModal = () => {
       <ModalBackdrop>
         <ModalView>
           <CloseBtn><div className='closeModalBtn' onClick={(e) => closeModal(e)}><FontAwesomeIcon icon={faTimes} /></div></CloseBtn>
-          <div className='header'>
+          <header>
             <div>Sign Up</div>
-          </div>
+          </header>
           {(() => {
-            if(index === 0) {
+            if(pageIdx === 0) {
               return (
                 <UserImage>
                   <div className='label'>사진을 선택해 주세요</div>
@@ -547,7 +513,7 @@ const SignupModal = () => {
                 </UserImage>
               )
             }
-            else if(index === 1) {
+            else if(pageIdx === 1) {
               return (
                 <UserID>
                   <tr>
@@ -599,7 +565,7 @@ const SignupModal = () => {
                 </UserID>
               )
             }
-            else if(index === 2) {
+            else if(pageIdx === 2) {
               return (
                 <UserInfo>
                 <tr>
@@ -675,7 +641,7 @@ const SignupModal = () => {
               </UserInfo>
               )
             }
-            else if(index === 3) {
+            else if(pageIdx === 3) {
               return (
                 <UserRegion>
                   <div id='map'>카카오맵 넣어조</div>
@@ -684,7 +650,7 @@ const SignupModal = () => {
                 </UserRegion>
               )
             }
-            else if(index === 4) {
+            else if(pageIdx === 4) {
               return (
                 <UserCheck>
                   <div className='header'>이 정보가 맞나요?</div>
@@ -716,27 +682,32 @@ const SignupModal = () => {
               )
             }
           })()}
-          {/* 여기까지 */}
+
+          {/* [dev] 페이지네이션 버튼 */}
           {(() => {
-            if(index === 0) {
-              return (<div className='btnContainer'>
-                <DummyBtn />
-                <NextBtn className='nextBtn' onClick={handleIdxPlus}>next</NextBtn> 
-              </div>)
+            if(pageIdx === 0) {
+              return (
+                <BtnContainer style={{ justifyContent: "flex-end" }}>
+                  <button onClick={handleNextPage}>next</button> 
+                </BtnContainer>
+              )
             }
-            else if(index === 4) {
-              return (<div className='btnContainer'>
-                <PrevBtn className='prevBtn' onClick={handleIdxMinus}>prev</PrevBtn>
-                <SubmitBtn className='submitBtn' onClick={handleSignup}>Sign Up</SubmitBtn>
-              </div>)
+            else if(pageIdx === 4) {
+              return (
+                <BtnContainer>
+                  <button onClick={handlePrevPage}>prev</button>
+                  <button onClick={handleSignup}>Sign Up</button>
+                </BtnContainer>
+              )
             }
             else {
-              return (<div className='btnContainer'>
-                <PrevBtn className='prevBtn' onClick={handleIdxMinus}>prev</PrevBtn>
-                <NextBtn className='nextBtn' onClick={handleIdxPlus}>next</NextBtn>
-              </div>)
+              return (
+                <BtnContainer>
+                  <button onClick={handlePrevPage}>prev</button>
+                  <button onClick={handleNextPage}>next</button>
+                </BtnContainer>
+              )
             }
-            // 뒤에 괄호 남겨주세요
           })()}
         </ModalView>
       </ModalBackdrop>

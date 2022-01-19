@@ -5,7 +5,7 @@ export type UserInfo = {
   id: number
   userName: string
   profileImage: string
-  region: string,
+  address: string,
   signupType: string
 }
 

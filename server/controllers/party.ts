@@ -11,8 +11,8 @@ import { NotificationAttributes } from "../models/notification";
 
 export const getPartyInfo = async (req: Request, res: Response) => {
   try {
-    const { partyId } = req.params;
-    const partyInfo = await getPartyInformation(Number(partyId));
+    const { partyId, userId } = req.params;
+    const partyInfo = await getPartyInformation(Number(partyId), Number(userId));
     const comments = await compileComments(Number(partyId));
     return SuccessfulResponse(res, { message: "Party Information Loaded", partyInfo, comments });
   }
