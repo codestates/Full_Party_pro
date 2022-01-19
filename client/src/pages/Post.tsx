@@ -5,7 +5,7 @@ import AWS from 'aws-sdk';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTimes, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 import { useSelector } from 'react-redux';
 import { AppState } from '../reducers';
@@ -678,7 +678,7 @@ export default function Post () {
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
-        Key: `${signinReducer.userInfo.id}_${file.name}`,
+        Key: `${signinReducer.userInfo.id}_${partyInfo.name}_image`,
         Body: file,
       }
     })
@@ -686,8 +686,7 @@ export default function Post () {
 
     promise.then(
       function (data) {
-        console.log("이미지 업로드에 성공했습니다.")
-        console.log("👉🏻 URL: ",data.Location)
+        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
         setPartyInfo({
           ...partyInfo,
           image: data.Location
