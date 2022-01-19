@@ -7,6 +7,7 @@ import Loading from '../components/Loading';
 import PartySlide from '../components/PartySlide';
 import LocalQuest from '../components/LocalQuest';
 import EmptyCard from '../components/EmptyCard';
+import AddressModal from '../components/AddressModal';
 import axios from 'axios';
 import { NOTIFY } from '../actions/notify';
 
@@ -74,6 +75,10 @@ export default function List () {
     return <Navigate to="/" />
   } else if(isLoading) {
     return <Loading />
+  }
+
+  if(!userInfo.address){
+    return <AddressModal />
   }
 
   return (
