@@ -22,6 +22,7 @@ export const PostContainer = styled.div`
   background-color: #fff;
   position: absolute;
   left: 0;
+  top: 0;
 
   z-index: 910;
 
@@ -643,7 +644,12 @@ export const Button = styled.button`
   margin-bottom: 30px;
 `
 
-export default function Post () {
+type Props = {
+  party: { [key: string]: any },
+  editHandler: Function,
+}
+
+export default function PartyEdit ({ party, editHandler }: Props) {
   const navigate = useNavigate();
   const fileRef = useRef<any>();
   const imgRef = useRef<any>(null);
@@ -660,17 +666,7 @@ export default function Post () {
   );
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
 
-  const [partyInfo, setPartyInfo] = useState({
-    image: 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png',
-    name: '',
-    startDate: '',
-    endDate: '',
-    memberLimit: 2,
-    location: '',
-    latlng: { lat: 0, lng: 0 },
-    privateLink: '',
-    content: ''
-  });
+  const [partyInfo, setPartyInfo] = useState(party);
 
   const [isName, setIsName] = useState({
     err: false,
@@ -702,11 +698,10 @@ export default function Post () {
     msg: ''
   })
 
-  const [fixedLocation, setFixedLocation] = useState('');
+  const [fixedLocation, setFixedLocation] = useState(partyInfo.location);
   const [formatLocation, setFormatLocation] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(partyInfo.tag);
   const [inputTxt, setInputTxt] = useState('');
-  const [isOnline, setIsOnline] = useState(false);
   const [isPosted, setIsPosted] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
 
@@ -724,7 +719,7 @@ export default function Post () {
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
-        Key: `${signinReducer.userInfo.id}_${partyInfo.name}_image`,
+        Key: `${signinReducer.userInfo.id}_${partyInfo.name}_edit_image`,
         Body: file,
       }
     })
@@ -842,9 +837,15 @@ export default function Post () {
 
   const handleIsOnline = (e: React.MouseEvent<HTMLButtonElement>) => {
     if(e.currentTarget.className === 'isOnline' || e.currentTarget.className === 'isOnline unfocused') {
-      setIsOnline(true)
+      setPartyInfo({
+        ...partyInfo,
+        isOnline: true,  
+      })
     } else {
-      setIsOnline(false)
+      setPartyInfo({
+        ...partyInfo,
+        isOnline: false,  
+      })
     }
   }
 
@@ -881,10 +882,10 @@ export default function Post () {
 
 
   const backToPage = () => {
-    navigate(-1)
+    editHandler();
   }
   
-  const createParty = () => {
+  const editParty = () => {
     const regex = {        
       url: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
     };
@@ -938,22 +939,23 @@ export default function Post () {
     }
   }
 
-  const postParty = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/list/create`, {
+  const patchParty = async () => {
+
+    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/edit/${partyInfo.id}`, {
       userId: signinReducer.userInfo?.id,
       partyInfo: {
         name: partyInfo.name,
         image: partyInfo.image,
         memberLimit: partyInfo.memberLimit,
         region: 
-          isOnline? 
+          partyInfo.isOnline? 
           signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
           : formatLocation,
         location: partyInfo.location,
         latlng: partyInfo.latlng,
         startDate: partyInfo.startDate,
         endDate: partyInfo.endDate,
-        isOnline: isOnline,
+        isOnline: partyInfo.isOnline,
         privateLink: partyInfo.privateLink,
         tag: tags
       }
@@ -968,10 +970,10 @@ export default function Post () {
 
   useEffect(() => {
     if(isPosted){
-      postParty()
+      patchParty()
       .then((res) => {
         setIsPosted(false);
-        navigate(`../party/${res.data.newParty.partyId}`);
+        navigate(`../party/${res.data.partyId}`);
       })
       .catch((err) => {
         setIsErrorModalOpen(true);
@@ -1002,8 +1004,8 @@ export default function Post () {
           <FontAwesomeIcon icon={ faArrowLeft } className="icon" /> 
         </button>
         <div className="partyName">{partyInfo.name}</div>
-        <button className="post" onClick={createParty}>
-          등록
+        <button className="post" onClick={editParty}>
+          수정
         </button>
       </TopNavigation>
       <PostCard>
@@ -1096,12 +1098,12 @@ export default function Post () {
             <div className='locationTitle'>
               <div className='label'>퀘스트 장소</div>
               <div className="details">
-                <button className={isOnline ? 'unfocused' : ''} onClick={(e) => {handleIsOnline(e)}}>오프라인</button>
+                <button className={partyInfo.isOnline ? 'unfocused' : ''} onClick={(e) => {handleIsOnline(e)}}>오프라인</button>
                 <span> | </span>
-                <button className={isOnline ? 'isOnline' : 'isOnline unfocused'} onClick={(e) => {handleIsOnline(e)}}>온라인</button>
+                <button className={partyInfo.isOnline ? 'isOnline' : 'isOnline unfocused'} onClick={(e) => {handleIsOnline(e)}}>온라인</button>
               </div>
             </div>
-            {!isOnline ? 
+            {!partyInfo.isOnline ? 
               <div className='mapContainer'>
                 <div id='map' className='mapDesc'>
                   <PostMap 
@@ -1186,7 +1188,7 @@ export default function Post () {
         </section>
 
         <div className='btn'>
-          <Button onClick={createParty} disabled={isPosted}>QUEST</Button>
+          <Button onClick={editParty} disabled={isPosted}>QUEST</Button>
         </div>
       </PostCard>
       <BottomNavigation>
