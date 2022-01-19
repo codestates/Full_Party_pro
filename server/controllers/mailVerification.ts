@@ -5,7 +5,7 @@ import { InternalServerError, SuccessfulResponse, FailedResponse } from "./funct
 export const mailVerification = async (req: Request, res: Response) => {
   try {
     const { email } = req.body
-    const code = "265524"
+    const code = String(Math.floor(Math.random()*1000000)).padStart(6,"0");
     console.log(req.body)
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -19,13 +19,13 @@ export const mailVerification = async (req: Request, res: Response) => {
     });
 
     const mailOptions = {
-      from: 'FullPartyPro',
-      to: email,
-      subject: '회원가입을 위한 인증번호를 입력해주세요.',
-      text: `회원가입을 위한 인증번호입니다. 이 인증 번호를 입력하여 인증을 완료해주세요. ${code}`
+      from: 'Full Party! 풀팟',    
+      to: email,                     
+      subject: '[풀팟] 이메일 인증을 진행해주세요.',   
+      text: `회원가입을 위한 인증번호입니다. 인증번호를 입력해 인증을 완료해주세요. ${code}`
     };
 
-    transporter.sendMail(mailOptions, function(error: any, info: any){
+    transporter.sendMail(mailOptions, function(error, info){
       if (error) {
         console.log(error);
       }

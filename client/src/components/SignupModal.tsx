@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faPlus, faCamera, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
 import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
@@ -12,6 +12,7 @@ import { modalChanger } from '../actions/modal';
 
 import Loading from './Loading';
 import UserMap from './UserMap';
+import { url } from 'inspector';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -100,6 +101,11 @@ export const ModalView = styled.div`
     }
   }
 
+  .profileImage {
+    width: 100px;
+    height: 100px;
+  }
+
   .confirm {
     margin: 8px 0;
     font-size: 0.9rem;
@@ -148,45 +154,45 @@ export const MapContainer = styled.section`
 
 `
 
-export const UserImage = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+// export const UserImage = styled.div`
+//   width: 100%;
+//   display: flex;
+//   flex-direction: column;
 
-  justify-content: center;
+//   justify-content: center;
 
-  margin: 5vh 0;
+//   margin: 5vh 0;
 
-  .label {
-    margin: 1vh 0;
-  }
+//   .label {
+//     margin: 1vh 0;
+//   }
 
-  .circle {
-    width: 140px;
-    height: 140px;
-    margin: 0 auto;
-    border-radius: 100% !important;
-    border: 1px solid darkcyan;
-    overflow: hidden;
+//   .circle {
+//     width: 140px;
+//     height: 140px;
+//     margin: 0 auto;
+//     border-radius: 100% !important;
+//     border: 1px solid darkcyan;
+//     overflow: hidden;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .pic {
-    width: 200px;
-    max-height: 200px;
-    display: inline-block;
-    margin: auto;
-  }
-  .imgUpload {
-    display: none;
-  }
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-`
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//   }
+//   .pic {
+//     width: 200px;
+//     max-height: 200px;
+//     display: inline-block;
+//     margin: auto;
+//   }
+//   .imgUpload {
+//     display: none;
+//   }
+//   img {
+//     max-width: 100%;
+//     height: auto;
+//   }
+// `
 
 
 export const CloseBtn = styled.button`
@@ -280,7 +286,7 @@ const SignupModal = () => {
   };
 
   const [userInfo, setUserInfo] = useState<Info>({
-    profileImage: 'img/defaultThumbnail.png',
+    profileImage: 'img/defaultProfile.png',
     email: '',
     password: '',
     confirmPassword: '',
@@ -325,7 +331,10 @@ const SignupModal = () => {
   const [isSent, setIsSent] = useState(false);
 
   const [inputCode, setInputCode] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
+  const [verificationData, setVerificationData] = useState({
+    email: userInfo.email,
+    code: '',
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     
@@ -362,7 +371,7 @@ const SignupModal = () => {
       if(!regex.password.test(value)){
         setIsPassword({
           isValid: false,
-          passwordMsg: `숫자/영문자/특수문자를 포함한 8~16자리의 비밀번호여야 합니다.`
+          passwordMsg: '숫자/영문자/특수문자를 포함한 8~16자리의 비밀번호여야 합니다.'
         })
       } else {
         setIsPassword({
@@ -438,7 +447,7 @@ const SignupModal = () => {
   }
 
   const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space' || e.code == 'ArrowRight') {
+    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
       setFixedLocation(userInfo.address);
     }
   }
@@ -446,13 +455,13 @@ const SignupModal = () => {
   // [dev] 이메일 인증 관련 함수
   const mailVerification = async () => {
     const res = await axios.post('https://localhost:443/mailVerification/nodemailerTest', { email: userInfo.email });
-    // [dev] 클라이언트에서 코드 생성해서 보내기
     setIsSent(true);
-    setVerificationCode(res.data.code);
+    setVerificationData({ email: userInfo.email, code: res.data.code });
+    setTimeout(handleCodeExpire, 1000 * 60 * 5);
   }
 
   function codeVerification() {
-    if(verificationCode === inputCode){
+    if(userInfo.email === verificationData.email && verificationData.code === inputCode){
       setPageIdx(pageIdx + 1);
     } else {
       setIsError({
@@ -461,6 +470,15 @@ const SignupModal = () => {
         verificationMsg: '인증번호가 틀렸습니다.',
       })
     }
+  }
+
+  function handleCodeExpire() {
+    setIsSent(false);
+    setIsError({
+      ...isError,
+      isVerificationCode: false,
+      verificationMsg: '인증시간이 만료됐습니다.',
+    })
   }
 
   const handleSignup = () => {
@@ -526,7 +544,7 @@ const SignupModal = () => {
     let file = e.target.files[0];
     const formData = new FormData();
     formData.append('profileImage', file)
-    const res = await axios.post('이미지서버', formData)
+    await axios.post('이미지서버', formData)
     //res.data.location 에 있는 url을 img의 src로 바꿔야 합니다.
     setIsLoading(false)
   }
@@ -571,20 +589,18 @@ const SignupModal = () => {
                       <div className='error'>{isError.emailMsg}</div>
                     </td>
                   </tr>
-                  {isSent ?
-                    <tr>
-                      <td className='label'>인증번호</td>
-                      <td className='input'>
-                        <input
-                          type='text'
-                          name='inputCode'
-                          value={inputCode}
-                          onChange={(e) => setInputCode(e.target.value)}
-                        />
-                        <div className='error'>{isError.verificationMsg}</div>
-                      </td>
-                    </tr>
-                  : null}
+                  <tr>
+                    <td className='label'>인증번호</td>
+                    <td className='input'>
+                      <input
+                        type='text'
+                        name='inputCode'
+                        value={inputCode}
+                        onChange={(e) => setInputCode(e.target.value)}
+                      />
+                      <div className='error'>{isError.verificationMsg}</div>
+                    </td>
+                  </tr>
                 </table>
               )
             }
@@ -721,7 +737,7 @@ const SignupModal = () => {
               return (
                 <>
                   <div className='confirm'>이 정보가 맞나요?</div>
-                  <div className='image'></div>
+                  {/* <div className='profileImage' style={{ backgroundImage: `url(${userInfo.profileImage})`, backgroundSize: "cover" }}/> */}
                   <table>
                     <tr>
                       <td className='label'>이메일</td>
@@ -756,7 +772,7 @@ const SignupModal = () => {
 
           {/* [dev] 페이지네이션 버튼 */}
           {(() => {
-            if(pageIdx === 0 || pageIdx === 1) {
+            if(pageIdx === 0) {
               return (
                 <BtnContainer style={{ justifyContent: "flex-end" }}>
                   {!isSent? <button onClick={mailVerification} className="request">인증번호 요청</button> : null}

@@ -8,7 +8,7 @@ interface InitialState {
 const initialState: InitialState = {
   isLoggedIn: false,
   userInfo: {
-    id: 999.999,
+    id: 0.1,
     userName: "",
     profileImage: "",
     address: "",

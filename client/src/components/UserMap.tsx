@@ -104,8 +104,6 @@ const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
 
     searchDetailAddrFromCoords(coords, function(result: any, status: any) {
       if (status === kakao.maps.services.Status.OK) {
-
-        console.log(result);
         const address = 
           !!result[0].road_address ? 
             result[0].road_address.address_name

@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AppState } from '../reducers';
 import axios from 'axios';
-import signinReducer from '../reducers/signinReducer';
-import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "../actions/signinType";
+import { SIGNIN_SUCCESS } from "../actions/signinType";
 import { modalChanger } from '../actions/modal';
 import { faClipboardCheck, faMapMarkedAlt, faStreetView, faBirthdayCake, faCodeBranch, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import AOS from "aos";
@@ -322,6 +320,7 @@ function Home () {
     if (!document.cookie) {
       document.cookie = "token=temp;";
       document.cookie = "signupType=temp;";
+      document.cookie = "location=http://localhost:3000/home;";
     }
     const { token, signupType, location } = cookieParser();
     if (token && signupType) {
@@ -354,7 +353,7 @@ function Home () {
       payload: response.data.userInfo
     });
     document.cookie = "signupType=google";
-    document.cookie = "location=http://localhost:3000/list";
+    document.cookie = "location=http://localhost:3000/home";
     document.cookie = "isLoggedIn=1;"
     window.location.assign(cookieParser().location);
 
@@ -370,7 +369,7 @@ function Home () {
       payload: response.data.userInfo
     });
     document.cookie = "signupType=kakao";
-    document.cookie = "location=http://localhost:3000/list";
+    document.cookie = "location=http://localhost:3000/home";
     document.cookie = "isLoggedIn=1;"
     window.location.assign(cookieParser().location);
 
