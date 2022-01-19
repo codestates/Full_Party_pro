@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import AWS from 'aws-sdk';
-
+import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faCrown } from '@fortawesome/free-solid-svg-icons';
@@ -538,30 +538,30 @@ export default function Mypage () {
     setParties(myParty)
   }
   const handleSignOut = async () => {
-    const cookie = document.cookie.split("; ");
-    const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
-    const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
+    const { token, signupType, location } = cookieParser();
     await axios.post("https://localhost:443/signout", {
-      access_token: accessToken, 
+      access_token: token, 
       signup_type: signupType
     });
     dispatch({ type: SIGNIN_FAIL });
     document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
     navigate("/");
   };
   const handleWithdrawal = async () => {
-    const cookie = document.cookie.split("; ");
-    const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
-    const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
+    const { token, signupType, location } = cookieParser();
     const userId = signinReducer.userInfo?.id;
     await axios.delete(`https://localhost:443/user/${userId}/${signupType}`, {
       headers: {
-        access_token: accessToken
+        access_token: token
       }
     });
     document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
     dispatch({ type: SIGNIN_FAIL });
     navigate("http://localhost:3000");
   };
@@ -584,9 +584,6 @@ export default function Mypage () {
   useEffect(() => {
     setIsLoading(true)
     const fetchBasicInfo = async () => {
-      const cookie = document.cookie.split("; ");
-      const accessToken = cookie[0].replace("token=", "").slice(1);
-      const signupType = cookie[1].replace("signupType=", "");
       const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
         withCredentials: true,
       });
