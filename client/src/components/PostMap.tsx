@@ -85,17 +85,21 @@ const PostMap = ({ location, name, image, handleCoordsChange }: Props) => {
   const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
 
-  useEffect(() => {
-    const geocoder = new kakao.maps.services.Geocoder();
+  const geocoder = new kakao.maps.services.Geocoder();
 
-    geocoder.addressSearch(location, function(result: any, status: any) {
-      if (status === kakao.maps.services.Status.OK) {
-        const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
-        const { La, Ma } = coordinates;
-        setCoords({ lat: Ma, lng: La });
-        handleCoordsChange(Ma, La);
-      }
-    });
+  useEffect(() => {
+
+    if(location){
+      geocoder.addressSearch(location, function(result: any, status: any) {
+        if (status === kakao.maps.services.Status.OK) {
+          const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
+          const { La, Ma } = coordinates;
+          setCoords({ lat: Ma, lng: La });
+          handleCoordsChange(Ma, La);
+        }
+      });  
+    }
+    
   },[location])
 
   if(!location){

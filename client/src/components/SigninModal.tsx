@@ -140,8 +140,8 @@ export const ModalView = styled.div`
     .oauth {
       width: 50px;
       height: 50px;
-      border-radius: 100%;
       border: none;
+      border-radius: 100%;
 
       margin: 0 10px;
       padding-top: 2px;
@@ -151,6 +151,10 @@ export const ModalView = styled.div`
       img {
         width: 25px;
         height: 25px;
+      }
+
+      &.guest {
+        background-color: #50C9C3;
       }
 
       &.kakao {
@@ -284,9 +288,6 @@ const SigninModal = () => {
             <button className='signinBtn' onClick={handleSignin}>
               Press Start
             </button>
-            <button onClick={guestLoginHandler}>
-              게스트 로그인
-            </button>
             <section className='toSignup'>
               아직 풀팟의 파티원이 아니세요?<br />
               지금 바로 <span className='signupModalBtn' onClick={(e) => signupModal(e)}>회원가입</span> 하세요 🥳
@@ -295,6 +296,13 @@ const SigninModal = () => {
               <div className="oauthLabel">
                 <hr /> OR <hr />
               </div>
+              <button 
+                onClick={guestLoginHandler} 
+                className="oauth guest"
+                id="guest"  
+              >
+                <img src="img/fullparty_symbol.png" />
+              </button>
               <button onClick={kakaoLoginHandler} className="oauth kakao">
                 <img src="img/kakao_symbol.svg" />
               </button>

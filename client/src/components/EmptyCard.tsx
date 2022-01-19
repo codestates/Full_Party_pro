@@ -42,6 +42,8 @@ export const CardContainer = styled.section`
 
       margin-top: 25px;
       margin-bottom: 0;
+
+      cursor: pointer;
     }
   }
 

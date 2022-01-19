@@ -1,6 +1,6 @@
 const dummyList = {
   // "myParty": [],
-  "userInfo": { "location": "경기도 수원시 장안구 정자동 111" },
+  "userInfo": { "address": "경기도 수원시 장안구 정자동 111" },
   "myParty": [
     {
       "id": 1,

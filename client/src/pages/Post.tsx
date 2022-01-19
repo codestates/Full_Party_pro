@@ -172,7 +172,7 @@ export const PostCard = styled.div`
 
   .mapDesc {
     width: 100%;
-    height: 250px;
+    height: 230px;
 
     margin: 20px 0;
   }

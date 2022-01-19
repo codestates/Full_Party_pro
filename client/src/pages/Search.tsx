@@ -12,6 +12,7 @@ import { RootReducerType } from '../store/store';
 
 import LocalQuest from '../components/LocalQuest';
 import EmptyCard from '../components/EmptyCard';
+import Loading from '../components/Loading';
 
 export const SearchContainer = styled.div`
   width: 100%;
@@ -63,7 +64,6 @@ export const SearchContent = styled.div`
   .result {
     width: 100%;
     height: 100%;
-    padding: 0 30px;
     .resultLabel {
       font-size: 1.7rem;
       font-weight: bold;
@@ -86,18 +86,19 @@ export const SearchContent = styled.div`
 `
 
 export default function Search () {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const params = useParams();
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
-    );
+  );
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
-  const searchRegion = signinReducer.userInfo?.region;
+  const userAddress = signinReducer.userInfo?.address;
+  const searchRegion = userAddress.split(" ")[0] + " " + userAddress.split(" ")[1];
   const userId = useSelector((state: AppState) => state.signinReducer.userInfo?.id);
+
   const [word, setWord] = useState<string | undefined>('');
-  const [isSearch, setIsSearch] = useState(false);
   const [parties, setParties] = useState<any>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   //[dev] 더미데이터입니다.
   const [tag, setTag] = useState(['태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333'])
@@ -118,39 +119,50 @@ export default function Search () {
   const hashtagHandler = (tag: string) => {
     navigate(`/search/tag/${tag}`)
   }
-
+  
   useEffect(() => {
+    let isComponentMounted = true;
+    setIsLoading(true);
     if(params.tag){
       const tag = params.tag;
-      setWord(tag);
-      (async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${word}&region=${searchRegion}&userId=${userId}`)
+      const searchData = async () => {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${tag}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
-        const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
-        let partyArr = [];
-        for(let i = 0; i < partyData.length; i++) {
-          partyArr[i] = {...partyData[i], ...parsedLatlng[i]};
+        const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
+        if (isComponentMounted) {
+          setWord(tag);
+          setParties(parsedData);
         }
-        setParties(partyArr)
-      })();
-    } else {
+      }
+      searchData();
+    } else if(params.keyword){
       const keyword = params.keyword;
-      setWord(keyword);
-      (async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${word}&region=${searchRegion}&userId=${userId}`)
+      const searchData = async () => {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${keyword}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
-        const parsedLatlng = res.data.result.map((item: any) => JSON.parse(item.latlng));
-        let partyArr = [];
-        for(let i = 0; i < partyData.length; i++) {
-          partyArr[i] = {...partyData[i], ...parsedLatlng[i]};
+        const parsedData = partyData.map((party: any) => ({ ...party, latlng: JSON.parse(party.latlng) }));
+        if (isComponentMounted) {
+          setWord(keyword);
+          setParties(parsedData);
         }
-        setParties(partyArr)
-      })();
+      }
+      searchData();
     }
-  },[params])
+
+    return () => {
+      isComponentMounted = false
+    }
+
+  },[params.tag, params.keyword])
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [ parties ]);
   
   if(!isLoggedIn){
     return <Navigate to="/" />
+  } else if(isLoading){
+    return <Loading />
   }
 
   return (
@@ -194,7 +206,7 @@ export default function Search () {
           else if(parties.length !== 0) {
             return(
               <div className='result'>
-                <LocalQuest location={searchRegion} localParty={parties} /> 
+                <LocalQuest location={userAddress} localParty={parties} /> 
               </div>
             )
           }

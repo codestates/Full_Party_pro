@@ -172,14 +172,17 @@ type Props = {
 
 export default function QuestCard ({ party }: Props) {
 
-  const { id, name, image, memberLimit, content, startDate, endDate, leaderId, favorite, tag, isOnline, region, location, members } = party;
+  const { id, name, memberLimit, startDate, endDate, leaderId, favorite, tag, isOnline, location, members } = party;
   const navigate = useNavigate();
-  function formatDate(timestamp: Date){
-    const date = timestamp.getDate();
-    const month = timestamp.getMonth() + 1;
-    const year = timestamp.getFullYear();
 
-    return year + "/" + month + "/" + date;
+  function formatDate(date: Date){
+    // const date = timestamp.getDate();
+    // const month = timestamp.getMonth() + 1;
+    // const year = timestamp.getFullYear();
+
+    // return year + "/" + month + "/" + date;
+
+    return String(date).slice(0, 11);
   }
 
   function favoriteHandler(event: React.MouseEvent<HTMLDivElement>) {
@@ -240,7 +243,7 @@ export default function QuestCard ({ party }: Props) {
                   }
                 </div>
                 <div className="time">
-                  <FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {String(startDate).slice(0, 11)} ~ {String(endDate).slice(0, 11)}   
+                  <FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {formatDate(startDate)} ~ {formatDate(endDate)}   
                 </div>
               </div>
             </div>
