@@ -5,7 +5,7 @@ import AWS from 'aws-sdk';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
 
 import { useSelector } from 'react-redux';
 import { AppState } from '../reducers';
@@ -29,7 +29,7 @@ export const PostContainer = styled.div`
   overflow: hidden;
 `
 
-export const Navigation = styled.nav`
+export const TopNavigation = styled.nav`
   width: 100vw;
   height: 60px;
 
@@ -63,6 +63,48 @@ export const Navigation = styled.nav`
       &:disabled {
         color: #d5d5d5;
       }
+    }
+  }
+`
+
+export const BottomNavigation = styled.nav`
+  width: 100vw;
+  height: 60px;
+
+  padding: 0 20px;
+
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 920;
+
+  background-color: #fff;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+
+  button {
+    width: 25vw;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    color: #777;
+    font-size: 10pt;
+
+    background-color: #fff;
+    border: none;
+
+    cursor: pointer;
+
+    .icon {
+      font-size: 16pt;
+      margin-bottom: 3px;
     }
   }
 `
@@ -119,17 +161,22 @@ export const PostCard = styled.div`
   .basicInfo {
 
     .imageContainer {
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
       img {
         width: 100%;
+        max-height: 40vh;
       }
       button {
-        width: 50%;
-        height: 27px;
+        width: 50px;
+        height: 50px;
         border: none;
-        border-radius: 20px;
-        color: white;
-        background-color: #50C9C3;
-        margin: 0 25%;
+        border-radius: 100%;
+        background: rgba(255, 255, 255, 0.6);
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
       }
     }
 
@@ -592,6 +639,8 @@ export const Button = styled.button`
   font-family: 'SilkscreenBold';
   font-size: 1.5rem;
   color: white;
+
+  margin-bottom: 30px;
 `
 
 export default function Post () {
@@ -654,6 +703,7 @@ export default function Post () {
   })
 
   const [fixedLocation, setFixedLocation] = useState('');
+  const [formatLocation, setFormatLocation] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [inputTxt, setInputTxt] = useState('');
   const [isOnline, setIsOnline] = useState(false);
@@ -768,8 +818,12 @@ export default function Post () {
     })
   }
 
+  const handleFormatLocationChange = (address: string) => {
+    setFormatLocation(address);
+  }
+
   const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space') {
+    if(e.code === 'Enter' || e.code === 'Space' || e.code == 'ArrowRight') {
       setFixedLocation(partyInfo.location);
     }
   }
@@ -882,8 +936,6 @@ export default function Post () {
       })
     }
 
-    console.log(partyInfo);
-
     if(partyInfo.name && partyInfo.startDate && partyInfo.endDate && partyInfo.location && partyInfo.privateLink && regex.url.test(partyInfo.privateLink) && partyInfo.content &&
       !isName.err && !isStrDate.err && !isEndDate.err && !isContent.err && !isLocation.err && !isPLink.err){
         setIsPosted(true);
@@ -897,7 +949,10 @@ export default function Post () {
         name: partyInfo.name,
         image: partyInfo.image,
         memberLimit: partyInfo.memberLimit,
-        // region: isOnline? partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1] : signinReducer.userInfo,
+        region: 
+          isOnline? 
+          signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
+          : formatLocation,
         location: partyInfo.location,
         latlng: partyInfo.latlng,
         startDate: partyInfo.startDate,
@@ -946,7 +1001,7 @@ export default function Post () {
           errorModalHandler={errorModalHandler}
         />
       : null}
-      <Navigation>
+      <TopNavigation>
         <button className="cancelBtn" onClick={postCancelHandler}>
           <FontAwesomeIcon icon={ faArrowLeft } className="icon" /> 
         </button>
@@ -954,18 +1009,17 @@ export default function Post () {
         <button className="post" onClick={createParty}>
           등록
         </button>
-      </Navigation>
+      </TopNavigation>
       <PostCard>
         <section className="basicInfo">
           <div className="imageContainer">
             {imgLoading ? <Loading /> :
-            <div>
+            <>
               <img className="preview" src={partyInfo.image} alt="thumbnail"
                 onError={() => {
                   return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
                 }}
               />
-              <button onClick={(e) => handleRefClick(e)}>UPLOAD</button>
               <input 
                 ref={fileRef}
                 type='file'
@@ -976,7 +1030,7 @@ export default function Post () {
                 hidden={true}
                 onChange={handleImgLoad}
               />
-            </div>
+            </>
             }
           </div>
           <div className="infoContainer">
@@ -1059,6 +1113,7 @@ export default function Post () {
                     name={partyInfo.name}
                     image={partyInfo.image} 
                     handleCoordsChange={handleCoordsChange}
+                    handleFormatLocationChange={handleFormatLocationChange}
                   />
                 </div>
                 <input 
@@ -1137,8 +1192,12 @@ export default function Post () {
         <div className='btn'>
           <Button onClick={createParty} disabled={isPosted}>QUEST</Button>
         </div>
-
       </PostCard>
+      <BottomNavigation>
+        <button className="button" onClick={(e) => handleRefClick(e)}>
+          <FontAwesomeIcon icon={ faCamera } className="icon" /> 사진 등록
+        </button>
+      </BottomNavigation>
     </PostContainer>
   );
 }

@@ -191,8 +191,9 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
     (state: AppState) => state.signinReducer.isLoggedIn
   );
 
-  // [dev] 메시지 등록 권한을 위해 임시로 설정한 유저 아이디, 나중에 리덕스에서 userId 불러오는 코드로 바꾸기
-  const userId = 1;
+  const userId = useSelector(
+    (state: AppState) => state.signinReducer.userInfo.id
+  )
 
   const [commentIdx, setCommentIdx] = useState(-1);
   const [isCommentOpen, setIsCommentOpen] = useState(false);

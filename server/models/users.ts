@@ -10,7 +10,7 @@ export interface UsersAttributes {
   gender: string;
   mobile: string;
   email: string;
-  region: string;
+  address: string;
   exp: number;
   level: number;
   signupType: string;
@@ -25,7 +25,7 @@ export class Users extends Model<UsersAttributes> {
   public gender!: string;
   public mobile!: string;
   public email!: string;
-  public region!: string;
+  public address!: string;
   public exp!: number;
   public level!: number;
   public signupType!: string;
@@ -73,7 +73,7 @@ Users.init(
     type: DataTypes.STRING,
     allowNull: false
   },
-  region: {
+  address: {
     type: DataTypes.STRING,
     allowNull: true
   },

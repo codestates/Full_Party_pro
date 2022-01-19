@@ -8,11 +8,11 @@ interface InitialState {
 const initialState: InitialState = {
   isLoggedIn: true,
   userInfo: {
-    id: 1,
-    userName: '귀오미',
-    profileImage: 'https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png',
-    address: '경기도 수원시 장안구 정자동 111',
-    signupType: "general"
+    id: 0.1,
+    userName: "",
+    profileImage: "",
+    address: "",
+    signupType: ""
   }
 }
 

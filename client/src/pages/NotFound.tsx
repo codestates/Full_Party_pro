@@ -7,7 +7,7 @@ export const Container = styled.section`
   width: 100%;
   height: 98vh;
 
-  padding-top: 60px 0;
+  padding-top: 5vh;
   overflow: hidden;
 
   display: flex;
@@ -23,10 +23,16 @@ export const Container = styled.section`
     .title {
       font-size: 5rem;
       margin-bottom: 10px;
+      color: #50C9C3;
     }
 
     .details {
       font-size: 1.2rem;
+    }
+
+    img {
+      width: 100px;
+      height: 100px;
     }
   }
 
@@ -60,6 +66,7 @@ export default function NotFound () {
   return (
     <Container>
       <header>
+        <img src="img/404logo.png" id="logo" alt="logo" />
         <div className="title">404</div>
         <div className="details">요청하신 페이지를 찾을 수 없습니다.</div>
       </header>

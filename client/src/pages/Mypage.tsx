@@ -380,7 +380,7 @@ export default function Mypage () {
     const promise = upload.promise()
 
     promise.then(
-      function (data) {
+      function (data: any) {
         console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
         setChangeInfo({
           ...changeInfo,
@@ -392,7 +392,7 @@ export default function Mypage () {
         })
         setImgLoading(false)
       },
-      function (err) {
+      function (err: any) {
         return console.log('오류가 발생했습니다: ', err.message)
       }
     )
@@ -523,17 +523,17 @@ export default function Mypage () {
 
   //파티 데이터
   const fetchJoinParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/participating/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
   const fetchRecruiteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
   const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/completed/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completed/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
@@ -599,9 +599,9 @@ export default function Mypage () {
         exp: userInfo.exp
       })
     }
-    fetchBasicInfo()
-    fetchJoinParty()
-    setIsLoading(false)
+    fetchBasicInfo();
+    fetchJoinParty();
+    setIsLoading(false);
   },[])
   
   const isLoggedIn = useSelector(

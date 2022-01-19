@@ -12,7 +12,7 @@ import { Users } from "../models/users";
 export const signin = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    const userInfo = await findUser({ email, password }, [ "id", "profileImage", "userName", "region", "signupType" ]);
+    const userInfo = await findUser({ email, password }, [ "id", "profileImage", "userName", "address", "signupType" ]);
     if (!userInfo) return FailedResponse(res, 401, "Unauthorized User");
     const accessToken = generateAccessToken(userInfo);
     setCookie(res, "token", String(accessToken));
@@ -69,7 +69,7 @@ export const guest = async (req: Request, res: Response) => {
       gender: "Guest",
       mobile: "Guest",
       email: `Guest${Math.floor(Math.random()*1000)}@fullparty.com`,
-      region: "Guest",
+      address: "Guest",
       exp: 25,
       level: 1,
       signupType: "guest"
@@ -124,14 +124,14 @@ export const googleSignIn = async (req: Request, res: Response) => {
         email,
         gender: "unidentified",
         birth: new Date("11/11/2222"),
-        region: "unidentified",
+        address: "unidentified",
         mobile: "unidentified",
         exp: 25,
         level: 1,
         signupType: "google"
       });
     }
-    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
+    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
     setCookie(res, "token", String(accessToken));
     return SuccessfulResponse(res, { message: "You have successfully signed in with Google Account", userInfo });
   } catch (error) {
@@ -174,14 +174,14 @@ export const kakao = async (req: Request, res: Response) => {
         email,
         gender: gender === "male" ? "M" : "F",
         birth: new Date("11/11/2222"),
-        region: "KAKAO",
+        address: "KAKAO",
         mobile: "KAKAO",
         exp: 25,
         level: 1,
         signupType: "kakao"
       });
     }
-    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
+    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
     setCookie(res, "token", String(accessToken));
     return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo });
   }
@@ -198,7 +198,7 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
       const verification = verifyAccessToken(String(accessToken));
       if (!verification) FailedResponse(res, 403, "Invalid access token");
       else if (typeof verification !== "string") {
-        const userInfo = await findUser({ id: verification.id }, [ "id", "profileImage", "userName", "region", "signupType" ]);
+        const userInfo = await findUser({ id: verification.id }, [ "id", "profileImage", "userName", "address", "signupType" ]);
         SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
       }
         
@@ -212,7 +212,7 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
         }
       });
       const { email } = userInfoFromKakao.data.kakao_account;
-      const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
+      const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
       SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
     }
     else if (signupType === "google") {
@@ -224,14 +224,14 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
         }
       });
       const { email } = userInfoFromGoogle.data;
-      const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
+      const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
       SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
     }
     else if (signupType === "guest") {
       const verification = verifyAccessToken(String(accessToken));
       if (!verification) FailedResponse(res, 403, "Invalid access token");
       else if (typeof verification !== "string") {
-        const userInfo = await findUser({ email: verification.email }, [ "id", "userName", "profileImage", "region", "signupType" ]);
+        const userInfo = await findUser({ email: verification.email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
         SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
       }
     }
