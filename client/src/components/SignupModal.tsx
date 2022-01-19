@@ -322,7 +322,7 @@ const SignupModal = () => {
   const [fixedLocation, setFixedLocation] = useState('');
   const [formatAddress, setFormatAddress] = useState('');
 
-  const [isSent, setIsSent] = useState(true);
+  const [isSent, setIsSent] = useState(false);
 
   const [inputCode, setInputCode] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
