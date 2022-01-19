@@ -1,14 +1,17 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faPlus, faCamera } from '@fortawesome/free-solid-svg-icons';
+
 import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
+
 import Loading from './Loading';
+import UserMap from './UserMap';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -43,11 +46,69 @@ export const ModalView = styled.div`
   padding: 30px;
   text-align: center;
 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
   header {
     font-size: 25px;
     margin-bottom: 15px;
 
     font-family: 'SilkscreenBold';
+  }
+
+  table {
+    td {
+      height: 50px;
+    }
+
+    .label {
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    .input, .info {
+      width: 186px;
+      font-size: 0.9rem;
+    }
+
+    .input {
+      padding: 0 8px;
+
+      input {
+        border: none;
+        border-bottom: 1px solid #d5d5d5;
+
+        width: 170px;
+        height: 25px;
+
+        text-align: center; 
+      }
+
+      input[type=date] {
+        font-family: "-apple-system";
+      }
+
+      select {
+        width: 170px;
+        text-align: center;
+
+        border: none;
+        border-bottom: 1px solid #d5d5d5;
+      }
+    }
+  }
+
+  .confirm {
+    margin: 5px 0;
+  }
+
+  .error {
+    font-size: 0.7rem;
+    color: #f34508;
+
+    margin-top: 5px;
   }
 `
 
@@ -62,7 +123,6 @@ export const UserImage = styled.div`
 
   .label {
     margin: 1vh 0;
-    font-family: "DungGeunMo";
   }
 
   .circle {
@@ -89,133 +149,6 @@ export const UserImage = styled.div`
   img {
     max-width: 100%;
     height: auto;
-  }
-`
-export const Camera = styled.div`
-  margin: 10px 0;
-  .faCamera {
-    font-size: 25px;
-    color: #888;
-    transition: all 0.3s
-  }
-  .faCamera:hover {
-    color: black;
-  }
-`
-
-export const UserID = styled.table`
-  width: 100%;
-  text-align: center;
-  margin: 5vh 0;
-
-  .label {
-    padding-right: 20px;
-    white-space: nowrap;
-
-    font-family: "DungGeunMo";
-    font-size: 14px;
-    font-weight: medium;
-  }
-
-  input {
-    width: 40vw;
-    max-width: 450px;
-    height: 3vh;
-
-    border: none;
-    border-bottom: 1px solid #d5d5d5;
-  }
-
-  .error {
-    color: red;
-    font-size: 12px;
-  }
-`
-
-export const UserInfo = styled.table`
-  width: 100%;
-  text-align: center;
-  margin: 5vh 0;
-
-  .label {
-    padding-right: 20px;
-    white-space: nowrap;
-
-    font-family: "DungGeunMo";
-    font-size: 14px;
-    font-weight: medium;
-  }
-
-input {
-  width: 40vw;
-  max-width: 450px;
-  height: 3vh;
-  text-align: center;
-
-  background-color: white;
-
-  border: none;
-  border-bottom: 1px solid #d5d5d5;
-}
-
-select {
-  width: 40vw;
-  max-width: 450px;
-  height: 3vh;
-
-  background-color: white;
-
-  border: none;
-  border-bottom: 1px solid #d5d5d5;
-
-  text-align: center;
-}
-
-.error {
-  color: red;
-  font-size: 12px;
-}
-`
-
-export const UserRegion = styled.div`
-  width: 100%
-`
-
-export const UserCheck = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-
-  align-items: center;
-
-  font-family: 'DungGeunMo';
-
-  .header {
-    margin: 1vh 0;
-
-    font-family: 'DungGeunMo';
-    font-size: 17px;
-  }
-
-  .image {
-    width: 90px;
-    height: 90px;
-
-    margin: 1vh 0;
-    margin-bottom: 3vh;
-
-    border: 1px solid black;
-    border-radius: 100%;
-  }
-  
-  table {
-    text-align: center;
-    border-spacing: 15px;
-  }
-  
-  .error {
-    font-size: 13px;
-    color: red;
   }
 `
 
@@ -251,7 +184,9 @@ export const BtnContainer = styled.section`
 const SignupModal = () => {
   const dispatch = useDispatch();
   const cameraRef = useRef<any>();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [pageIdx, setPageIdx] = useState(0)
+
   type Info = {
     profileImage: any;
     email: string;
@@ -261,10 +196,11 @@ const SignupModal = () => {
     gender: string;
     birth: string;
     mobile: string;
-    region: string;
+    address: string;
   };
+
   const [userInfo, setUserInfo] = useState<Info>({
-    profileImage: '',
+    profileImage: 'img/defaultThumbnail.png',
     email: '',
     password: '',
     confirmPassword: '',
@@ -272,45 +208,47 @@ const SignupModal = () => {
     gender: '',
     birth: '',
     mobile: '',
-    region: ''
+    address: ''
   });
+
   const [isError, setIsError] = useState({
     isEmail: false,
-    isPassword: false,
-    isConfirmPassword: false,
     isName: false,
     isGender: false,
     isBirth: false,
     isMobile: false,
-    isRegion: false,
     isAxios: false,
 
     emailMsg: '',
-    passwordMsg: '',
-    confirmPasswordMsg: '',
     nameMsg: '',
     genderMsg: '',
     birthMsg: '',
     mobileMsg: '',
-    regionMsg: '',
     axiosMsg: ''
   });
 
-  const [pageIdx, setPageIdx] = useState(0)
-  let today = new Date();
-  let year = today.getFullYear();
-  let month = ('0' + (today.getMonth() + 1)).slice(-2);
-  let day = ('0' + today.getDate()).slice(-2);
-  const date = year + '-' + month + '-' + day
+  const [isPassword, setIsPassword] = useState({
+    isValid: false,
+    passwordMsg: '',
+  })
 
-  
+  const [isConfirmPassword, setIsConfirmPassword] = useState({
+    isValid: false,
+    confirmPasswordMsg: '',
+  })
+
+  const [fixedLocation, setFixedLocation] = useState('');
+  const [formatAddress, setFormatAddress] = useState('');
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    
+    const {name, value} = e.target;
+
     const regex={
       email: /\S+@\S+\.\S+/,
       password: /^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W).{8,16}$)/,
       mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/
     };
-    const {name, value} = e.target
 
     setUserInfo({
       ...userInfo,
@@ -321,13 +259,13 @@ const SignupModal = () => {
       if(!regex.email.test(value)){
         setIsError({
           ...isError,
-          isEmail: true,
-          emailMsg: '유효하지 않은 이메일 형식입니다'
+          isEmail: false,
+          emailMsg: '유효하지 않은 이메일 형식입니다.'
         })
       } else {
         setIsError({
           ...isError,
-          isEmail: false,
+          isEmail: true,
           emailMsg: ''
         })
       }
@@ -335,32 +273,40 @@ const SignupModal = () => {
 
     if(name === 'password'){
       if(!regex.password.test(value)){
-        setIsError({
-          ...isError,
-          isPassword: true,
-          passwordMsg: `숫자/영문자/특수문자를 포함한 8~16자리의 비밀번호여야 합니다`
+        setIsPassword({
+          isValid: false,
+          passwordMsg: `숫자/영문자/특수문자를 포함한 8~16자리의 비밀번호여야 합니다.`
         })
       } else {
-        setIsError({
-          ...isError,
-          isPassword: false,
-          passwordMsg: ''
+        setIsPassword({
+          isValid: true,
+          passwordMsg: '',
+        })
+      }
+
+      if(userInfo.confirmPassword !== value){
+        setIsConfirmPassword({
+          isValid: false,
+          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
+        })
+      } else {
+        setIsConfirmPassword({
+          isValid: true,
+          confirmPasswordMsg: '',
         })
       }
     };
 
     if(name === 'confirmPassword'){
-      if(userInfo.password !== userInfo.confirmPassword){
-        setIsError({
-          ...isError,
-          isConfirmPassword: true,
-          confirmPasswordMsg: '비밀번호가 일치하지 않습니다'
+      if(userInfo.password !== value){
+        setIsConfirmPassword({
+          isValid: false,
+          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
         })
       } else {
-        setIsError({
-          ...isError,
-          isConfirmPassword: false,
-          confirmPasswordMsg: ''
+        setIsConfirmPassword({
+          isValid: true,
+          confirmPasswordMsg: '',
         })
       }
     };
@@ -369,27 +315,17 @@ const SignupModal = () => {
       if(!regex.mobile.test(value)){
         setIsError({
           ...isError,
-          isMobile: true,
-          mobileMsg: '"-"을 포함하여 입력해 주세요'
+          isMobile: false,
+          mobileMsg: "'-'를 포함하여 입력해주세요."
         })
       } else {
         setIsError({
           ...isError,
-          isMobile: false,
+          isMobile: true,
           mobileMsg: ''
         })
       }
     };
-
-    if(name ==='name'){
-      if(userInfo.name.length >= 2){
-        setIsError({
-          ...isError,
-          isName: false,
-          nameMsg: ''
-        })
-      }
-    }
   }
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -399,36 +335,44 @@ const SignupModal = () => {
       ...userInfo,
       [name]: value
     });
+  }
 
-    if(name === 'gender'){
-      if(userInfo.gender === '남성' || userInfo.gender === '여성' || userInfo.gender === '기타'){
-        setIsError({
-          ...isError,
-          isGender: false,
-          genderMsg: ''
-        })
-      }
+  function getCurrentDate() {
+    let newDate = new Date();
+    let date = newDate.getDate();
+    let month = newDate.getMonth() + 1;
+    let year = newDate.getFullYear();
+    
+    return `${year}-${month<10?`0${month}`:`${month}`}-${date}`
+  }
+
+  const handleFormatAddressChange = (address: string) => {
+    setFormatAddress(address);
+  }
+
+  const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if(e.code === 'Enter' || e.code === 'Space' || e.code == 'ArrowRight') {
+      setFixedLocation(userInfo.address);
     }
   }
 
   const handleSignup = () => {
-    const {profileImage, email, password, name, gender, birth, mobile, region} = userInfo
-    const {isEmail, isPassword, isConfirmPassword, isName, isGender, isBirth, isMobile, isRegion} = isError
+    const {profileImage, email, password, name, gender, birth, mobile, address} = userInfo
+    const {isEmail, isName, isGender, isBirth, isMobile} = isError
 
-    if(isEmail || isPassword || isConfirmPassword || isName || isGender || isBirth || isMobile || isRegion) {
+    if(!email || !password || !name || !gender || !birth || !mobile || !address) {
       setIsError({
         ...isError,
         isAxios: true,
-        axiosMsg: '입력한 정보를 확인하세요'
+        axiosMsg: '작성이 완료되지 않은 정보가 있습니다.'
       })
-    } else if(email === '' || password === '' || name === '' || gender === '' || birth === '' || mobile === '' || region === '') {
+    } else if(!isEmail || !isPassword.isValid || !isConfirmPassword.isValid || !isName || !isGender || !isBirth || !isMobile) {
       setIsError({
         ...isError,
         isAxios: true,
-        axiosMsg: '입력한 정보를 확인하세요'
+        axiosMsg: '입력하신 정보가 올바른지 확인해주세요.'
       })
-    }
-    else {
+    } else {
       axios.post(`${process.env.REACT_APP_API_URL}`,{
         userInfo: {
           profileImage,
@@ -437,7 +381,7 @@ const SignupModal = () => {
           birth,
           gender,
           mobile,
-          region
+          address
         }
       })
       .then((res) => {
@@ -445,7 +389,7 @@ const SignupModal = () => {
           setIsError({
             ...isError,
             isAxios: true,
-            axiosMsg: '이미 가입된 이메일입니다'
+            axiosMsg: '이미 가입된 이메일 주소입니다.'
           })
         } else {
           dispatch(modalChanger('signinModalBtn'))
@@ -456,7 +400,7 @@ const SignupModal = () => {
   }
 
   const handleNextPage = () => {
-    if(pageIdx < 4) {
+    if(pageIdx < 3) {
       setPageIdx(pageIdx + 1)
     }
   }
@@ -480,9 +424,14 @@ const SignupModal = () => {
     //res.data.location 에 있는 url을 img의 src로 바꿔야 합니다.
     setIsLoading(false)
   }
+
   const handleRefClick = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     e.preventDefault();
     cameraRef.current.click();
+  }
+
+  if(isLoading){
+    return <Loading />
   }
 
   return(
@@ -491,31 +440,12 @@ const SignupModal = () => {
         <ModalView>
           <CloseBtn><div className='closeModalBtn' onClick={(e) => closeModal(e)}><FontAwesomeIcon icon={faTimes} /></div></CloseBtn>
           <header>
-            <div>Sign Up</div>
+            <div className="title">Sign Up</div>
           </header>
           {(() => {
             if(pageIdx === 0) {
               return (
-                <UserImage>
-                  <div className='label'>사진을 선택해 주세요</div>
-                  <div className='imageSelect'>
-                    <div className='circle'>
-                      {isLoading ? <Loading /> : 
-                      <img className='pic' src='img/bubble.png' />}
-                      {/* 초기 src 값은 로고 온걸로 변환해주세요 */}
-                      {/* 로딩이 끝나면 scr 주소를 변경해야 합니다 */}
-                    </div>
-                    <Camera>
-                      <FontAwesomeIcon icon={faCamera} className='faCamera' onClick={(e) => handleRefClick(e)}/>
-                      <input ref={cameraRef} className='imgUpload' id='file' type='file' accept='image/*' name='imgUpload' onChange={handleImgLoad}></input>
-                    </Camera>
-                  </div>
-                </UserImage>
-              )
-            }
-            else if(pageIdx === 1) {
-              return (
-                <UserID>
+                <table>
                   <tr>
                     <td className='label'>이메일</td>
                     <td className='input'>
@@ -523,137 +453,124 @@ const SignupModal = () => {
                         type='email'
                         name='email'
                         value={userInfo.email}
-                        onChange={(e) => handleInputChange(e)}/>
+                        onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isError.emailMsg}</div>
                     </td>
                   </tr>
                   <tr>
-                    <td />
-                    <td>
-                      <div className='error'>{isError.emailMsg}</div>
-                    </td>
-                  </tr><tr>
                     <td className='label'>비밀번호</td>
                     <td className='input'>
                       <input
                         type='password'
                         name='password'
                         value={userInfo.password}
-                        onChange={(e) => handleInputChange(e)}/>
+                        onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isPassword.passwordMsg}</div>
                     </td>
                   </tr>
                   <tr>
-                    <td />
-                    <td>
-                      <div className='error'>{isError.passwordMsg}</div>
-                    </td>
-                  </tr><tr>
                     <td className='label'>비밀번호<br />확인</td>
                     <td className='input'>
                       <input
                         type='password'
                         name='confirmPassword'
                         value={userInfo.confirmPassword}
-                        onChange={(e) => handleInputChange(e)}/>
+                        onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isConfirmPassword.confirmPasswordMsg}</div>
+                    </td>
+                  </tr>
+                </table>
+              )
+            }
+            else if(pageIdx === 1) {
+              return (
+                <table>
+                  <tr>
+                    <td className='label'>닉네임</td>
+                    <td className='input'>
+                      <input
+                        type='text'
+                        name='name'
+                        value={userInfo.name}
+                        onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isError.nameMsg}</div>
                     </td>
                   </tr>
                   <tr>
-                    <td />
-                    <td>
-                      <div className='error'>{isError.confirmPasswordMsg}</div>
+                    <td className='label'>젠더</td>
+                    <td className='input'>
+                    <select
+                      name='gender'
+                      value={userInfo.gender}
+                      onChange={(e) => handleSelectChange(e)}
+                      id='gender'
+                    >
+                      <option value='none' selected={true} disabled={true}>선택</option>
+                      <option value='남성'>남성</option>
+                      <option value='여성'>여성</option>
+                      <option value='기타'>기타</option>
+                    </select>
+                    <div className='error'>{isError.genderMsg}</div>
                     </td>
                   </tr>
-                </UserID>
+                  <tr>
+                    <td className='label'>생일</td>
+                    <td className='input'>
+                      <input
+                        type='date'
+                        name='birth'
+                        max={getCurrentDate()}
+                        value={userInfo.birth}
+                        onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isError.birthMsg}</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className='label'>전화번호</td>
+                    <td className='input'>
+                      <input
+                        type='tel'
+                        name='mobile'
+                        value={userInfo.mobile}
+                        onChange={(e) => handleInputChange(e)}
+                        placeholder="'-'을 포함하여 입력해주세요."
+                      />
+                      <div className='error'>{isError.mobileMsg}</div>
+                    </td>
+                  </tr>
+                </table>
               )
             }
             else if(pageIdx === 2) {
               return (
-                <UserInfo>
-                <tr>
-                  <td className='label'>닉네임</td>
-                  <td className='input'>
-                    <input
-                      type='text'
-                      name='name'
-                      value={userInfo.name}
-                      onChange={(e) => handleInputChange(e)}/>
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td>
-                    <div className='error'>{isError.nameMsg}</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='label'>젠더</td>
-                  <td className='input'>
-                  <select
-                    name='gender'
-                    value={userInfo.gender}
-                    onChange={(e) => handleSelectChange(e)}
-                    id='gender'
-                  >
-                    <option value='none' selected disabled>선택</option>
-                    <option value='남성'>남성</option>
-                    <option value='여성'>여성</option>
-                    <option value='기타'>기타</option>
-                  </select>
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td className='error'>{isError.genderMsg}</td>
-                </tr>
-                <tr>
-                  <td className='label'>생일</td>
-                  <td className='input'>
-                    <input
-                      type='date'
-                      name='birth'
-                      max={date}
-                      value={userInfo.birth}
-                      onChange={(e) => handleInputChange(e)}
-                    ></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td className='error'>{isError.birthMsg}</td>
-                </tr>
-                <tr>
-                  <td className='label'>휴대폰</td>
-                  <td className='input'>
-                    <input
-                      type='tel'
-                      name='mobile'
-                      value={userInfo.mobile}
-                      onChange={(e) => handleInputChange(e)}
-                      placeholder="'-'을 포함하여 입력하세요"
+                <div className='mapContainer'>
+                  <div id='map' className='mapDesc'>
+                    <UserMap 
+                      location={fixedLocation} 
+                      image={userInfo.profileImage} 
+                      handleFormatAddressChange={handleFormatAddressChange}
                     />
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td>
-                    <div className='error'>{isError.mobileMsg}</div>
-                  </td>
-                </tr>
-              </UserInfo>
+                  </div>
+                  <input 
+                    className='mapInput'
+                    name='location'
+                    type='text'
+                    value={userInfo.address}
+                    onChange={(e) => handleInputChange(e)}
+                    onKeyUp={(e) => handleSearchLocation(e)}
+                  />
+                </div>
               )
             }
             else if(pageIdx === 3) {
               return (
-                <UserRegion>
-                  <div id='map'>카카오맵 넣어조</div>
-                  <div>지도 찍으면 input에 상세주소, input 작성하면 지도 이동됨</div>
-                  <input />
-                </UserRegion>
-              )
-            }
-            else if(pageIdx === 4) {
-              return (
-                <UserCheck>
-                  <div className='header'>이 정보가 맞나요?</div>
+                <>
+                  <div className='confirm'>이 정보가 맞나요?</div>
                   <div className='image'></div>
                   <table>
                     <tr>
@@ -673,12 +590,16 @@ const SignupModal = () => {
                       <td className='info'>{userInfo.birth}</td>
                     </tr>
                     <tr>
-                      <td className='label'>휴대폰</td>
+                      <td className='label'>전화번호</td>
                       <td className='info'>{userInfo.mobile}</td>
+                    </tr>
+                    <tr>
+                      <td className='label'>주소</td>
+                      <td className='info'>{formatAddress}</td>
                     </tr>
                   </table>
                   <div className='error'>{isError.axiosMsg}</div>
-                </UserCheck>
+                </>
               )
             }
           })()}
@@ -692,7 +613,7 @@ const SignupModal = () => {
                 </BtnContainer>
               )
             }
-            else if(pageIdx === 4) {
+            else if(pageIdx === 3) {
               return (
                 <BtnContainer>
                   <button onClick={handlePrevPage}>prev</button>

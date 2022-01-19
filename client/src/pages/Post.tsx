@@ -635,6 +635,7 @@ export default function Post () {
   })
 
   const [fixedLocation, setFixedLocation] = useState('');
+  const [formatLocation, setFormatLocation] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [inputTxt, setInputTxt] = useState('');
   const [isOnline, setIsOnline] = useState(false);
@@ -715,8 +716,12 @@ export default function Post () {
     })
   }
 
+  const handleFormatLocationChange = (address: string) => {
+    setFormatLocation(address);
+  }
+
   const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space') {
+    if(e.code === 'Enter' || e.code === 'Space' || e.code == 'ArrowRight') {
       setFixedLocation(partyInfo.location);
     }
   }
@@ -829,8 +834,6 @@ export default function Post () {
       })
     }
 
-    console.log(partyInfo);
-
     if(partyInfo.name && partyInfo.startDate && partyInfo.endDate && partyInfo.location && partyInfo.privateLink && regex.url.test(partyInfo.privateLink) && partyInfo.content &&
       !isName.err && !isStrDate.err && !isEndDate.err && !isContent.err && !isLocation.err && !isPLink.err){
         setIsPosted(true);
@@ -844,7 +847,10 @@ export default function Post () {
         name: partyInfo.name,
         image: partyInfo.image,
         memberLimit: partyInfo.memberLimit,
-        // region: isOnline? partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1] : signinReducer.userInfo,
+        region: 
+          isOnline? 
+          signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
+          : formatLocation,
         location: partyInfo.location,
         latlng: partyInfo.latlng,
         startDate: partyInfo.startDate,
@@ -994,6 +1000,7 @@ export default function Post () {
                     name={partyInfo.name}
                     image={partyInfo.image} 
                     handleCoordsChange={handleCoordsChange}
+                    handleFormatLocationChange={handleFormatLocationChange}
                   />
                 </div>
                 <input 
