@@ -7,6 +7,7 @@ import { faFlag, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 
 import CommentDeleteModal from './CommentDeleteModal';
+import axios from 'axios';
 
 export const QnAContainer = styled.section`
 
@@ -197,13 +198,16 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
 
   const [commentIdx, setCommentIdx] = useState(-1);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
-  const curComments = comments.map((comment) => [ comment.comment, ...comment.subcomments ])[commentIdx];
+  console.log(comments);
+  const curComments = comments.map((comment) => [ comment.comment, ...comment.subComments ])[commentIdx];
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [newComment, setNewComment] = useState({comment: "", subcomment: ""});
 
   const [isCommentDeleteModalOpen, setIsCommentDeleteModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState({});
+
+  const formatDate = (date: String) => date.slice(0, 10);
 
   function editHandler(event: React.MouseEvent<HTMLButtonElement>): void {
     setNewComment({ ...newComment, comment : "" });
@@ -226,19 +230,25 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
     setNewComment({ ...newComment, [event.target.name] : event.target.value });
   }
 
-  function postHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  async function postHandler(event: React.MouseEvent<HTMLButtonElement>) {
     // [dev] userId, partyId, content 서버로 전송
-    console.log({userId: userId, partyId: partyId, content: newComment.comment});
-    console.log("코멘트를 등록합니다.");
+    await axios.post(`${process.env.REACT_APP_API_URL}/party/${partyId}/comment`, {
+      userId, partyId, content: newComment.comment 
+    }, {
+      withCredentials: true
+    });
   }
 
-  function replyHandler(event: React.MouseEvent<HTMLButtonElement>, commentId:number) {
+  async function replyHandler(event: React.MouseEvent<HTMLButtonElement>, commentId:number) {
     // [dev] userId, commentId, content 서버로 전송
-    console.log({userId: userId, commentId: commentId, content: newComment.subcomment});
-    console.log("서브코멘트를 등록합니다.");
+    await axios.post(`${process.env.REACT_APP_API_URL}/party/${commentId}/subComment`, {
+      userId, commentId, content: newComment.subcomment
+    }, {
+      withCredentials: true
+    });
   }
 
-  function commentDeleteModalHandler(event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId:number): void {
+  function commentDeleteModalHandler(event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId: number): void {
     setCommentToDelete({ idx: idx, commentId: commentId })
     setIsCommentDeleteModalOpen(!isCommentDeleteModalOpen);
   }
@@ -303,7 +313,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
           <div className="commentsContainer" key={idx}>
             <div className="commentList" onClick={(e) => commentListHandler(e, idx)}>
               <div className="content">{comment.comment.content}</div>
-              <div className="date">{comment.comment.createdAt}</div>
+              <div className="date">{formatDate(comment.comment.createdAt)}</div>
             </div>
             {isCommentOpen && idx === commentIdx ? 
               <CommentDetails>
@@ -321,7 +331,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                           : null}
                           <div className="subCommentContainer" style={{ backgroundColor: "#50C9C3", color: "#fff" }}>
                             <div className="subContent">{subcomment.content}</div>
-                            <div className="date">{subcomment.createdAt}</div> 
+                            <div className="date">{formatDate(subcomment.createdAt)}</div> 
                           </div>
                           <div className="profileContainer">
                             <div className="profileImage" style={{ backgroundImage: `url(${subcomment.profileImage})`, backgroundSize: "cover" }} />
@@ -338,7 +348,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                           </div>
                           <div className="subCommentContainer" style={{ border: "1px solid #d5d5d5" }}>
                             <div className="subContent">{subcomment.content}</div>
-                            <div className="date">{subcomment.createdAt}</div> 
+                            <div className="date">{formatDate(subcomment.createdAt)}</div> 
                           </div>
                           {subcomment.userId === userId ?
                             <button

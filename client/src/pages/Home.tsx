@@ -11,6 +11,7 @@ import { modalChanger } from '../actions/modal';
 import { faClipboardCheck, faMapMarkedAlt, faStreetView, faBirthdayCake, faCodeBranch, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import AOS from "aos";
 import "../../node_modules/aos/dist/aos.css";
+import { cookieParser, requestKeepLoggedIn } from "../App";
 
 export const HomeContainer = styled.div`
 
@@ -316,42 +317,31 @@ export const Footer = styled.footer`
 
 function Home () {
   const dispatch = useDispatch();
-  const isLoggedin = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
-  const signinReducer = useSelector(
-    (state: AppState) => state.signinReducer
-  );
 
   useEffect(() => {
     if (!document.cookie) {
       document.cookie = "token=temp;";
       document.cookie = "signupType=temp;";
     }
-    const cookie = document.cookie.split("; ");
-    if (cookie.length) {
-      const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
-      const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
-      let response;
-      const requestKeepLoggedIn = async () => {
-        response = await axios.post("https://localhost:443/keeping", {}, {
-          headers: {
-            access_token: accessToken,
-            signup_type: signupType
-          }
+    const { token, signupType, location } = cookieParser();
+    if (token && signupType) {
+      if (token !== "temp" && signupType !== "temp") {
+        requestKeepLoggedIn(token, signupType).then((res) => {
+          dispatch({
+            type: SIGNIN_SUCCESS,
+            payload: res.data.userInfo
+          });
         });
-        return response;
-      };
-      requestKeepLoggedIn().then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-      });
+        document.cookie = "isLoggedIn=1;"
+      }
     }
     const address = new URL(window.location.href).searchParams.get("code")
     if (address && address[1] !== "/") handleKakaoLogin();
     else if (address && address[1] === "/") handleGoogleLogin();
+  }, []);
+
+  useEffect(() => {
+    if (cookieParser().isLoggedIn === '1') window.location.assign(cookieParser().location);
   }, []);
 
   const handleGoogleLogin = async () => {
@@ -364,6 +354,10 @@ function Home () {
       payload: response.data.userInfo
     });
     document.cookie = "signupType=google";
+    document.cookie = "location=http://localhost:3000/list";
+    document.cookie = "isLoggedIn=1;"
+    window.location.assign(cookieParser().location);
+
   };
 
   const handleKakaoLogin = async () => {
@@ -376,6 +370,10 @@ function Home () {
       payload: response.data.userInfo
     });
     document.cookie = "signupType=kakao";
+    document.cookie = "location=http://localhost:3000/list";
+    document.cookie = "isLoggedIn=1;"
+    window.location.assign(cookieParser().location);
+
   };
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => {
