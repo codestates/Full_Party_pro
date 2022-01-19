@@ -1,5 +1,5 @@
 const dummyParty = {
-    partyId: 1,
+    id: 1,
     partyState: 0,
     name: "등 긁어주실 분...",
     image: "https://pbs.twimg.com/media/Es4KAp3U4AM01nT?format=jpg",
@@ -9,8 +9,8 @@ const dummyParty = {
     location: "경기도 수원시 장안구 정자동 111 101호",
     // location: "http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/",
     isOnline: false,
-    startDate: new Date('12/24/2021'),
-    endDate: new Date('12/25/2021'),
+    startDate: "2021-12-24",
+    endDate: "2021-12-25",
     favorite: 12,
     // [dev] 이 부분은 임시입니다.
     isFavorite: true,
@@ -21,7 +21,7 @@ const dummyParty = {
     memberLimit: 11,
     members: [ {
         id: 1,
-        name: "귀오미",
+        userName: "귀오미",
         profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png",
         level: 7,
         message: "",

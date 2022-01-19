@@ -17,7 +17,7 @@ export const MapContainer = styled.div`
     border: 1px solid #ccc;
     border-bottom:2px solid #ddd;
 
-    width: 130px;
+    width: 100px;
   }
 
   .infoWindow:nth-of-type(n) {
@@ -46,10 +46,6 @@ export const MapContainer = styled.div`
     padding:10px 15px;
     font-size:14px;
     font-weight:bold;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
   .infoWindow:after {
@@ -73,13 +69,11 @@ export const MapContainer = styled.div`
 
 type Props = {
   location: string,
-  name: string,
   image: string,
-  handleCoordsChange: Function,
-  handleFormatLocationChange: Function
+  handleFormatAddressChange: Function
 }
 
-const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocationChange }: Props) => {
+const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
   
   const { kakao } = window;
 
@@ -88,8 +82,8 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
 
   const geocoder = new kakao.maps.services.Geocoder();
 
-  function searchAddrFromCoords(coords: { lat: number, lng: number }, callback: Function) {
-    geocoder.coord2RegionCode(coords.lng, coords.lat, callback);         
+  function searchDetailAddrFromCoords(coords: { lat: number, lng: number }, callback: Function) {
+    geocoder.coord2Address(coords.lng, coords.lat, callback);         
   }
 
   useEffect(() => {
@@ -100,7 +94,6 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
           const { La, Ma } = coordinates;
           setCoords({ lat: Ma, lng: La });
-          handleCoordsChange(Ma, La);
         }
       });  
     }
@@ -109,11 +102,14 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
 
   useEffect(() => {
 
-    searchAddrFromCoords(coords, function(result: any, status: any) {
+    searchDetailAddrFromCoords(coords, function(result: any, status: any) {
       if (status === kakao.maps.services.Status.OK) {
-        const address = result[0].address_name;
-        const region = address.split(" ")[0] + " " + address.split(" ")[1];
-        handleFormatLocationChange(region);
+        const address = 
+          !!result[0].road_address ? 
+            result[0].road_address.address_name
+          : result[0].address.address_name;
+        console.log(address);
+        handleFormatAddressChange(address);
       }   
    });
 
@@ -135,7 +131,7 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
   return (
     <MapContainer>
       <Map
-        center={{ lat: lat + 0.001, lng: lng - 0.0001 }}
+        center={{ lat: lat + 0.0012, lng: lng - 0.0001 }}
         style={{ width: "100%", height: "100%" }}
         level={4}
         onZoomChanged={(map) => map.setLevel(map.getLevel() > 7 ? 7 : map.getLevel())}
@@ -160,7 +156,7 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
         >
           <div className="infoWindow">
             <div>
-              <span className="title">{name ? name : "퀘스트 장소"}</span>
+              <span className="title">우리 집</span>
             </div>
           </div>
         </CustomOverlayMap>
@@ -169,4 +165,4 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
   )
 }
 
-export default PostMap;
+export default UserMap;

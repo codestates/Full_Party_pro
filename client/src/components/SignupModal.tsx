@@ -3,12 +3,16 @@ import styled from 'styled-components';
 import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faPlus, faCamera } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+
 import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
+
 import Loading from './Loading';
+import UserMap from './UserMap';
+import { url } from 'inspector';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -21,9 +25,8 @@ export const ModalContainer = styled.div`
 `;
 
 export const ModalBackdrop = styled.div`
-  width: 100%;
-  height: 100%;
-  position: absolute;
+  width: 100vw;
+  height: 100vh;
   background-color: rgba(0,0,0,0.4);
 
   display: flex;
@@ -33,200 +36,164 @@ export const ModalBackdrop = styled.div`
 
 export const ModalView = styled.div`
   width: 80%;
-  max-width: 600px;
-  position: absolute;
+  max-width: 350px;
+  max-height: 90vh;
+  overflow: auto;
 
-  border-radius: 20px;
+  border-radius: 30px;
   background-color: white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 
-  padding: 3vh;
+  padding: 30px;
   text-align: center;
 
-  .header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  header {
     font-size: 25px;
-    margin: 1.5vh 0;
+    margin-bottom: 15px;
 
     font-family: 'SilkscreenBold';
   }
 
-  .btnContainer {
-    width: 100%;
-    display: flex;
+  table {
+    td {
+      height: 50px;
+    }
 
-    margin-top: 4vh;
+    .label {
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
 
-    justify-content: space-between;
+    .input, .info {
+      width: 186px;
+      font-size: 0.9rem;
+    }
+
+    .input {
+      padding: 0 8px;
+
+      input {
+        border: none;
+        border-bottom: 1px solid #d5d5d5;
+
+        width: 170px;
+        height: 25px;
+
+        text-align: center; 
+      }
+
+      input[type=date] {
+        font-family: "-apple-system";
+      }
+
+      select {
+        width: 170px;
+        text-align: center;
+
+        border: none;
+        border-bottom: 1px solid #d5d5d5;
+      }
+    }
+  }
+
+  .profileImage {
+    width: 100px;
+    height: 100px;
+  }
+
+  .confirm {
+    margin: 8px 0;
+    font-size: 0.9rem;
+  }
+
+  .error {
+    font-size: 0.7rem;
+    color: #f34508;
+
+    margin-top: 5px;
   }
 `
 
-export const UserImage = styled.div`
-  width: 100%;
+export const MapContainer = styled.section`
   display: flex;
   flex-direction: column;
+  align-items: center;
 
-  justify-content: center;
+  width: 90%;
 
-  margin: 5vh 0;
-
-  .label {
-    margin: 1vh 0;
-    font-family: "DungGeunMo";
+  .mapTitle {
+    font-weight: bold;
+    margin-bottom: 5px;
+    margin-top: 10px;
   }
 
-  .circle {
-    width: 140px;
-    height: 140px;
-    margin: 0 auto;
-    border-radius: 100% !important;
-    border: 1px solid darkcyan;
-    overflow: hidden;
+  .details {
+    font-size: 0.8rem;
+    color: #777;
+    margin-bottom: 20px;
+  }
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .pic {
-    width: 200px;
-    max-height: 200px;
-    display: inline-block;
-    margin: auto;
-  }
-  .imgUpload {
-    display: none;
-  }
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-`
-export const Camera = styled.div`
-  margin: 10px 0;
-  .faCamera {
-    font-size: 25px;
-    color: #888;
-    transition: all 0.3s
-  }
-  .faCamera:hover {
-    color: black;
-  }
-`
-
-export const UserID = styled.table`
-  width: 100%;
-  text-align: center;
-  margin: 5vh 0;
-
-  .label {
-    padding-right: 20px;
-    white-space: nowrap;
-
-    font-family: "DungGeunMo";
-    font-size: 14px;
-    font-weight: medium;
+  #map {
+    width: 100%;
+    height: 150px;
   }
 
   input {
-    width: 40vw;
-    max-width: 450px;
-    height: 3vh;
-
+    width: 100%;
+    height: 25px;
     border: none;
     border-bottom: 1px solid #d5d5d5;
+
+    margin: 15px 0;
   }
 
-  .error {
-    color: red;
-    font-size: 12px;
-  }
 `
 
-export const UserInfo = styled.table`
-  width: 100%;
-  text-align: center;
-  margin: 5vh 0;
+// export const UserImage = styled.div`
+//   width: 100%;
+//   display: flex;
+//   flex-direction: column;
 
-  .label {
-    padding-right: 20px;
-    white-space: nowrap;
+//   justify-content: center;
 
-    font-family: "DungGeunMo";
-    font-size: 14px;
-    font-weight: medium;
-  }
+//   margin: 5vh 0;
 
-input {
-  width: 40vw;
-  max-width: 450px;
-  height: 3vh;
-  text-align: center;
+//   .label {
+//     margin: 1vh 0;
+//   }
 
-  background-color: white;
+//   .circle {
+//     width: 140px;
+//     height: 140px;
+//     margin: 0 auto;
+//     border-radius: 100% !important;
+//     border: 1px solid darkcyan;
+//     overflow: hidden;
 
-  border: none;
-  border-bottom: 1px solid #d5d5d5;
-}
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//   }
+//   .pic {
+//     width: 200px;
+//     max-height: 200px;
+//     display: inline-block;
+//     margin: auto;
+//   }
+//   .imgUpload {
+//     display: none;
+//   }
+//   img {
+//     max-width: 100%;
+//     height: auto;
+//   }
+// `
 
-select {
-  width: 40vw;
-  max-width: 450px;
-  height: 3vh;
-
-  background-color: white;
-
-  border: none;
-  border-bottom: 1px solid #d5d5d5;
-
-  text-align: center;
-}
-
-.error {
-  color: red;
-  font-size: 12px;
-}
-`
-
-export const UserRegion = styled.div`
-  width: 100%
-`
-
-export const UserCheck = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-
-  align-items: center;
-
-  font-family: 'DungGeunMo';
-
-  .header {
-    margin: 1vh 0;
-
-    font-family: 'DungGeunMo';
-    font-size: 17px;
-  }
-
-  .image {
-    width: 90px;
-    height: 90px;
-
-    margin: 1vh 0;
-    margin-bottom: 3vh;
-
-    border: 1px solid black;
-    border-radius: 100%;
-  }
-  
-  table {
-    text-align: center;
-    border-spacing: 15px;
-  }
-  
-  .error {
-    font-size: 13px;
-    color: red;
-  }
-`
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -238,54 +205,74 @@ export const CloseBtn = styled.button`
   background-color: white;
   border: none;
 `
-export const NextBtn = styled.button`
-  width: 90px;
-  height: 40px;
-  text-align: center;
 
-  background-image: linear-gradient(to right, #329D9C 20%, #56C596 100%);
-  border: none;
-  border-radius: 10px;
+export const BtnContainer = styled.section`
+  width: 100%;
+  margin-top: 20px;
 
-  font-family: 'SilkscreenRegular';
-  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+
+  button {
+    width: 90px;
+    height: 40px;
+
+    border: none;
+    border-radius: 10px;
+
+    background-color: white;
+
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .icon {
+      &.left {
+        margin-right: 5px;
+      }
+
+      &.right {
+        margin-left: 5px;
+      }
+    }
+
+    &.request {
+      background-color: #50C9C3;
+      color: #fff;
+    }
+  }
 `
-export const PrevBtn = styled.button`
-  width: 90px;
-  height: 40px;
-  text-align: center;
 
-  background-image: linear-gradient(to right, #329D9C 20%, #56C596 100%);
-  border: none;
-  border-radius: 10px;
+export const ProgressBar = styled.section`
 
-  font-family: 'SilkscreenRegular';
-  font-size: 15px;
-`
-export const SubmitBtn = styled.button`
-width: 90px;
-height: 40px;
-text-align: center;
+  width: 100%;
+  margin: 15px 0;
+  padding: 0 25px;
 
-background-image: linear-gradient(to right, #329D9C 20%, #56C596 100%);
-border: none;
-border-radius: 10px;
+  .barContainer {
+    height: 5px;
+    width: 100%;
+    /* border: 1px solid #e9e7e7; */
+    border-radius: 50px;
+    background-color: #e9e7e7;
+  }
 
-font-family: 'SilkscreenRegular';
-font-size: 15px;
-`
-export const DummyBtn = styled.div`
-  width: 90px;
-  height: 40px;
-
-  background-image: white;
-  border: none;
+  .barFiller {
+    height: 100%;
+    background-color: #50C9C3;
+    border-radius: inherit;
+    text-align: right;
+  }
 `
 
 const SignupModal = () => {
   const dispatch = useDispatch();
   const cameraRef = useRef<any>();
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [pageIdx, setPageIdx] = useState(0)
+
   type Info = {
     profileImage: any;
     email: string;
@@ -295,56 +282,69 @@ const SignupModal = () => {
     gender: string;
     birth: string;
     mobile: string;
-    region: string;
+    address: string;
   };
+
   const [userInfo, setUserInfo] = useState<Info>({
-    profileImage: '',
+    profileImage: 'img/defaultProfile.png',
     email: '',
     password: '',
     confirmPassword: '',
     name: '',
-    gender: '',
+    gender: 'none',
     birth: '',
     mobile: '',
-    region: ''
+    address: ''
   });
+
   const [isError, setIsError] = useState({
     isEmail: false,
-    isPassword: false,
-    isConfirmPassword: false,
     isName: false,
     isGender: false,
     isBirth: false,
     isMobile: false,
-    isRegion: false,
     isAxios: false,
+    isVerificationCode: false,
 
     emailMsg: '',
-    passwordMsg: '',
-    confirmPasswordMsg: '',
     nameMsg: '',
     genderMsg: '',
     birthMsg: '',
     mobileMsg: '',
-    regionMsg: '',
-    axiosMsg: ''
+    axiosMsg: '',
+    verificationMsg: '',
   });
 
-  const [index, setIndex] = useState(0)
-  let today = new Date();
-  let year = today.getFullYear();
-  let month = ('0' + (today.getMonth() + 1)).slice(-2);
-  let day = ('0' + today.getDate()).slice(-2);
-  const date = year + '-' + month + '-' + day
+  const [isPassword, setIsPassword] = useState({
+    isValid: false,
+    passwordMsg: '',
+  })
 
-  
+  const [isConfirmPassword, setIsConfirmPassword] = useState({
+    isValid: false,
+    confirmPasswordMsg: '',
+  })
+
+  const [fixedLocation, setFixedLocation] = useState('');
+  const [formatAddress, setFormatAddress] = useState('');
+
+  const [isSent, setIsSent] = useState(false);
+
+  const [inputCode, setInputCode] = useState('');
+  const [verificationData, setVerificationData] = useState({
+    email: userInfo.email,
+    code: '',
+  });
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    
+    const {name, value} = e.target;
+
     const regex={
       email: /\S+@\S+\.\S+/,
       password: /^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W).{8,16}$)/,
       mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/
     };
-    const {name, value} = e.target
 
     setUserInfo({
       ...userInfo,
@@ -355,13 +355,13 @@ const SignupModal = () => {
       if(!regex.email.test(value)){
         setIsError({
           ...isError,
-          isEmail: true,
-          emailMsg: '유효하지 않은 이메일 형식입니다'
+          isEmail: false,
+          emailMsg: '유효하지 않은 이메일 형식입니다.'
         })
       } else {
         setIsError({
           ...isError,
-          isEmail: false,
+          isEmail: true,
           emailMsg: ''
         })
       }
@@ -369,32 +369,40 @@ const SignupModal = () => {
 
     if(name === 'password'){
       if(!regex.password.test(value)){
-        setIsError({
-          ...isError,
-          isPassword: true,
-          passwordMsg: `숫자/영문자/특수문자를 포함한 8~16자리의 비밀번호여야 합니다`
+        setIsPassword({
+          isValid: false,
+          passwordMsg: '숫자/영문자/특수문자를 포함한 8~16자리의 비밀번호여야 합니다.'
         })
       } else {
-        setIsError({
-          ...isError,
-          isPassword: false,
-          passwordMsg: ''
+        setIsPassword({
+          isValid: true,
+          passwordMsg: '',
+        })
+      }
+
+      if(userInfo.confirmPassword !== value){
+        setIsConfirmPassword({
+          isValid: false,
+          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
+        })
+      } else {
+        setIsConfirmPassword({
+          isValid: true,
+          confirmPasswordMsg: '',
         })
       }
     };
 
     if(name === 'confirmPassword'){
-      if(userInfo.password !== userInfo.confirmPassword){
-        setIsError({
-          ...isError,
-          isConfirmPassword: true,
-          confirmPasswordMsg: '비밀번호가 일치하지 않습니다'
+      if(userInfo.password !== value){
+        setIsConfirmPassword({
+          isValid: false,
+          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
         })
       } else {
-        setIsError({
-          ...isError,
-          isConfirmPassword: false,
-          confirmPasswordMsg: ''
+        setIsConfirmPassword({
+          isValid: true,
+          confirmPasswordMsg: '',
         })
       }
     };
@@ -403,27 +411,17 @@ const SignupModal = () => {
       if(!regex.mobile.test(value)){
         setIsError({
           ...isError,
-          isMobile: true,
-          mobileMsg: '"-"을 포함하여 입력해 주세요'
+          isMobile: false,
+          mobileMsg: "'-'를 포함하여 입력해주세요."
         })
       } else {
         setIsError({
           ...isError,
-          isMobile: false,
+          isMobile: true,
           mobileMsg: ''
         })
       }
     };
-
-    if(name ==='name'){
-      if(userInfo.name.length >= 2){
-        setIsError({
-          ...isError,
-          isName: false,
-          nameMsg: ''
-        })
-      }
-    }
   }
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -433,37 +431,75 @@ const SignupModal = () => {
       ...userInfo,
       [name]: value
     });
+  }
 
-    if(name === 'gender'){
-      if(userInfo.gender === '남성' || userInfo.gender === '여성' || userInfo.gender === '기타'){
-        setIsError({
-          ...isError,
-          isGender: false,
-          genderMsg: ''
-        })
-      }
+  function getCurrentDate() {
+    let newDate = new Date();
+    let date = newDate.getDate();
+    let month = newDate.getMonth() + 1;
+    let year = newDate.getFullYear();
+    
+    return `${year}-${month<10?`0${month}`:`${month}`}-${date}`
+  }
+
+  const handleFormatAddressChange = (address: string) => {
+    setFormatAddress(address);
+  }
+
+  const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
+      setFixedLocation(userInfo.address);
     }
   }
 
-  const handleSignup = () => {
-    const {profileImage, email, password, name, gender, birth, mobile, region} = userInfo
-    const {isEmail, isPassword, isConfirmPassword, isName, isGender, isBirth, isMobile, isRegion} = isError
+  // [dev] 이메일 인증 관련 함수
+  const mailVerification = async () => {
+    const res = await axios.post('https://localhost:443/mailVerification/nodemailerTest', { email: userInfo.email });
+    setIsSent(true);
+    setVerificationData({ email: userInfo.email, code: res.data.code });
+    setTimeout(handleCodeExpire, 1000 * 60 * 5);
+  }
 
-    if(isEmail || isPassword || isConfirmPassword || isName || isGender || isBirth || isMobile || isRegion) {
+  function codeVerification() {
+    if(userInfo.email === verificationData.email && verificationData.code === inputCode){
+      setPageIdx(pageIdx + 1);
+    } else {
       setIsError({
         ...isError,
-        isAxios: true,
-        axiosMsg: '입력한 정보를 확인하세요'
+        isVerificationCode: false,
+        verificationMsg: '인증번호가 틀렸습니다.',
       })
-    } else if(email === '' || password === '' || name === '' || gender === '' || birth === '' || mobile === '' || region === '') {
+    }
+  }
+
+  function handleCodeExpire() {
+    setIsSent(false);
+    setIsError({
+      ...isError,
+      isVerificationCode: false,
+      verificationMsg: '인증시간이 만료됐습니다.',
+    })
+  }
+
+  const handleSignup = () => {
+    const {profileImage, email, password, name, gender, birth, mobile, address} = userInfo
+    const {isEmail, isName, isGender, isBirth, isMobile} = isError
+
+    if(!email || !password || !name || gender === "none" || !birth || !mobile || !address) {
       setIsError({
         ...isError,
         isAxios: true,
-        axiosMsg: '입력한 정보를 확인하세요'
+        axiosMsg: '작성이 완료되지 않은 정보가 있습니다.'
+      })
+    } else if(!isEmail || !isPassword.isValid || !isConfirmPassword.isValid || !isName || !isGender || !isBirth || !isMobile) {
+      setIsError({
+        ...isError,
+        isAxios: true,
+        axiosMsg: '입력하신 정보가 올바른지 확인해주세요.'
       })
     }
     else {
-      axios.post(`${process.env.REACT_APP_API_URL}`,{
+      axios.post(`${process.env.REACT_APP_API_URL}/signup`,{
         userInfo: {
           profileImage,
           email,
@@ -471,7 +507,7 @@ const SignupModal = () => {
           birth,
           gender,
           mobile,
-          region
+          address
         }
       })
       .then((res) => {
@@ -479,7 +515,7 @@ const SignupModal = () => {
           setIsError({
             ...isError,
             isAxios: true,
-            axiosMsg: '이미 가입된 이메일입니다'
+            axiosMsg: '이미 가입된 이메일 주소입니다.'
           })
         } else {
           dispatch(modalChanger('signinModalBtn'))
@@ -489,14 +525,12 @@ const SignupModal = () => {
     }
   }
 
-  const handleIdxPlus = () => {
-    if(index < 4) {
-      setIndex(index + 1)
-    }
-  }
-  const handleIdxMinus = () => {
-    if(index > 0) {
-      setIndex(index - 1)
+  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {    
+    const toGo = (event.currentTarget as HTMLButtonElement).value;
+    if(toGo === "next"){
+      setPageIdx(pageIdx + 1);
+    } else {
+      setPageIdx(pageIdx - 1);
     }
   }
 
@@ -510,13 +544,18 @@ const SignupModal = () => {
     let file = e.target.files[0];
     const formData = new FormData();
     formData.append('profileImage', file)
-    const res = await axios.post('이미지서버', formData)
+    await axios.post('이미지서버', formData)
     //res.data.location 에 있는 url을 img의 src로 바꿔야 합니다.
     setIsLoading(false)
   }
+
   const handleRefClick = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     e.preventDefault();
     cameraRef.current.click();
+  }
+
+  if(isLoading){
+    return <Loading />
   }
 
   return(
@@ -524,32 +563,20 @@ const SignupModal = () => {
       <ModalBackdrop>
         <ModalView>
           <CloseBtn><div className='closeModalBtn' onClick={(e) => closeModal(e)}><FontAwesomeIcon icon={faTimes} /></div></CloseBtn>
-          <div className='header'>
-            <div>Sign Up</div>
-          </div>
+          <header>
+            <div className="title">Sign Up</div>
+          </header>
+
+          <ProgressBar>
+            <div className="barContainer">
+              <div className="barFiller" style={{ width: `${((pageIdx + 1)/5*100)}%` }} />
+            </div>
+          </ProgressBar>
+
           {(() => {
-            if(index === 0) {
+            if(pageIdx === 0) {
               return (
-                <UserImage>
-                  <div className='label'>사진을 선택해 주세요</div>
-                  <div className='imageSelect'>
-                    <div className='circle'>
-                      {isLoading ? <Loading /> : 
-                      <img className='pic' src='img/bubble.png' />}
-                      {/* 초기 src 값은 로고 온걸로 변환해주세요 */}
-                      {/* 로딩이 끝나면 scr 주소를 변경해야 합니다 */}
-                    </div>
-                    <Camera>
-                      <FontAwesomeIcon icon={faCamera} className='faCamera' onClick={(e) => handleRefClick(e)}/>
-                      <input ref={cameraRef} className='imgUpload' id='file' type='file' accept='image/*' name='imgUpload' onChange={handleImgLoad}></input>
-                    </Camera>
-                  </div>
-                </UserImage>
-              )
-            }
-            else if(index === 1) {
-              return (
-                <UserID>
+                <table>
                   <tr>
                     <td className='label'>이메일</td>
                     <td className='input'>
@@ -557,138 +584,160 @@ const SignupModal = () => {
                         type='email'
                         name='email'
                         value={userInfo.email}
-                        onChange={(e) => handleInputChange(e)}/>
+                        onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isError.emailMsg}</div>
                     </td>
                   </tr>
                   <tr>
-                    <td />
-                    <td>
+                    <td className='label'>인증번호</td>
+                    <td className='input'>
+                      <input
+                        type='text'
+                        name='inputCode'
+                        value={inputCode}
+                        onChange={(e) => setInputCode(e.target.value)}
+                      />
+                      <div className='error'>{isError.verificationMsg}</div>
+                    </td>
+                  </tr>
+                </table>
+              )
+            }
+            else if(pageIdx === 1) {
+              return (
+                <table>
+                  <tr>
+                    <td className='label'>이메일</td>
+                    <td className='input'>
+                      <input 
+                        type='email'
+                        name='email'
+                        value={userInfo.email}
+                        onChange={(e) => handleInputChange(e)}
+                        disabled={true}
+                      />
                       <div className='error'>{isError.emailMsg}</div>
                     </td>
-                  </tr><tr>
+                  </tr>
+                  <tr>
                     <td className='label'>비밀번호</td>
                     <td className='input'>
                       <input
                         type='password'
                         name='password'
                         value={userInfo.password}
-                        onChange={(e) => handleInputChange(e)}/>
+                        onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isPassword.passwordMsg}</div>
                     </td>
                   </tr>
                   <tr>
-                    <td />
-                    <td>
-                      <div className='error'>{isError.passwordMsg}</div>
-                    </td>
-                  </tr><tr>
                     <td className='label'>비밀번호<br />확인</td>
                     <td className='input'>
                       <input
                         type='password'
                         name='confirmPassword'
                         value={userInfo.confirmPassword}
-                        onChange={(e) => handleInputChange(e)}/>
+                        onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isConfirmPassword.confirmPasswordMsg}</div>
+                    </td>
+                  </tr>
+                </table>
+              )
+            }
+            else if(pageIdx === 2) {
+              return (
+                <table>
+                  <tr>
+                    <td className='label'>닉네임</td>
+                    <td className='input'>
+                      <input
+                        type='text'
+                        name='name'
+                        value={userInfo.name}
+                        onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isError.nameMsg}</div>
                     </td>
                   </tr>
                   <tr>
-                    <td />
-                    <td>
-                      <div className='error'>{isError.confirmPasswordMsg}</div>
+                    <td className='label'>젠더</td>
+                    <td className='input'>
+                    <select
+                      name='gender'
+                      value={userInfo.gender}
+                      onChange={(e) => handleSelectChange(e)}
+                      id='gender'
+                    >
+                      <option value='none' selected={true} disabled={true}>선택</option>
+                      <option value='남성'>남성</option>
+                      <option value='여성'>여성</option>
+                      <option value='기타'>기타</option>
+                    </select>
+                    <div className='error'>{isError.genderMsg}</div>
                     </td>
                   </tr>
-                </UserID>
+                  <tr>
+                    <td className='label'>생일</td>
+                    <td className='input'>
+                      <input
+                        type='date'
+                        name='birth'
+                        max={getCurrentDate()}
+                        value={userInfo.birth}
+                        onChange={(e) => handleInputChange(e)}
+                      />
+                      <div className='error'>{isError.birthMsg}</div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className='label'>전화번호</td>
+                    <td className='input'>
+                      <input
+                        type='tel'
+                        name='mobile'
+                        value={userInfo.mobile}
+                        onChange={(e) => handleInputChange(e)}
+                        placeholder="'-'을 포함하여 입력해주세요."
+                      />
+                      <div className='error'>{isError.mobileMsg}</div>
+                    </td>
+                  </tr>
+                </table>
               )
             }
-            else if(index === 2) {
+            else if(pageIdx === 3) {
               return (
-                <UserInfo>
-                <tr>
-                  <td className='label'>닉네임</td>
-                  <td className='input'>
-                    <input
-                      type='text'
-                      name='name'
-                      value={userInfo.name}
-                      onChange={(e) => handleInputChange(e)}/>
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td>
-                    <div className='error'>{isError.nameMsg}</div>
-                  </td>
-                </tr>
-                <tr>
-                  <td className='label'>젠더</td>
-                  <td className='input'>
-                  <select
-                    name='gender'
-                    value={userInfo.gender}
-                    onChange={(e) => handleSelectChange(e)}
-                    id='gender'
-                  >
-                    <option value='none' selected disabled>선택</option>
-                    <option value='남성'>남성</option>
-                    <option value='여성'>여성</option>
-                    <option value='기타'>기타</option>
-                  </select>
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td className='error'>{isError.genderMsg}</td>
-                </tr>
-                <tr>
-                  <td className='label'>생일</td>
-                  <td className='input'>
-                    <input
-                      type='date'
-                      name='birth'
-                      max={date}
-                      value={userInfo.birth}
-                      onChange={(e) => handleInputChange(e)}
-                    ></input>
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td className='error'>{isError.birthMsg}</td>
-                </tr>
-                <tr>
-                  <td className='label'>휴대폰</td>
-                  <td className='input'>
-                    <input
-                      type='tel'
-                      name='mobile'
-                      value={userInfo.mobile}
-                      onChange={(e) => handleInputChange(e)}
-                      placeholder="'-'을 포함하여 입력하세요"
+                <MapContainer>
+                  <div className="mapInfo">
+                    <div className="mapTitle">주소</div>
+                    <div className="details">이 위치를 기반으로 퀘스트가 검색됩니다.</div>
+                  </div>
+                  <div id='map' className='mapDesc'>
+                    <UserMap 
+                      location={fixedLocation} 
+                      image={userInfo.profileImage} 
+                      handleFormatAddressChange={handleFormatAddressChange}
                     />
-                  </td>
-                </tr>
-                <tr>
-                  <td />
-                  <td>
-                    <div className='error'>{isError.mobileMsg}</div>
-                  </td>
-                </tr>
-              </UserInfo>
+                  </div>
+                  <input 
+                    className='mapInput'
+                    name='address'
+                    type='text'
+                    value={userInfo.address}
+                    onChange={(e) => handleInputChange(e)}
+                    onKeyUp={(e) => handleSearchLocation(e)}
+                  />
+                </MapContainer>
               )
             }
-            else if(index === 3) {
+            else if(pageIdx === 4) {
               return (
-                <UserRegion>
-                  <div id='map'>카카오맵 넣어조</div>
-                  <div>지도 찍으면 input에 상세주소, input 작성하면 지도 이동됨</div>
-                  <input />
-                </UserRegion>
-              )
-            }
-            else if(index === 4) {
-              return (
-                <UserCheck>
-                  <div className='header'>이 정보가 맞나요?</div>
-                  <div className='image'></div>
+                <>
+                  <div className='confirm'>이 정보가 맞나요?</div>
+                  {/* <div className='profileImage' style={{ backgroundImage: `url(${userInfo.profileImage})`, backgroundSize: "cover" }}/> */}
                   <table>
                     <tr>
                       <td className='label'>이메일</td>
@@ -700,43 +749,60 @@ const SignupModal = () => {
                     </tr>
                     <tr>
                       <td className='label'>젠더</td>
-                      <td className='info'>{userInfo.gender}</td>
+                      <td className='info'>{userInfo.gender === 'none' ? '' : userInfo.gender}</td>
                     </tr>
                     <tr>
                       <td className='label'>생일</td>
                       <td className='info'>{userInfo.birth}</td>
                     </tr>
                     <tr>
-                      <td className='label'>휴대폰</td>
+                      <td className='label'>전화번호</td>
                       <td className='info'>{userInfo.mobile}</td>
+                    </tr>
+                    <tr>
+                      <td className='label'>주소</td>
+                      <td className='info'>{!userInfo.address ? '' : formatAddress}</td>
                     </tr>
                   </table>
                   <div className='error'>{isError.axiosMsg}</div>
-                </UserCheck>
+                </>
               )
             }
           })()}
-          {/* 여기까지 */}
+
+          {/* [dev] 페이지네이션 버튼 */}
           {(() => {
-            if(index === 0) {
-              return (<div className='btnContainer'>
-                <DummyBtn />
-                <NextBtn className='nextBtn' onClick={handleIdxPlus}>next</NextBtn> 
-              </div>)
+            if(pageIdx === 0) {
+              return (
+                <BtnContainer style={{ justifyContent: "flex-end" }}>
+                  {!isSent? <button onClick={mailVerification} className="request">인증번호 요청</button> : null}
+                  {isSent? <button onClick={codeVerification} className="request">인증번호 확인</button> : null}
+                </BtnContainer>
+              )
             }
-            else if(index === 4) {
-              return (<div className='btnContainer'>
-                <PrevBtn className='prevBtn' onClick={handleIdxMinus}>prev</PrevBtn>
-                <SubmitBtn className='submitBtn' onClick={handleSignup}>Sign Up</SubmitBtn>
-              </div>)
+            else if(pageIdx === 1){
+              return (
+                <BtnContainer style={{ justifyContent: "flex-end" }}>
+                  <button onClick={handlePageChange} value="next">다음 <FontAwesomeIcon icon={faAngleRight} className="icon right" /></button>
+                </BtnContainer> 
+              )
+            }
+            else if(pageIdx === 4) {
+              return (
+                <BtnContainer>
+                  <button onClick={handlePageChange} value="prev"><FontAwesomeIcon icon={faAngleLeft} className="icon left" /> 이전</button>
+                  <button onClick={handleSignup} className="request">완료</button>
+                </BtnContainer>
+              )
             }
             else {
-              return (<div className='btnContainer'>
-                <PrevBtn className='prevBtn' onClick={handleIdxMinus}>prev</PrevBtn>
-                <NextBtn className='nextBtn' onClick={handleIdxPlus}>next</NextBtn>
-              </div>)
+              return (
+                <BtnContainer>
+                  <button onClick={handlePageChange} value="prev"><FontAwesomeIcon icon={faAngleLeft} className="icon left" /> 이전</button>
+                  <button onClick={handlePageChange} value="next">다음 <FontAwesomeIcon icon={faAngleRight} className="icon right" /></button>
+                </BtnContainer>
+              )
             }
-            // 뒤에 괄호 남겨주세요
           })()}
         </ModalView>
       </ModalBackdrop>

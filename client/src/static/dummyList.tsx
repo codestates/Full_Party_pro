@@ -1,6 +1,6 @@
 const dummyList = {
   // "myParty": [],
-  "userInfo": { "location": "경기도 수원시 장안구 정자동 111" },
+  "userInfo": { "address": "경기도 수원시 장안구 정자동 111" },
   "myParty": [
     {
       "id": 1,
@@ -59,46 +59,46 @@ const dummyList = {
   ],
   // "localParty": [],
   "localParty": [
-    {
-      "id": 1,
-      "name": "등 긁어주실 분...",
-      "image": "https://pbs.twimg.com/media/Es4KAp3U4AM01nT?format=jpg",
-      "memberLimit": 10,
-      "content": "등 좀 긁어주세요...",
-      "startDate": new Date('12/24/2021'),
-      "endDate": new Date('12/25/2021'),
-      "leaderId": 1,
-      "favorite": true,
-      "tag": ["이웃", "효자손", "도와주세요"],
-      "isOnline": false,
-      "region": "경기도 수원시",
-      "location": "경기도 수원시 장안구 정자동 111",
-      "latlng": {lat: 37.2884656931288, lng: 126.990616107101},
-      "members": [
-        {
-          id: 1,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png",
-        }, {
-          id: 2,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/b/b8/Deena_NH.png",
-        }, {
-          id: 3,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/6/6b/Pate_NH.png",
-        }, {
-          id: 4,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/e/ec/Scoot_NH.png",
-        }, {
-          id: 5,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/6/66/Joey_NH.png",
-        }, {
-          id: 6,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/c/c1/Bill_NH.png",
-        }, {
-          id: 7,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/9/98/Derwin_NH.png",
-        },
-      ]
-    },
+    // {
+    //   "id": 1,
+    //   "name": "등 긁어주실 분...",
+    //   "image": "https://pbs.twimg.com/media/Es4KAp3U4AM01nT?format=jpg",
+    //   "memberLimit": 10,
+    //   "content": "등 좀 긁어주세요...",
+    //   "startDate": new Date('12/24/2021'),
+    //   "endDate": new Date('12/25/2021'),
+    //   "leaderId": 1,
+    //   "favorite": true,
+    //   "tag": ["이웃", "효자손", "도와주세요"],
+    //   "isOnline": false,
+    //   "region": "경기도 수원시",
+    //   "location": "경기도 수원시 장안구 정자동 111",
+    //   "latlng": {lat: 37.2884656931288, lng: 126.990616107101},
+    //   "members": [
+    //     {
+    //       id: 1,
+    //       profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png",
+    //     }, {
+    //       id: 2,
+    //       profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/b/b8/Deena_NH.png",
+    //     }, {
+    //       id: 3,
+    //       profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/6/6b/Pate_NH.png",
+    //     }, {
+    //       id: 4,
+    //       profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/e/ec/Scoot_NH.png",
+    //     }, {
+    //       id: 5,
+    //       profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/6/66/Joey_NH.png",
+    //     }, {
+    //       id: 6,
+    //       profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/c/c1/Bill_NH.png",
+    //     }, {
+    //       id: 7,
+    //       profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/9/98/Derwin_NH.png",
+    //     },
+    //   ]
+    // },
     {
       "id": 2,
       "name": "이런 파티",
@@ -142,34 +142,35 @@ const dummyList = {
           "profileImage": "https://static.wikia.nocookie.net/animalcrossing/images/6/66/Weber_NH.png"
         },
       ]
-    }, {
-      "id": 4,
-      "name": "더미 파티",
-      "image": "https://i.redd.it/k1hyxx55mi351.jpg",
-      "memberLimit": 7,
-      "content": "테스트",
-      "startDate": new Date('12/24/2021'),
-      "endDate": new Date('12/25/2021'),
-      "leaderId": 2,
-      "favorite": true,
-      "tag": ["아무나", "오세요"],
-      "isOnline": false,
-      "region": "경기도 수원시",
-      "location": "경기 수원시 팔달구 일월로 50",
-      "latlng": {lat: 37.2878291286377, lng: 126.978878045673},
-      "members": [
-        {
-          id: 2,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/b/b8/Deena_NH.png",
-        }, {
-          id: 1,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png",
-        }, {
-          id: 3,
-          profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/6/6b/Pate_NH.png",
-        }
-      ]
     }
+    // }, {
+    //   "id": 4,
+    //   "name": "더미 파티",
+    //   "image": "https://i.redd.it/k1hyxx55mi351.jpg",
+    //   "memberLimit": 7,
+    //   "content": "테스트",
+    //   "startDate": new Date('12/24/2021'),
+    //   "endDate": new Date('12/25/2021'),
+    //   "leaderId": 2,
+    //   "favorite": true,
+    //   "tag": ["아무나", "오세요"],
+    //   "isOnline": false,
+    //   "region": "경기도 수원시",
+    //   "location": "경기 수원시 팔달구 일월로 50",
+    //   "latlng": {lat: 37.2878291286377, lng: 126.978878045673},
+    //   "members": [
+    //     {
+    //       id: 2,
+    //       profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/b/b8/Deena_NH.png",
+    //     }, {
+    //       id: 1,
+    //       profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/2/29/Molly_NH.png",
+    //     }, {
+    //       id: 3,
+    //       profileImage: "https://static.wikia.nocookie.net/animalcrossing/images/6/6b/Pate_NH.png",
+    //     }
+    //   ]
+    // }
   ],
 };
 

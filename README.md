@@ -1,4 +1,4 @@
-# 🎉 풀팟 Full Party
+![projectLogo](https://user-images.githubusercontent.com/85741019/150170034-b4e1486b-e2e2-497e-ada3-acb5f98bcf57.png)
 
 ### 외로운 도시에서 동료가 필요한 모험가들을 위한 플랫폼, 풀팟
 풀파티는 사람들을 모으기 힘든 아싸들을 위한 매칭플랫폼 입니다.

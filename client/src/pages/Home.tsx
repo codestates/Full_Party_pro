@@ -1,16 +1,15 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { AppState } from '../reducers';
 import axios from 'axios';
-import signinReducer from '../reducers/signinReducer';
-import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "../actions/signinType";
+import { SIGNIN_SUCCESS } from "../actions/signinType";
 import { modalChanger } from '../actions/modal';
 import { faClipboardCheck, faMapMarkedAlt, faStreetView, faBirthdayCake, faCodeBranch, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import AOS from "aos";
 import "../../node_modules/aos/dist/aos.css";
+import { cookieParser, requestKeepLoggedIn } from "../App";
 
 export const HomeContainer = styled.div`
 
@@ -316,51 +315,48 @@ export const Footer = styled.footer`
 
 function Home () {
   const dispatch = useDispatch();
-  const isLoggedin = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
-  const signinReducer = useSelector(
-    (state: AppState) => state.signinReducer
-  );
 
   useEffect(() => {
     if (!document.cookie) {
       document.cookie = "token=temp;";
       document.cookie = "signupType=temp;";
+      document.cookie = "location=http://localhost:3000/home;";
     }
-    const cookie = document.cookie.split("; ");
-    if (cookie.length) {
-      const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
-      const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
-      let response;
-      const requestKeepLoggedIn = async () => {
-        response = await axios.post("https://localhost:443/keeping", {}, { 
-          headers: {
-            access_token: accessToken, 
-            signup_type: signupType 
-          } 
+    const { token, signupType, location } = cookieParser();
+    if (token && signupType) {
+      if (token !== "temp" && signupType !== "temp") {
+        requestKeepLoggedIn(token, signupType).then((res) => {
+          dispatch({
+            type: SIGNIN_SUCCESS,
+            payload: res.data.userInfo
+          });
         });
-        return response;
-      };
-      requestKeepLoggedIn().then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-      });
+        document.cookie = "isLoggedIn=1;"
+      }
     }
-    // 구글 로그인 추가 필요 -> URL로 조건 분기
-    if (new URL(window.location.href).searchParams.get("code")) handleKakaoLogin();
+    const address = new URL(window.location.href).searchParams.get("code")
+    if (address && address[1] !== "/") handleKakaoLogin();
+    else if (address && address[1] === "/") handleGoogleLogin();
+  }, []);
+
+  useEffect(() => {
+    if (cookieParser().isLoggedIn === '1') window.location.assign(cookieParser().location);
   }, []);
 
   const handleGoogleLogin = async () => {
     const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post("https://localhost:443/google", { authorizationCode });
+    const response = await axios.post("https://localhost:443/google", { authorizationCode }, {
+      withCredentials: true
+    });
     dispatch({
       type: SIGNIN_SUCCESS,
       payload: response.data.userInfo
     });
-    document.cookie = "token=" + response.data.userInfo.accessToken;
+    document.cookie = "signupType=google";
+    document.cookie = "location=http://localhost:3000/home";
+    document.cookie = "isLoggedIn=1;"
+    window.location.assign(cookieParser().location);
+
   };
 
   const handleKakaoLogin = async () => {
@@ -372,8 +368,11 @@ function Home () {
       type: SIGNIN_SUCCESS,
       payload: response.data.userInfo
     });
-    document.cookie = "token=" + response.data.userInfo.accessToken;
     document.cookie = "signupType=kakao";
+    document.cookie = "location=http://localhost:3000/home";
+    document.cookie = "isLoggedIn=1;"
+    window.location.assign(cookieParser().location);
+
   };
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => {

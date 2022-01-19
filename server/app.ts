@@ -14,6 +14,7 @@ import partyRouter from "./router/party";
 import favoriteRouter from "./router/favorite";
 import searchRouter from "./router/search";
 import notificationRouter from "./router/notification";
+import mailVerification from "./router/mailVerification";
 
 const app = express();
 
@@ -29,11 +30,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+
 app.get("/", (req: Request, res: Response) => {
   res.status(200).send("Welcome to Full Party!");
 });
 
 app.use("/", authRouter);
+app.use("/mailVerification", mailVerification);
 app.use("/list", listRouter);
 app.use("/user", userRouter);
 app.use("/party", partyRouter);
@@ -47,7 +50,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ message: `Something went wrong: ${err}` });
 });
 
-const HTTPS_PORT = config.port || 80;
+const HTTPS_PORT = config.port || 4000;
 
 let server;
 if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {

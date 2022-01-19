@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-
+import { useSelector, useDispatch } from 'react-redux';
+import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
 import { AppState } from '../reducers';
-
 import Loading from '../components/Loading';
 import PartySlide from '../components/PartySlide';
 import LocalQuest from '../components/LocalQuest';
 import EmptyCard from '../components/EmptyCard';
-
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyList from '../static/dummyList';
+import AddressModal from '../components/AddressModal';
+import axios from 'axios';
+import { NOTIFY } from '../actions/notify';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const ListContainer = styled.div`
   width: 100%;
@@ -40,23 +40,63 @@ export const ListContainer = styled.div`
 
 export default function List () {
 
+  const dispatch = useDispatch();
+
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
 
-  const { userInfo, myParty, localParty } = dummyList;
+  const userInfo = useSelector(
+    (state: AppState) => state.signinReducer.userInfo
+  );
 
+  const searchRegion = userInfo.address.split(" ")[0] + " " + userInfo.address.split(" ")[1];
   const [isLoading, setIsLoading] = useState(true);
+  const [ myParty, setMyParty ] = useState([]);
+  const [ localParty, setLocalParty ] = useState([]);
 
   useEffect(() => {
-    // [dev] 서버통신
-    setIsLoading(false);
-  }, [])
+    setIsLoading(true);
+    (async () => {
+      const { token, signupType } = cookieParser();
+      await requestKeepLoggedIn(token, signupType).then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+        document.cookie = "location=http://localhost:3000/list";
+      });
+    })();
+  }, []);
 
-  if(!isLoggedIn){
-    return <Navigate to="/" />
-  } else if(isLoading) {
+  useEffect(() => {
+    setIsLoading(true);
+    (async () => {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/list/${userInfo.id}/${searchRegion}`, {
+        withCredentials: true
+      });
+      dispatch({
+        type: NOTIFY,
+        payload: {
+          isBadgeOn: response.data.notification
+        }
+      });
+      const parsedLocalParty = response.data.localParty.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
+      setLocalParty(parsedLocalParty);
+      setMyParty(response.data.myParty);
+    })();
+  }, [ userInfo ]);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [ localParty, myParty ]);
+
+  if(isLoading) {
     return <Loading />
+  }
+
+  if(!userInfo.address){
+    return <AddressModal />
   }
 
   return (
@@ -72,7 +112,7 @@ export default function List () {
         </section>
       : null}
       {localParty.length > 0 ?
-        <LocalQuest location={userInfo.location} localParty={localParty} />
+        <LocalQuest location={userInfo.address} localParty={localParty} />
         : <EmptyCard from="list" />}
     </ListContainer>
   );

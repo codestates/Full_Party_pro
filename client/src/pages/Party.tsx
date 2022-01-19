@@ -1,18 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-
+import { useSelector, useDispatch } from 'react-redux';
+import { requestKeepLoggedIn, cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart, faAngleDown, faAngleUp, faBullhorn, faBirthdayCake, faCalendarCheck, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
-
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 import Loading from '../components/Loading';
 import UserInfoModal from '../components/UserInfoModal';
 import PartyJoinModal from '../components/PartyJoinModal';
 import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
 import PartyCancelModal from '../components/PartyCancelModal';
+import PartyEdit from '../components/PartyEdit';
 
 import PartyMap from '../components/PartyMap';
 import MemberList from '../components/MemberList';
@@ -20,8 +21,7 @@ import QnA from '../components/QnA';
 
 import { AppState } from '../reducers';
 
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyParty from '../static/dummyParty';
+import axios from 'axios';
 
 export const PartyContainer = styled.div`
 
@@ -301,29 +301,32 @@ export default function Party () {
 
   const params = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const commentRef = useRef<HTMLElement>(null);
 
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
+  const userId = useSelector(
+    (state: AppState) => state.signinReducer.userInfo.id
+  );
 
   const { Kakao } = window;
 
   // [dev] 유저 모달 메시지 수정 권한을 위해 임시로 설정한 유저 아이디, 나중에 리덕스에서 userId 불러오는 코드로 바꾸기
-  const userId = 1;
 
-  const { partyId, name, image, memberLimit, partyState, privateLink, content, region, startDate, endDate, favorite, tag, location, isOnline, isReviewed, leaderId, members, waitingQueue, comments } = dummyParty;
+  // const { partyId, name, image, memberLimit, partyState, privateLink, content, region, startDate, endDate, favorite, tag, location, isOnline, isReviewed, leaderId, members, waitingQueue, comments } = dummyParty;
 
-  // [dev] 서버와 연결되면 아래 코드는 삭제하고, 그 다음줄 주석을 활성화. 
+  // [dev] 서버와 연결되면 아래 코드는 삭제하고, 그 다음줄 주석을 활성화.
   // 서버에서 관심 파티 등록되어있는지 여부 받아와야 함.
-  const [isFavorite, setIsFavorite] = useState(false);
-  // const { isFavorite } = dummyParty;
 
   const [isLoading, setIsLoading] = useState(true);
-
-  const [isLeader, setIsLeader] = useState(true);
-  const [isMember, setIsMember] = useState(false);
-  const [isWaiting, setIsWaiting] = useState(false);
+  const [ userState, setUserState ] = useState({
+    isLeader: false,
+    isMember: false,
+    isWaiting: false
+  });
+  const { isLeader, isMember, isWaiting } = userState;
 
   //[dev] 모달 관련 코드 객체 하나로 합쳐보기
   // const [isModalOpen, setIsModalOpen] = useState({
@@ -340,49 +343,85 @@ export default function Party () {
   const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen]  = useState(false);
   const [isPartyCancelModalOpen, setIsPartyCancelModalOpen]  = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
 
   const [from, setFrom] = useState("");
   const [userInfo, setUserInfo] = useState({});
   const [findComment, setFindComment] = useState(-1);
+
+  const [ partyInfo, setPartyInfo ] = useState({
+    name: "",
+    startDate: "",
+    endDate: "",
+    content: "",
+    favorite: 0,
+    id: 0,
+    image: "",
+    isOnline: 0,
+    leaderId: 0,
+    privateLink: "",
+    partyState: 0,
+    region: "",
+    location: "",
+    latlng: "",
+    memberLimit: 2,
+    isReviewed: false,
+    isFavorite: false,
+    members: [{
+      exp: 0,
+      id: 0,
+      joinDate: "",
+      message: "",
+      profileImage: "",
+      userName: ""
+    }],
+    tag: [],
+    waitingQueue: [{
+      id: 0,
+      userName: "",
+      profileImage: "",
+      level: 0,
+      message: ""
+    }]
+  });
+  const [ comments, setComments ] = useState([]);
   
-  function formatDate(timestamp: Date){
-    const date = timestamp.getDate();
-    const month = timestamp.getMonth() + 1;
-    const year = timestamp.getFullYear();
+  const formatDate = (date: String) => date.slice(0, 11);
 
-    return year + "/" + month + "/" + date;
-  }
-
-  function favoriteHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev] 서버 통신 후에는 setIsFavorite 삭제하기
-    setIsFavorite(!isFavorite);
-    console.log("관심파티를 등록합니다");  
+  async function favoriteHandler(event: React.MouseEvent<HTMLButtonElement>) {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${partyInfo.id}`, { 
+      userId, partyId: partyInfo.id
+     }, {
+      withCredentials: true
+    });
+    setPartyInfo(response.data.partyInfo.isFavorite);
   }
 
   function shareHandler(event: React.MouseEvent<HTMLButtonElement>) {
 
-    const leader = members.filter((member) => member.id === leaderId)[0];
-    const hashtags = tag.map((t) => `#${t}`).join(" ");
+    const leader = partyInfo.members.filter((member) => member.id === partyInfo.leaderId)[0];
+    const hashtags = partyInfo.tag.map((t) => `#${t}`).join(" ");
 
     Kakao.Link.sendDefault({
       objectType: 'feed',
       itemContent: {
-        profileText: `${leader.name}님의 지원 요청!`,
+        profileText: `${leader.userName}님의 지원 요청!`,
         profileImageUrl: leader.profileImage, 
       },
       content: {
-        title: `[퀘스트] ${name}`,
-        description: `${content}\n ${hashtags}`,
-        imageUrl: image,
+        title: `[퀘스트] ${partyInfo.name}`,
+        description: `${partyInfo.content}\n ${hashtags}`,
+        imageUrl: partyInfo.image,
         // [dev] url 파티 인덱스 포함한 path로 수정해야 합니다.
         link: {
-          mobileWebUrl: `http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party/${partyId}`,
-          webUrl: `http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party/${partyId}`,
+          // [dev] 도메인 수정 필요
+          mobileWebUrl: `http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party/${params.partyId}`,
+          webUrl: `http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party/${params.partyId}`,
         },
       },
       social: { 
-        likeCount: favorite,
-        subscriberCount: members.length 
+        likeCount: partyInfo.favorite,
+        subscriberCount: partyInfo.members.length 
       },
       buttonTitle: '퀘스트 참여하기'
     })
@@ -402,9 +441,9 @@ export default function Party () {
     setFrom(from);
   
     if(from === "members") {
-      setUserInfo(members[listIdx]);
+      setUserInfo(partyInfo.members[listIdx]);
     } else {
-      setUserInfo(waitingQueue[listIdx]);
+      setUserInfo(partyInfo.waitingQueue[listIdx]);
     }
     setIsUserInfoModalOpen(!isUserInfoModalOpen);
   }
@@ -437,8 +476,7 @@ export default function Party () {
   }
 
   function editHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("현재 파티의 정보를 Props로 보내면서, 파티 생성창으로 이동합니다.");
+    setIsEdit(!isEdit);
   }
 
   function fullPartyHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -457,19 +495,58 @@ export default function Party () {
   }
 
   useEffect(() => {
-    // [dev]
-    // params라는 변수에 파티 아이디가 저장되어있음.
-    // api call: params로 파티 정보 불러오고, 리더, 멤버에 따라 상태 변경
-    // then => 로딩 상태 false로
-    if(params.commentId){
+    const { token, signupType, location } = cookieParser();
+    requestKeepLoggedIn(token, signupType).then((res) => {
+      dispatch({
+        type: SIGNIN_SUCCESS,
+        payload: res.data.userInfo
+      });
+    });
+    if (params.commentId) {
       setFindComment(Number(params.commentId));
-      if(commentRef.current){
+      if (commentRef.current) {
         commentRef.current.scrollIntoView();
       }
     }
-
+    setIsLoading(true);
+    (async () => {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`);
+      setPartyInfo(response.data.partyInfo);
+      setComments(response.data.comments);
+    })();
+  }, [params]);
+  
+  useEffect(() => {
+    if (userId === partyInfo.leaderId) {
+      setUserState({
+        isLeader: true,
+        isMember: true,
+        isWaiting: false
+      });
+    }
+    else if (partyInfo.members.filter((item: any) => item.id === userId).length) {
+      setUserState({
+        isLeader: false,
+        isMember: true,
+        isWaiting: false
+      });
+    }
+    else if (partyInfo.waitingQueue.filter((item: any) => item.id === userId).length) {
+      setUserState({
+        isLeader: false,
+        isMember: false,
+        isWaiting: true
+      });
+    };
+  }, [ partyInfo ]);
+  
+  useEffect(() => {
+    console.log(userId);
+    console.log(partyInfo);
+    console.log(userState);
     setIsLoading(false);
-  }, [params])
+    document.cookie = `location=http://localhost:3000/party/${partyInfo.id}`;
+  }, [ userState ]);
 
   if(isLoading) {
     return <Loading />
@@ -488,15 +565,15 @@ export default function Party () {
             {isLoggedIn?
               <button onClick={favoriteHandler}>
                 <FontAwesomeIcon 
-                  icon={isFavorite ? faHeart : blankFaHeart} 
+                  icon={partyInfo.isFavorite ? faHeart : blankFaHeart} 
                   className="favorite" 
-                /> 
+                />
               </button>
             : null}
             <button onClick={shareHandler}>
               <FontAwesomeIcon icon={ faShareAlt } className="icon" />
-            </button>  
-          </div>  
+            </button>
+          </div>
         </div>
       </CVBtns>
 
@@ -504,30 +581,30 @@ export default function Party () {
 
         {/* 썸네일과 타이틀, 채팅방 링크 */}
         <header>
-          <img src={image} className="thumbnail" alt="thumbnail" />
+          <img src={partyInfo.image} className="thumbnail" alt="thumbnail" />
           <div className="titleContainer">
             <div id="partyState">
-              {partyState === 0 ? 
+              {partyInfo.partyState === 0 ? 
                 <>
                   <FontAwesomeIcon icon={ faBullhorn } /> 모집중 퀘스트
                 </>
               : null}
-              {partyState === 1 ?
+              {partyInfo.partyState === 1 ?
                 <>
                   <FontAwesomeIcon icon={ faBirthdayCake } /> 진행중 퀘스트
                 </>
               : null}
-              {partyState === 2 ? 
+              {partyInfo.partyState === 2 ? 
                 <>
                   <FontAwesomeIcon icon={ faCalendarCheck } /> 완료된 퀘스트
                 </>
               : null}
             </div>
             <div className="titleAndChat">
-              <div id="title">{ name }</div>
+              <div id="title">{ partyInfo.name }</div>
               {isMember? 
                 <button className="privateLink">
-                  <a href={ privateLink } target="_blank" rel="noreferrer" style={{ color: "#000" }}>
+                  <a href={ partyInfo.privateLink } target="_blank" rel="noreferrer" style={{ color: "#000" }}>
                     <FontAwesomeIcon icon={ faComments } className="icon" />
                   </a>
                 </button>
@@ -544,13 +621,13 @@ export default function Party () {
             disabled={!isLoggedIn}
           >
             <FontAwesomeIcon 
-              icon={isFavorite ? faHeart : blankFaHeart}
+              icon={partyInfo.isFavorite ? faHeart : blankFaHeart}
               className="favorite" 
             />
-            &nbsp;{ favorite }
+            &nbsp;{ partyInfo.favorite }
           </button>
           <div className="tagContainer">
-            { tag.map((t, idx) => 
+            { partyInfo.tag.map((t, idx) => 
               <button 
                 key={idx} 
                 className="tag" 
@@ -567,7 +644,7 @@ export default function Party () {
         {/* 글 내용 */}
         <section className="contentContainer">
           <div className="content">
-            { content }
+            { partyInfo.content }
           </div>
         </section>
 
@@ -576,30 +653,30 @@ export default function Party () {
           <div className="topWrapper">
             <div className="details">
               <div className="icon"><FontAwesomeIcon icon={ faMapMarkerAlt } /></div>
-              { !isMember || isOnline ? region : location }
+              { !isMember || partyInfo.isOnline ? partyInfo.region : partyInfo.location }
             </div>
             <div className="details">
               <div className="icon"><FontAwesomeIcon icon={ faCalendarAlt } /></div>
-              { formatDate(startDate) } ~ { formatDate(endDate) }
+              { formatDate(partyInfo.startDate) } ~ { formatDate(partyInfo.endDate) }
             </div>
           </div>
-          {isOnline ?
+          {partyInfo.isOnline ?
             <div className="details">
               <div className="icon"><FontAwesomeIcon icon={ faGlobe } /></div>
               {isMember? 
-                <a href={location}>{location}</a>
+                <a href={partyInfo.location}>{partyInfo.location}</a>
               : "이 퀘스트는 온라인으로 진행되는 퀘스트입니다." }
             </div>
           : null}
         </TimeandLocation>
 
         {/* 지도 */}
-        {!isOnline? 
+        {!partyInfo.isOnline? 
           <div className="mapDesc">
             <PartyMap
               isMember={isMember}
-              location={location}
-              image={image}
+              location={partyInfo.location}
+              image={partyInfo.image}
             />  
             {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null}
           </div> 
@@ -611,15 +688,14 @@ export default function Party () {
             <div className="label">파티원 목록</div>
             <MemberList
               from="members"
-              leaderId={leaderId}
-              members={members}
+              leaderId={partyInfo.leaderId}
+              members={partyInfo.members}
               userInfoModalHandler={userInfoModalHandler}
             />
           </div>
         </MembersContainer>
 
-        {/* [dev] 대기자 리스트 없을 때를 위한 렌더링 필요 */}
-        {isLeader && partyState <= 0 && memberLimit > members.length ? 
+        {isLeader && partyInfo.partyState <= 0 && partyInfo.memberLimit > partyInfo.members.length ? 
           <MembersContainer>
             <div className="members">
               <div className="label" onClick={waitingListHandler}>
@@ -628,8 +704,8 @@ export default function Party () {
               {isWaitingListOpen ?
                 <MemberList
                   from="waitingQueue"
-                  leaderId={leaderId}
-                  members={waitingQueue}
+                  leaderId={partyInfo.leaderId}
+                  members={partyInfo.waitingQueue}
                   userInfoModalHandler={userInfoModalHandler}
                 />
               : null}
@@ -640,10 +716,10 @@ export default function Party () {
         {/* 문의 게시판 */}
         <section id="qna" ref={commentRef}>
           <QnA 
-            partyId={partyId}
+            partyId={partyInfo.id}
             isLeader={isLeader}
-            leaderId={leaderId}
-            comments={comments}
+            leaderId={partyInfo.leaderId}
+            comments={comments.reverse()}
             findComment={findComment}
           /> 
         </section>
@@ -660,7 +736,7 @@ export default function Party () {
           : null}
 
           {/* 가입 전 */}
-          {isLoggedIn && !isMember && !isWaiting && partyState <= 0  ? 
+          {isLoggedIn && !isMember && !isWaiting && partyInfo.partyState <= 0  ? 
             <button onClick={partyJoinModalHandler}>가입 신청</button> 
           : null}
 
@@ -677,22 +753,22 @@ export default function Party () {
           {/* 파티장 */}
 
           {/* [dev] 대기자 리스트에서 승인했을 때, 바로 partyState가 변경되면 세번째 조건은 필요 없음 */}
-          {isLeader && partyState === 0 && memberLimit > members.length ? 
+          {isLeader && partyInfo.partyState === 0 && partyInfo.memberLimit > partyInfo.members.length ? 
             <button onClick={editHandler}>정보 수정</button> 
           : null}
-          {isLeader && partyState === 0 && memberLimit > members.length ? 
+          {isLeader && partyInfo.partyState === 0 && partyInfo.memberLimit > partyInfo.members.length ? 
             <button onClick={(e) => partyCancelModalHandler(e, "fullParty")}>모집 완료</button> 
           : null}
-          {isLeader && partyState === 1 && memberLimit > members.length ? 
+          {isLeader && partyInfo.partyState === 1 && partyInfo.memberLimit > partyInfo.members.length ? 
             <button onClick={rePartyHandler}>모집 재개</button> 
           : null}
           {isLeader ? 
             <button onClick={(e) => partyCancelModalHandler(e, "dismiss")}>파티 해산</button>
           : null}
-          {isLeader && ( partyState === 1 || memberLimit === members.length ) ? 
+          {isLeader && ( partyInfo.partyState === 1 || partyInfo.memberLimit === partyInfo.members.length ) ? 
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
           : null}
-          {isMember && partyState === 2 && !isReviewed ? 
+          {isMember && partyInfo.partyState === 2 && !partyInfo.isReviewed ? 
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
           : null}
         </PartyStateBtns>
@@ -702,7 +778,7 @@ export default function Party () {
         <UserInfoModal 
           userInfoModalHandler={userInfoModalHandler}
           userId={userId}
-          leaderId={leaderId}
+          leaderId={partyInfo.leaderId}
           isLeader={isLeader}
           isMember={isMember}
           from={from}
@@ -713,14 +789,14 @@ export default function Party () {
         <PartyJoinModal 
           partyJoinModalHandler={partyJoinModalHandler}
           userId={userId}
-          partyId={partyId}
+          partyId={partyInfo.id}
         /> 
       : null}
       {isReviewModalOpen? 
         <ReviewModal 
           reviewModalHandler={reviewModalHandler}
-          members={members.filter((member) => member.id !== userId)}
-          leaderId={leaderId}
+          members={partyInfo.members.filter((member) => member.id !== userId)}
+          leaderId={partyInfo.leaderId}
         /> 
       : null}
       {isPartyCancelModalOpen? 
@@ -732,6 +808,12 @@ export default function Party () {
           fullPartyHandler={fullPartyHandler}
           dismissHandler={dismissHandler}
         /> 
+      : null}
+      {isEdit?
+        <PartyEdit
+          party={partyInfo}
+          editHandler={editHandler}
+        />
       : null}
       {isSigninModalOpen? <SigninModal /> : null}
     </PartyContainer>

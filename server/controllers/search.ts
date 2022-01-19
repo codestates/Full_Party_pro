@@ -6,6 +6,7 @@ import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "
 export const searchByTagNameOrKeyword = async (req: Request, res: Response) => {
   try {
     const { tagName, keyword, region, userId } = req.query;
+    console.log(req.query);
     if (keyword) {
       const result = await searchPartiesByKeyword(String(keyword), String(region), Number(userId));
       return SuccessfulResponse(res, { message: "Successfully Searched By Keyword", result });

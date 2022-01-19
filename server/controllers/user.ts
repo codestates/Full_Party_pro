@@ -36,11 +36,9 @@ export const withdrawUser = async (req: Request, res: Response) => {
         }
       });
     }
-    else if (signupType === "google") {
-      
-    }
     else if (signupType === "guest") {
-
+      const verification =  verifyAccessToken(String(accessToken));
+      if (verification && typeof verification !== "string") await deleteUser(verification.id);
     }
     if (deleted) return SuccessfulResponse(res, { message: "Good Bye!" });
     return FailedResponse(res, 400, "Bad Request");
@@ -50,7 +48,6 @@ export const withdrawUser = async (req: Request, res: Response) => {
   }
 };
 
-// 메세지가 빠져있음 아래 세 개
 export const getRecruitingParty = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -111,7 +108,7 @@ export const verifyUser = async (req: Request, res: Response) => {
 export const modifyUserInfo = async (req: Request, res: Response) => {
   try {
     const { userId, password, userName, birth, gender, region, mobile, profileImage } = req.body.userInfo;
-    const userInfo = { userName, password, birth, gender, region, mobile, profileImage } as UsersAttributes;
+    const userInfo: any = { userName, password, birth, gender, region, mobile, profileImage };
     const updated = await updateUser(userId, userInfo);
     const updatedUserInfo = await findUser({ id: userId }, [ "userName", "password", "birth", "gender", "region", "mobile", "profileImage" ]);
     if (updated) return SuccessfulResponse(res, { message: "Successfully Modified", userInfo: updatedUserInfo });
@@ -119,5 +116,17 @@ export const modifyUserInfo = async (req: Request, res: Response) => {
   }
   catch (error) {
     return InternalServerError(res, error);
+  }
+};
+
+export const updateUserAddress = async (req: Request, res: Response) => {
+  try {
+    const { userId, address } = req.body;
+    const updated = await updateUser(userId, { address });
+    if (!updated) return FailedResponse(res, 400, "Bad Request");
+    SuccessfulResponse(res, { message: "Successfully modified" });
+  }
+  catch (error) {
+    InternalServerError(res, error);
   }
 };

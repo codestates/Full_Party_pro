@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-
+import AWS from 'aws-sdk';
+import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faCrown } from '@fortawesome/free-solid-svg-icons';
@@ -10,6 +11,7 @@ import { faMapMarkerAlt, faCrown } from '@fortawesome/free-solid-svg-icons';
 import { RootReducerType } from '../store/store';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
+import UserCancelModal from '../components/UserCancelModal'
 import PartySlide from '../components/PartySlide';
 
 // [dev] 더미데이터: 서버 통신되면 삭제
@@ -26,6 +28,18 @@ export const MypageContainer = styled.div`
     font-size: 22px;
     font-family: 'DungGeunMo';
   }
+
+  .imgChange {
+    width: 40%;
+    margin: 0 30%;
+    .imgChangeBtn {
+      width: 100%;
+      height: 30px;
+      border: none;
+      border-radius: 20px;
+      background-color: darkcyan;
+    }
+  }
 `
 
 export const MypageHeader = styled.div`
@@ -36,10 +50,11 @@ export const MypageHeader = styled.div`
   justify-content: center;
 
   .profileImage {
-    width: 100px;
-    height: 100px;
-    border: 2px solid #cff4d2;
+    display: block;
+    width: 120px;
+    height: 120px;
     border-radius: 100%;
+    overflow: hidden;
   }
 
   .mainProfile {
@@ -62,7 +77,7 @@ export const MypageHeader = styled.div`
 
   @media screen and (min-width: 500px) {
     justify-content: flex-start;
-    padding: 1vh 22vw;
+    padding: 1vh 15vw;
   }
 `
 
@@ -87,7 +102,7 @@ export const MypageInfo = styled.div`
   }
 
   .changeInfoBtn {
-    width: 140px;
+    width: 100px;
     height: 30px;
     margin: 25px 0;
 
@@ -97,7 +112,17 @@ export const MypageInfo = styled.div`
     background-color: #cff4d2;
   }
   .signoutBtn {
-    width: 140px;
+    width: 100px;
+    height: 30px;
+    margin: 25px 0;
+
+    border: none;
+    border-radius: 20px;
+    color: #888;
+    background-color: #cff4d2;
+  }
+  .deleteBtn{
+    width: 100px;
     height: 30px;
     margin: 25px 0;
 
@@ -145,7 +170,84 @@ export const MypageInfo = styled.div`
       height: 40px;
       font-size: 15px;
     }
+    .deleteBtn {
+      border-radius: 30px;
+      width: 200px;
+      height: 40px;
+      font-size: 15px;
+    }
   }
+`
+export const InfoTable = styled.table`
+  width: 300px;
+  margin: 30px 0 15px 0;
+
+  .label {
+    width: 70px;
+    height: 33px;
+    font-size: 15px;
+    font-family: 'DungGeunMo'; 
+    text-align: center;
+  }
+  input {
+    width: 170px;
+    height: 33px;
+    background-color: white;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #d5d5d5;
+    margin: 10px;
+    padding: 0 2px;
+
+    font-size: 13px;
+    text-align: center;
+  }
+  select {
+    width: 170px;
+    height: 33px;
+    background-color: white;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid #d5d5d5;
+    margin: 10px;
+    padding: 0 2px;
+
+    font-size: 13px;
+    text-align: center;
+  }
+
+  @media screen and (min-width: 500px) {
+    width: 600px;
+    margin-left: 12vw;
+
+    select {
+      width: 300px;
+    }
+    input {
+      width: 300px;
+    }
+  }
+`
+
+export const ProgressBar = styled.div<{ exp: number }>`
+  display: inline-block;
+  width: 150px;
+  height: 20px;
+  background-color: #d6d3d3;
+  margin: 2px 5px;
+  border-radius: 20px;
+
+ .bar {
+   display: inline-block;
+   width: ${(props) => props.exp || 0}%;
+   height: 20px;
+   background-color: #cff4d2;
+   border-radius: 20px;
+ }
+
+ @media screen and (min-width: 1000px) {
+   width: 270px;
+ }
 `
 
 export const MypartyCards = styled.div`
@@ -207,73 +309,25 @@ export const MypartyCards = styled.div`
   }
 `
 
-export const InfoTable = styled.table`
-  width: 300px;
-  margin: 30px 0 15px 0;
-
-  .label {
-    width: 70px;
-    height: 33px;
-    font-size: 15px;
-    font-family: 'DungGeunMo'; 
-    text-align: center;
-  }
-  input {
-    width: 170px;
-    height: 33px;
-    background-color: white;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid #d5d5d5;
-    margin: 10px;
-    padding: 0 2px;
-
-    font-size: 13px;
-    text-align: center;
-  }
-  select {
-    width: 170px;
-    height: 33px;
-    background-color: white;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid #d5d5d5;
-    margin: 10px;
-    padding: 0 2px;
-
-    font-size: 13px;
-    text-align: center;
-  }
-
-  @media screen and (min-width: 500px) {
-    width: 600px;
-    margin-left: 12vw;
-
-    select {
-      width: 300px;
-    }
-    input {
-      width: 300px;
-    }
-  }
-`
-
 export default function Mypage () {
   // [dev] 더미데이터: 서버 통신되면 삭제
   const { userInfo, myParty, localParty } = dummyList;
   //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
-  const [isLoading, setIsLoading] = useState(false)
-  const [isInfoLoading, setIsInfoLoading] = useState(false)
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
+  const [curTab, setCurTab] = useState(0);
+  const [parties, setParties] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInfoLoading, setIsInfoLoading] = useState(false);
+  //img 상태가 제대로 반영이 안되면 로딩창 넣어주세요
+  const [imgLoading, setImgLoading] = useState(false);
+  const [isChange, setIsChange] = useState(true);
+  const [callModal, setCallModal] = useState<string | null>(null);
   const [basicInfo, setBasicInfo] = useState({
-    userName: '기본이름',
-    profileImage: '기본이미지',
-    region: '기본지역',
-    level: '넘버타입',
-    exp: '넘버타입'
-  })
+    userName: '베이직이름',
+    profileImage: '/img/defaultThumbnail.png',
+    region: '베이직지역',
+    level: 7,
+    exp: 148
+  });
   const [changeInfo, setChangeInfo] = useState({
     userName: '',
     profileImage: '',
@@ -283,24 +337,66 @@ export default function Mypage () {
     gender: '',
     region: '',
     mobile: '',
-    //기본값을 axios로 받아온 값으로 설정할 것.
     nowPwd: ''
-  })
-  const [isChange, setIsChange] = useState(true)
+  });
   const [wrongConfirm, setWrongConfirm] = useState({
     err: false,
     msg: '비밀번호를 다시 확인해주세요'
-  })
+  });
   const [wrongMobile, setWrongMobile] =useState({
     err: false,
     msg: "'-'를 포함하여 입력하세요"
-  })
+  });
 
-  const [curTab, setCurTab] = useState(0)
-  const [parties, setParties] = useState([])
-
+  const expBar = Number( Math.floor(basicInfo.exp % 20) * 5 );
   let today: any = new Date();
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const fileRef = useRef<any>();
+  const imgRef=useRef<any>(null);
+
+  AWS.config.update({
+    region: "ap-northeast-2",
+    credentials: new AWS.CognitoIdentityCredentials({
+      IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
+    })
+  })
+  const handleRefClick = (e: any) => {
+    e.preventDefault();
+    fileRef.current.click();
+  }
+  const handleImgLoad = async (e: any) => {
+    setImgLoading(true)
+    let file = e.target.files[0]
+
+    const upload = new AWS.S3.ManagedUpload({
+      params: {
+        Bucket: "teo-img",
+        Key: `${signinReducer.userInfo.id}_profileImage`,
+        Body: file,
+      }
+    })
+    const promise = upload.promise()
+
+    promise.then(
+      function (data: any) {
+        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
+        setChangeInfo({
+          ...changeInfo,
+          profileImage: data.Location
+        })
+        setBasicInfo({
+          ...basicInfo,
+          profileImage: data.Location
+        })
+        setImgLoading(false)
+      },
+      function (err: any) {
+        return console.log('오류가 발생했습니다: ', err.message)
+      }
+    )
+  }
 
   const handleIsChange = async () => {
     if(isChange) {
@@ -319,6 +415,7 @@ export default function Mypage () {
       setIsInfoLoading(false)
     }
   }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const regex = {
       mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/
@@ -357,6 +454,7 @@ export default function Mypage () {
       [e.target.name]: e.target.value
     })
   }
+
   const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     if(e.currentTarget.value === 0) {
       fetchJoinParty()
@@ -388,78 +486,106 @@ export default function Mypage () {
       }
     })
     if(verify.data.message === "User Identified") {
-      const res = await axios.patch('https://localhost:443/user/profile', {
-        userInfo: {
-          profileImage: profileImage,
-          userName: userName,
-          password: password,
-          birth: birth,
-          gender: gender,
-          region: region,
-          mobile: mobile
+      if(password === '') {
+        const res = await axios.patch('https://localhost:443/user/profile', {
+          userInfo: {
+            profileImage,
+            userName,
+            password: nowPwd,
+            birth,
+            gender,
+            region,
+            mobile
+          }
+        })
+        if(res.data.message === "Successfully Modified") {
+          setIsChange(false)
         }
-      })
-
-      if(res.data.message === "Successfully Modified") {
-        setIsChange(false)
+      } 
+      else if (password !== '') {
+        const res = await axios.patch('https://localhost:443/user/profile', {
+          userInfo: {
+            profileImage: profileImage,
+            userName: userName,
+            password: password,
+            birth: birth,
+            gender: gender,
+            region: region,
+            mobile: mobile
+          }
+        })
+        if(res.data.message === "Successfully Modified") {
+          setIsChange(false)
+        }
       }
     }
   }
 
   //파티 데이터
   const fetchJoinParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/participating/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
   const fetchRecruiteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
   const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/completed/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completed/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
   const handleSignOut = async () => {
-    const cookie = document.cookie.split("; ");
-    const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
-    const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
+    const { token, signupType, location } = cookieParser();
     await axios.post("https://localhost:443/signout", {
-      access_token: accessToken, 
+      access_token: token, 
       signup_type: signupType
     });
     dispatch({ type: SIGNIN_FAIL });
     document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
     navigate("/");
   };
-
   const handleWithdrawal = async () => {
-    const cookie = document.cookie.split("; ");
-    const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
-    const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
+    const { token, signupType, location } = cookieParser();
     const userId = signinReducer.userInfo?.id;
     await axios.delete(`https://localhost:443/user/${userId}/${signupType}`, {
       headers: {
-        access_token: accessToken
+        access_token: token
       }
     });
     document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
     dispatch({ type: SIGNIN_FAIL });
     navigate("http://localhost:3000");
+  };
+  const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    if(callModal !== null) {
+      setCallModal(null)
+    }
+    else if(callModal === null) {
+      const type = e.currentTarget.className
+      if(type === 'signoutBtn') {
+        setCallModal('signout')
+      }
+      else if(type === 'deleteBtn') {
+        setCallModal('delete')
+      }
+    }
   };
 
   //페이지 진입시 로딩
   useEffect(() => {
+    setIsLoading(true)
     const fetchBasicInfo = async () => {
-      const cookie = document.cookie.split("; ");
-      const accessToken = cookie[0].replace("token=", "").slice(1);
-      const signupType = cookie[1].replace("signupType=", "");
       const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
-        withCredentials: true
+        withCredentials: true,
       });
       const userInfo = res.data.userInfo;
       setBasicInfo({
@@ -470,9 +596,9 @@ export default function Mypage () {
         exp: userInfo.exp
       })
     }
-    fetchBasicInfo()
-    fetchJoinParty()
-    setIsLoading(false)
+    fetchBasicInfo();
+    fetchJoinParty();
+    setIsLoading(false);
   },[])
   
   const isLoggedIn = useSelector(
@@ -488,10 +614,22 @@ export default function Mypage () {
 
   return (
     <MypageContainer>
+      {callModal === 'signout'?
+      <UserCancelModal from={'signout'} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} />
+      : null}
+      {callModal === 'delete'?
+      <UserCancelModal from={'delete'} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} />
+      : null}
       <MypageHeader>
-        <div className='profileImage'></div>
-        {/* 이미지 연결이 되면 주석 풀어준 뒤 border는 없애주세요
-        <img className='profileImage' src={basicInfo.profileImage} /> */}
+        <div className='profileImage'>
+          <img className='profileImage' 
+            src={basicInfo.profileImage}
+            alt='thumbnail'
+            onError={() => {
+              return(imgRef.current.src = '/img/bubble.png')
+            }}
+          />
+        </div>
         <p className='mainProfile'>
           <div className='userName'>{basicInfo.userName}</div>
           <div>
@@ -500,8 +638,33 @@ export default function Mypage () {
           <div>
             <FontAwesomeIcon icon={faCrown} className='crown'/><span className='text'>Lv.{basicInfo.level}</span>
           </div>
+          <ProgressBar exp={expBar}>
+            <span className='bar' />
+          </ProgressBar>
         </p>
       </MypageHeader>
+      <div className='imgChange'>
+        {isChange ? 
+        <div>
+          <button 
+            className='imgChangeBtn'
+            onClick={(e) => handleRefClick(e)
+          }>
+          이미지 수정
+          </button>
+          <input 
+            ref={fileRef}
+            type='file'
+            className='imgInput'
+            id='profileImg'
+            accept='image/*'
+            name='file'
+            hidden={true}
+            onChange={handleImgLoad}
+          />
+        </div>
+        : null }
+      </div>
       <MypageInfo>
         <div className='subject'>프로필</div>
         {(() => {
@@ -631,12 +794,14 @@ export default function Mypage () {
                   개인 정보 수정
                 </button>
                 {/* 로그아웃 구현한 함수 넣어주세요 */}
-                <button onClick={handleSignOut}
+                <button onClick={(e) => userCancelHandler(e)}
                   className='signoutBtn'
                 >
                   로그아웃
                 </button>
-                <button onClick={handleWithdrawal}>회원탈퇴</button>
+                <button onClick={(e) => userCancelHandler(e)}
+                  className='deleteBtn'
+                >회원탈퇴</button>
               </section>
             )}
         })()}

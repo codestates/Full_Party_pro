@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 import styled from 'styled-components';
-import axios from 'axios';
-import { ImGoogle } from "react-icons/im";
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+
 import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
 import { modalChanger } from '../actions/modal';
 import { CLOSE_MODAL } from '../actions/modalType';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -93,6 +93,8 @@ export const ModalView = styled.div`
     font-size: 15px;
   
     margin: 10px 0 15px 0;
+
+    cursor: pointer;
   }
 
   .signupModalBtn {
@@ -138,15 +140,21 @@ export const ModalView = styled.div`
     .oauth {
       width: 50px;
       height: 50px;
-      border-radius: 100%;
       border: none;
+      border-radius: 100%;
 
       margin: 0 10px;
       padding-top: 2px;
 
+      cursor: pointer;
+
       img {
         width: 25px;
         height: 25px;
+      }
+
+      &.guest {
+        background-color: #50C9C3;
       }
 
       &.kakao {
@@ -219,15 +227,32 @@ const SigninModal = () => {
     dispatch(modalChanger(e.currentTarget.className))
   }
 
-  const handleSignGoogle = () => {
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`
+  const googleLoginHandler = () => {
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`;
     window.location.assign(url);
   };
 
-  const handleSignKakao = () => {
+  const kakaoLoginHandler = () => {
     const url = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`;
     window.location.assign(url);
   };
+  
+  const guestLoginHandler = async () => {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/guest`, {}, {
+      withCredentials: true
+    });
+    const payload = response.data.userInfo;
+    console.log(payload);
+    dispatch({
+      type: SIGNIN_SUCCESS,
+      payload
+    });
+    dispatch({
+      type: CLOSE_MODAL
+    });
+    document.cookie = "signupType=guest";
+  }
+  
 
   return(
     <ModalContainer>
@@ -271,10 +296,17 @@ const SigninModal = () => {
               <div className="oauthLabel">
                 <hr /> OR <hr />
               </div>
-              <button onClick={handleSignKakao} className="oauth kakao">
+              <button 
+                onClick={guestLoginHandler} 
+                className="oauth guest"
+                id="guest"  
+              >
+                <img src="img/fullparty_symbol.png" />
+              </button>
+              <button onClick={kakaoLoginHandler} className="oauth kakao">
                 <img src="img/kakao_symbol.svg" />
               </button>
-              <button onClick={handleSignGoogle} className="oauth google">
+              <button onClick={googleLoginHandler} className="oauth google">
                 <img src="img/google_symbol.svg" />
               </button>
             </div>

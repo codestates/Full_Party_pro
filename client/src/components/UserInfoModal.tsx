@@ -183,10 +183,12 @@ type Props = {
 
 const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, isMember, from, userInfo }: Props) => {
 
-  const { id, name, profileImage, level, message, joinDate } = userInfo;
+  const { id, userName, profileImage, level, message, joinDate } = userInfo;
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [newMsg, setNewMsg] = useState(message);
+
+  const formatDate = (date: String) => date.slice(0, 10);
 
   const closeModal =() => {
     userInfoModalHandler();
@@ -243,7 +245,7 @@ const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, isMem
                 />
               : null}
               {message && !isEditMode ? message : null}
-              {!message && !isEditMode ? `안녕하세요, ${name}입니다!` : null}
+              {!message && !isEditMode ? `안녕하세요, ${userName}입니다!` : null}
             </section> 
           : null}
           <section className="memberContainer">
@@ -252,7 +254,7 @@ const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, isMem
               style={{ backgroundImage: `url(${profileImage})`, backgroundSize: "cover" }} 
             />
             <div className="nameplate">
-              {id === leaderId? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {name}
+              {id === leaderId? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {userName}
             </div>
             <div className="levelAndJoinDate">
               <div className="level">
@@ -260,7 +262,7 @@ const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, isMem
               </div>
               {from === "members" ?
                 <div className="joinDate">
-                    <FontAwesomeIcon icon={faCalendarCheck} /> {joinDate}
+                    <FontAwesomeIcon icon={faCalendarCheck} /> {formatDate(joinDate)}
                 </div>
               : null}
             </div>

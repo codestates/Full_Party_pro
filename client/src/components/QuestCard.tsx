@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { AppState } from '../reducers';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faMapMarkerAlt, faCalendarAlt, faGlobe, faExclamation } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 export const QuestCardContainer = styled.div`
   width: 100%;
@@ -172,21 +174,23 @@ type Props = {
 
 export default function QuestCard ({ party }: Props) {
 
-  const { id, name, image, memberLimit, content, startDate, endDate, leaderId, favorite, tag, isOnline, region, location, members } = party;
-
   const navigate = useNavigate();
-  function formatDate(timestamp: Date){
-    const date = timestamp.getDate();
-    const month = timestamp.getMonth() + 1;
-    const year = timestamp.getFullYear();
+  const { id, name, memberLimit, startDate, endDate, leaderId, favorite, tag, isOnline, region, members } = party;
+  const userId = useSelector(
+    (state: AppState) => state.signinReducer.userInfo.id
+  );
+  const [ like, setLike ] = useState(favorite);
 
-    return year + "/" + month + "/" + date;
-  }
+  const formatDate = (date: Date) => String(date).slice(0, 11);
 
-  function favoriteHandler(event: React.MouseEvent<HTMLDivElement>) {
+  const favoriteHandler = async (event: React.MouseEvent<HTMLDivElement>) => {
     // [dev] 서버 통신 후에는 setIsFavorite 삭제하기
     event.stopPropagation();
-    console.log("관심파티를 등록합니다");  
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${id}`, { userId, partyId: id }, {
+      withCredentials: true
+    });
+    if (response.data.message === "Like selected") setLike(true);
+    else if (response.data.message === "Like canceled") setLike(false);
   }
   
   return (
@@ -215,8 +219,8 @@ export default function QuestCard ({ party }: Props) {
           </div>
           <div onClick={(e) => favoriteHandler(e)}>
             <FontAwesomeIcon 
-              icon={favorite ? faHeart : blankFaHeart} 
-              className="favorite" 
+              icon={like ? faHeart : blankFaHeart} 
+              className="favorite"
             /> 
           </div>  
         </div>
@@ -237,11 +241,11 @@ export default function QuestCard ({ party }: Props) {
                 <div className="location">
                   {isOnline ?
                     <><FontAwesomeIcon icon={ faGlobe } className="icon" /> 온라인 퀘스트</>
-                    : <><FontAwesomeIcon icon={ faMapMarkerAlt } className="icon" /> {location.split(" ")[1] + " " + location.split(" ")[2]}</>
+                    : <><FontAwesomeIcon icon={ faMapMarkerAlt } className="icon" /> {region}</>
                   }
                 </div>
                 <div className="time">
-                  <FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {String(startDate).slice(0, 11)} ~ {String(endDate).slice(0, 11)}   
+                  <FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {formatDate(startDate)} ~ {formatDate(endDate)}   
                 </div>
               </div>
             </div>
@@ -262,6 +266,8 @@ export default function QuestCard ({ party }: Props) {
                     style={{ backgroundImage: `url(${member.profileImage})`, backgroundSize: "cover" }} 
                   />
                 )
+              } else {
+                return null;
               }
             })}
             {[...Array(memberLimit - members.length)].map((n, idx) => 

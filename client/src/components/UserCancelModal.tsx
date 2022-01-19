@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from "axios";
+
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -54,6 +54,8 @@ export const ModalView = styled.div`
       margin: 0 5px;
 
       border-radius: 20px;
+
+      cursor: pointer;
     }
 
     .delete {
@@ -84,30 +86,26 @@ export const CloseBtn = styled.button`
 `
 
 type Props = {
-  commentDeleteModalHandler: Function,
-  commentToDelete: { [key: string] : number },
+  from: string,
+  userCancelHandler: Function,
+  handleSignOut: Function,
+  handleWithdrawal: Function,
 }
 
-const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete }: Props) => {
-
-  const { idx, commentId } = commentToDelete;
+const UserCancelModal = ({ from, userCancelHandler, handleSignOut, handleWithdrawal }: Props) => {
 
   const closeModal =() => {
-    commentDeleteModalHandler();
+    userCancelHandler();
   }
 
-  async function deleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev] 덧글의 경우 코멘트 아이디, 대댓글의 경우 서브코멘트아이디 패러미터로 전달
-    if (idx === 0){
-      await axios.delete(`${process.env.REACT_APP_API_URL}/party/comment/${commentId}`);
-      console.log("덧글을 삭제합니다.");
+  function functionController(){
+    if(from === "signout"){
+      handleSignOut();
+    } else if(from === "delete"){
+      handleWithdrawal();
     } 
-    else {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/party/subComment/${commentId}`);
-      console.log("대댓글을 삭제합니다.")
-    }
 
-    commentDeleteModalHandler();
+    userCancelHandler();
   }
 
   return(
@@ -115,10 +113,16 @@ const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete }: Prop
       <ModalBackdrop onClick={closeModal}>
         <ModalView onClick={(e) => e.stopPropagation()}>
           <CloseBtn onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
-          <div className="title">덧글을 삭제하시겠습니까?</div>
+          <div className="title">
+            {from === "signout" ? "로그아웃하시겠습니까?" : null}
+            {from === "delete" ? "풀팟을 탈퇴하시겠습니까?" : null}
+          </div>
           <div className="buttons">
-            <button className="delete" onClick={deleteHandler}>
-                삭제
+            <button 
+              className="delete" 
+              onClick={functionController}
+            >
+                확인
             </button>
             <button className="cancel" onClick={closeModal}>
                 취소
@@ -130,4 +134,4 @@ const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete }: Prop
   )
 }
 
-export default CommentDeleteModal;
+export default UserCancelModal;
