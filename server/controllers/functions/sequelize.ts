@@ -254,7 +254,7 @@ export const getPartyInformation = async (partyId: number, userId?: number | und
   });
   const favoriteCount = await countFavorite(partyId);
   const tag = await getTag(partyId);
-  const members = await getMembers(partyId, [ "id", "userName", "profileImage", "exp" ]);
+  const members = await getMembers(partyId, [ "id", "userName", "profileImage", "level" ]);
   for (let i = 0; i < members.length; i++) {
     const infoFromUserParty = await getMessageAndJoinDate(members[i].id, partyId);
     members[i].message = infoFromUserParty?.message;
