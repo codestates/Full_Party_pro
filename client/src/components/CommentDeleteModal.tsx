@@ -1,5 +1,5 @@
 import React from 'react';
-
+import axios from "axios";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -96,13 +96,14 @@ const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete }: Prop
     commentDeleteModalHandler();
   }
 
-  function deleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  async function deleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
     // [dev] 덧글의 경우 코멘트 아이디, 대댓글의 경우 서브코멘트아이디 패러미터로 전달
-    if(idx === 0){
-      console.log({ commentId: commentId });
+    if (idx === 0){
+      await axios.delete(`${process.env.REACT_APP_API_URL}/party/comment/${commentId}`);
       console.log("덧글을 삭제합니다.");
-    } else {
-      console.log({ subCommentId: commentId });
+    } 
+    else {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/party/subComment/${commentId}`);
       console.log("대댓글을 삭제합니다.")
     }
 

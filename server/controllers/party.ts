@@ -36,10 +36,10 @@ export const modifyPartyInfo = async (req: Request, res: Response) => {
     return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
-    return InternalServerError(res, error);
+    InternalServerError(res, error);
   }
-};
-
+}
+  
 export const enqueue = async (req: Request, res: Response) => {
   try {
     const { userId, partyId, message } = req.body;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
@@ -10,6 +11,7 @@ import EmptyCard from '../components/EmptyCard';
 import AddressModal from '../components/AddressModal';
 import axios from 'axios';
 import { NOTIFY } from '../actions/notify';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const ListContainer = styled.div`
   width: 100%;
@@ -54,6 +56,21 @@ export default function List () {
   const [ localParty, setLocalParty ] = useState([]);
 
   useEffect(() => {
+    setIsLoading(true);
+    (async () => {
+      const { token, signupType } = cookieParser();
+      await requestKeepLoggedIn(token, signupType).then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+        document.cookie = "location=http://localhost:3000/home";
+      });
+    })();
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(true);
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/list/${userInfo.id}/${searchRegion}`, {
         withCredentials: true
@@ -68,12 +85,13 @@ export default function List () {
       setLocalParty(parsedLocalParty);
       setMyParty(response.data.myParty);
     })();
-    setIsLoading(false);
-  }, []);
+  }, [ userInfo ]);
 
-  if(!isLoggedIn){
-    return <Navigate to="/" />
-  } else if(isLoading) {
+  useEffect(() => {
+    setIsLoading(false);
+  }, [ localParty, myParty ]);
+
+  if(isLoading) {
     return <Loading />
   }
 

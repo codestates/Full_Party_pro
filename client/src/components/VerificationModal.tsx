@@ -49,30 +49,12 @@ export const ModalView = styled.div`
     font-family: 'SilkscreenBold';
   }
 
-  input {
-    border: none;
-    border-bottom: 1px solid #d5d5d5;
-
-    width: 170px;
-    height: 25px;
-
-    text-align: center; 
-  }
-
   .error {
     font-size: 0.7rem;
     color: #f34508;
 
     margin-top: 5px;
   }
-`
-
-export const MapContainer = styled.section`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  width: 90%;
 
   img {
     width: 50px;
@@ -108,7 +90,11 @@ export const MapContainer = styled.section`
   }
 `
 
-const VerificationModal = () => {
+type Props = {
+  verficationModalHandler: Function
+}
+
+const VerificationModal = ({ verficationModalHandler }: Props) => {
 
   const [password, setPassword] = useState('');
 
@@ -132,7 +118,7 @@ const VerificationModal = () => {
 
   return(
     <ModalContainer>
-      <ModalBackdrop>
+      <ModalBackdrop onClick={(e) => verficationModalHandler(e)}>
         <ModalView>
           <div className="mapInfo">
             <img src="img/404logo.png" alt="logo" />

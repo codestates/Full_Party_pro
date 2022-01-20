@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import AWS, { Detective } from 'aws-sdk';
-
+import AWS from 'aws-sdk';
+import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
@@ -251,12 +251,13 @@ export default function Mypage () {
   //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
   const [curTab, setCurTab] = useState(0);
   const [parties, setParties] = useState(myParty);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isInfoLoading, setIsInfoLoading] = useState(false);
   //img 상태가 제대로 반영이 안되면 로딩창 넣어주세요
   const [imgLoading, setImgLoading] = useState(false);
   const [isChange, setIsChange] = useState(true);
   const [callModal, setCallModal] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(true);
   const [from, setFrom] = useState('');
   const [basicInfo, setBasicInfo] = useState({
     userName: '베이직이름',
@@ -291,6 +292,7 @@ export default function Mypage () {
   const fileRef = useRef<any>();
   const imgRef=useRef<any>(null);
 
+  // [CAUTION] 이미지 서버 관련 코드 => 범님 외 수정 X
   AWS.config.update({
     region: "ap-northeast-2",
     credentials: new AWS.CognitoIdentityCredentials({
@@ -308,7 +310,7 @@ export default function Mypage () {
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
-        Key: `${signinReducer.userInfo.id}_profileImage`,
+        Key: `${signinReducer.userInfo.id}_profileImage.jpg`,
         Body: file,
       }
     })
@@ -336,18 +338,29 @@ export default function Mypage () {
   const handleIsChange = async () => {
     if(isChange) {
       setIsChange(false)
-    } else {
-      const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/profile/${signinReducer.userInfo?.id}`)
-      const userInfo = res.data.userInfo
-      setChangeInfo({
-        ...changeInfo,
-        userName: userInfo.userName,
-        birth: userInfo.birth,
-        address: userInfo.address,
-        gender: userInfo.gender,
-        mobile: userInfo.mobile
+    } 
+    else if(!isChange) {
+      const verify = await axios.post('https://localhost:443/user/verification', {
+        userInfo: {
+          userId: signinReducer.userInfo?.id,
+          password: changeInfo.nowPwd
+        }
       })
-      setIsInfoLoading(false)
+      if(verify.data.message === "User Identified") {
+        setIsInfoLoading(true)
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/profile/${signinReducer.userInfo?.id}`)
+        const userInfo = res.data.userInfo
+        setChangeInfo({
+          ...changeInfo,
+          userName: userInfo.userName,
+          birth: userInfo.birth,
+          address: userInfo.address,
+          gender: userInfo.gender,
+          mobile: userInfo.mobile
+        });
+        setIsInfoLoading(false);
+        setIsChange(true);
+      }
     }
   }
 
@@ -421,48 +434,41 @@ export default function Mypage () {
       })
       return;
     }
-
-    const verify = await axios.post('https://localhost:443/user/verification', {
-      userInfo: {
-        id: signinReducer.userInfo?.id,
-        password: nowPwd
-        //API확인해주세요 (email제외)
+    else if(password === '') {
+      const res = await axios.patch('https://localhost:443/user/profile', {
+        userInfo: {
+          userId: signinReducer.userInfo?.id,
+          profileImage,
+          userName,
+          password: nowPwd,
+          birth,
+          gender,
+          address,
+          mobile
+        }
+      })
+      if(res.data.message === "Successfully Modified") {
+        setIsChange(false)
       }
-    })
-    if(verify.data.message === "User Identified") {
-      if(password === '') {
-        const res = await axios.patch('https://localhost:443/user/profile', {
-          userInfo: {
-            profileImage,
-            userName,
-            password: nowPwd,
-            birth,
-            gender,
-            address,
-            mobile
-          }
-        })
-        if(res.data.message === "Successfully Modified") {
-          setIsChange(false)
+    } 
+    else if (password !== '') {
+      const res = await axios.patch('https://localhost:443/user/profile', {
+        userInfo: {
+          userId: signinReducer.userInfo?.id,
+          profileImage,
+          userName,
+          password,
+          birth,
+          gender,
+          address,
+          mobile
         }
-      } 
-      else if (password !== '') {
-        const res = await axios.patch('https://localhost:443/user/profile', {
-          userInfo: {
-            profileImage: profileImage,
-            userName: userName,
-            password: password,
-            birth: birth,
-            gender: gender,
-            address: address,
-            mobile: mobile
-          }
-        })
-        if(res.data.message === "Successfully Modified") {
-          setIsChange(false)
-        }
+      })
+      if(res.data.message === "Successfully Modified") {
+        setIsChange(false)
       }
     }
+    
   }
 
   //파티 데이터
@@ -482,31 +488,31 @@ export default function Mypage () {
     setParties(myParty)
   }
   const handleSignOut = async () => {
-    const cookie = document.cookie.split("; ");
-    const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
-    const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
+    const { token, signupType, location } = cookieParser();
     await axios.post("https://localhost:443/signout", {
-      access_token: accessToken, 
+      access_token: token, 
       signup_type: signupType
     });
     dispatch({ type: SIGNIN_FAIL });
     document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
-    navigate("/");
+    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
+    navigate("http://localhost:3000");
   };
   const handleWithdrawal = async () => {
-    const cookie = document.cookie.split("; ");
-    const accessToken = cookie[0].slice(0, 5) === "token" ? cookie[0].replace("token=", "") : cookie[1].replace("token=", "");
-    const signupType = cookie[1].slice(0, 10) === "signupType" ? cookie[1].replace("signupType=", "") : cookie[0].replace("signupType=", "");
+    const { token, signupType, location } = cookieParser();
     const userId = signinReducer.userInfo?.id;
     await axios.delete(`https://localhost:443/user/${userId}/${signupType}`, {
       headers: {
-        access_token: accessToken
+        access_token: token
       }
     });
+    dispatch({ type: SIGNIN_FAIL });
     document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
-    dispatch({ type: SIGNIN_FAIL });
+    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
     navigate("http://localhost:3000");
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
@@ -514,13 +520,14 @@ export default function Mypage () {
     setCallModal(!callModal);
   };
 
+  function verficationModalHandler(e: React.MouseEvent<HTMLDivElement>){
+    setIsVerificationModalOpen(!isVerificationModalOpen);
+  }
+
   //페이지 진입시 로딩
   useEffect(() => {
-    setIsLoading(true)
-    const fetchBasicInfo = async () => {
-      const cookie = document.cookie.split("; ");
-      const accessToken = cookie[0].replace("token=", "").slice(1);
-      const signupType = cookie[1].replace("signupType=", "");
+    setIsLoading(true);
+    (async () => {
       const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
         withCredentials: true,
       });
@@ -531,12 +538,15 @@ export default function Mypage () {
         address: userInfo.address,
         level: userInfo.level,
         exp: userInfo.exp
-      })
-    }
-    fetchBasicInfo();
+      });
+      console.log(res);
+    })();
     fetchJoinParty();
+  },[]);
+
+  useEffect(() => {
     setIsLoading(false);
-  },[])
+  }, [ basicInfo ]);
   
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
@@ -552,6 +562,7 @@ export default function Mypage () {
   return (
     <MypageContainer>
       {callModal? <UserCancelModal from={from} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} /> : null}
+      {isVerificationModalOpen? <VerificationModal verficationModalHandler={verficationModalHandler} /> : null}
       <MypageHeader>
         <div className="leftWrapper">
           <div className='profileImageContainer'>
@@ -702,17 +713,6 @@ export default function Mypage () {
                       <td />
                       {wrongMobile.err ?
                       <td className='error'>{wrongMobile.msg}</td> : <td />}
-                    </tr>
-                    <tr>
-                      <td className='label'>현재<br />비밀번호</td>
-                      <td>
-                        <input
-                          name='nowPwd'
-                          value={changeInfo.nowPwd}
-                          onChange={(e) => handleInputChange(e)}
-                          placeholder='비밀번호를 입력한뒤 제출하세요'
-                        ></input>
-                      </td>
                     </tr>
                   </InfoTable>
                   <button onClick={submitInfo}>제출</button><br />

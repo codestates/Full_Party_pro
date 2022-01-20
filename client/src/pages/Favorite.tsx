@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { cookieParser, requestKeepLoggedIn } from "../App"
 import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
 import QuestCard from '../components/QuestCard';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 import axios from 'axios';
 
 export const FavoriteContainer = styled.div`
@@ -27,29 +29,45 @@ export const FavoriteContainer = styled.div`
 `
 
 export default function Favorite () {
-
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
+  const dispatch = useDispatch();
+  const userInfo = useSelector(
+    (state: AppState) => state.signinReducer.userInfo
   );
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
   );
-
+  
   const [ isLoading, setIsLoading ] = useState(true);
   const [ favoriteList, setFavoriteList ] = useState<Array<Object>>([]);
+
+  useEffect(() => {
+    setIsLoading(true);
+    (async () => {
+      const { token, signupType, location } = cookieParser();
+      await requestKeepLoggedIn(token, signupType).then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+        document.cookie = "location=http://localhost:3000/favorite";
+      });
+    })();
+  }, []);
 
   useEffect(() => {
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/favorite/${userId}`, {
         withCredentials: true
       });
-      console.log(response.data.partyList);
       setFavoriteList(response.data.partyList);
     })();
-    setIsLoading(false);
-  }, []);
+  }, [ userInfo ]);
 
-  if(!isLoggedIn){
+  useEffect(() => {
+    setIsLoading(false);
+  }, [ favoriteList ]);
+
+  if(!cookieParser().isLoggedIn){
     return <Navigate to="/" />
   } else if(isLoading){
     return <Loading />

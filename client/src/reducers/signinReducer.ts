@@ -11,7 +11,7 @@ const initialState: InitialState = {
     id: 0.1,
     userName: "",
     profileImage: "",
-    address: "대전시 어쩌구",
+    address: "",
     signupType: ""
   }
 }

@@ -12,15 +12,7 @@ export const getPartyList = async (req: Request, res: Response) => {
     const localParty = await getLocalParty(Number(userId), region);
     const notification = await checkIsRead(Number(userId));
     let myParty = [ ...leadingParty ];
-    console.log(myParty)
-    // 여기 아래 
-    try {
-
-      participatingParty.map((item: any, i: number) => item.id === myParty[i].id ? item : myParty.push(item));
-    }
-    catch (error) {
-      console.log(error);
-    }
+    participatingParty.map((item: any, i: number) => item.id === myParty[i].id ? item : myParty.push(item));
     return SuccessfulResponse(res, {
       message: "Loaded Successfully",
       userInfo,

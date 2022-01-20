@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-
+import { useSelector, useDispatch } from 'react-redux';
+import { requestKeepLoggedIn, cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart, faAngleDown, faAngleUp, faBullhorn, faBirthdayCake, faCalendarCheck, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
-
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 import Loading from '../components/Loading';
 import UserInfoModal from '../components/UserInfoModal';
 import PartyJoinModal from '../components/PartyJoinModal';
@@ -301,6 +301,7 @@ export default function Party () {
 
   const params = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const commentRef = useRef<HTMLElement>(null);
 
   const isLoggedIn = useSelector(
@@ -316,10 +317,8 @@ export default function Party () {
 
   // const { partyId, name, image, memberLimit, partyState, privateLink, content, region, startDate, endDate, favorite, tag, location, isOnline, isReviewed, leaderId, members, waitingQueue, comments } = dummyParty;
 
-  // [dev] 서버와 연결되면 아래 코드는 삭제하고, 그 다음줄 주석을 활성화. 
+  // [dev] 서버와 연결되면 아래 코드는 삭제하고, 그 다음줄 주석을 활성화.
   // 서버에서 관심 파티 등록되어있는지 여부 받아와야 함.
-  const [isFavorite, setIsFavorite] = useState(false);
-  // const { isFavorite } = dummyParty;
 
   const [isLoading, setIsLoading] = useState(true);
   const [ userState, setUserState ] = useState({
@@ -367,6 +366,7 @@ export default function Party () {
     latlng: "",
     memberLimit: 2,
     isReviewed: false,
+    isFavorite: false,
     members: [{
       exp: 0,
       id: 0,
@@ -388,10 +388,13 @@ export default function Party () {
   
   const formatDate = (date: String) => date.slice(0, 11);
 
-  function favoriteHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev] 서버 통신 후에는 setIsFavorite 삭제하기
-    setIsFavorite(!isFavorite);
-    console.log("관심파티를 등록합니다");  
+  async function favoriteHandler(event: React.MouseEvent<HTMLButtonElement>) {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${partyInfo.id}`, { 
+      userId, partyId: partyInfo.id
+     }, {
+      withCredentials: true
+    });
+    setPartyInfo(response.data.partyInfo.isFavorite);
   }
 
   function shareHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -424,74 +427,86 @@ export default function Party () {
     })
   }
 
-  function tagSearchHandler(tag: string) {
+  const tagSearchHandler = (tag: string) => {
     console.log(tag + "를 검색합니다.");
     navigate(`../search/tag/${tag}`);
   }
 
-  function waitingListHandler(event: React.MouseEvent<HTMLDivElement>): void {
+  const waitingListHandler = (event: React.MouseEvent<HTMLDivElement>): void =>{
     setIsWaitingListOpen(!isWaitingListOpen);
   }
 
-  function userInfoModalHandler(event: React.MouseEvent<HTMLDivElement>, from: string, listIdx: number): void {
+  const userInfoModalHandler = (event: React.MouseEvent<HTMLDivElement>, from: string, listIdx: number): void => {
    
     setFrom(from);
   
-    if(from === "members") {
+    if (from === "members") {
       setUserInfo(partyInfo.members[listIdx]);
-    } else {
+    } 
+    else {
       setUserInfo(partyInfo.waitingQueue[listIdx]);
     }
     setIsUserInfoModalOpen(!isUserInfoModalOpen);
   }
 
-  function partyJoinModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
+  const partyJoinModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsPartyJoinModalOpen(!isPartyJoinModalOpen);
   }
 
-  function signinModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
+  const signinModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsSigninModalOpen(!isSigninModalOpen);
   }
 
-  function reviewModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
+  const reviewModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsReviewModalOpen(!isReviewModalOpen);
   }
 
-  function partyCancelModalHandler(event: React.MouseEvent<HTMLButtonElement>, from: string): void {
+  const partyCancelModalHandler = (event: React.MouseEvent<HTMLButtonElement>, from: string): void => {
     setFrom(from);
     setIsPartyCancelModalOpen(!isPartyCancelModalOpen);
   }
+  
+    const editHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+      setIsEdit(!isEdit);
+    }
 
-  function cancelHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  const cancelHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     // [dev]
     console.log("가입 신청을 취소합니다.");
   }
 
-  function quitHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  const quitHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     // [dev]
     console.log("파티를 탈퇴합니다.");
   }
 
-  function editHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    setIsEdit(!isEdit);
+  const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
+    await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
+      partyId: partyInfo.id
+    });
   }
 
-  function fullPartyHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("파티 모집을 완료합니다");
+  const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
+    await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
+      partyId: partyInfo.id
+    });
   }
 
-  function rePartyHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("파티 모집을 재개합니다.");
-  }
-
-  function dismissHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("파티를 해산합니다.");
+  const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
+    await axios.delete(`${process.env.REACT_APP_API_URL}/party/${partyInfo.id}`);
   }
 
   useEffect(() => {
+    const { token, signupType, location } = cookieParser();
+    requestKeepLoggedIn(token, signupType).then((res) => {
+      dispatch({
+        type: SIGNIN_SUCCESS,
+        payload: res.data.userInfo
+      });
+    });
     if (params.commentId) {
       setFindComment(Number(params.commentId));
       if (commentRef.current) {
@@ -535,6 +550,7 @@ export default function Party () {
     console.log(partyInfo);
     console.log(userState);
     setIsLoading(false);
+    document.cookie = `location=http://localhost:3000/party/${partyInfo.id}`;
   }, [ userState ]);
 
   if(isLoading) {
@@ -554,7 +570,7 @@ export default function Party () {
             {isLoggedIn?
               <button onClick={favoriteHandler}>
                 <FontAwesomeIcon 
-                  icon={isFavorite ? faHeart : blankFaHeart} 
+                  icon={partyInfo.isFavorite ? faHeart : blankFaHeart} 
                   className="favorite" 
                 />
               </button>
@@ -610,7 +626,7 @@ export default function Party () {
             disabled={!isLoggedIn}
           >
             <FontAwesomeIcon 
-              icon={isFavorite ? faHeart : blankFaHeart}
+              icon={partyInfo.isFavorite ? faHeart : blankFaHeart}
               className="favorite" 
             />
             &nbsp;{ partyInfo.favorite }

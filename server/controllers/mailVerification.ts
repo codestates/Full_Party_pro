@@ -14,7 +14,7 @@ export const mailVerification = async (req: Request, res: Response) => {
       secure: false,
       auth: {
         user: process.env.NODEMAILER_USER,
-        pass: process.env.NODEMAILER_PASS      
+        pass: process.env.NODEMAILER_PASS
       }
     });
 
