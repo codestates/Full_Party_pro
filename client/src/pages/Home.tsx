@@ -341,6 +341,7 @@ function Home () {
   }, []);
 
   useEffect(() => {
+    console.log("🌈", process.env.REACT_APP_CLIENT_URL);
     if (cookieParser().isLoggedIn === '1') window.location.assign(cookieParser().location);
   }, []);
 
