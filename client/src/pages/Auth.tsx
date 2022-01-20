@@ -42,7 +42,7 @@ export const LoadingBackdrop = styled.div`
   }
 `;
 
-export default function Loading() {
+export default function Auth() {
   return (
     <LoadingContainer>
       <LoadingBackdrop>

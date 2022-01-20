@@ -9,7 +9,8 @@ import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import UserMap from './UserMap';
 
 import { AppState } from '../reducers';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -197,6 +198,7 @@ export const BtnContainer = styled.section`
 const AddressModal = () => {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [pageIdx, setPageIdx] = useState(0);
 
@@ -236,10 +238,20 @@ const AddressModal = () => {
   const handleAddressRegister = async () => {
     if(address){
       setErrorMsg('')
-      await axios.patch(`${process.env.REACT_APP_API_URL}/address/${userInfo.id}`, {
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/address/${userInfo.id}`, {
         userId: userInfo.id, address: formatAddress
       });
-      navigate(`../`);
+
+      if(res.status === 200) {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: {
+            ...userInfo,
+            address: formatAddress
+          }
+        })
+        navigate('../');
+      }
     } else {
       setErrorMsg('주소를 입력해주세요.')
     }

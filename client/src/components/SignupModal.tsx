@@ -298,12 +298,12 @@ const SignupModal = () => {
   });
 
   const [isError, setIsError] = useState({
-    isEmail: false,
-    isName: false,
-    isGender: false,
-    isBirth: false,
-    isMobile: false,
-    isAxios: false,
+    isEmail: true,
+    isName: true,
+    isGender: true,
+    isBirth: true,
+    isMobile: true,
+    isAxios: true,
     isVerificationCode: false,
 
     emailMsg: '',
@@ -344,7 +344,7 @@ const SignupModal = () => {
     const regex={
       email: /\S+@\S+\.\S+/,
       password: /^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W).{8,16}$)/,
-      mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/
+      mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4,4}/
     };
 
     setUserInfo({
@@ -455,7 +455,7 @@ const SignupModal = () => {
 
   // [dev] 이메일 인증 관련 함수
   const mailVerification = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification/nodemailerTest`, { email: userInfo.email });
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification/nodemailerTest`, { email: userInfo.email }, { withCredentials: true });
     setIsSent(true);
     setVerificationData({ email: userInfo.email, code: res.data.code });
     setTimeout(handleCodeExpire, 1000 * 60 * 5);

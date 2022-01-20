@@ -95,7 +95,7 @@ export default function List () {
     return <Loading />
   }
 
-  if(!userInfo.address || userInfo.address === 'Guest'){
+  if(!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "unidentified" || userInfo.address === "KAKAO"){
     return <AddressModal />
   }
 
