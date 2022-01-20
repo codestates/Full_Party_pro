@@ -1024,6 +1024,7 @@ export default function Post () {
                 accept='image/*'
                 name='file'
                 hidden={true}
+                autoComplete='off'
                 onChange={handleImgLoad}
               />
             </>
@@ -1037,6 +1038,7 @@ export default function Post () {
                 type='text'
                 value={partyInfo.name}
                 maxLength={30}
+                autoComplete='off'
                 onChange={(e) => {handleInputChange(e)}}
               />
               {isName.err ?
@@ -1117,6 +1119,7 @@ export default function Post () {
                   name='location'
                   type='text'
                   value={partyInfo.location}
+                  autoComplete='off'
                   onChange={(e) => handleInputChange(e)}
                   onKeyUp={(e) => handleSearchLocation(e)}
                 />
@@ -1126,6 +1129,7 @@ export default function Post () {
                 name='location'
                 type='text'
                 value={partyInfo.location}
+                autoComplete='off'
                 onChange={(e) => {handleInputChange(e)}}
               />
             }
@@ -1141,6 +1145,7 @@ export default function Post () {
               name='privateLink'
               type='text'
               value={partyInfo.privateLink}
+              autoComplete='off'
               onChange={(e) => {handleInputChange(e)}}
             />
             {isPLink.err ?
@@ -1166,6 +1171,7 @@ export default function Post () {
                 maxLength={10}
                 value={inputTxt}
                 placeholder={tags.length === 3 ? '' : '최대 3개까지 추가할 수 있습니다.'}
+                autoComplete='off'
                 onChange={(e) => setInputTxt(e.target.value)}
                 onKeyUp={(e) => addTag(e)}
               />

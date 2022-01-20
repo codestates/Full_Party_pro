@@ -270,6 +270,7 @@ const SigninModal = () => {
                 type='text'
                 name='email'
                 value={userInfo.email}
+                autoComplete='off'
                 onChange={(e) => handleInput(e)}
               />
             </fieldset>
@@ -279,6 +280,7 @@ const SigninModal = () => {
                 type='password'
                 name='password'
                 value={userInfo.password}
+                autoComplete='off'
                 onChange={(e) => handleInput(e)}
               />
             </fieldset>
