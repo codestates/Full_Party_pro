@@ -931,7 +931,7 @@ export default function Post () {
     } else if(!regex.url.test(partyInfo.privateLink)) {
       setIsPLink({
         err: true,
-        msg: '유효한 링크를 입력해주세요.'
+        msg: "유효한 링크를 입력해주세요. 링크는 'https://'를 포함합니다."
       })
     }
 
@@ -974,7 +974,7 @@ export default function Post () {
           type: SIGNIN_SUCCESS,
           payload: res.data.userInfo
         });
-        document.cookie = `location=http://localhost:3000/search`;
+        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/post`;
       });
     })();
   }, []);
@@ -1037,6 +1037,7 @@ export default function Post () {
                 accept='image/*'
                 name='file'
                 hidden={true}
+                autoComplete='off'
                 onChange={handleImgLoad}
               />
             </>
@@ -1050,6 +1051,7 @@ export default function Post () {
                 type='text'
                 value={partyInfo.name}
                 maxLength={30}
+                autoComplete='off'
                 onChange={(e) => {handleInputChange(e)}}
               />
               {isName.err ?
@@ -1130,6 +1132,7 @@ export default function Post () {
                   name='location'
                   type='text'
                   value={partyInfo.location}
+                  autoComplete='off'
                   onChange={(e) => handleInputChange(e)}
                   onKeyUp={(e) => handleSearchLocation(e)}
                 />
@@ -1139,6 +1142,7 @@ export default function Post () {
                 name='location'
                 type='text'
                 value={partyInfo.location}
+                autoComplete='off'
                 onChange={(e) => {handleInputChange(e)}}
               />
             }
@@ -1154,6 +1158,7 @@ export default function Post () {
               name='privateLink'
               type='text'
               value={partyInfo.privateLink}
+              autoComplete='off'
               onChange={(e) => {handleInputChange(e)}}
             />
             {isPLink.err ?
@@ -1179,6 +1184,7 @@ export default function Post () {
                 maxLength={10}
                 value={inputTxt}
                 placeholder={tags.length === 3 ? '' : '최대 3개까지 추가할 수 있습니다.'}
+                autoComplete='off'
                 onChange={(e) => setInputTxt(e.target.value)}
                 onKeyUp={(e) => addTag(e)}
               />

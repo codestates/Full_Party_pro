@@ -329,6 +329,7 @@ const SignupModal = () => {
   const [formatAddress, setFormatAddress] = useState('');
 
   const [isSent, setIsSent] = useState(false);
+  const [isTimeOut, setIsTimeOut] = useState(false);
 
   const [inputCode, setInputCode] = useState('');
   const [verificationData, setVerificationData] = useState({
@@ -454,7 +455,7 @@ const SignupModal = () => {
 
   // [dev] 이메일 인증 관련 함수
   const mailVerification = async () => {
-    const res = await axios.post('https://localhost:443/mailVerification/nodemailerTest', { email: userInfo.email });
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification/nodemailerTest`, { email: userInfo.email });
     setIsSent(true);
     setVerificationData({ email: userInfo.email, code: res.data.code });
     setTimeout(handleCodeExpire, 1000 * 60 * 5);
@@ -463,6 +464,11 @@ const SignupModal = () => {
   function codeVerification() {
     if(userInfo.email === verificationData.email && verificationData.code === inputCode){
       setPageIdx(pageIdx + 1);
+      setIsError({
+        ...isError,
+        isVerificationCode: true,
+        verificationMsg: '',
+      })
     } else {
       setIsError({
         ...isError,
@@ -472,8 +478,19 @@ const SignupModal = () => {
     }
   }
 
+  const remailVerification = async () => {
+    setIsTimeOut(false);
+    setIsError({
+      ...isError,
+      isVerificationCode: false,
+      verificationMsg: '',
+    });
+
+    mailVerification();
+  }
+
   function handleCodeExpire() {
-    setIsSent(false);
+    setIsTimeOut(true);
     setIsError({
       ...isError,
       isVerificationCode: false,
@@ -584,23 +601,27 @@ const SignupModal = () => {
                         type='email'
                         name='email'
                         value={userInfo.email}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                       />
                       <div className='error'>{isError.emailMsg}</div>
                     </td>
                   </tr>
-                  <tr>
-                    <td className='label'>인증번호</td>
-                    <td className='input'>
-                      <input
-                        type='text'
-                        name='inputCode'
-                        value={inputCode}
-                        onChange={(e) => setInputCode(e.target.value)}
-                      />
-                      <div className='error'>{isError.verificationMsg}</div>
-                    </td>
-                  </tr>
+                  {isSent ? 
+                    <tr>
+                      <td className='label'>인증번호</td>
+                      <td className='input'>
+                        <input
+                          type='text'
+                          name='inputCode'
+                          value={inputCode}
+                          autoComplete='off'
+                          onChange={(e) => setInputCode(e.target.value)}
+                        />
+                        <div className='error'>{isError.verificationMsg}</div>
+                      </td>
+                    </tr>
+                  : null}
                 </table>
               )
             }
@@ -614,6 +635,7 @@ const SignupModal = () => {
                         type='email'
                         name='email'
                         value={userInfo.email}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                         disabled={true}
                       />
@@ -627,6 +649,7 @@ const SignupModal = () => {
                         type='password'
                         name='password'
                         value={userInfo.password}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                       />
                       <div className='error'>{isPassword.passwordMsg}</div>
@@ -639,6 +662,7 @@ const SignupModal = () => {
                         type='password'
                         name='confirmPassword'
                         value={userInfo.confirmPassword}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                       />
                       <div className='error'>{isConfirmPassword.confirmPasswordMsg}</div>
@@ -657,6 +681,7 @@ const SignupModal = () => {
                         type='text'
                         name='name'
                         value={userInfo.name}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                       />
                       <div className='error'>{isError.nameMsg}</div>
@@ -687,6 +712,7 @@ const SignupModal = () => {
                         name='birth'
                         max={getCurrentDate()}
                         value={userInfo.birth}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                       />
                       <div className='error'>{isError.birthMsg}</div>
@@ -699,6 +725,7 @@ const SignupModal = () => {
                         type='tel'
                         name='mobile'
                         value={userInfo.mobile}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                         placeholder="'-'을 포함하여 입력해주세요."
                       />
@@ -727,6 +754,7 @@ const SignupModal = () => {
                     name='address'
                     type='text'
                     value={userInfo.address}
+                    autoComplete='off'
                     onChange={(e) => handleInputChange(e)}
                     onKeyUp={(e) => handleSearchLocation(e)}
                   />
@@ -776,7 +804,8 @@ const SignupModal = () => {
               return (
                 <BtnContainer style={{ justifyContent: "flex-end" }}>
                   {!isSent? <button onClick={mailVerification} className="request">인증번호 요청</button> : null}
-                  {isSent? <button onClick={codeVerification} className="request">인증번호 확인</button> : null}
+                  {isSent && !isTimeOut ? <button onClick={codeVerification} className="request">인증번호 확인</button> : null}
+                  {isSent && isTimeOut? <button onClick={remailVerification} className="request">인증번호 재전송</button> : null}
                 </BtnContainer>
               )
             }

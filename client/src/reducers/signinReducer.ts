@@ -6,13 +6,13 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  isLoggedIn: false,
+  isLoggedIn: null,
   userInfo: {
     id: 0.1,
-    userName: "Teo",
-    profileImage: "https://teo-img.s3.ap-northeast-2.amazonaws.com/1_Don't+die.jpeg",
-    address: "서울특별시 노원구 월계로45길 21",
-    signupType: "general"
+    userName: "",
+    profileImage: "",
+    address: "",
+    signupType: ""
   }
 }
 

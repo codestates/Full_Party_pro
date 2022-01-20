@@ -132,7 +132,7 @@ export default function Search () {
           type: SIGNIN_SUCCESS,
           payload: res.data.userInfo
         });
-        document.cookie = `location=http://localhost:3000/search`;
+        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/search`;
       });
     })();
   }, []);
@@ -187,6 +187,7 @@ export default function Search () {
         <input
           name='word'
           value={word}
+          autoComplete='off'
           onChange={(e) => handleInputChange(e)}
           onKeyUp={(e) => enterKey(e)}
           placeholder='검색어를 입력해주세요'

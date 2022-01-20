@@ -64,7 +64,7 @@ export default function List () {
           type: SIGNIN_SUCCESS,
           payload: res.data.userInfo
         });
-        document.cookie = "location=http://localhost:3000/home";
+        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
       });
     })();
   }, []);
@@ -95,7 +95,7 @@ export default function List () {
     return <Loading />
   }
 
-  if(!userInfo.address){
+  if(!userInfo.address || userInfo.address === 'Guest'){
     return <AddressModal />
   }
 
