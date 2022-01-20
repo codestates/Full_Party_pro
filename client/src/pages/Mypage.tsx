@@ -7,7 +7,7 @@ import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faCrown } from '@fortawesome/free-solid-svg-icons';
-
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { RootReducerType } from '../store/store';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
@@ -312,6 +312,15 @@ export const MypartyCards = styled.div`
 export default function Mypage () {
   // [dev] 더미데이터: 서버 통신되면 삭제
   const { userInfo, myParty, localParty } = dummyList;
+  
+  const isLoggedIn = useSelector(
+    (state: AppState) => state.signinReducer.isLoggedIn
+  );
+
+  const userInfoFromStore = useSelector(
+    (state: AppState) => state.signinReducer.userInfo
+  );
+
   //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
   const [curTab, setCurTab] = useState(0);
   const [parties, setParties] = useState([]);
@@ -347,6 +356,7 @@ export default function Mypage () {
     err: false,
     msg: "'-'를 포함하여 입력하세요"
   });
+
 
   const expBar = Number( Math.floor(basicInfo.exp % 20) * 5 );
   let today: any = new Date();
@@ -553,7 +563,7 @@ export default function Mypage () {
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
-    navigate("http://localhost:3000");
+    navigate("/");
   };
   const handleWithdrawal = async () => {
     const { token, signupType, location } = cookieParser();
@@ -568,7 +578,7 @@ export default function Mypage () {
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
-    navigate("http://localhost:3000");
+    navigate("/");
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if(callModal !== null) {
@@ -589,6 +599,23 @@ export default function Mypage () {
   useEffect(() => {
     setIsLoading(true);
     (async () => {
+      const { token, signupType, location } = cookieParser();
+      await requestKeepLoggedIn(token, signupType).then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+        document.cookie = `location=http://localhost:3000/mypage`;
+      });
+    })();
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, [ basicInfo ]);
+
+  useEffect(() => {
+    (async () => {
       const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
         withCredentials: true,
       });
@@ -600,21 +627,10 @@ export default function Mypage () {
         level: userInfo.level,
         exp: userInfo.exp
       });
-      console.log(res);
     })();
     fetchJoinParty();
-  },[]);
+  },[ userInfoFromStore ]);
 
-  useEffect(() => {
-    setIsLoading(false);
-  }, [ basicInfo ]);
-  
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
-  if(!isLoggedIn){
-    return <Navigate to="/" />
-  }
 
   if(isLoading) {
     return <Loading />
@@ -633,9 +649,9 @@ export default function Mypage () {
           <img className='profileImage' 
             src={basicInfo.profileImage}
             alt='thumbnail'
-            onError={() => {
-              return(imgRef.current.src = '/img/bubble.png')
-            }}
+            // onError={() => {
+            //   return(imgRef.current.src = 'img/bubble.png')
+            // }}
           />
         </div>
         <p className='mainProfile'>

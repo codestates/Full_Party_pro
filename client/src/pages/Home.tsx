@@ -320,7 +320,8 @@ function Home () {
     if (!document.cookie) {
       document.cookie = "token=temp;";
       document.cookie = "signupType=temp;";
-      document.cookie = "location=http://localhost:3000/home;";
+      document.cookie = "location=http://localhost:3000;";
+      document.cookie = "isLoggedIn=0;";
     }
     const { token, signupType, location } = cookieParser();
     if (token && signupType) {
@@ -331,7 +332,7 @@ function Home () {
             payload: res.data.userInfo
           });
         });
-        document.cookie = "isLoggedIn=1;"
+        document.cookie = "isLoggedIn=1;";
       }
     }
     const address = new URL(window.location.href).searchParams.get("code")

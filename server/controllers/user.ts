@@ -95,14 +95,9 @@ export const getUserProfile = async (req: Request, res: Response) => {
 
 export const verifyUser = async (req: Request, res: Response) => {
   try {
-    try {
-      const { userId, password } = req.body.userInfo;
-      const user = await findUser({ id: userId, password });
-      if (user?.id === userId) return SuccessfulResponse(res, { message: "User Identified" });
-    }
-    catch (error) {
-      console.log(error);
-    }
+    const { userId, password } = req.body.userInfo;
+    const user = await findUser({ id: userId, password });
+    if (user?.id === userId) return SuccessfulResponse(res, { message: "User Identified" });
     return FailedResponse(res, 401, "Unauthorized User");
   }
   catch (error) {
