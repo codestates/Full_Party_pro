@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -173,6 +174,7 @@ export const UserStateBtns = styled.section`
 
 type Props = {
   userInfoModalHandler: Function,
+  partyId: number,
   userId: number,
   leaderId: number,
   isLeader: boolean,
@@ -181,7 +183,7 @@ type Props = {
   userInfo: { [key: string]: any }
 }
 
-const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, isMember, from, userInfo }: Props) => {
+const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLeader, isMember, from, userInfo }: Props) => {
 
   const { id, userName, profileImage, level, message, joinDate } = userInfo;
 
@@ -202,29 +204,36 @@ const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, isMem
     setIsEditMode(!isEditMode);
   }
 
-  function confirmHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log(newMsg)
-    console.log("메시지 변경사항을 서버로 전송합니다.")
-    //서버 요청 완료 후,
+  async function confirmHandler(event: React.MouseEvent<HTMLButtonElement>) {
+    // [FEAT] 기능 확인 필요
+    await axios.patch(`${process.env.REACT_APP_API_URL}/party/message`, {
+      userId, partyId, message: newMsg,
+    });
     setIsEditMode(!isEditMode);
   }
 
-  function expelHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("파티원을 추방합니다.")
+  async function expelHandler(event: React.MouseEvent<HTMLButtonElement>) {
+    // [FEAT] 기능 확인 필요
+    await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userId}`);
+    userInfoModalHandler();
   }
 
-  function refuseHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("파티원 가입 신청을 거절합니다.")
+  async function refuseHandler(event: React.MouseEvent<HTMLButtonElement>) {
+    // [FEAT] 기능 확인 필요
+    await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userId}`);
+    userInfoModalHandler();
   }
 
-  function acceptHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("파티원 가입 신청을 승인합니다.")
+  async function acceptHandler(event: React.MouseEvent<HTMLButtonElement>) {
+    // [FEAT] 기능 확인 필요
     // 이 멤버의 가입을 승인했을 때, 멤버 수가 멤버 정원에 도달했을 경우 
     // partyState를 1로 바꿉니다.
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/party/approval`, { 
+      userId, partyId
+     }, {
+      withCredentials: true
+    });
+    userInfoModalHandler();
   }
 
   return(
