@@ -9,10 +9,10 @@ const initialState: InitialState = {
   isLoggedIn: false,
   userInfo: {
     id: 0.1,
-    userName: "",
-    profileImage: "",
-    address: "",
-    signupType: ""
+    userName: "Teo",
+    profileImage: "https://teo-img.s3.ap-northeast-2.amazonaws.com/1_Don't+die.jpeg",
+    address: "서울특별시 노원구 월계로45길 21",
+    signupType: "general"
   }
 }
 
