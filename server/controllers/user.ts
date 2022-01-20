@@ -9,12 +9,12 @@ export const getUserInfo = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const notifications = await getNotification(Number(userId));
-      const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "region", "exp", "level", "signupType" ]);
-      if (userInfo && notifications) return SuccessfulResponse(res, {
-        message: "Loaded Successfully",
-        userInfo,
-        notifications
-      });
+    const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "address", "exp", "level", "signupType" ]);
+    if (userInfo && notifications) return SuccessfulResponse(res, {
+      message: "Loaded Successfully",
+      userInfo,
+      notifications
+    });
     return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {
@@ -84,7 +84,7 @@ export const getCompletedParty = async (req: Request, res: Response) => {
 export const getUserProfile = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const userInfo = await findUser({ id: userId }, [ "userName", "birth", "email", "region", "mobile", "gender" ]);
+    const userInfo = await findUser({ id: userId }, [ "userName", "birth", "email", "address", "mobile", "gender" ]);
     if (userInfo) return SuccessfulResponse(res, { message: "Successfully Loaded", userInfo });
     return FailedResponse(res, 400, "Bad Request");
   }
@@ -95,9 +95,14 @@ export const getUserProfile = async (req: Request, res: Response) => {
 
 export const verifyUser = async (req: Request, res: Response) => {
   try {
-    const { userId, email, password } = req.body.userInfo;
-    const user = await findUser({ email, password });
-    if (user?.id === userId) return SuccessfulResponse(res, { message: "User Identified" });
+    try {
+      const { userId, password } = req.body.userInfo;
+      const user = await findUser({ id: userId, password });
+      if (user?.id === userId) return SuccessfulResponse(res, { message: "User Identified" });
+    }
+    catch (error) {
+      console.log(error);
+    }
     return FailedResponse(res, 401, "Unauthorized User");
   }
   catch (error) {
@@ -110,7 +115,7 @@ export const modifyUserInfo = async (req: Request, res: Response) => {
     const { userId, password, userName, birth, gender, region, mobile, profileImage } = req.body.userInfo;
     const userInfo: any = { userName, password, birth, gender, region, mobile, profileImage };
     const updated = await updateUser(userId, userInfo);
-    const updatedUserInfo = await findUser({ id: userId }, [ "userName", "password", "birth", "gender", "region", "mobile", "profileImage" ]);
+    const updatedUserInfo = await findUser({ id: userId }, [ "userName", "password", "birth", "gender", "address", "mobile", "profileImage" ]);
     if (updated) return SuccessfulResponse(res, { message: "Successfully Modified", userInfo: updatedUserInfo });
     return FailedResponse(res, 400, "Bad Request");
   }

@@ -64,7 +64,7 @@ export default function List () {
           type: SIGNIN_SUCCESS,
           payload: res.data.userInfo
         });
-        document.cookie = "location=http://localhost:3000/list";
+        document.cookie = "location=http://localhost:3000/home";
       });
     })();
   }, []);
