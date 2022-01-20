@@ -239,6 +239,7 @@ const UserInfoModal = ({ userInfoModalHandler, userId, leaderId, isLeader, isMem
                 <input 
                   type="text"
                   name="newMsg"
+                  autoComplete='off'
                   onChange={(e) => inputHandler(e)}
                   value={newMsg}
                   maxLength={45}

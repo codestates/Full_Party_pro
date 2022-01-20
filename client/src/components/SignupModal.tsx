@@ -455,7 +455,7 @@ const SignupModal = () => {
 
   // [dev] 이메일 인증 관련 함수
   const mailVerification = async () => {
-    const res = await axios.post('https://localhost:443/mailVerification/nodemailerTest', { email: userInfo.email });
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification/nodemailerTest`, { email: userInfo.email });
     setIsSent(true);
     setVerificationData({ email: userInfo.email, code: res.data.code });
     setTimeout(handleCodeExpire, 1000 * 60 * 5);
@@ -601,6 +601,7 @@ const SignupModal = () => {
                         type='email'
                         name='email'
                         value={userInfo.email}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                       />
                       <div className='error'>{isError.emailMsg}</div>
@@ -614,6 +615,7 @@ const SignupModal = () => {
                           type='text'
                           name='inputCode'
                           value={inputCode}
+                          autoComplete='off'
                           onChange={(e) => setInputCode(e.target.value)}
                         />
                         <div className='error'>{isError.verificationMsg}</div>
@@ -633,6 +635,7 @@ const SignupModal = () => {
                         type='email'
                         name='email'
                         value={userInfo.email}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                         disabled={true}
                       />
@@ -646,6 +649,7 @@ const SignupModal = () => {
                         type='password'
                         name='password'
                         value={userInfo.password}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                       />
                       <div className='error'>{isPassword.passwordMsg}</div>
@@ -658,6 +662,7 @@ const SignupModal = () => {
                         type='password'
                         name='confirmPassword'
                         value={userInfo.confirmPassword}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                       />
                       <div className='error'>{isConfirmPassword.confirmPasswordMsg}</div>
@@ -676,6 +681,7 @@ const SignupModal = () => {
                         type='text'
                         name='name'
                         value={userInfo.name}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                       />
                       <div className='error'>{isError.nameMsg}</div>
@@ -706,6 +712,7 @@ const SignupModal = () => {
                         name='birth'
                         max={getCurrentDate()}
                         value={userInfo.birth}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                       />
                       <div className='error'>{isError.birthMsg}</div>
@@ -718,6 +725,7 @@ const SignupModal = () => {
                         type='tel'
                         name='mobile'
                         value={userInfo.mobile}
+                        autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                         placeholder="'-'을 포함하여 입력해주세요."
                       />
@@ -746,6 +754,7 @@ const SignupModal = () => {
                     name='address'
                     type='text'
                     value={userInfo.address}
+                    autoComplete='off'
                     onChange={(e) => handleInputChange(e)}
                     onKeyUp={(e) => handleSearchLocation(e)}
                   />

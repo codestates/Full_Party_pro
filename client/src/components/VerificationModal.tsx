@@ -129,6 +129,7 @@ const VerificationModal = ({ verficationModalHandler }: Props) => {
             name='password'
             type='text'
             value={password}
+            autoComplete='off'
             onChange={(e) => handleInputChange(e)}
           />
           <button className="request">제출</button>

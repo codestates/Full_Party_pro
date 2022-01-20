@@ -340,7 +340,7 @@ export default function Mypage () {
       setIsChange(false)
     } 
     else if(!isChange) {
-      const verify = await axios.post('https://localhost:443/user/verification', {
+      const verify = await axios.post(`${process.env.REACT_APP_API_URL}/user/verification`, {
         userInfo: {
           userId: signinReducer.userInfo?.id,
           password: changeInfo.nowPwd
@@ -435,7 +435,7 @@ export default function Mypage () {
       return;
     }
     else if(password === '') {
-      const res = await axios.patch('https://localhost:443/user/profile', {
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
         userInfo: {
           userId: signinReducer.userInfo?.id,
           profileImage,
@@ -452,7 +452,7 @@ export default function Mypage () {
       }
     } 
     else if (password !== '') {
-      const res = await axios.patch('https://localhost:443/user/profile', {
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
         userInfo: {
           userId: signinReducer.userInfo?.id,
           profileImage,
@@ -489,31 +489,31 @@ export default function Mypage () {
   }
   const handleSignOut = async () => {
     const { token, signupType, location } = cookieParser();
-    await axios.post("https://localhost:443/signout", {
+    await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {
       access_token: token, 
       signup_type: signupType
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
-    navigate("http://localhost:3000");
+    document.cookie = `token=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    navigate(`${process.env.REACT_APP_API_URL}`);
   };
   const handleWithdrawal = async () => {
     const { token, signupType, location } = cookieParser();
     const userId = signinReducer.userInfo?.id;
-    await axios.delete(`https://localhost:443/user/${userId}/${signupType}`, {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}/${signupType}`, {
       headers: {
         access_token: token
       }
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
-    navigate("http://localhost:3000");
+    document.cookie = `token=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    navigate(`${process.env.REACT_APP_API_URL}`);
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
     setFrom(from);
@@ -528,7 +528,7 @@ export default function Mypage () {
   useEffect(() => {
     setIsLoading(true);
     (async () => {
-      const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${signinReducer.userInfo?.id}`, {
         withCredentials: true,
       });
       const userInfo = res.data.userInfo;
@@ -607,6 +607,7 @@ export default function Mypage () {
             accept='image/*'
             name='file'
             hidden={true}
+            autoComplete='off'
             onChange={handleImgLoad}
           />
         </div>
@@ -628,6 +629,7 @@ export default function Mypage () {
                         <input
                           name='userName'
                           value={changeInfo.userName}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                         ></input>
                       </td>
@@ -669,6 +671,7 @@ export default function Mypage () {
                           max={getCurrentDate()}
                           name='birth'
                           value={changeInfo.birth}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                         ></input>
                       </td>
@@ -694,6 +697,7 @@ export default function Mypage () {
                         <input
                           name='address'
                           value={changeInfo.address}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                         ></input>
                       </td>
@@ -704,6 +708,7 @@ export default function Mypage () {
                         <input
                           name='mobile'
                           value={changeInfo.mobile}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                           placeholder="'-'을 포함해 입력하세요"
                         ></input>

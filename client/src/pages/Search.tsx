@@ -171,6 +171,7 @@ export default function Search () {
         <input
           name='word'
           value={word}
+          autoComplete='off'
           onChange={(e) => handleInputChange(e)}
           onKeyUp={(e) => enterKey(e)}
           placeholder='검색어를 입력해주세요'
