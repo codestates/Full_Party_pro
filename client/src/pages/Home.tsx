@@ -9,7 +9,6 @@ import { modalChanger } from '../actions/modal';
 import { faClipboardCheck, faMapMarkedAlt, faStreetView, faBirthdayCake, faCodeBranch, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import AOS from "aos";
 import "../../node_modules/aos/dist/aos.css";
-import { cookieParser, requestKeepLoggedIn } from "../App";
 
 export const HomeContainer = styled.div`
 

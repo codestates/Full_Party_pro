@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { cookieParser, requestKeepLoggedIn } from "../App";
+import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
@@ -40,10 +40,7 @@ export const ListContainer = styled.div`
 export default function List () {
 
   const dispatch = useDispatch();
-
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
+  const navigate = useNavigate();
 
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo
@@ -82,6 +79,10 @@ export default function List () {
 
   if(!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "unidentified" || userInfo.address === "KAKAO"){
     return <AddressModal />
+  }
+
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
   }
 
   return (
