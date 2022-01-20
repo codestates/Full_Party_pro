@@ -929,7 +929,7 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     } else if(!regex.url.test(partyInfo.privateLink)) {
       setIsPLink({
         err: true,
-        msg: '유효한 링크를 입력해주세요.'
+        msg: "유효한 링크를 입력해주세요. 링크는 'https://'를 포함합니다."
       })
     }
 
@@ -972,19 +972,20 @@ export default function PartyEdit ({ party, editHandler }: Props) {
       validationCheck();
     }, [partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink]);
 
-    useEffect(() => {
-      if(isPosted){
-        patchParty()
-        .then((res) => {
-          setIsPosted(false);
-          navigate(`../party/${res.data.partyInfo.partyId}`);
-        })
-        .catch((err) => {
-          setIsErrorModalOpen(true);
-          setIsPosted(false);
-        })
-      }
-    }, [isPosted])
+  useEffect(() => {
+    if(isPosted){
+      patchParty()
+      .then((res) => {
+        setIsPosted(false);
+        editHandler();
+        navigate(`../party/${res.data.partyInfo.partyId}`);
+      })
+      .catch((err) => {
+        setIsErrorModalOpen(true);
+        setIsPosted(false);
+      })
+    }
+  }, [isPosted])
 
     if(!isLoggedIn){
       return <Navigate to="/" />

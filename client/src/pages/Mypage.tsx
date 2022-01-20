@@ -6,13 +6,14 @@ import AWS from 'aws-sdk';
 import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkerAlt, faCrown } from '@fortawesome/free-solid-svg-icons';
+import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 
 import { RootReducerType } from '../store/store';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
 import UserCancelModal from '../components/UserCancelModal'
 import PartySlide from '../components/PartySlide';
+import VerificationModal from '../components/VerificationModal';
 
 // [dev] 더미데이터: 서버 통신되면 삭제
 import dummyList from '../static/dummyList';
@@ -20,14 +21,7 @@ import { SIGNIN_FAIL } from '../actions/signinType';
 
 export const MypageContainer = styled.div`
   width: 100%;
-  height: 100%;
-  max-width: 1280px;
-  padding: 60px 1px;
-
-  .subject {
-    font-size: 22px;
-    font-family: 'DungGeunMo';
-  }
+  padding: 60px 0;
 
   .imgChange {
     width: 40%;
@@ -40,53 +34,84 @@ export const MypageContainer = styled.div`
       background-color: darkcyan;
     }
   }
+
+  .subject {
+    font-size: 1.2rem;
+    font-weight: bold;
+
+    margin-bottom: 10px;
+  }
+
+  section {
+    margin: 30px 0;
+    padding: 0 10%;
+  }
 `
 
-export const MypageHeader = styled.div`
+export const MypageHeader = styled.header`
   width: 100%;
-  min-height: 150px;
   display: flex;
-  align-items: center;
-  justify-content: center;
 
-  .profileImage {
-    display: block;
-    width: 120px;
-    height: 120px;
-    border-radius: 100%;
-    overflow: hidden;
+  margin: 30px 0;
+  padding: 0 10%;
+
+  .leftWrapper {
+    width: 40%;
+    height: 100%;
+
+    display: flex;
+    justify-content: flex-end;
+
+    .profileImageContainer {
+
+      width: 100px;
+      height: 100px;
+
+      border-radius: 100%;
+      overflow: hidden;
+
+      border: 1px solid #d5d5d5;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
   }
 
   .mainProfile {
-    margin: 0 3vw;
+    margin: 0 30px;
+    margin-top: 5px;
+
+    width: 60%;
+    height: 100%;
+
     display: flex;
     flex-direction: column;
-  }
-  .userName {
-    font-size: 30px;
-    margin-bottom: 1vh;
-  }
-  .mapMarker{
-    margin: 0 9px;
-    color: darkcyan;
-  }
-  .crown{
-    margin: 0 5px;
-    color: darkcyan;
-  }
+    justify-content: center;
 
-  @media screen and (min-width: 500px) {
-    justify-content: flex-start;
-    padding: 1vh 15vw;
+    .userName {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .icon {
+      margin-right: 8px;
+    }
+
+    .info {
+      color: #777;
+      margin-bottom: 5px;
+    }
+
   }
 `
 
-export const MypageInfo = styled.div`
+export const MypageInfo = styled.section`
   width: 100%;
-  min-height: 200px;
   display: flex;
   flex-direction: column;
-  padding: 3vh 13vw;
 
   .changeInfo {
     width: 100%;
@@ -95,92 +120,33 @@ export const MypageInfo = styled.div`
     align-items: center;
   }
 
+  button {
+    width: 120px;
+    height: 40px;
+
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    background-color: #50C9C3;
+
+    margin: 10px 10px 0 0;
+    cursor: pointer;
+  }
+
   .btns {
     width: 100%;
     display: flex;
-    justify-content: space-around;
   }
 
-  .changeInfoBtn {
-    width: 100px;
-    height: 30px;
-    margin: 25px 0;
-
-    border: none;
-    border-radius: 20px;
-    color: #888;
-    background-color: #cff4d2;
-  }
-  .signoutBtn {
-    width: 100px;
-    height: 30px;
-    margin: 25px 0;
-
-    border: none;
-    border-radius: 20px;
-    color: #888;
-    background-color: #cff4d2;
-  }
-  .deleteBtn{
-    width: 100px;
-    height: 30px;
-    margin: 25px 0;
-
-    border: none;
-    border-radius: 20px;
-    color: #888;
-    background-color: #cff4d2;
-  }
-  .submitInfoBtn {
-    width: 160px;
-    height: 30px;
-    margin: 2px 0 0 0;
-
-    border: none;
-    border-radius: 20px;
-    color: #888;
-    background-color: #cff4d2;
-  }
-  .cancelInfoBtn {
-    width: 160px;
-    height: 30px;
-    margin: 2px 0 0 0;
-
-    border: none;
-    border-radius: 20px;
-    color: #888;
-    background-color: #cff4d2;
-  }
   .error {
     font-size: 12px;
     color: red;
     padding-left: 12px;
   }
-
-  @media screen and (min-width: 500px) {
-    .changeInfoBtn {
-      border-radius: 30px;
-      width: 200px;
-      height: 40px;
-      font-size: 15px;
-    }
-    .signoutBtn {
-      border-radius: 30px;
-      width: 200px;
-      height: 40px;
-      font-size: 15px;
-    }
-    .deleteBtn {
-      border-radius: 30px;
-      width: 200px;
-      height: 40px;
-      font-size: 15px;
-    }
-  }
 `
 export const InfoTable = styled.table`
-  width: 300px;
-  margin: 30px 0 15px 0;
+  width: 100%;
+  padding: 5%;
 
   .label {
     width: 70px;
@@ -229,82 +195,52 @@ export const InfoTable = styled.table`
   }
 `
 
-export const ProgressBar = styled.div<{ exp: number }>`
-  display: inline-block;
-  width: 150px;
-  height: 20px;
-  background-color: #d6d3d3;
-  margin: 2px 5px;
-  border-radius: 20px;
+export const ProgressBar = styled.div`
+  margin-top: 5px;
 
- .bar {
-   display: inline-block;
-   width: ${(props) => props.exp || 0}%;
-   height: 20px;
-   background-color: #cff4d2;
-   border-radius: 20px;
- }
+ .barContainer {
+    height: 10px;
+    width: 100%;
+    max-width: 200px;
+    /* border: 1px solid #e9e7e7; */
+    border-radius: 50px;
+    background-color: #e9e7e7;
+  }
 
- @media screen and (min-width: 1000px) {
-   width: 270px;
- }
+  .barFiller {
+    height: 100%;
+    background-color: #50C9C3;
+    border-radius: inherit;
+    text-align: right;
+  }
+
+
 `
 
-export const MypartyCards = styled.div`
+export const MypartyCards = styled.section`
   width: 100%;
-  min-height: 300px;
-  padding: 3vh 13vw;
   
   fieldset {
     border: none;
+    margin-bottom: 10px;
   }
   
-  .partyCardContainer {
-    border: 1px solid black;
-    width: 100%;
-    height: 100%;
-
-    padding: 10px 15px;
-    
-    section {
-      margin-bottom: 20px;
-    }
-
-    main {
-      display: flex;
-      justify-content: center;
-    }
-  }
-
-  .cardTabContainer{
-    width: 325px;
-    margin: 1vh 0;
-  }
   .cardTab {
     list-style: none;
 
     li {
       float: left;
-      margin: 0 3px;
+      margin: 5px 3px;
+    }
+
+    .tab {
+      cursor: pointer;
       color: #d5d5d5;
-    }
-    .disabled {
-      color: black;
-    }
-    .focus {
-      color: black;
-    }
-    .join {
-      cursor: pointer;
-    }
-    .recruite {
-      cursor: pointer;
-    }
-    .favorite {
-      cursor: pointer;
-    }
-    .complete {
-      cursor: pointer;
+      
+      &.focus {
+        color: black;
+        font-weight: bold;
+      }
     }
   }
 `
@@ -314,17 +250,19 @@ export default function Mypage () {
   const { userInfo, myParty, localParty } = dummyList;
   //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
   const [curTab, setCurTab] = useState(0);
-  const [parties, setParties] = useState([]);
+  const [parties, setParties] = useState(myParty);
   const [isLoading, setIsLoading] = useState(true);
   const [isInfoLoading, setIsInfoLoading] = useState(false);
   //img 상태가 제대로 반영이 안되면 로딩창 넣어주세요
   const [imgLoading, setImgLoading] = useState(false);
   const [isChange, setIsChange] = useState(true);
-  const [callModal, setCallModal] = useState<string | null>(null);
+  const [callModal, setCallModal] = useState(false);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(true);
+  const [from, setFrom] = useState('');
   const [basicInfo, setBasicInfo] = useState({
     userName: '베이직이름',
     profileImage: '/img/defaultThumbnail.png',
-    address: '베이직지역',
+    address: '수원시 장안구',
     level: 7,
     exp: 148
   });
@@ -348,8 +286,6 @@ export default function Mypage () {
     msg: "'-'를 포함하여 입력하세요"
   });
 
-  const expBar = Number( Math.floor(basicInfo.exp % 20) * 5 );
-  let today: any = new Date();
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -467,6 +403,15 @@ export default function Mypage () {
     })
   }
 
+  function getCurrentDate() {
+    let newDate = new Date();
+    let date = newDate.getDate();
+    let month = newDate.getMonth() + 1;
+    let year = newDate.getFullYear();
+    
+    return `${year}-${month<10?`0${month}`:`${month}`}-${date}`
+  }
+
   const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     if(e.currentTarget.value === 0) {
       fetchJoinParty()
@@ -570,20 +515,14 @@ export default function Mypage () {
     document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
     navigate("http://localhost:3000");
   };
-  const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if(callModal !== null) {
-      setCallModal(null)
-    }
-    else if(callModal === null) {
-      const type = e.currentTarget.className
-      if(type === 'signoutBtn') {
-        setCallModal('signout')
-      }
-      else if(type === 'deleteBtn') {
-        setCallModal('delete')
-      }
-    }
+  const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
+    setFrom(from);
+    setCallModal(!callModal);
   };
+
+  function verficationModalHandler(e: React.MouseEvent<HTMLDivElement>){
+    setIsVerificationModalOpen(!isVerificationModalOpen);
+  }
 
   //페이지 진입시 로딩
   useEffect(() => {
@@ -622,32 +561,32 @@ export default function Mypage () {
 
   return (
     <MypageContainer>
-      {callModal === 'signout'?
-      <UserCancelModal from={'signout'} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} />
-      : null}
-      {callModal === 'delete'?
-      <UserCancelModal from={'delete'} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} />
-      : null}
+      {callModal? <UserCancelModal from={from} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} /> : null}
+      {isVerificationModalOpen? <VerificationModal verficationModalHandler={verficationModalHandler} /> : null}
       <MypageHeader>
-        <div className='profileImage'>
-          <img className='profileImage' 
-            src={basicInfo.profileImage}
-            alt='thumbnail'
-            onError={() => {
-              return(imgRef.current.src = '/img/bubble.png')
-            }}
-          />
+        <div className="leftWrapper">
+          <div className='profileImageContainer'>
+            <img
+              src={basicInfo.profileImage}
+              alt='thumbnail'
+              onError={() => {
+                return(imgRef.current.src = '/img/bubble.png')
+              }}
+            />
+          </div>
         </div>
         <p className='mainProfile'>
           <div className='userName'>{basicInfo.userName}</div>
-          <div>
-            <FontAwesomeIcon icon={faMapMarkerAlt} className='mapMarker'/><span className='text'>{basicInfo.address}</span>
+          <div className="info">
+            <FontAwesomeIcon icon={faMapMarkerAlt} className='icon'/>{basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1]}
           </div>
-          <div>
-            <FontAwesomeIcon icon={faCrown} className='crown'/><span className='text'>Lv.{basicInfo.level}</span>
+          <div className="info">
+            <FontAwesomeIcon icon={faTrophy} className='icon'/>Lv. {basicInfo.level}
           </div>
-          <ProgressBar exp={expBar}>
-            <span className='bar' />
+          <ProgressBar>
+            <div className="barContainer">
+              <div className="barFiller" style={{ width: `${Math.floor(basicInfo.exp % 20) * 5}%` }} />
+            </div>
           </ProgressBar>
         </p>
       </MypageHeader>
@@ -727,7 +666,7 @@ export default function Mypage () {
                       <td>
                         <input
                           type='date'
-                          max={today}
+                          max={getCurrentDate()}
                           name='birth'
                           value={changeInfo.birth}
                           onChange={(e) => handleInputChange(e)}
@@ -750,7 +689,7 @@ export default function Mypage () {
                       </td>
                     </tr>
                     <tr>
-                      <td className='label'>지역</td>
+                      <td className='label'>주소</td>
                       <td>
                         <input
                           name='address'
@@ -776,39 +715,21 @@ export default function Mypage () {
                       <td className='error'>{wrongMobile.msg}</td> : <td />}
                     </tr>
                   </InfoTable>
-                  <button className='submitInfoBtn' onClick={submitInfo}>제출</button><br />
-                  <button className='cancelInfoBtn' onClick={handleIsChange}>취소</button>
+                  <button onClick={submitInfo}>제출</button><br />
+                  <button onClick={handleIsChange}>취소</button>
+                  <button onClick={(e) => userCancelHandler(e, "delete")}>회원 탈퇴</button>
                 </div>
               )
             }
           } else {
             return(
-              <div>
-              <div>
-                <span className='label'>비밀번호</span>
-                  <input
-                    name='nowPwd'
-                    value={changeInfo.nowPwd}
-                    onChange={(e) => handleInputChange(e)}
-                    placeholder='비밀번호를 입력한뒤 제출하세요'
-                  ></input>
-              </div>
-              <section className='btns'>
-                <button
-                  className='changeInfoBtn'
-                  onClick={handleIsChange}
-                >
+              <div className='btns'>
+                <button onClick={handleIsChange}>
                   개인 정보 수정
                 </button>
-                <button onClick={(e) => userCancelHandler(e)}
-                  className='signoutBtn'
-                >
+                <button onClick={(e) => userCancelHandler(e, "signout")}>
                   로그아웃
                 </button>
-                <button onClick={(e) => userCancelHandler(e)}
-                  className='deleteBtn'
-                >회원탈퇴</button>
-              </section>
               </div>
             )}
         })()}
@@ -817,33 +738,24 @@ export default function Mypage () {
         <div className='subject'>내 파티</div>
         <fieldset className='cardTabContainer'>
           <ol className='cardTab'>
-            <li value={0} className={`join${curTab === 0 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>참여중 파티</li>
-            <li className='disabled'> | </li>
-            <li value={1} className={`recruite${curTab === 1 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>모집중 파티</li>
-            <li className='disabled'> | </li>
-            <li value={2} className={`complete${curTab === 2 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>완료 파티</li>
+            <li value={0} className={`tab ${curTab === 0 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>참여중 파티</li>
+            <li> | </li>
+            <li value={1} className={`tab ${curTab === 1 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>모집중 파티</li>
+            <li> | </li>
+            <li value={2} className={`tab ${curTab === 2 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>완료 파티</li>
           </ol>
         </fieldset>
-        <fieldset className='partyCardContainer'>
           {(() => {
             if(curTab === 0) {
-              return (<div>참여 파티 카드</div>)
-              // return (
-              //   <section>
-              //     <main className='joinParty'>
-              //       <PartySlide myParty={parties} />
-              //     </main>
-              //   </section>
-              // )
+              return <PartySlide myParty={parties} />
             }
             else if(curTab === 1) {
-              return (<div> 모집 파티 카드</div>)
+              return <PartySlide myParty={parties} />
             }
             else if(curTab === 2) {
-              return (<div> 완료 파티 카드</div>)
+              return <PartySlide myParty={parties} />
             }
           })()}
-        </fieldset>
       </MypartyCards>
     </MypageContainer>
   );

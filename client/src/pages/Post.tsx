@@ -928,7 +928,7 @@ export default function Post () {
     } else if(!regex.url.test(partyInfo.privateLink)) {
       setIsPLink({
         err: true,
-        msg: '유효한 링크를 입력해주세요.'
+        msg: "유효한 링크를 입력해주세요. 링크는 'https://'를 포함합니다."
       })
     }
 
