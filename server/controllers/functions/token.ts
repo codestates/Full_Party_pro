@@ -16,14 +16,14 @@ export const verifyAccessToken = (token: string): JwtPayload | string | undefine
     return verify(token, config.accessSecret);
   }
   catch (error) {
-    console.log(error);
+    return error;
   }
 };
 
 export const setCookie = (res: Response, type: string, token: string | null) => {
   try {
     res.cookie(type, token, {
-      domain: "fullpartypro.com",
+      domain: "localhost",
       path: "/",
       sameSite: "none",
       secure: true,

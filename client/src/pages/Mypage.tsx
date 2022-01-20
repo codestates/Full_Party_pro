@@ -610,10 +610,10 @@ export default function Mypage () {
       signup_type: signupType
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `token=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
   const handleWithdrawal = async () => {
@@ -625,10 +625,10 @@ export default function Mypage () {
       }
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `token=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
@@ -651,20 +651,6 @@ export default function Mypage () {
   }
 
   //페이지 진입시 로딩
-  useEffect(() => {
-    setIsLoading(true);
-    (async () => {
-      const { token, signupType, location } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/mypage`;
-      });
-    })();
-  }, []);
-
   
   useEffect(() => {
     (async () => {
