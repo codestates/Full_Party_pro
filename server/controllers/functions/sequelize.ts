@@ -45,7 +45,7 @@ export const createUser = async (userInfo: UsersAttributes) => {
   return await Users.create({ ...userInfo, exp: 25, level: 1 });
 };
 
-export const updateUser = async (userId: number, userInfo: UsersAttributes) => {
+export const updateUser = async (userId: number, userInfo: any) => {
   const updated = await Users.update(userInfo, {
     where: { id: userId }
   });
@@ -246,7 +246,6 @@ export const getMessageAndJoinDate = async (userId: number, partyId: number) => 
 };
 
 export const getPartyInformation = async (partyId: number, userId?: number | undefined) => {
-  console.log("🌈", userId);
   const party: PartyInfo | null = await Parties.findOne({
     where: { id: partyId },
     attributes: { exclude: [ "createdAt", "updatedAt" ] },
@@ -271,18 +270,20 @@ export const getPartyInformation = async (partyId: number, userId?: number | und
     attributes: [ "id", "userName", "profileImage", "level" ],
     raw: true
   });
-  waitingUsers.map((item: any, i: number) => waitingQueue[i] = { ...waitingQueue[i], message: item.message })
+  waitingUsers.map((item: any, i: number) => waitingQueue[i] = { ...waitingQueue[i], message: item.message });
   if (userId) {
+    let isFavorite: boolean;
+    await checkFavorite(userId, partyId) ? isFavorite = true : isFavorite = false;
     const checkReviewed = await UserParty.findOne({
       where: { userId, partyId },
       attributes: [ "isReviewed" ],
       raw: true
     });
     const isReviewed = checkReviewed?.isReviewed ? true : false;
-    const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed };
+    const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed, isFavorite };
     return partyInfo;
   }
-  const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed: false };
+  const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed: false, isFavorite: false };
     return partyInfo;
 };
 

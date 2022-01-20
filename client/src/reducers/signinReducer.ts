@@ -6,7 +6,7 @@ interface InitialState {
 }
 
 const initialState: InitialState = {
-  isLoggedIn: true,
+  isLoggedIn: false,
   userInfo: {
     id: 0.1,
     userName: "Teo",

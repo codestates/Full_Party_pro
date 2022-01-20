@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -195,6 +196,8 @@ export const BtnContainer = styled.section`
 
 const AddressModal = () => {
 
+  const navigate = useNavigate();
+
   const [pageIdx, setPageIdx] = useState(0);
 
   const [address, setAddress] = useState('');
@@ -216,7 +219,7 @@ const AddressModal = () => {
   }
 
   const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space' || e.code == 'ArrowRight') {
+    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
       setFixedLocation(address);
     }
   }
@@ -230,11 +233,13 @@ const AddressModal = () => {
     }
   }
 
-  const handleAddressRegister = () => {
+  const handleAddressRegister = async () => {
     if(address){
       setErrorMsg('')
-      //[dev] 서버에 주소 등록 요청을 보냅니다.
-      console.log({ "주소": formatAddress })
+      await axios.patch(`${process.env.REACT_APP_API_URL}/address/${userInfo.id}`, {
+        userId: userInfo.id, address: formatAddress
+      });
+      navigate(`../`);
     } else {
       setErrorMsg('주소를 입력해주세요.')
     }

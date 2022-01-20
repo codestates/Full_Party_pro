@@ -447,7 +447,7 @@ const SignupModal = () => {
   }
 
   const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space' || e.code == 'ArrowRight') {
+    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
       setFixedLocation(userInfo.address);
     }
   }
@@ -544,7 +544,7 @@ const SignupModal = () => {
     let file = e.target.files[0];
     const formData = new FormData();
     formData.append('profileImage', file)
-    const res = await axios.post('이미지서버', formData)
+    await axios.post('이미지서버', formData)
     //res.data.location 에 있는 url을 img의 src로 바꿔야 합니다.
     setIsLoading(false)
   }

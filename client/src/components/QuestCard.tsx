@@ -7,7 +7,6 @@ import { faHeart, faMapMarkerAlt, faCalendarAlt, faGlobe, faExclamation } from '
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import signinReducer from '../reducers/signinReducer';
 
 export const QuestCardContainer = styled.div`
   width: 100%;
@@ -267,6 +266,8 @@ export default function QuestCard ({ party }: Props) {
                     style={{ backgroundImage: `url(${member.profileImage})`, backgroundSize: "cover" }} 
                   />
                 )
+              } else {
+                return null;
               }
             })}
             {[...Array(memberLimit - members.length)].map((n, idx) => 

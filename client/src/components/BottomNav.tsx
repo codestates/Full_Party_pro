@@ -50,7 +50,7 @@ export default function BottomNav () {
 
   return (
     <NavContainer>
-      <Link to="/" style={{ textDecoration: 'none' }}>
+      <Link to="/home" style={{ textDecoration: 'none' }}>
         <div className="button">
           <FontAwesomeIcon icon={ faHome } className="icon" /> 홈
         </div>  

@@ -1,18 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-
+import { useSelector, useDispatch } from 'react-redux';
+import { requestKeepLoggedIn, cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart, faAngleDown, faAngleUp, faBullhorn, faBirthdayCake, faCalendarCheck, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
-
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 import Loading from '../components/Loading';
 import UserInfoModal from '../components/UserInfoModal';
 import PartyJoinModal from '../components/PartyJoinModal';
 import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
 import PartyCancelModal from '../components/PartyCancelModal';
+import PartyEdit from '../components/PartyEdit';
 
 import PartyMap from '../components/PartyMap';
 import MemberList from '../components/MemberList';
@@ -20,10 +21,7 @@ import QnA from '../components/QnA';
 
 import { AppState } from '../reducers';
 
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyParty from '../static/dummyParty';
 import axios from 'axios';
-import signinReducer from '../reducers/signinReducer';
 
 export const PartyContainer = styled.div`
 
@@ -303,6 +301,7 @@ export default function Party () {
 
   const params = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const commentRef = useRef<HTMLElement>(null);
 
   const isLoggedIn = useSelector(
@@ -318,15 +317,13 @@ export default function Party () {
 
   // const { partyId, name, image, memberLimit, partyState, privateLink, content, region, startDate, endDate, favorite, tag, location, isOnline, isReviewed, leaderId, members, waitingQueue, comments } = dummyParty;
 
-  // [dev] 서버와 연결되면 아래 코드는 삭제하고, 그 다음줄 주석을 활성화. 
+  // [dev] 서버와 연결되면 아래 코드는 삭제하고, 그 다음줄 주석을 활성화.
   // 서버에서 관심 파티 등록되어있는지 여부 받아와야 함.
-  const [isFavorite, setIsFavorite] = useState(false);
-  // const { isFavorite } = dummyParty;
 
   const [isLoading, setIsLoading] = useState(true);
   const [ userState, setUserState ] = useState({
     isLeader: false,
-    isMember:false,
+    isMember: false,
     isWaiting: false
   });
   const { isLeader, isMember, isWaiting } = userState;
@@ -346,6 +343,7 @@ export default function Party () {
   const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen]  = useState(false);
   const [isPartyCancelModalOpen, setIsPartyCancelModalOpen]  = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
 
   const [from, setFrom] = useState("");
   const [userInfo, setUserInfo] = useState({});
@@ -366,8 +364,9 @@ export default function Party () {
     region: "",
     location: "",
     latlng: "",
-    memberLimit: 0,
+    memberLimit: 2,
     isReviewed: false,
+    isFavorite: false,
     members: [{
       exp: 0,
       id: 0,
@@ -376,7 +375,7 @@ export default function Party () {
       profileImage: "",
       userName: ""
     }],
-    tag: [ "" ],
+    tag: [],
     waitingQueue: [{
       id: 0,
       userName: "",
@@ -389,10 +388,13 @@ export default function Party () {
   
   const formatDate = (date: String) => date.slice(0, 11);
 
-  function favoriteHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev] 서버 통신 후에는 setIsFavorite 삭제하기
-    setIsFavorite(!isFavorite);
-    console.log("관심파티를 등록합니다");  
+  async function favoriteHandler(event: React.MouseEvent<HTMLButtonElement>) {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${partyInfo.id}`, { 
+      userId, partyId: partyInfo.id
+     }, {
+      withCredentials: true
+    });
+    setPartyInfo(response.data.partyInfo.isFavorite);
   }
 
   function shareHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -474,8 +476,7 @@ export default function Party () {
   }
 
   function editHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("현재 파티의 정보를 Props로 보내면서, 파티 생성창으로 이동합니다.");
+    setIsEdit(!isEdit);
   }
 
   function fullPartyHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -494,6 +495,13 @@ export default function Party () {
   }
 
   useEffect(() => {
+    const { token, signupType, location } = cookieParser();
+    requestKeepLoggedIn(token, signupType).then((res) => {
+      dispatch({
+        type: SIGNIN_SUCCESS,
+        payload: res.data.userInfo
+      });
+    });
     if (params.commentId) {
       setFindComment(Number(params.commentId));
       if (commentRef.current) {
@@ -537,6 +545,7 @@ export default function Party () {
     console.log(partyInfo);
     console.log(userState);
     setIsLoading(false);
+    document.cookie = `location=http://localhost:3000/party/${partyInfo.id}`;
   }, [ userState ]);
 
   if(isLoading) {
@@ -556,7 +565,7 @@ export default function Party () {
             {isLoggedIn?
               <button onClick={favoriteHandler}>
                 <FontAwesomeIcon 
-                  icon={isFavorite ? faHeart : blankFaHeart} 
+                  icon={partyInfo.isFavorite ? faHeart : blankFaHeart} 
                   className="favorite" 
                 />
               </button>
@@ -612,7 +621,7 @@ export default function Party () {
             disabled={!isLoggedIn}
           >
             <FontAwesomeIcon 
-              icon={isFavorite ? faHeart : blankFaHeart}
+              icon={partyInfo.isFavorite ? faHeart : blankFaHeart}
               className="favorite" 
             />
             &nbsp;{ partyInfo.favorite }
@@ -710,7 +719,7 @@ export default function Party () {
             partyId={partyInfo.id}
             isLeader={isLeader}
             leaderId={partyInfo.leaderId}
-            comments={comments}
+            comments={comments.reverse()}
             findComment={findComment}
           /> 
         </section>
@@ -799,6 +808,12 @@ export default function Party () {
           fullPartyHandler={fullPartyHandler}
           dismissHandler={dismissHandler}
         /> 
+      : null}
+      {isEdit?
+        <PartyEdit
+          party={partyInfo}
+          editHandler={editHandler}
+        />
       : null}
       {isSigninModalOpen? <SigninModal /> : null}
     </PartyContainer>

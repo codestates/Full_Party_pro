@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 
@@ -15,7 +15,7 @@ import Notification from './pages/Notification';
 import Favorite from './pages/Favorite';
 import Mypage from './pages/Mypage';
 import NotFound from './pages/NotFound';
-
+import axios from "axios";
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
 import SigninModal from './components/SigninModal';
@@ -29,14 +29,25 @@ declare global {
     kakao: any;
   }
 }
+export const cookieParser = () => {
+  const cookieString = document.cookie.split("; ");
+  const keyAndValue = cookieString.map(item => item.split("="));
+  let cookieObject: { [key: string]: string } = {};
+  keyAndValue.map((item, i) => cookieObject[item[0]] = item[1]);
+  return cookieObject;
+};
+
+export const requestKeepLoggedIn = async (token: string, signupType: string) => {
+  const response = await axios.post("https://localhost:443/keeping", {}, {
+    headers: {
+      access_token: token,
+      signup_type: signupType
+    }
+  });
+  return response;
+};
 
 export default function App() {
-  const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
-
-  function signinModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
-    setIsSigninModalOpen(!isSigninModalOpen);
-  }
-
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
@@ -60,7 +71,9 @@ export default function App() {
           <section className="features">
             <Routes>
               <Fragment>
-                <Route path="/" element={isLoggedIn ? <List /> : <Home />} />
+                {/* <Route path="/" element={isLoggedIn ? <List /> : <Home />} /> */}
+                <Route path="/" element={<Home />} />
+                <Route path="/home" element={<List />} />
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
                 </Route>
