@@ -18,7 +18,7 @@ export const signin = async (req: Request, res: Response) => {
     setCookie(res, "token", String(accessToken));
     return SuccessfulResponse(res, { message: "You Have Successfully Signed In", userInfo });
   }
-  catch (error) {
+  catch (error) { 
     return InternalServerError(res, error);
   }
 };
@@ -142,48 +142,53 @@ export const googleSignIn = async (req: Request, res: Response) => {
 export const kakao = async (req: Request, res: Response) => {
   try {
     const { authorizationCode } = req.body;
-    const response = await axios({
-      method: "POST",
-      url: "https://kauth.kakao.com/oauth/token",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
-      },
-      params : {
-        grant_type: "authorization_code",
-        client_id: "dfdae48bc5a2f6e1f3326d50455762b3",
-        client_secret: "eHYGMf3Vm2V5IbA0frZ1qfvdsgJwgZcv",
-        redirect_uri: "http://localhost:3000",
-        code: authorizationCode
-      }
-    });
-    const accessToken = response.data.access_token;
-    const userInfoFromKakao = await axios({
-      method: "GET",
-      url: "https://kapi.kakao.com/v2/user/me",
-      headers: {
-        "Authorization": `Bearer ${accessToken}`
-      }
-    });
-    const { nickname, profile_image } = userInfoFromKakao.data.properties;
-    const { email, gender } = userInfoFromKakao.data.kakao_account;
-    const checkUser = await findUser({ email });
-    if (!checkUser) {
-      await createUser({
-        userName: nickname,
-        profileImage: profile_image ? profile_image : null,
-        email,
-        gender: "기타",
-        birth: new Date(),
-        address: "KAKAO",
-        mobile: "KAKAO",
-        exp: 25,
-        level: 1,
-        signupType: "kakao"
+    try {
+      const response = await axios({
+        method: "POST",
+        url: "https://kauth.kakao.com/oauth/token",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+        },
+        params : {
+          grant_type: "authorization_code",
+          client_id: "dfdae48bc5a2f6e1f3326d50455762b3",
+          client_secret: "eHYGMf3Vm2V5IbA0frZ1qfvdsgJwgZcv",
+          redirect_uri: process.env.REACT_APP_REDIRECT_URI,
+          code: authorizationCode
+        }
       });
+      const accessToken = response.data.access_token;
+      const userInfoFromKakao = await axios({
+        method: "GET",
+        url: "https://kapi.kakao.com/v2/user/me",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`
+        }
+      });
+      const { nickname, profile_image } = userInfoFromKakao.data.properties;
+      const { email, gender } = userInfoFromKakao.data.kakao_account;
+      const checkUser = await findUser({ email });
+      if (!checkUser) {
+        await createUser({
+          userName: nickname,
+          profileImage: profile_image ? profile_image : null,
+          email,
+          gender: "기타",
+          birth: new Date(),
+          address: "KAKAO",
+          mobile: "KAKAO",
+          exp: 25,
+          level: 1,
+          signupType: "kakao"
+        });
+      }
+      const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
+      setCookie(res, "token", String(accessToken));
+      SuccessfulResponse(res, { message: "You have successfully signed in", userInfo });
     }
-    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
-    setCookie(res, "token", String(accessToken));
-    return SuccessfulResponse(res, { message: "You have successfully signed in", userInfo });
+    catch (error) {
+      console.log(error)
+    }
   }
   catch (error) {
     InternalServerError(res, error);
@@ -201,7 +206,6 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
         const userInfo = await findUser({ id: verification.id }, [ "id", "profileImage", "userName", "address", "signupType" ]);
         SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
       }
-        
     }
     else if (signupType === "kakao") {
       const userInfoFromKakao = await axios({

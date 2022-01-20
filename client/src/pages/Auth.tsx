@@ -1,5 +1,9 @@
 import React from 'react';
-
+import { useEffect } from 'react';
+import { Navigate, useNavigate } from 'react-router';
+import axios from 'axios';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 export const LoadingContainer = styled.div`
@@ -43,6 +47,50 @@ export const LoadingBackdrop = styled.div`
 `;
 
 export default function Auth() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const address = new URL(window.location.href).searchParams.get("code")
+    if (address && address[1] !== "/") handleKakaoLogin();
+    else if (address && address[1] === "/") handleGoogleLogin();
+  }, []);
+
+  const handleGoogleLogin = async () => {
+    const authorizationCode = new URL(window.location.href).searchParams.get("code");
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/google`, { authorizationCode }, {
+      withCredentials: true
+    });
+    dispatch({
+      type: SIGNIN_SUCCESS,
+      payload: response.data.userInfo
+    });
+    document.cookie = "signupType=google";
+    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
+    document.cookie = "isLoggedIn=1;"
+    navigate("../home");
+  };
+
+  const handleKakaoLogin = async () => {
+    try {
+      const authorizationCode = new URL(window.location.href).searchParams.get("code");
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/kakao`, { authorizationCode }, {
+        withCredentials: true
+      });
+      dispatch({
+        type: SIGNIN_SUCCESS,
+        payload: response.data.userInfo
+      });
+      document.cookie = "signupType=kakao";
+      document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home;`;
+      document.cookie = "isLoggedIn=1;"
+      navigate("../home");
+    }
+    catch (error) {
+      console.log(error);
+    }
+  };
+  
   return (
     <LoadingContainer>
       <LoadingBackdrop>

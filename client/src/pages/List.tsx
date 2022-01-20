@@ -11,7 +11,6 @@ import EmptyCard from '../components/EmptyCard';
 import AddressModal from '../components/AddressModal';
 import axios from 'axios';
 import { NOTIFY } from '../actions/notify';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const ListContainer = styled.div`
   width: 100%;
@@ -54,20 +53,6 @@ export default function List () {
   const [isLoading, setIsLoading] = useState(true);
   const [ myParty, setMyParty ] = useState([]);
   const [ localParty, setLocalParty ] = useState([]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    (async () => {
-      const { token, signupType } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
-      });
-    })();
-  }, []);
 
   useEffect(() => {
     setIsLoading(true);

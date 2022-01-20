@@ -12,7 +12,7 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
     document.cookie = "signupType=general";
     document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
     document.cookie = "isLoggedIn=1;"
-    window.location.assign(cookieParser().location);
+    // window.location.assign(cookieParser().location);
 
     dispatch({
       type: SIGNIN_SUCCESS,

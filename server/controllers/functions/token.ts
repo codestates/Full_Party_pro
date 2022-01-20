@@ -16,7 +16,7 @@ export const verifyAccessToken = (token: string): JwtPayload | string | undefine
     return verify(token, config.accessSecret);
   }
   catch (error) {
-    console.log(error);
+    return error;
   }
 };
 

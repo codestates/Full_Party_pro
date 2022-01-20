@@ -238,7 +238,7 @@ const AddressModal = () => {
   const handleAddressRegister = async () => {
     if(address){
       setErrorMsg('')
-      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/address/${userInfo.id}`, {
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/address/${userInfo.id}`, {
         userId: userInfo.id, address: formatAddress
       });
 

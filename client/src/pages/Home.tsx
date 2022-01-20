@@ -316,66 +316,6 @@ export const Footer = styled.footer`
 function Home () {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (!document.cookie) {
-      document.cookie = "token=temp;";
-      document.cookie = "signupType=temp;";
-      document.cookie = "isLoggedIn=0;";
-      document.cookie = `location=${process.env.REACT_APP_CLIENT_URL};`;
-    }
-    const { token, signupType, location } = cookieParser();
-    if (token && signupType) {
-      if (token !== "temp" && signupType !== "temp") {
-        requestKeepLoggedIn(token, signupType).then((res) => {
-          dispatch({
-            type: SIGNIN_SUCCESS,
-            payload: res.data.userInfo
-          });
-        });
-        document.cookie = "isLoggedIn=1;";
-      }
-    }
-    const address = new URL(window.location.href).searchParams.get("code")
-    if (address && address[1] !== "/") handleKakaoLogin();
-    else if (address && address[1] === "/") handleGoogleLogin();
-  }, []);
-
-  useEffect(() => {
-    if (cookieParser().isLoggedIn === '1') window.location.assign(cookieParser().location);
-  }, []);
-
-  const handleGoogleLogin = async () => {
-    const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/google`, { authorizationCode }, {
-      withCredentials: true
-    });
-    dispatch({
-      type: SIGNIN_SUCCESS,
-      payload: response.data.userInfo
-    });
-    document.cookie = "signupType=google";
-    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
-    document.cookie = "isLoggedIn=1;"
-    window.location.assign(cookieParser().location);
-
-  };
-
-  const handleKakaoLogin = async () => {
-    const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/kakao`, { authorizationCode }, {
-      withCredentials: true
-    });
-    dispatch({
-      type: SIGNIN_SUCCESS,
-      payload: response.data.userInfo
-    });
-    document.cookie = "signupType=kakao";
-    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home;`;
-    document.cookie = "isLoggedIn=1;"
-    window.location.assign(cookieParser().location);
-
-  };
-
   const handleModal = (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className));
   }

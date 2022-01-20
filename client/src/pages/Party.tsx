@@ -493,19 +493,6 @@ export default function Party () {
   }
 
   useEffect(() => {
-    const { token, signupType, location } = cookieParser();
-    requestKeepLoggedIn(token, signupType).then((res) => {
-      dispatch({
-        type: SIGNIN_SUCCESS,
-        payload: res.data.userInfo
-      });
-    });
-    if (params.commentId) {
-      setFindComment(Number(params.commentId));
-      if (commentRef.current) {
-        commentRef.current.scrollIntoView();
-      }
-    }
     setIsLoading(true);
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`);
@@ -540,7 +527,7 @@ export default function Party () {
   
   useEffect(() => {
     setIsLoading(false);
-    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
+    // document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
   }, [ userState ]);
 
   if(isLoading) {
