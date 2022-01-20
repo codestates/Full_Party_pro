@@ -726,7 +726,6 @@ const SignupModal = () => {
                       <input
                         type='tel'
                         name='mobile'
-                        maxLength={13}
                         value={userInfo.mobile}
                         maxLength={13}
                         autoComplete='off'

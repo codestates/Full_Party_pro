@@ -163,7 +163,9 @@ export default function Search () {
     setIsLoading(false);
   }, [ parties ]);
   
-  if(isLoading){
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
+  } else if(isLoading){
     return <Loading />
   }
 
