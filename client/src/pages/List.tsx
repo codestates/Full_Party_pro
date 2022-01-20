@@ -59,12 +59,13 @@ export default function List () {
     setIsLoading(true);
     (async () => {
       const { token, signupType } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
+      requestKeepLoggedIn(token, signupType).then((res) => {
         dispatch({
           type: SIGNIN_SUCCESS,
           payload: res.data.userInfo
         });
         document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
+        console.log(res.data);
       });
     })();
   }, []);

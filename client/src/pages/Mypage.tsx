@@ -585,7 +585,7 @@ export default function Mypage () {
     setParties(myParty)
   }
   const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completed/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
@@ -694,7 +694,7 @@ export default function Mypage () {
   return (
     <MypageContainer>
       {callModal? <UserCancelModal from={from} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} /> : null}
-      {isVerificationModalOpen? <VerificationModal userId={signinReducer.userInfo?.id} handleIsChange={handleIsChange} verficationModalHandler={verficationModalHandler} /> : null}
+      {isVerificationModalOpen? <VerificationModal userId={userInfoFromStore?.id} handleIsChange={handleIsChange} verficationModalHandler={verficationModalHandler} /> : null}
       <MypageHeader>
         <div className="leftWrapper">
           <div className='profileImageContainer'>

@@ -152,7 +152,7 @@ export const kakao = async (req: Request, res: Response) => {
         grant_type: "authorization_code",
         client_id: "dfdae48bc5a2f6e1f3326d50455762b3",
         client_secret: "eHYGMf3Vm2V5IbA0frZ1qfvdsgJwgZcv",
-        redirect_uri: "http://localhost:3000",
+        redirect_uri: process.env.REACT_APP_REDIRECT_URI,
         code: authorizationCode
       }
     });

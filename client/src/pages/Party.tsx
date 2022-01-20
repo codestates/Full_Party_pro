@@ -470,13 +470,14 @@ export default function Party () {
       setIsEdit(!isEdit);
     }
 
-  const cancelHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     // [dev]
     console.log("가입 신청을 취소합니다.");
   }
 
-  const quitHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     // [dev]
+    await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
     console.log("파티를 탈퇴합니다.");
   }
 
