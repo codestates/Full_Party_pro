@@ -11,7 +11,6 @@ import EmptyCard from '../components/EmptyCard';
 import AddressModal from '../components/AddressModal';
 import axios from 'axios';
 import { NOTIFY } from '../actions/notify';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const ListContainer = styled.div`
   width: 100%;
@@ -81,9 +80,9 @@ export default function List () {
     return <Loading />
   }
 
-  // if(!userInfo.address || userInfo.address === 'Guest'){
-  //   return <AddressModal />
-  // }
+  if(!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "unidentified" || userInfo.address === "KAKAO"){
+    return <AddressModal />
+  }
 
   return (
     <ListContainer>

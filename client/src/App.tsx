@@ -1,7 +1,6 @@
 import React, { useEffect, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Loading from './components/Loading';
 import { Navigate, useNavigate } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from './reducers';
@@ -16,6 +15,7 @@ import Notification from './pages/Notification';
 import Favorite from './pages/Favorite';
 import Mypage from './pages/Mypage';
 import NotFound from './pages/NotFound';
+import Auth from './pages/Auth';
 import axios from "axios";
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
@@ -93,17 +93,16 @@ export default function App() {
             <Routes>
               <Fragment>
                 <Route path="/" element={<Home />} />
-                <Route path="/auth" element={<Loading />} />
+                <Route path="/auth" element={<Auth />} />
                 <Route path="/home" element={cookieParser().isLoggedIn === "1" ? <List /> : <Home />} />
-                {/* <Route path="/home" element={<List />} /> */}
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
                 </Route>
                 <Route path="/post" element={<Post />} />
-                <Route path="/post/:partyInfo" element={<Post />} /> 
-                <Route path="/search" element={<Search />} />
-                <Route path="/search/keyword/:keyword" element={<Search />} />
-                <Route path="/search/tag/:tag" element={<Search />} />
+                <Route path="/search" element={<Search />}>
+                  <Route path="/keyword/:keyword" element={<Search />} />
+                  <Route path="/tag/:tag" element={<Search />} />
+                </Route>
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/favorite" element={<Favorite />} />
                 <Route path="/mypage" element={<Mypage />} />
