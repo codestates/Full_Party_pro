@@ -10,7 +10,7 @@ const initialState: InitialState = {
   userInfo: {
     id: 0.1,
     userName: "",
-    profileImage: "",
+    profileImage: "img/defaultProfile.png",
     address: "",
     signupType: ""
   }

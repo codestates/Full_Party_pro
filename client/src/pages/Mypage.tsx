@@ -15,6 +15,8 @@ import Loading from '../components/Loading';
 import UserCancelModal from '../components/UserCancelModal'
 import PartySlide from '../components/PartySlide';
 import VerificationModal from '../components/VerificationModal';
+import UserMap from '../components/UserMap';
+import EmptyParty from '../components/EmptyParty';
 
 // [dev] 더미데이터: 서버 통신되면 삭제
 import dummyList from '../static/dummyList';
@@ -25,14 +27,24 @@ export const MypageContainer = styled.div`
   padding: 60px 0;
 
   .imgChange {
-    width: 40%;
-    margin: 0 30%;
+    width: 90%;
+
+    display: flex;
+    justify-content: flex-end;
+
     .imgChangeBtn {
-      width: 100%;
-      height: 30px;
-      border: none;
-      border-radius: 20px;
-      background-color: darkcyan;
+      margin-top: 0;
+      width: 150px;
+      height: 40px;
+
+      border: 1px solid #50C9C3;
+      border-radius: 30px;
+      color: #50C9C3;
+      background-color: #fff;
+
+      padding: 0 10px;
+
+      cursor: pointer;
     }
   }
 
@@ -46,6 +58,12 @@ export const MypageContainer = styled.div`
   section {
     margin: 30px 0;
     padding: 0 10%;
+  }
+
+  .error {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #f34508;
   }
 `
 
@@ -118,7 +136,8 @@ export const MypageInfo = styled.section`
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: center;
+    /* align-items: center; */
   }
 
   button {
@@ -130,7 +149,7 @@ export const MypageInfo = styled.section`
     color: #fff;
     background-color: #50C9C3;
 
-    margin: 10px 10px 0 0;
+    margin: 10px 20px 0 0;
     cursor: pointer;
   }
 
@@ -139,59 +158,88 @@ export const MypageInfo = styled.section`
     display: flex;
   }
 
-  .error {
-    font-size: 12px;
-    color: red;
-    padding-left: 12px;
+  .buttons {
+    width: 100%;
+    padding: 0 5%;
+    margin: 20px 0;
+
+    display: flex;
+    justify-content: center;
+
+    .cancel {
+      border: 1px solid #50C9C3;
+      color: #50C9C3;
+      background-color: #fff;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .buttons {
+      display: flex;
+      flex-direction: column;
+
+      width: 100%;
+
+      margin: 10px 0;
+
+      button {
+        width: 100%;
+      }
+    }
   }
 `
 export const InfoTable = styled.table`
-  width: 100%;
-  padding: 5%;
+  margin: 10px 0 20px 0;
+
+  td {
+    height: 50px;
+  }
 
   .label {
-    width: 70px;
-    height: 33px;
-    font-size: 15px;
-    font-family: 'DungGeunMo'; 
+    padding-right: 15px;
     text-align: center;
-  }
-  input {
-    width: 170px;
-    height: 33px;
-    background-color: white;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid #d5d5d5;
-    margin: 10px;
-    padding: 0 2px;
 
-    font-size: 13px;
-    text-align: center;
-  }
-  select {
-    width: 170px;
-    height: 33px;
-    background-color: white;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid #d5d5d5;
-    margin: 10px;
-    padding: 0 2px;
-
-    font-size: 13px;
-    text-align: center;
+    font-weight: bold;
   }
 
-  @media screen and (min-width: 500px) {
-    width: 600px;
-    margin-left: 12vw;
+  .input {
+    padding: 0 8px;
+    max-width: 400px;
+
+    input {
+      border: none;
+      border-bottom: 1px solid #d5d5d5;
+
+      width: 100%;
+      height: 25px;
+
+      text-align: center; 
+    }
+
+    input[type=date] {
+      font-family: "-apple-system";
+    }
 
     select {
-      width: 300px;
+      width: 100%;
+      text-align: center;
+
+      border: none;
+      border-bottom: 1px solid #d5d5d5;
     }
-    input {
-      width: 300px;
+  }
+
+  .error {
+    margin-top: 5px;
+  }
+  
+  .map {
+    display: none;
+  }
+
+  @media screen and (max-width: 600px) {
+    .input {
+      max-width: 200px;
     }
   }
 `
@@ -247,8 +295,11 @@ export const MypartyCards = styled.section`
 `
 
 export default function Mypage () {
-  // [dev] 더미데이터: 서버 통신되면 삭제
-  const { userInfo, myParty, localParty } = dummyList;
+  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const fileRef = useRef<any>();
+  const imgRef=useRef<any>(null);
   
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
@@ -260,21 +311,23 @@ export default function Mypage () {
 
   //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
   const [curTab, setCurTab] = useState(0);
-  const [parties, setParties] = useState(myParty);
+  const [parties, setParties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isInfoLoading, setIsInfoLoading] = useState(false);
+  const [isInfoLoading, setIsInfoLoading] = useState(true);
   //img 상태가 제대로 반영이 안되면 로딩창 넣어주세요
   const [imgLoading, setImgLoading] = useState(false);
-  const [isChange, setIsChange] = useState(true);
+  const [isChange, setIsChange] = useState(false);
   const [callModal, setCallModal] = useState(false);
-  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(true);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [from, setFrom] = useState('');
+  const [fixedLocation, setFixedLocation] = useState('');
+  const [formatAddress, setFormatAddress] = useState('');
   const [basicInfo, setBasicInfo] = useState({
-    userName: '베이직이름',
-    profileImage: '/img/defaultThumbnail.png',
-    address: '수원시 장안구',
-    level: 7,
-    exp: 148
+    userName: signinReducer.userInfo.userName,
+    profileImage: signinReducer.userInfo.profileImage,
+    address: signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1],
+    level: 0,
+    exp: 0
   });
   const [changeInfo, setChangeInfo] = useState({
     userName: '',
@@ -287,20 +340,25 @@ export default function Mypage () {
     mobile: '',
     nowPwd: ''
   });
-  const [wrongConfirm, setWrongConfirm] = useState({
-    err: false,
-    msg: '비밀번호를 다시 확인해주세요'
-  });
-  const [wrongMobile, setWrongMobile] =useState({
-    err: false,
-    msg: "'-'를 포함하여 입력하세요"
+
+  const [isError, setIsError] = useState({
+    isName: true,
+    isMobile: true,
+    isAxios: true,
+    nameMsg: '',
+    mobileMsg: '',
+    axiosMsg: '',
   });
 
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const fileRef = useRef<any>();
-  const imgRef=useRef<any>(null);
+  const [isPassword, setIsPassword] = useState({
+    isValid: false,
+    passwordMsg: '',
+  })
+
+  const [isConfirmPassword, setIsConfirmPassword] = useState({
+    isValid: false,
+    confirmPasswordMsg: '',
+  })
 
   // [CAUTION] 이미지 서버 관련 코드 => 범님 외 수정 X
   AWS.config.update({
@@ -348,63 +406,102 @@ export default function Mypage () {
   const handleIsChange = async () => {
     if(isChange) {
       setIsChange(false)
-    } 
-    else if(!isChange) {
-      const verify = await axios.post(`${process.env.REACT_APP_API_URL}/user/verification`, {
-        userInfo: {
-          userId: signinReducer.userInfo?.id,
-          password: changeInfo.nowPwd
-        }
-      })
-      if(verify.data.message === "User Identified") {
-        setIsInfoLoading(true)
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/profile/${signinReducer.userInfo?.id}`)
-        const userInfo = res.data.userInfo
-        setChangeInfo({
-          ...changeInfo,
-          userName: userInfo.userName,
-          birth: userInfo.birth,
-          address: userInfo.address,
-          gender: userInfo.gender,
-          mobile: userInfo.mobile
-        });
-        setIsInfoLoading(false);
-        setIsChange(true);
-      }
+    } else {
+      setIsInfoLoading(true)
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/profile/${signinReducer.userInfo?.id}`)
+      const userInfo = res.data.userInfo
+      setChangeInfo({
+        ...changeInfo,
+        userName: userInfo.userName,
+        birth: userInfo.birth,
+        address: userInfo.address,
+        gender: userInfo.gender,
+        mobile: userInfo.mobile
+      });
+      setIsInfoLoading(false);
+      setIsChange(true);
     }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const regex = {
-      mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/
-    };
+
+    const { name, value } = e.target;
 
     setChangeInfo({
       ...changeInfo,
-      [e.target.name]: e.target.value
+      [name]: value,
     })
 
-    if(e.target.name === 'confirm') {
-      if(e.target.value === changeInfo.password) {
-        setWrongConfirm({
-          ...wrongConfirm,
-          err: false
+    const regex={
+      password: /^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W).{8,16}$)/,
+      mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/
+    };
+
+    if(name === 'userName'){
+      if(value.length < 2){
+        setIsError({
+          ...isError,
+          isName: false,
+          nameMsg: "두 글자 이상 입력해주세요."
         })
       }
     }
-    else if(e.target.name === 'mobile') {
-      if(!regex.mobile.test(e.target.value)) {
-        setWrongMobile({
-          ...wrongMobile,
-          err: true
+
+    if(name === 'password'){
+      if(!regex.password.test(value)){
+        setIsPassword({
+          isValid: false,
+          passwordMsg: '숫자/영문자/특수문자를 포함한 8~16자리의 비밀번호여야 합니다.'
         })
       } else {
-        setWrongMobile({
-          ...wrongMobile,
-          err: false
+        setIsPassword({
+          isValid: true,
+          passwordMsg: '',
         })
       }
-    }
+
+      if(changeInfo.confirm !== value){
+        setIsConfirmPassword({
+          isValid: false,
+          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
+        })
+      } else {
+        setIsConfirmPassword({
+          isValid: true,
+          confirmPasswordMsg: '',
+        })
+      }
+    };
+
+    if(name === 'confirmPassword'){
+      if(changeInfo.password !== value){
+        setIsConfirmPassword({
+          isValid: false,
+          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
+        })
+      } else {
+        setIsConfirmPassword({
+          isValid: true,
+          confirmPasswordMsg: '',
+        })
+      }
+    };
+
+    if(name === 'mobile'){
+      if(!regex.mobile.test(value)){
+        setIsError({
+          ...isError,
+          isMobile: false,
+          mobileMsg: "'-'를 포함하여 입력해주세요."
+        })
+      } else {
+        setIsError({
+          ...isError,
+          isMobile: true,
+          mobileMsg: ''
+        })
+      }
+    };
   }
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setChangeInfo({
@@ -421,47 +518,26 @@ export default function Mypage () {
     
     return `${year}-${month<10?`0${month}`:`${month}`}-${date}`
   }
-  //파티 데이터
-  const fetchJoinParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${userInfoFromStore?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
-  const fetchRecruiteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${userInfoFromStore?.id}`)
-    const myParty = res.data.myParty;
-    console.log(myParty);
-    setParties(myParty);
-  }
-  const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${userInfoFromStore?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
-  
-  const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
-    if(e.currentTarget.value === 0) {
-      fetchJoinParty()
-    }
-    else if(e.currentTarget.value === 1) {
-      fetchRecruiteParty()
-    }
-    else if(e.currentTarget.value === 2) {
-      fetchCompleteParty()
-    }
-    setCurTab(e.currentTarget.value)
-  }
 
   const submitInfo = async () => {
-    const { userName, profileImage, password, confirm, birth, gender, address, mobile, nowPwd } = changeInfo
-    if(password !== confirm) {
-      setWrongConfirm({
-        ...wrongConfirm,
-        err: true
+    const { userName, profileImage, password, confirm, birth, gender, address, mobile, nowPwd } = changeInfo;
+    const { isName, isMobile } = isError;
+    if(password !== confirm || !isName || !isMobile) {
+      setIsError({
+        ...isError,
+        isAxios: false,
+        axiosMsg: '입력하신 정보를 확인해주세요.',
       })
-      return;
     }
-    else if(password === '') {
+    else if(password === '') {      
+      setIsError({
+        isName: true,
+        isMobile: true,
+        isAxios: true,
+        nameMsg: '',
+        mobileMsg: '',
+        axiosMsg: '',
+      })
       const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
         userInfo: {
           userId: signinReducer.userInfo?.id,
@@ -470,7 +546,7 @@ export default function Mypage () {
           password: nowPwd,
           birth,
           gender,
-          address,
+          address: formatAddress,
           mobile
         }
       })
@@ -487,7 +563,7 @@ export default function Mypage () {
           password,
           birth,
           gender,
-          address,
+          address: formatAddress,
           mobile
         }
       })
@@ -495,7 +571,36 @@ export default function Mypage () {
         setIsChange(false)
       }
     }
-    
+  }
+
+  //파티 데이터
+  const fetchJoinParty = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`)
+    const myParty = res.data.myParty
+    setParties(myParty)
+  }
+  const fetchRecruiteParty = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
+    const myParty = res.data.myParty
+    setParties(myParty)
+  }
+  const fetchCompleteParty = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completed/${signinReducer.userInfo?.id}`)
+    const myParty = res.data.myParty
+    setParties(myParty)
+  }
+
+  const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+    if(e.currentTarget.value === 0) {
+      fetchJoinParty()
+    }
+    else if(e.currentTarget.value === 1) {
+      fetchRecruiteParty()
+    }
+    else if(e.currentTarget.value === 2) {
+      fetchCompleteParty()
+    }
+    setCurTab(e.currentTarget.value)
   }
 
   const handleSignOut = async () => {
@@ -531,8 +636,18 @@ export default function Mypage () {
     setCallModal(!callModal);
   };
 
-  function verficationModalHandler(e: React.MouseEvent<HTMLDivElement>){
+  function verficationModalHandler(e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>){
     setIsVerificationModalOpen(!isVerificationModalOpen);
+  }
+
+  const handleFormatAddressChange = (address: string) => {
+    setFormatAddress(address);
+  }
+
+  const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
+      setFixedLocation(changeInfo.address);
+    }
   }
 
   //페이지 진입시 로딩
@@ -579,16 +694,18 @@ export default function Mypage () {
   return (
     <MypageContainer>
       {callModal? <UserCancelModal from={from} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} /> : null}
-      {isVerificationModalOpen? <VerificationModal verficationModalHandler={verficationModalHandler} /> : null}
+      {isVerificationModalOpen? <VerificationModal userId={signinReducer.userInfo?.id} handleIsChange={handleIsChange} verficationModalHandler={verficationModalHandler} /> : null}
       <MypageHeader>
-        <div className='profileImage'>
-          <img className='profileImage' 
-            src={basicInfo.profileImage}
-            alt='thumbnail'
-            // onError={() => {
-            //   return(imgRef.current.src = 'img/bubble.png')
-            // }}
-          />
+        <div className="leftWrapper">
+          <div className='profileImageContainer'>
+            <img
+              src={basicInfo.profileImage}
+              alt='thumbnail'
+              // onError={() => {
+              //   return(imgRef.current.src = 'img/bubble.png')
+              // }}
+            />
+          </div>
         </div>
         <p className='mainProfile'>
           <div className='userName'>{basicInfo.userName}</div>
@@ -605,29 +722,26 @@ export default function Mypage () {
           </ProgressBar>
         </p>
       </MypageHeader>
-      <div className='imgChange'>
-        {isChange ? 
-        <div>
-          <button 
-            className='imgChangeBtn'
-            onClick={(e) => handleRefClick(e)
-          }>
-          이미지 수정
-          </button>
-          <input 
-            ref={fileRef}
-            type='file'
-            className='imgInput'
-            id='profileImg'
-            accept='image/*'
-            name='file'
-            hidden={true}
-            autoComplete='off'
-            onChange={handleImgLoad}
-          />
-        </div>
+      {isChange ? 
+          <div className="imgChange">
+            <button 
+              className='imgChangeBtn'
+              onClick={(e) => handleRefClick(e)
+            }>
+            프로필 이미지 수정
+            </button>
+            <input 
+              ref={fileRef}
+              type='file'
+              className='imgInput'
+              id='profileImg'
+              accept='image/*'
+              name='file'
+              hidden={true}
+              onChange={handleImgLoad}
+            />
+          </div>
         : null }
-      </div>
       <MypageInfo>
         <div className='subject'>프로필</div>
         {(() => {
@@ -640,18 +754,19 @@ export default function Mypage () {
                   <InfoTable>
                     <tr>
                       <td className='label'>닉네임</td>
-                      <td>
+                      <td className='input'>
                         <input
                           name='userName'
                           value={changeInfo.userName}
                           autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                         ></input>
+                        <div className='error'>{isError.nameMsg}</div>
                       </td>
                     </tr>
                     <tr>
                       <td className='label'>비밀번호</td>
-                      <td>
+                      <td className='input'>
                         <input
                           placeholder='비밀번호 수정시에만 입력하세요'
                           name='password'
@@ -659,11 +774,12 @@ export default function Mypage () {
                           value={changeInfo.password}
                           onChange={(e) => handleInputChange(e)}
                         ></input>
+                        <div className='error'>{isPassword.passwordMsg}</div>
                       </td>
                     </tr>
                     <tr>
                       <td className='label'>비밀번호<br />확인</td>
-                      <td>
+                      <td className='input'>
                         <input
                           placeholder='비밀번호 수정시에만 입력하세요'
                           name='confirm'
@@ -671,16 +787,12 @@ export default function Mypage () {
                           value={changeInfo.confirm}
                           onChange={(e) => handleInputChange(e)}
                         ></input>
+                        <div className='error'>{isConfirmPassword.confirmPasswordMsg}</div>
                       </td>
                     </tr>
                     <tr>
-                      <td />
-                      {wrongConfirm.err ? 
-                      <td className='error'>{wrongConfirm.msg}</td> : <td />}
-                    </tr>
-                    <tr>
                       <td className='label'>생일</td>
-                      <td>
+                      <td className='input'>
                         <input
                           type='date'
                           max={getCurrentDate()}
@@ -693,7 +805,7 @@ export default function Mypage () {
                     </tr>
                     <tr>
                       <td className='label'>젠더</td>
-                      <td>
+                      <td className='input'>
                         <select
                           name='gender'
                           value={changeInfo.gender}
@@ -708,18 +820,26 @@ export default function Mypage () {
                     </tr>
                     <tr>
                       <td className='label'>주소</td>
-                      <td>
+                      <td className='input'>
+                        <div className="map">
+                          <UserMap
+                            location={fixedLocation} 
+                            image={basicInfo.profileImage} 
+                            handleFormatAddressChange={handleFormatAddressChange}
+                          />
+                        </div>
                         <input
                           name='address'
                           value={changeInfo.address}
                           autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
+                          onKeyUp={(e) => handleSearchLocation(e)}
                         ></input>
                       </td>
                     </tr>
                     <tr>
-                      <td className='label'>휴대폰</td>
-                      <td>
+                      <td className='label'>전화번호</td>
+                      <td className='input'>
                         <input
                           name='mobile'
                           value={changeInfo.mobile}
@@ -727,24 +847,23 @@ export default function Mypage () {
                           onChange={(e) => handleInputChange(e)}
                           placeholder="'-'을 포함해 입력하세요"
                         ></input>
+                        <div className='error'>{isError.mobileMsg}</div>
                       </td>
                     </tr>
-                    <tr>
-                      <td />
-                      {wrongMobile.err ?
-                      <td className='error'>{wrongMobile.msg}</td> : <td />}
-                    </tr>
                   </InfoTable>
-                  <button onClick={submitInfo}>제출</button><br />
-                  <button onClick={handleIsChange}>취소</button>
-                  <button onClick={(e) => userCancelHandler(e, "delete")}>회원 탈퇴</button>
+                  <div className='error'>{isError.axiosMsg}</div>
+                  <div className="buttons">
+                    <button onClick={submitInfo}>변경</button>
+                    <button onClick={handleIsChange} className="cancel">취소</button>
+                    <button onClick={(e) => userCancelHandler(e, "delete")} className="cancel">회원 탈퇴</button>
+                  </div>
                 </div>
               )
             }
           } else {
             return(
               <div className='btns'>
-                <button onClick={handleIsChange}>
+                <button onClick={verficationModalHandler}>
                   개인 정보 수정
                 </button>
                 <button onClick={(e) => userCancelHandler(e, "signout")}>
@@ -754,29 +873,27 @@ export default function Mypage () {
             )}
         })()}
       </MypageInfo>
-      <MypartyCards>
-        <div className='subject'>내 파티</div>
-        <fieldset className='cardTabContainer'>
-          <ol className='cardTab'>
-            <li value={0} className={`tab ${curTab === 0 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>참여중 파티</li>
-            <li> | </li>
-            <li value={1} className={`tab ${curTab === 1 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>모집중 파티</li>
-            <li> | </li>
-            <li value={2} className={`tab ${curTab === 2 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>완료 파티</li>
-          </ol>
-        </fieldset>
-          {(() => {
-            if(curTab === 0) {
-              return <PartySlide myParty={parties} />
-            }
-            else if(curTab === 1) {
-              return <PartySlide myParty={parties} />
-            }
-            else if(curTab === 2) {
-              return <PartySlide myParty={parties} />
-            }
-          })()}
-      </MypartyCards>
+      {!isChange ?
+        <MypartyCards>
+          <div className='subject'>내 파티</div>
+          <fieldset className='cardTabContainer'>
+            <ol className='cardTab'>
+              <li value={0} className={`tab ${curTab === 0 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>참여중 파티</li>
+              <li> | </li>
+              <li value={1} className={`tab ${curTab === 1 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>운영중 파티</li>
+              <li> | </li>
+              <li value={2} className={`tab ${curTab === 2 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>완료 파티</li>
+            </ol>
+          </fieldset>
+            {(() => {
+              if(parties.length > 0){
+                return <PartySlide myParty={parties} />
+              } else {
+                return <EmptyParty />
+              }
+            })()}
+        </MypartyCards>
+      : null}
     </MypageContainer>
   );
 }

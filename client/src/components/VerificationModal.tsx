@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -42,23 +43,18 @@ export const ModalView = styled.div`
   justify-content: center;
   align-items: center;
 
-  header {
-    font-size: 25px;
-    margin-bottom: 15px;
-
-    font-family: 'SilkscreenBold';
-  }
-
   .error {
     font-size: 0.7rem;
     color: #f34508;
 
-    margin-top: 5px;
+    margin-top: 10px;
   }
 
   img {
     width: 50px;
     height: 50px;
+
+    margin-bottom: 5px;
   }
 
   .title {
@@ -68,15 +64,17 @@ export const ModalView = styled.div`
   }
 
   input {
-    width: 100%;
+    width: 200px;
     height: 25px;
     border: none;
     border-bottom: 1px solid #d5d5d5;
 
-    margin: 15px 0;
+    margin-top: 15px;
+
+    text-align: center;
   }
 
-  button {
+  .request {
     width: 90px;
     height: 40px;
 
@@ -87,52 +85,75 @@ export const ModalView = styled.div`
     color: #fff;
 
     cursor: pointer;
+
+    margin-top: 10px;
   }
 `
 
+export const CloseBtn = styled.button`
+
+  width: 100%;
+  text-align: right;
+
+  cursor: pointer;
+  margin-bottom: 10px;
+
+  background-color: white;
+  border: none;
+
+`
+
 type Props = {
+  userId: number,
+  handleIsChange: Function,
   verficationModalHandler: Function
 }
 
-const VerificationModal = ({ verficationModalHandler }: Props) => {
+const VerificationModal = ({ userId, handleIsChange, verficationModalHandler }: Props) => {
 
   const [password, setPassword] = useState('');
 
   const [errorMsg, setErrorMsg] = useState('');
 
+  const closeModal =() => {
+    verficationModalHandler();
+  }
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   }
 
-  const handleVerification = (e: React.MouseEvent<HTMLButtonElement>) => {
-    //[dev] 비밀번호 인증
+  const handleVerification = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const verify = await axios.post(`${process.env.REACT_APP_API_URL}/user/verification`, {
+      userInfo: {
+        userId: userId,
+        password: password
+      }
+    })
 
-    // await axios.post(`${process.env.REACT_APP_API_URL}/user/verification`, {
-    //   userInfo: {
-    //     userId: "", 
-    //     email: "",
-    //     password: "",
-    //   }
-    // }
+    if(verify.data.message === "Unauthorized User"){
+      setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
+    } else if(verify.data.message === "User Identified"){
+
+      handleIsChange();
+    }
   }
 
   return(
     <ModalContainer>
-      <ModalBackdrop onClick={(e) => verficationModalHandler(e)}>
-        <ModalView>
-          <div className="mapInfo">
+      <ModalBackdrop onClick={closeModal}>
+        <ModalView onClick={(e) => e.stopPropagation()}>
+          <CloseBtn onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
             <img src="img/404logo.png" alt="logo" />
             <div className="title">비밀번호를 입력해주세요.</div>
-          </div>
-          <input 
-            className='mapInput'
-            name='password'
-            type='text'
-            value={password}
-            autoComplete='off'
-            onChange={(e) => handleInputChange(e)}
-          />
-          <button className="request">제출</button>
+            <input 
+              name='password'
+              type='password'
+              value={password}
+              onChange={(e) => handleInputChange(e)}
+            />
+            <div className="error">{errorMsg}</div>
+            <button onClick={handleVerification} className="request">제출</button>
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
