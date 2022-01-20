@@ -69,7 +69,7 @@ export const HomeContainer = styled.div`
     }
   }
 
-  @media (min-width: 700px) {
+  @media screen and (min-width: 700px) {
     .bannerImg {
       img {
         width: 700px;
@@ -77,7 +77,7 @@ export const HomeContainer = styled.div`
     }
   }
 
-  @media (min-width: 800px) {
+  @media screen and (min-width: 800px) {
 
     .main {
 
@@ -155,13 +155,13 @@ export const AppInfo = styled.section`
     text-decoration: none;
   }
 
-  @media (min-width: 800px) {
+  @media screen and (min-width: 800px) {
     .appInfo{
       padding: 0 12%;
     }
   }
 
-  @media (min-width: 1000px) {
+  @media screen and (min-width: 1000px) {
 
     img {
       width: 700px;
@@ -274,7 +274,7 @@ export const SignIn = styled.section`
     box-shadow: rgba(80, 201, 195, 0.4) 0px 8px 24px;
   }
 
-  @media (min-width: 620px) {
+  @media screen and (min-width: 620px) {
     button {
       width: 400px;
     }

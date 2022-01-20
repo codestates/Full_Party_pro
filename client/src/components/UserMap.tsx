@@ -108,7 +108,6 @@ const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
           !!result[0].road_address ? 
             result[0].road_address.address_name
           : result[0].address.address_name;
-        console.log(address);
         handleFormatAddressChange(address);
       }   
    });
