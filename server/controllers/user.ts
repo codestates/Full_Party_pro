@@ -9,12 +9,12 @@ export const getUserInfo = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const notifications = await getNotification(Number(userId));
-      const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "region", "exp", "level", "signupType" ]);
-      if (userInfo && notifications) return SuccessfulResponse(res, {
-        message: "Loaded Successfully",
-        userInfo,
-        notifications
-      });
+    const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "address", "exp", "level", "signupType" ]);
+    if (userInfo && notifications) return SuccessfulResponse(res, {
+      message: "Loaded Successfully",
+      userInfo,
+      notifications
+    });
     return FailedResponse(res, 400, "Bad Request");
   }
   catch (error) {

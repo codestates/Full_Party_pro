@@ -427,71 +427,76 @@ export default function Party () {
     })
   }
 
-  function tagSearchHandler(tag: string) {
+  const tagSearchHandler = (tag: string) => {
     console.log(tag + "를 검색합니다.");
     navigate(`../search/tag/${tag}`);
   }
 
-  function waitingListHandler(event: React.MouseEvent<HTMLDivElement>): void {
+  const waitingListHandler = (event: React.MouseEvent<HTMLDivElement>): void =>{
     setIsWaitingListOpen(!isWaitingListOpen);
   }
 
-  function userInfoModalHandler(event: React.MouseEvent<HTMLDivElement>, from: string, listIdx: number): void {
+  const userInfoModalHandler = (event: React.MouseEvent<HTMLDivElement>, from: string, listIdx: number): void => {
    
     setFrom(from);
   
-    if(from === "members") {
+    if (from === "members") {
       setUserInfo(partyInfo.members[listIdx]);
-    } else {
+    } 
+    else {
       setUserInfo(partyInfo.waitingQueue[listIdx]);
     }
     setIsUserInfoModalOpen(!isUserInfoModalOpen);
   }
 
-  function partyJoinModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
+  const partyJoinModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsPartyJoinModalOpen(!isPartyJoinModalOpen);
   }
 
-  function signinModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
+  const signinModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsSigninModalOpen(!isSigninModalOpen);
   }
 
-  function reviewModalHandler(event: React.MouseEvent<HTMLButtonElement>): void {
+  const reviewModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsReviewModalOpen(!isReviewModalOpen);
   }
 
-  function partyCancelModalHandler(event: React.MouseEvent<HTMLButtonElement>, from: string): void {
+  const partyCancelModalHandler = (event: React.MouseEvent<HTMLButtonElement>, from: string): void => {
     setFrom(from);
     setIsPartyCancelModalOpen(!isPartyCancelModalOpen);
   }
+  
+    const editHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+      setIsEdit(!isEdit);
+    }
 
-  function cancelHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  const cancelHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     // [dev]
     console.log("가입 신청을 취소합니다.");
   }
 
-  function quitHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  const quitHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     // [dev]
     console.log("파티를 탈퇴합니다.");
   }
 
-  function editHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    setIsEdit(!isEdit);
+  const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
+    await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
+      partyId: partyInfo.id
+    });
   }
 
-  function fullPartyHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("파티 모집을 완료합니다");
+  const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
+    await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
+      partyId: partyInfo.id
+    });
   }
 
-  function rePartyHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("파티 모집을 재개합니다.");
-  }
-
-  function dismissHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev]
-    console.log("파티를 해산합니다.");
+  const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
+    await axios.delete(`${process.env.REACT_APP_API_URL}/party/${partyInfo.id}`);
   }
 
   useEffect(() => {

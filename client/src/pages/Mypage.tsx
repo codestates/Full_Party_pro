@@ -315,7 +315,7 @@ export default function Mypage () {
   //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
   const [curTab, setCurTab] = useState(0);
   const [parties, setParties] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isInfoLoading, setIsInfoLoading] = useState(false);
   //img 상태가 제대로 반영이 안되면 로딩창 넣어주세요
   const [imgLoading, setImgLoading] = useState(false);
@@ -324,7 +324,7 @@ export default function Mypage () {
   const [basicInfo, setBasicInfo] = useState({
     userName: '베이직이름',
     profileImage: '/img/defaultThumbnail.png',
-    region: '베이직지역',
+    address: '베이직지역',
     level: 7,
     exp: 148
   });
@@ -335,7 +335,7 @@ export default function Mypage () {
     confirm: '',
     birth: '',
     gender: '',
-    region: '',
+    address: '',
     mobile: '',
     nowPwd: ''
   });
@@ -356,6 +356,7 @@ export default function Mypage () {
   const fileRef = useRef<any>();
   const imgRef=useRef<any>(null);
 
+  // [CAUTION] 이미지 서버 관련 코드 => 범님 외 수정 X
   AWS.config.update({
     region: "ap-northeast-2",
     credentials: new AWS.CognitoIdentityCredentials({
@@ -408,7 +409,7 @@ export default function Mypage () {
         ...changeInfo,
         userName: userInfo.userName,
         birth: userInfo.birth,
-        region: userInfo.region,
+        address: userInfo.address,
         gender: userInfo.gender,
         mobile: userInfo.mobile
       })
@@ -469,7 +470,7 @@ export default function Mypage () {
   }
 
   const submitInfo = async () => {
-    const { userName, profileImage, password, confirm, birth, gender, region, mobile, nowPwd } = changeInfo
+    const { userName, profileImage, password, confirm, birth, gender, address, mobile, nowPwd } = changeInfo
     if(password !== confirm) {
       setWrongConfirm({
         ...wrongConfirm,
@@ -494,7 +495,7 @@ export default function Mypage () {
             password: nowPwd,
             birth,
             gender,
-            region,
+            address,
             mobile
           }
         })
@@ -510,10 +511,10 @@ export default function Mypage () {
             password: password,
             birth: birth,
             gender: gender,
-            region: region,
+            address: address,
             mobile: mobile
           }
-        })
+        });
         if(res.data.message === "Successfully Modified") {
           setIsChange(false)
         }
@@ -548,7 +549,7 @@ export default function Mypage () {
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
-    navigate("/");
+    navigate("http://localhost:3000");
   };
   const handleWithdrawal = async () => {
     const { token, signupType, location } = cookieParser();
@@ -558,11 +559,11 @@ export default function Mypage () {
         access_token: token
       }
     });
+    dispatch({ type: SIGNIN_FAIL });
     document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
-    dispatch({ type: SIGNIN_FAIL });
     navigate("http://localhost:3000");
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -582,8 +583,8 @@ export default function Mypage () {
 
   //페이지 진입시 로딩
   useEffect(() => {
-    setIsLoading(true)
-    const fetchBasicInfo = async () => {
+    setIsLoading(true);
+    (async () => {
       const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
         withCredentials: true,
       });
@@ -591,15 +592,18 @@ export default function Mypage () {
       setBasicInfo({
         userName: userInfo.userName,
         profileImage: userInfo.profileImage,
-        region: userInfo.region,
-        level: userInfo.region,
+        address: userInfo.address,
+        level: userInfo.level,
         exp: userInfo.exp
-      })
-    }
-    fetchBasicInfo();
+      });
+      console.log(res);
+    })();
     fetchJoinParty();
+  },[]);
+
+  useEffect(() => {
     setIsLoading(false);
-  },[])
+  }, [ basicInfo ]);
   
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
@@ -633,7 +637,7 @@ export default function Mypage () {
         <p className='mainProfile'>
           <div className='userName'>{basicInfo.userName}</div>
           <div>
-            <FontAwesomeIcon icon={faMapMarkerAlt} className='mapMarker'/><span className='text'>{basicInfo.region}</span>
+            <FontAwesomeIcon icon={faMapMarkerAlt} className='mapMarker'/><span className='text'>{basicInfo.address}</span>
           </div>
           <div>
             <FontAwesomeIcon icon={faCrown} className='crown'/><span className='text'>Lv.{basicInfo.level}</span>
@@ -745,8 +749,8 @@ export default function Mypage () {
                       <td className='label'>지역</td>
                       <td>
                         <input
-                          name='region'
-                          value={changeInfo.region}
+                          name='address'
+                          value={changeInfo.address}
                           onChange={(e) => handleInputChange(e)}
                         ></input>
                       </td>

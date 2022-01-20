@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Dispatch } from 'redux'
+import { cookieParser } from "../App";
 import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "./signinType";
 
 export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<UserInfoDispatchType>) => {
@@ -9,6 +10,9 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
     });
     const payload = response.data.userInfo;
     document.cookie = "signupType=general";
+    document.cookie = "location=http://localhost:3000/home";
+    document.cookie = "isLoggedIn=1;"
+    window.location.assign(cookieParser().location);
 
     dispatch({
       type: SIGNIN_SUCCESS,
