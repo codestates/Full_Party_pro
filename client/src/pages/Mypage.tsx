@@ -699,7 +699,7 @@ export default function Mypage () {
         <div className="leftWrapper">
           <div className='profileImageContainer'>
             <img
-              src={basicInfo.profileImage}
+              src={basicInfo.profileImage ? basicInfo.profileImage : 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
               alt='thumbnail'
               // onError={() => {
               //   return(imgRef.current.src = 'img/bubble.png')
