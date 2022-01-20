@@ -728,7 +728,7 @@ export default function Post () {
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
-        Key: `${signinReducer.userInfo.id}_${partyInfo.name}_image`,
+        Key: `${signinReducer.userInfo.id}_${partyInfo.name}_image.jpg`,
         Body: file,
       }
     })

@@ -373,7 +373,7 @@ export default function Mypage () {
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
-        Key: `${signinReducer.userInfo.id}_profileImage`,
+        Key: `${signinReducer.userInfo.id}_profileImage.jpg`,
         Body: file,
       }
     })
@@ -401,18 +401,28 @@ export default function Mypage () {
   const handleIsChange = async () => {
     if(isChange) {
       setIsChange(false)
-    } else {
-      const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/profile/${signinReducer.userInfo?.id}`)
-      const userInfo = res.data.userInfo
-      setChangeInfo({
-        ...changeInfo,
-        userName: userInfo.userName,
-        birth: userInfo.birth,
-        region: userInfo.region,
-        gender: userInfo.gender,
-        mobile: userInfo.mobile
+    } 
+    else if(!isChange) {
+      const verify = await axios.post('https://localhost:443/user/verification', {
+        userInfo: {
+          id: signinReducer.userInfo?.id,
+          password: changeInfo.nowPwd
+        }
       })
-      setIsInfoLoading(false)
+      if(verify.data.message === "User Identified") {
+        setIsInfoLoading(true)
+        const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/profile/${signinReducer.userInfo?.id}`)
+        const userInfo = res.data.userInfo
+        setChangeInfo({
+          ...changeInfo,
+          userName: userInfo.userName,
+          birth: userInfo.birth,
+          region: userInfo.region,
+          gender: userInfo.gender,
+          mobile: userInfo.mobile
+        })
+        setIsInfoLoading(false)
+      }
     }
   }
 
@@ -477,48 +487,39 @@ export default function Mypage () {
       })
       return;
     }
-
-    const verify = await axios.post('https://localhost:443/user/verification', {
-      userInfo: {
-        id: signinReducer.userInfo?.id,
-        password: nowPwd
-        //API확인해주세요 (email제외)
+    else if(password === '') {
+      const res = await axios.patch('https://localhost:443/user/profile', {
+        userInfo: {
+          profileImage,
+          userName,
+          password: nowPwd,
+          birth,
+          gender,
+          region,
+          mobile
+        }
+      })
+      if(res.data.message === "Successfully Modified") {
+        setIsChange(false)
       }
-    })
-    if(verify.data.message === "User Identified") {
-      if(password === '') {
-        const res = await axios.patch('https://localhost:443/user/profile', {
-          userInfo: {
-            profileImage,
-            userName,
-            password: nowPwd,
-            birth,
-            gender,
-            region,
-            mobile
-          }
-        })
-        if(res.data.message === "Successfully Modified") {
-          setIsChange(false)
+    } 
+    else if (password !== '') {
+      const res = await axios.patch('https://localhost:443/user/profile', {
+        userInfo: {
+          profileImage: profileImage,
+          userName: userName,
+          password: password,
+          birth: birth,
+          gender: gender,
+          region: region,
+          mobile: mobile
         }
-      } 
-      else if (password !== '') {
-        const res = await axios.patch('https://localhost:443/user/profile', {
-          userInfo: {
-            profileImage: profileImage,
-            userName: userName,
-            password: password,
-            birth: birth,
-            gender: gender,
-            region: region,
-            mobile: mobile
-          }
-        })
-        if(res.data.message === "Successfully Modified") {
-          setIsChange(false)
-        }
+      })
+      if(res.data.message === "Successfully Modified") {
+        setIsChange(false)
       }
     }
+    
   }
 
   //파티 데이터
@@ -770,17 +771,6 @@ export default function Mypage () {
                       {wrongMobile.err ?
                       <td className='error'>{wrongMobile.msg}</td> : <td />}
                     </tr>
-                    <tr>
-                      <td className='label'>현재<br />비밀번호</td>
-                      <td>
-                        <input
-                          name='nowPwd'
-                          value={changeInfo.nowPwd}
-                          onChange={(e) => handleInputChange(e)}
-                          placeholder='비밀번호를 입력한뒤 제출하세요'
-                        ></input>
-                      </td>
-                    </tr>
                   </InfoTable>
                   <button className='submitInfoBtn' onClick={submitInfo}>제출</button><br />
                   <button className='cancelInfoBtn' onClick={handleIsChange}>취소</button>
@@ -789,6 +779,16 @@ export default function Mypage () {
             }
           } else {
             return(
+              <div>
+              <div>
+                <span className='label'>비밀번호</span>
+                  <input
+                    name='nowPwd'
+                    value={changeInfo.nowPwd}
+                    onChange={(e) => handleInputChange(e)}
+                    placeholder='비밀번호를 입력한뒤 제출하세요'
+                  ></input>
+              </div>
               <section className='btns'>
                 <button
                   className='changeInfoBtn'
@@ -796,7 +796,6 @@ export default function Mypage () {
                 >
                   개인 정보 수정
                 </button>
-                {/* 로그아웃 구현한 함수 넣어주세요 */}
                 <button onClick={(e) => userCancelHandler(e)}
                   className='signoutBtn'
                 >
@@ -806,6 +805,7 @@ export default function Mypage () {
                   className='deleteBtn'
                 >회원탈퇴</button>
               </section>
+              </div>
             )}
         })()}
       </MypageInfo>
