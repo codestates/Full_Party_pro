@@ -559,7 +559,7 @@ function Home () {
         </div>
         <div className="contact">
           <div className="title">Contact Us</div>
-          <FontAwesomeIcon icon={ faEnvelope } className="icon" />reindeer1604@gmail.com
+          <FontAwesomeIcon icon={ faEnvelope } className="icon" />fullparty.gm@gmail.com
           <br /><FontAwesomeIcon icon={ faCodeBranch } className="icon" /><a href="https://github.com/codestates/Full_Party_pro/wiki" target="_blank" rel="noreferrer">github.com/codestates/Full_Party_pro</a>
         </div>      
       </Footer>

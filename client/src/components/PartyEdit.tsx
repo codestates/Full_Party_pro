@@ -929,7 +929,7 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     } else if(!regex.url.test(partyInfo.privateLink)) {
       setIsPLink({
         err: true,
-        msg: '유효한 링크를 입력해주세요.'
+        msg: "유효한 링크를 입력해주세요. 링크는 'https://'를 포함합니다."
       })
     }
 
@@ -973,7 +973,8 @@ export default function PartyEdit ({ party, editHandler }: Props) {
       patchParty()
       .then((res) => {
         setIsPosted(false);
-        navigate(`../party/${res.data.partyId}`);
+        editHandler();
+        navigate(`../party/${res.data.partyInfo.partyId}`);
       })
       .catch((err) => {
         setIsErrorModalOpen(true);

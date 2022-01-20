@@ -329,6 +329,7 @@ const SignupModal = () => {
   const [formatAddress, setFormatAddress] = useState('');
 
   const [isSent, setIsSent] = useState(false);
+  const [isTimeOut, setIsTimeOut] = useState(false);
 
   const [inputCode, setInputCode] = useState('');
   const [verificationData, setVerificationData] = useState({
@@ -463,6 +464,11 @@ const SignupModal = () => {
   function codeVerification() {
     if(userInfo.email === verificationData.email && verificationData.code === inputCode){
       setPageIdx(pageIdx + 1);
+      setIsError({
+        ...isError,
+        isVerificationCode: true,
+        verificationMsg: '',
+      })
     } else {
       setIsError({
         ...isError,
@@ -472,8 +478,19 @@ const SignupModal = () => {
     }
   }
 
+  const remailVerification = async () => {
+    setIsTimeOut(false);
+    setIsError({
+      ...isError,
+      isVerificationCode: false,
+      verificationMsg: '',
+    });
+
+    mailVerification();
+  }
+
   function handleCodeExpire() {
-    setIsSent(false);
+    setIsTimeOut(true);
     setIsError({
       ...isError,
       isVerificationCode: false,
@@ -589,18 +606,20 @@ const SignupModal = () => {
                       <div className='error'>{isError.emailMsg}</div>
                     </td>
                   </tr>
-                  <tr>
-                    <td className='label'>인증번호</td>
-                    <td className='input'>
-                      <input
-                        type='text'
-                        name='inputCode'
-                        value={inputCode}
-                        onChange={(e) => setInputCode(e.target.value)}
-                      />
-                      <div className='error'>{isError.verificationMsg}</div>
-                    </td>
-                  </tr>
+                  {isSent ? 
+                    <tr>
+                      <td className='label'>인증번호</td>
+                      <td className='input'>
+                        <input
+                          type='text'
+                          name='inputCode'
+                          value={inputCode}
+                          onChange={(e) => setInputCode(e.target.value)}
+                        />
+                        <div className='error'>{isError.verificationMsg}</div>
+                      </td>
+                    </tr>
+                  : null}
                 </table>
               )
             }
@@ -776,7 +795,8 @@ const SignupModal = () => {
               return (
                 <BtnContainer style={{ justifyContent: "flex-end" }}>
                   {!isSent? <button onClick={mailVerification} className="request">인증번호 요청</button> : null}
-                  {isSent? <button onClick={codeVerification} className="request">인증번호 확인</button> : null}
+                  {isSent && !isTimeOut ? <button onClick={codeVerification} className="request">인증번호 확인</button> : null}
+                  {isSent && isTimeOut? <button onClick={remailVerification} className="request">인증번호 재전송</button> : null}
                 </BtnContainer>
               )
             }

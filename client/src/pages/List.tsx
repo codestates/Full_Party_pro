@@ -77,7 +77,7 @@ export default function List () {
     return <Loading />
   }
 
-  if(!userInfo.address){
+  if(!userInfo.address || userInfo.address === 'Guest'){
     return <AddressModal />
   }
 
