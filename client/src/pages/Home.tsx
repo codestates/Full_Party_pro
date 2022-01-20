@@ -373,7 +373,6 @@ function Home () {
     document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home;`;
     document.cookie = "isLoggedIn=1;"
     window.location.assign(cookieParser().location);
-
   };
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => {
