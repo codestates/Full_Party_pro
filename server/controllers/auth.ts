@@ -18,7 +18,7 @@ export const signin = async (req: Request, res: Response) => {
     setCookie(res, "token", String(accessToken));
     return SuccessfulResponse(res, { message: "You Have Successfully Signed In", userInfo });
   }
-  catch (error) {
+  catch (error) { 
     return InternalServerError(res, error);
   }
 };
