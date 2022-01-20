@@ -122,20 +122,6 @@ export default function Search () {
   const hashtagHandler = (tag: string) => {
     navigate(`/search/tag/${tag}`)
   }
-  
-  useEffect(() => {
-    setIsLoading(true);
-    (async () => {
-      const { token, signupType, location } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/search`;
-      });
-    })();
-  }, []);
 
   useEffect(() => {
     let isComponentMounted = true;

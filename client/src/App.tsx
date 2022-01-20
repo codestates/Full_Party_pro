@@ -1,11 +1,12 @@
 import React, { useEffect, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-
-import { useSelector } from 'react-redux';
+import Loading from './components/Loading';
+import { Navigate, useNavigate } from 'react-router';
+import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from './reducers';
 import { RootReducerType } from './store/store';
-
+import { SIGNIN_SUCCESS } from './actions/signinType';
 import Home from './pages/Home';
 import List from './pages/List';
 import Party from './pages/Party';
@@ -48,9 +49,13 @@ export const requestKeepLoggedIn = async (token: string, signupType: string) => 
 };
 
 export default function App() {
+  const dispatch = useDispatch();
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
+  const userInfo = useSelector(
+    (state: AppState) => state.signinReducer.userInfo
+  )
 
   const { Kakao } = window;
   const modalReducer = useSelector((state: RootReducerType) => state.modalReducer)
@@ -58,6 +63,22 @@ export default function App() {
   useEffect(() => {
     if(!Kakao.isInitialized()){
       initialize();
+    }
+    if (!document.cookie) {
+      document.cookie = "token=temp;";
+      document.cookie = "signupType=temp;";
+      document.cookie = "isLoggedIn=0;";
+      document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
+    }
+    const { token, signupType, location, isLoggedIn } = cookieParser();
+    if (token !== "temp" && signupType !== "temp" && isLoggedIn !== "0") {
+      requestKeepLoggedIn(token, signupType).then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+      });
+      document.cookie = "isLoggedIn=1;";
     }
   }, []);
 
@@ -71,9 +92,10 @@ export default function App() {
           <section className="features">
             <Routes>
               <Fragment>
-                {/* <Route path="/" element={isLoggedIn ? <List /> : <Home />} /> */}
                 <Route path="/" element={<Home />} />
-                <Route path="/home" element={<List />} />
+                <Route path="/auth" element={<Loading />} />
+                <Route path="/home" element={cookieParser().isLoggedIn === "1" ? <List /> : <Home />} />
+                {/* <Route path="/home" element={<List />} /> */}
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
                 </Route>

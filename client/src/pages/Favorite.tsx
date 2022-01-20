@@ -41,20 +41,6 @@ export default function Favorite () {
   const [ favoriteList, setFavoriteList ] = useState<Array<Object>>([]);
 
   useEffect(() => {
-    setIsLoading(true);
-    (async () => {
-      const { token, signupType, location } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/favorite`;
-      });
-    })();
-  }, []);
-
-  useEffect(() => {
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/favorite/${userId}`, {
         withCredentials: true

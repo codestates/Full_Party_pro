@@ -967,19 +967,6 @@ export default function Post () {
   }
 
   useEffect(() => {
-    (async () => {
-      const { token, signupType, location } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/post`;
-      });
-    })();
-  }, []);
-
-  useEffect(() => {
     validationCheck();
   }, [partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink]);
 

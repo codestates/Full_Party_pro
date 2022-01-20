@@ -1,5 +1,4 @@
-const dotenv = require('dotenv').config();
-
+const dotenv = require("dotenv").config();
 const importer = (key: any, defaultValue: any = undefined) => {
   const value = process.env[key] || defaultValue;
   if (value === null) throw new Error(`Key ${key} is undefined`);

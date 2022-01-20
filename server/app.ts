@@ -50,7 +50,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json({ message: `Something went wrong: ${err}` });
 });
 
-const HTTPS_PORT = config.port || 4000;
+const HTTPS_PORT = config.port || 80;
 
 let server;
 if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
@@ -66,6 +66,6 @@ if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
       .catch(error => console.log(error))
   });
 } else {
-  server = app.listen(HTTPS_PORT, () => console.log('✅ http server runnning'));
+  server = app.listen(HTTPS_PORT, () => console.log('✅ http server running'));
 }
 export default server;

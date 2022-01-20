@@ -58,20 +58,6 @@ export default function List () {
   useEffect(() => {
     setIsLoading(true);
     (async () => {
-      const { token, signupType } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
-      });
-    })();
-  }, []);
-
-  useEffect(() => {
-    setIsLoading(true);
-    (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/list/${userInfo.id}/${searchRegion}`, {
         withCredentials: true
       });
@@ -95,9 +81,9 @@ export default function List () {
     return <Loading />
   }
 
-  if(!userInfo.address || userInfo.address === 'Guest'){
-    return <AddressModal />
-  }
+  // if(!userInfo.address || userInfo.address === 'Guest'){
+  //   return <AddressModal />
+  // }
 
   return (
     <ListContainer>

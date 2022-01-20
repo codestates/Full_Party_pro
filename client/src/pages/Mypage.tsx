@@ -585,7 +585,7 @@ export default function Mypage () {
     setParties(myParty)
   }
   const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completed/${signinReducer.userInfo?.id}`)
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
   }
@@ -610,10 +610,10 @@ export default function Mypage () {
       signup_type: signupType
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `token=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
   const handleWithdrawal = async () => {
@@ -625,10 +625,10 @@ export default function Mypage () {
       }
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `token=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
@@ -651,20 +651,6 @@ export default function Mypage () {
   }
 
   //페이지 진입시 로딩
-  useEffect(() => {
-    setIsLoading(true);
-    (async () => {
-      const { token, signupType, location } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/mypage`;
-      });
-    })();
-  }, []);
-
   
   useEffect(() => {
     (async () => {
@@ -694,7 +680,7 @@ export default function Mypage () {
   return (
     <MypageContainer>
       {callModal? <UserCancelModal from={from} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} /> : null}
-      {isVerificationModalOpen? <VerificationModal userId={signinReducer.userInfo?.id} handleIsChange={handleIsChange} verficationModalHandler={verficationModalHandler} /> : null}
+      {isVerificationModalOpen? <VerificationModal userId={userInfoFromStore?.id} handleIsChange={handleIsChange} verficationModalHandler={verficationModalHandler} /> : null}
       <MypageHeader>
         <div className="leftWrapper">
           <div className='profileImageContainer'>
