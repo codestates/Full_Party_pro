@@ -1,12 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faBullhorn, faScroll, faTrophy, faStar, faBellSlash } from '@fortawesome/free-solid-svg-icons';
 
+import { useSelector } from 'react-redux';
 import { AppState } from '../reducers';
+
+import Loading from '../components/Loading';
 
 // [dev] 더미데이터: 서버 통신되면 삭제
 import dummyNotification from '../static/dummyNotification';
@@ -93,6 +96,10 @@ export const NotificationContainer = styled.div`
 
 export default function Notification () {
 
+  const userId = useSelector(
+    (state: AppState) => state.signinReducer.userInfo.id
+  );
+
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
@@ -103,7 +110,9 @@ export default function Notification () {
 
   // [dev] 더미데이터 코드 실제 데이터로 변경. 
   // 뒤에 map + reverse는 남겨둘것(최신순으로 배열하기 위해 배열 순서를 바꿈)
-  const notification = dummyNotification.map(noti => noti).reverse();
+  // const notification = dummyNotification.map(noti => noti).reverse();
+  const [notification, setNotification] = useState<{ [key: string]: any }>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   type messageType = {
     [index: string]: string
@@ -150,12 +159,22 @@ export default function Notification () {
   }
 
   useEffect(() => {
-    // [dev]
-    // isRead 상태 바꿔주는 요청
-  }, [])
+    //[FEAT] 기능확인 필요
+    (async () => {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/notification/${userId}`);
+      setNotification(response.data.notifications);
+    })();
+  }, []);
+  
+  useEffect(() => {
+    setIsLoading(false);
+    // document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
+  }, [ notification ]);
 
   if(!isLoggedIn){
     return <Navigate to="/" />
+  } else if(isLoading){
+    return <Loading />
   }
 
   if(notification.length <= 0){
@@ -178,7 +197,7 @@ export default function Notification () {
 
   return (
     <NotificationContainer>
-      {notification.map((noti, idx) => {
+      {notification.map((noti: {[key: string]: any}, idx: number) => {
         if(!noti.partyId){
           return (
             <Link to="/mypage" style={{ textDecoration: 'none' }} key={idx}>
@@ -193,7 +212,6 @@ export default function Notification () {
           );
         } else {
           return (
-            //[dev] 파티 아이디로 링크 연결해야함
             <Link to={`/party/${noti.partyId}${noti.commentId ? `/${noti.commentId}` : ""}`} style={{ textDecoration: 'none' }} key={idx}>
               <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
                 <div className="contentWrapper">
