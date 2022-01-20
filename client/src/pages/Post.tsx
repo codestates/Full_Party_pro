@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import AWS from 'aws-sdk';
-
+import { useDispatch } from 'react-redux';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
+import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
@@ -647,6 +649,7 @@ export default function Post () {
   const navigate = useNavigate();
   const fileRef = useRef<any>();
   const imgRef = useRef<any>(null);
+  const dispatch = useDispatch();
 
   AWS.config.update({
     region: "ap-northeast-2",
@@ -939,12 +942,13 @@ export default function Post () {
   }
 
   const postParty = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/list/create`, {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/list/creation`, {
       userId: signinReducer.userInfo?.id,
       partyInfo: {
         name: partyInfo.name,
         image: partyInfo.image,
         memberLimit: partyInfo.memberLimit,
+        content: partyInfo.content,
         region: 
           isOnline? 
           signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
@@ -961,6 +965,19 @@ export default function Post () {
 
     return res;
   }
+
+  useEffect(() => {
+    (async () => {
+      const { token, signupType, location } = cookieParser();
+      await requestKeepLoggedIn(token, signupType).then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/post`;
+      });
+    })();
+  }, []);
 
   useEffect(() => {
     validationCheck();
@@ -980,10 +997,6 @@ export default function Post () {
     }
   }, [isPosted])
 
-  if(!isLoggedIn){
-    return <Navigate to="/" />
-  }
-  
   return (
     <PostContainer>
       {cancelModal ?

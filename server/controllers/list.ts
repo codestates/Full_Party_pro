@@ -29,6 +29,7 @@ export const getPartyList = async (req: Request, res: Response) => {
 export const createParty = async (req: Request, res: Response) => {
   try {
     const { userId, partyInfo } = req.body;
+    console.log("🌈", userId);
     const latlng = JSON.stringify(partyInfo.latlng);
     const newParty = await createNewParty(Number(userId), { ...partyInfo, latlng });
     return SuccessfulResponse(res, { message: "Successfully Created", newParty });

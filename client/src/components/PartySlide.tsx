@@ -123,7 +123,7 @@ type Props = {
 }
 
 export default function PartySlide ({ myParty }: Props) {
-
+  console.log(myParty)
   const settings = {
     dots: true,
     arrows: true,

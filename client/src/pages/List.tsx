@@ -64,7 +64,7 @@ export default function List () {
           type: SIGNIN_SUCCESS,
           payload: res.data.userInfo
         });
-        document.cookie = `location=${process.env.REACT_APP_API_URL}/home`;
+        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
       });
     })();
   }, []);

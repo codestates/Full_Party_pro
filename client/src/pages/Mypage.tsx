@@ -6,6 +6,7 @@ import AWS from 'aws-sdk';
 import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 
 import { RootReducerType } from '../store/store';
@@ -248,6 +249,15 @@ export const MypartyCards = styled.section`
 export default function Mypage () {
   // [dev] 더미데이터: 서버 통신되면 삭제
   const { userInfo, myParty, localParty } = dummyList;
+  
+  const isLoggedIn = useSelector(
+    (state: AppState) => state.signinReducer.isLoggedIn
+  );
+
+  const userInfoFromStore = useSelector(
+    (state: AppState) => state.signinReducer.userInfo
+  );
+
   //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
   const [curTab, setCurTab] = useState(0);
   const [parties, setParties] = useState(myParty);
@@ -411,7 +421,24 @@ export default function Mypage () {
     
     return `${year}-${month<10?`0${month}`:`${month}`}-${date}`
   }
-
+  //파티 데이터
+  const fetchJoinParty = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${userInfoFromStore?.id}`)
+    const myParty = res.data.myParty
+    setParties(myParty)
+  }
+  const fetchRecruiteParty = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${userInfoFromStore?.id}`)
+    const myParty = res.data.myParty;
+    console.log(myParty);
+    setParties(myParty);
+  }
+  const fetchCompleteParty = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${userInfoFromStore?.id}`)
+    const myParty = res.data.myParty
+    setParties(myParty)
+  }
+  
   const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     if(e.currentTarget.value === 0) {
       fetchJoinParty()
@@ -471,22 +498,6 @@ export default function Mypage () {
     
   }
 
-  //파티 데이터
-  const fetchJoinParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
-  const fetchRecruiteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
-  const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completed/${signinReducer.userInfo?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
   const handleSignOut = async () => {
     const { token, signupType, location } = cookieParser();
     await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {
@@ -494,11 +505,11 @@ export default function Mypage () {
       signup_type: signupType
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    navigate(`${process.env.REACT_APP_API_URL}`);
+    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
+    navigate("/");
   };
   const handleWithdrawal = async () => {
     const { token, signupType, location } = cookieParser();
@@ -509,11 +520,11 @@ export default function Mypage () {
       }
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
-    navigate(`${process.env.REACT_APP_API_URL}`);
+    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
+    navigate("/");
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
     setFrom(from);
@@ -528,7 +539,21 @@ export default function Mypage () {
   useEffect(() => {
     setIsLoading(true);
     (async () => {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${signinReducer.userInfo?.id}`, {
+      const { token, signupType, location } = cookieParser();
+      await requestKeepLoggedIn(token, signupType).then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/mypage`;
+      });
+    })();
+  }, []);
+
+  
+  useEffect(() => {
+    (async () => {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
         withCredentials: true,
       });
       const userInfo = res.data.userInfo;
@@ -539,21 +564,13 @@ export default function Mypage () {
         level: userInfo.level,
         exp: userInfo.exp
       });
-      console.log(res);
     })();
     fetchJoinParty();
-  },[]);
-
+  }, [ userInfoFromStore ]);
+  
   useEffect(() => {
     setIsLoading(false);
   }, [ basicInfo ]);
-  
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
-  if(!isLoggedIn){
-    return <Navigate to="/" />
-  }
 
   if(isLoading) {
     return <Loading />
@@ -564,16 +581,14 @@ export default function Mypage () {
       {callModal? <UserCancelModal from={from} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} /> : null}
       {isVerificationModalOpen? <VerificationModal verficationModalHandler={verficationModalHandler} /> : null}
       <MypageHeader>
-        <div className="leftWrapper">
-          <div className='profileImageContainer'>
-            <img
-              src={basicInfo.profileImage}
-              alt='thumbnail'
-              onError={() => {
-                return(imgRef.current.src = '/img/bubble.png')
-              }}
-            />
-          </div>
+        <div className='profileImage'>
+          <img className='profileImage' 
+            src={basicInfo.profileImage}
+            alt='thumbnail'
+            // onError={() => {
+            //   return(imgRef.current.src = 'img/bubble.png')
+            // }}
+          />
         </div>
         <p className='mainProfile'>
           <div className='userName'>{basicInfo.userName}</div>

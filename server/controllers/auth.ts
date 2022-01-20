@@ -199,7 +199,6 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
       if (!verification) FailedResponse(res, 403, "Invalid access token");
       else if (typeof verification !== "string") {
         const userInfo = await findUser({ id: verification.id }, [ "id", "profileImage", "userName", "address", "signupType" ]);
-        // return res.status(200).json({ message: "Keep Logged In", userInfo });
         SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
       }
         
