@@ -38,7 +38,7 @@ export const cookieParser = () => {
 };
 
 export const requestKeepLoggedIn = async (token: string, signupType: string) => {
-  const response = await axios.post("https://localhost:443/keeping", {}, {
+  const response = await axios.post(`${process.env.REACT_APP_API_URL}/keeping`, {}, {
     headers: {
       access_token: token,
       signup_type: signupType
