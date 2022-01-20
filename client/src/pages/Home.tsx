@@ -320,8 +320,8 @@ function Home () {
     if (!document.cookie) {
       document.cookie = "token=temp;";
       document.cookie = "signupType=temp;";
-      document.cookie = "isLoggedIn=0;";
-      document.cookie = `location=${process.env.REACT_APP_CLIENT_URL};`;
+      document.cookie = "isLoggedIn=0;"; 
+      document.cookie = `location=${process.env.REACT_APP_CLIENT_URL};`; 
     }
     const { token, signupType, location } = cookieParser();
     if (token && signupType) {
@@ -331,7 +331,7 @@ function Home () {
             type: SIGNIN_SUCCESS,
             payload: res.data.userInfo
           });
-        });
+        }); 
         document.cookie = "isLoggedIn=1;";
       }
     }
