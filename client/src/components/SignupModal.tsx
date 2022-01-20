@@ -298,12 +298,12 @@ const SignupModal = () => {
   });
 
   const [isError, setIsError] = useState({
-    isEmail: false,
-    isName: false,
-    isGender: false,
-    isBirth: false,
-    isMobile: false,
-    isAxios: false,
+    isEmail: true,
+    isName: true,
+    isGender: true,
+    isBirth: true,
+    isMobile: true,
+    isAxios: true,
     isVerificationCode: false,
 
     emailMsg: '',
@@ -344,7 +344,7 @@ const SignupModal = () => {
     const regex={
       email: /\S+@\S+\.\S+/,
       password: /^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W).{8,16}$)/,
-      mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/
+      mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4,4}/
     };
 
     setUserInfo({
@@ -427,7 +427,6 @@ const SignupModal = () => {
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const {name, value} = e.target
-
     setUserInfo({
       ...userInfo,
       [name]: value
@@ -518,6 +517,7 @@ const SignupModal = () => {
     else {
       axios.post(`${process.env.REACT_APP_API_URL}/signup`,{
         userInfo: {
+          userName: name,
           profileImage,
           email,
           password,
@@ -526,6 +526,8 @@ const SignupModal = () => {
           mobile,
           address
         }
+      }, {
+        withCredentials: true
       })
       .then((res) => {
         if(res.data.message === 'Already Signed Up') {
@@ -724,6 +726,7 @@ const SignupModal = () => {
                       <input
                         type='tel'
                         name='mobile'
+                        maxLength={13}
                         value={userInfo.mobile}
                         autoComplete='off'
                         onChange={(e) => handleInputChange(e)}

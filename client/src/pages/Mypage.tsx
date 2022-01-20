@@ -300,6 +300,7 @@ export default function Mypage () {
   const dispatch = useDispatch();
   const fileRef = useRef<any>();
   const imgRef=useRef<any>(null);
+  const { signupType } = cookieParser();
   
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
@@ -863,7 +864,7 @@ export default function Mypage () {
           } else {
             return(
               <div className='btns'>
-                <button onClick={verficationModalHandler}>
+                <button onClick={signupType === 'general' ? verficationModalHandler : handleIsChange}>
                   개인 정보 수정
                 </button>
                 <button onClick={(e) => userCancelHandler(e, "signout")}>

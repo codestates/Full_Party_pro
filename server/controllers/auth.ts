@@ -52,6 +52,7 @@ export const signup = async (req: Request, res: Response) => {
   try {
     const { userInfo } = req.body;
     const result = await createUser({ ...userInfo, signupType: "general" });
+    
     if (result) return SuccessfulResponse(res, { message: "Welcome!" });
     return FailedResponse(res, 409, "Already Signed Up");
   }
@@ -123,7 +124,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
         profileImage: picture,
         email,
         gender: "unidentified",
-        birth: new Date("11/11/2222"),
+        birth: new Date(),
         address: "unidentified",
         mobile: "unidentified",
         exp: 25,

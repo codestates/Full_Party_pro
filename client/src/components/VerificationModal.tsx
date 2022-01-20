@@ -136,6 +136,7 @@ const VerificationModal = ({ userId, handleIsChange, verficationModalHandler }: 
     } else if(verify.data.message === "User Identified"){
 
       handleIsChange();
+      closeModal();
     }
   }
 

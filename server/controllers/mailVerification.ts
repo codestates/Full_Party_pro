@@ -5,6 +5,7 @@ import { InternalServerError, SuccessfulResponse, FailedResponse } from "./funct
 export const mailVerification = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
+    console.log("11111111111111111111", req.body)
     const code = String(Math.floor(Math.random()*1000000)).padStart(6,"0");
     const transporter = nodemailer.createTransport({
       service: "gmail",
