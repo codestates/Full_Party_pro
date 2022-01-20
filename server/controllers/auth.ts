@@ -52,6 +52,7 @@ export const signup = async (req: Request, res: Response) => {
   try {
     const { userInfo } = req.body;
     const result = await createUser({ ...userInfo, signupType: "general" });
+    
     if (result) return SuccessfulResponse(res, { message: "Welcome!" });
     return FailedResponse(res, 409, "Already Signed Up");
   }

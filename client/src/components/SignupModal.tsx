@@ -427,7 +427,6 @@ const SignupModal = () => {
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const {name, value} = e.target
-
     setUserInfo({
       ...userInfo,
       [name]: value
@@ -518,6 +517,7 @@ const SignupModal = () => {
     else {
       axios.post(`${process.env.REACT_APP_API_URL}/signup`,{
         userInfo: {
+          userName: name,
           profileImage,
           email,
           password,
@@ -526,6 +526,8 @@ const SignupModal = () => {
           mobile,
           address
         }
+      }, {
+        withCredentials: true
       })
       .then((res) => {
         if(res.data.message === 'Already Signed Up') {
@@ -724,6 +726,7 @@ const SignupModal = () => {
                       <input
                         type='tel'
                         name='mobile'
+                        maxLength={13}
                         value={userInfo.mobile}
                         maxLength={13}
                         autoComplete='off'
