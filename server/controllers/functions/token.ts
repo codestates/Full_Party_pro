@@ -23,7 +23,7 @@ export const verifyAccessToken = (token: string): JwtPayload | string | undefine
 export const setCookie = (res: Response, type: string, token: string | null) => {
   try {
     res.cookie(type, token, {
-      domain: "localhost",
+      domain: "fullpartypro.com",
       path: "/",
       sameSite: "none",
       secure: true,

@@ -610,10 +610,10 @@ export default function Mypage () {
       signup_type: signupType
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `token=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
     navigate("/");
   };
   const handleWithdrawal = async () => {
@@ -625,10 +625,10 @@ export default function Mypage () {
       }
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `token=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `signupType=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `location=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
+    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=fullpartypro.com; path=/;`;
     navigate("/");
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
