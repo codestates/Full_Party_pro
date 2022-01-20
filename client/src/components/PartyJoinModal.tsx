@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -107,10 +108,13 @@ const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
     setMessage(event.target.value);
   }
 
-  function joinHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev] message, userId, partyId 서버로 전송
-    console.log(message, userId, partyId);
-    console.log("가입을 신청합니다.");
+  async function joinHandler(event: React.MouseEvent<HTMLButtonElement>) {
+    // [FEAT] 기능 확인 필요
+    await axios.post(`${process.env.REACT_APP_API_URL}/party/enqueued`, {
+      userId,
+      partyId,
+      message,
+    });
   }
 
   return(

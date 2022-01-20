@@ -313,13 +313,6 @@ export default function Party () {
 
   const { Kakao } = window;
 
-  // [dev] 유저 모달 메시지 수정 권한을 위해 임시로 설정한 유저 아이디, 나중에 리덕스에서 userId 불러오는 코드로 바꾸기
-
-  // const { partyId, name, image, memberLimit, partyState, privateLink, content, region, startDate, endDate, favorite, tag, location, isOnline, isReviewed, leaderId, members, waitingQueue, comments } = dummyParty;
-
-  // [dev] 서버와 연결되면 아래 코드는 삭제하고, 그 다음줄 주석을 활성화.
-  // 서버에서 관심 파티 등록되어있는지 여부 받아와야 함.
-
   const [isLoading, setIsLoading] = useState(true);
   const [ userState, setUserState ] = useState({
     isLeader: false,
@@ -412,11 +405,9 @@ export default function Party () {
         title: `[퀘스트] ${partyInfo.name}`,
         description: `${partyInfo.content}\n ${hashtags}`,
         imageUrl: partyInfo.image,
-        // [dev] url 파티 인덱스 포함한 path로 수정해야 합니다.
         link: {
-          // [dev] 도메인 수정 필요
-          mobileWebUrl: `http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party/${params.partyId}`,
-          webUrl: `http://full-party-pro-bucket.s3-website.ap-northeast-2.amazonaws.com/party/${params.partyId}`,
+          mobileWebUrl: `https://fullpartypro.com/party/${params.partyId}`,
+          webUrl: `https://fullpartypro.com/party/${params.partyId}`,
         },
       },
       social: { 
@@ -466,18 +457,20 @@ export default function Party () {
     setIsPartyCancelModalOpen(!isPartyCancelModalOpen);
   }
   
-    const editHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
-      setIsEdit(!isEdit);
-    }
-
-  const cancelHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
-    // [dev]
-    console.log("가입 신청을 취소합니다.");
+  const editHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setIsEdit(!isEdit);
   }
 
-  const quitHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
-    // [dev]
+  const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // [FEAT] 기능 확인 필요
+    console.log("가입 신청을 취소합니다.");
+    await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyInfo.id}/cancel/${userId}`);
+  }
+
+  const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    // [FEAT] 기능 확인 필요
     console.log("파티를 탈퇴합니다.");
+    await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
   }
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -779,6 +772,7 @@ export default function Party () {
       {isUserInfoModalOpen? 
         <UserInfoModal 
           userInfoModalHandler={userInfoModalHandler}
+          partyId={partyInfo.id}
           userId={userId}
           leaderId={partyInfo.leaderId}
           isLeader={isLeader}
@@ -799,6 +793,9 @@ export default function Party () {
           reviewModalHandler={reviewModalHandler}
           members={partyInfo.members.filter((member) => member.id !== userId)}
           leaderId={partyInfo.leaderId}
+          isLeader={isLeader}
+          userId={userId}
+          partyId={partyInfo.id}
         /> 
       : null}
       {isPartyCancelModalOpen? 

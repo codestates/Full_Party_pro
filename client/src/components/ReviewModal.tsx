@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -202,13 +203,16 @@ type Props = {
   reviewModalHandler: Function,
   members: Array<{ [key: string]: any }>,
   leaderId: number,
+  isLeader: boolean,
+  userId: number,
+  partyId: number
 };
 
 interface keyable {
  [key: string]: any  
 };
 
-const ReviewModal = ({ reviewModalHandler, members, leaderId }: Props) => {
+const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, partyId }: Props) => {
 
   const [curIdx, setCurIdx] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -238,16 +242,31 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId }: Props) => {
     }
   }
 
-  function questCompleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  async function questCompleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
     // partyState를 2로 바꾸는 요청을 전송함
     // 유저 파티 테이블의 isReviewed를 true로 변경합니다.
     // 평가한 각 유저의 exp에 영향을 줍니다.
 
     // [dev] exp 키로 전송해줄 데이터
     const reviewedMembers = reviewMembers.map((member) => ({ userId: member.id, exp: member.exp}));
-
-    console.log(reviewedMembers);
     console.log("퀘스트를 완료합니다.");
+
+    // [FEAT] 기능 확인 필요
+    if(isLeader){
+      await axios.patch(`${process.env.REACT_APP_API_URL}/party/completed`, {
+        partyId
+      }, {
+        withCredentials: true
+      });
+    }
+
+    await axios.patch(`${process.env.REACT_APP_API_URL}/party/review`, { 
+      partyId, 
+      userId, 
+      exp: reviewedMembers,
+    }, {
+      withCredentials: true
+    });
 
     confetti();
     reviewModalHandler();
