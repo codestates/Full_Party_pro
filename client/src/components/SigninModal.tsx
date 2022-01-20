@@ -242,7 +242,6 @@ const SigninModal = () => {
       withCredentials: true
     });
     const payload = response.data.userInfo;
-    console.log(payload);
     dispatch({
       type: SIGNIN_SUCCESS,
       payload
