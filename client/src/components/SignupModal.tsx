@@ -454,7 +454,7 @@ const SignupModal = () => {
 
   // [dev] 이메일 인증 관련 함수
   const mailVerification = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification/nodemailerTest`, { email: userInfo.email });
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification/nodemailerTest`, { email: userInfo.email }, { withCredentials: true });
     setIsSent(true);
     setVerificationData({ email: userInfo.email, code: res.data.code });
     setTimeout(handleCodeExpire, 1000 * 60 * 5);
@@ -728,6 +728,7 @@ const SignupModal = () => {
                         name='mobile'
                         maxLength={13}
                         value={userInfo.mobile}
+                        maxLength={13}
                         autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                         placeholder="'-'을 포함하여 입력해주세요."

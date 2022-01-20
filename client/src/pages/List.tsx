@@ -11,7 +11,6 @@ import EmptyCard from '../components/EmptyCard';
 import AddressModal from '../components/AddressModal';
 import axios from 'axios';
 import { NOTIFY } from '../actions/notify';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const ListContainer = styled.div`
   width: 100%;
@@ -58,20 +57,6 @@ export default function List () {
   useEffect(() => {
     setIsLoading(true);
     (async () => {
-      const { token, signupType } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
-      });
-    })();
-  }, []);
-
-  useEffect(() => {
-    setIsLoading(true);
-    (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/list/${userInfo.id}/${searchRegion}`, {
         withCredentials: true
       });
@@ -95,7 +80,7 @@ export default function List () {
     return <Loading />
   }
 
-  if(!userInfo.address || userInfo.address === 'Guest'){
+  if(!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "unidentified" || userInfo.address === "KAKAO"){
     return <AddressModal />
   }
 

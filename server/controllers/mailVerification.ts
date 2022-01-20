@@ -1,3 +1,6 @@
+import dotenv from "dotenv"
+dotenv.config();
+
 import { Request, Response } from "express";
 import nodemailer from "nodemailer"
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";

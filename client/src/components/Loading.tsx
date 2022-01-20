@@ -43,10 +43,11 @@ export const LoadingBackdrop = styled.div`
 `;
 
 export default function Loading() {
+
   return (
     <LoadingContainer>
       <LoadingBackdrop>
-        <img src="img/animationLogo.gif" />
+        <img src="img/loadingLogo.gif" />
         <div className="text">Loading...</div>
       </LoadingBackdrop>
     </LoadingContainer>

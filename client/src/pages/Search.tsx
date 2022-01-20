@@ -104,7 +104,7 @@ export default function Search () {
   const [isLoading, setIsLoading] = useState(false);
 
   //[dev] 더미데이터입니다.
-  const [tag, setTag] = useState(['태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333'])
+  // const [tag, setTag] = useState(['태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333'])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value)
@@ -122,20 +122,6 @@ export default function Search () {
   const hashtagHandler = (tag: string) => {
     navigate(`/search/tag/${tag}`)
   }
-  
-  useEffect(() => {
-    setIsLoading(true);
-    (async () => {
-      const { token, signupType, location } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/search`;
-      });
-    })();
-  }, []);
 
   useEffect(() => {
     let isComponentMounted = true;
@@ -201,7 +187,7 @@ export default function Search () {
           if(!params.tag && !params.keyword) {
             return (
               <div className='result'>
-                <div className='resultLabel'>
+                {/* <div className='resultLabel'>
                   인기 태그
                 </div>
                 <div className='hashtag'>
@@ -216,7 +202,7 @@ export default function Search () {
                       #{t}
                     </button>
                   )}
-                </div>
+                </div> */}
               </div>
             )
           }
