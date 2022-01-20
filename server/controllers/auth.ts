@@ -1,3 +1,6 @@
+import dotenv from "dotenv"
+dotenv.config();
+
 import { UsersAttributes } from './../models/users';
 import axios from "axios";
 import { Request, Response } from "express";

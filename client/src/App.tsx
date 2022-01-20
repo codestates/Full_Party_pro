@@ -1,7 +1,6 @@
 import React, { useEffect, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-
 import { useSelector } from 'react-redux';
 import { AppState } from './reducers';
 import { RootReducerType } from './store/store';
