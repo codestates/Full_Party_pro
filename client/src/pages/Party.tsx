@@ -546,11 +546,8 @@ export default function Party () {
   }, [ partyInfo ]);
   
   useEffect(() => {
-    console.log(userId);
-    console.log(partyInfo);
-    console.log(userState);
     setIsLoading(false);
-    document.cookie = `location=http://localhost:3000/party/${partyInfo.id}`;
+    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
   }, [ userState ]);
 
   if(isLoading) {

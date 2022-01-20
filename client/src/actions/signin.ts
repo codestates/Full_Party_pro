@@ -10,7 +10,7 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
     });
     const payload = response.data.userInfo;
     document.cookie = "signupType=general";
-    document.cookie = "location=http://localhost:3000/home";
+    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
     document.cookie = "isLoggedIn=1;"
     window.location.assign(cookieParser().location);
 

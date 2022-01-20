@@ -92,7 +92,7 @@ export const invertFavorite = async (userId: number, partyId: number) => {
 export const getLeadingParty = async (userId: number) => {
   const leadingParty = await Parties.findAll({
     where: { leaderId: userId },
-    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ]
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline", "location" ]
   });
   return leadingParty;
 };
@@ -106,13 +106,12 @@ export const getParticipatingParty = async (userId: number) => {
   for (let i = 0; i < partyIdArr.length; i++) {
     party[i] = await Parties.findOne({
       where: { id: partyIdArr[i].partyId },
-      attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ],
+      attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline", "location" ],
       raw: true
     });
   }
   return party;
 };
-
 
 export const findParticipatingParty = async (userId: number) => {
   const partyIds = await UserParty.findAll({
@@ -122,8 +121,14 @@ export const findParticipatingParty = async (userId: number) => {
   });
   const partyIdArr = partyIds.map(item => item.partyId);
   const participatingParty = await Parties.findAll({
-    where: { id: partyIdArr, partyState: [ 0, 1 ] },
-    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    where: { 
+      id: partyIdArr, 
+      partyState: [ 0, 1 ], 
+      leaderId: {
+        [Op.not]: userId
+      }
+    },
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location" ],
     raw: true
   });
   return participatingParty;
@@ -598,7 +603,7 @@ export const searchPartiesByKeyword = async (keyword: string, region: string, us
 export const findLeadingParty = async (userId: number) => {
   const leadingParty = await Parties.findAll({
     where: { leaderId: userId, partyState: [ 0, 1 ] },
-    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location" ],
     raw: true
   });
   return leadingParty;

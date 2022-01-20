@@ -320,7 +320,8 @@ function Home () {
     if (!document.cookie) {
       document.cookie = "token=temp;";
       document.cookie = "signupType=temp;";
-      document.cookie = "location=http://localhost:3000/home;";
+      document.cookie = "isLoggedIn=0;";
+      document.cookie = `location=${process.env.REACT_APP_CLIENT_URL};`;
     }
     const { token, signupType, location } = cookieParser();
     if (token && signupType) {
@@ -331,7 +332,7 @@ function Home () {
             payload: res.data.userInfo
           });
         });
-        document.cookie = "isLoggedIn=1;"
+        document.cookie = "isLoggedIn=1;";
       }
     }
     const address = new URL(window.location.href).searchParams.get("code")
@@ -345,7 +346,7 @@ function Home () {
 
   const handleGoogleLogin = async () => {
     const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post("https://localhost:443/google", { authorizationCode }, {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/google`, { authorizationCode }, {
       withCredentials: true
     });
     dispatch({
@@ -353,7 +354,7 @@ function Home () {
       payload: response.data.userInfo
     });
     document.cookie = "signupType=google";
-    document.cookie = "location=http://localhost:3000/home";
+    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
     document.cookie = "isLoggedIn=1;"
     window.location.assign(cookieParser().location);
 
@@ -361,7 +362,7 @@ function Home () {
 
   const handleKakaoLogin = async () => {
     const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post("https://localhost:443/kakao", { authorizationCode }, {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/kakao`, { authorizationCode }, {
       withCredentials: true
     });
     dispatch({
@@ -369,7 +370,7 @@ function Home () {
       payload: response.data.userInfo
     });
     document.cookie = "signupType=kakao";
-    document.cookie = "location=http://localhost:3000/home";
+    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home;`;
     document.cookie = "isLoggedIn=1;"
     window.location.assign(cookieParser().location);
 

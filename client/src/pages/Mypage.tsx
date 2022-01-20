@@ -6,6 +6,7 @@ import AWS from 'aws-sdk';
 import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 
 import { RootReducerType } from '../store/store';
@@ -299,7 +300,16 @@ export default function Mypage () {
   const dispatch = useDispatch();
   const fileRef = useRef<any>();
   const imgRef=useRef<any>(null);
+  
+  const isLoggedIn = useSelector(
+    (state: AppState) => state.signinReducer.isLoggedIn
+  );
 
+  const userInfoFromStore = useSelector(
+    (state: AppState) => state.signinReducer.userInfo
+  );
+
+  //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
   const [curTab, setCurTab] = useState(0);
   const [parties, setParties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -528,7 +538,7 @@ export default function Mypage () {
         mobileMsg: '',
         axiosMsg: '',
       })
-      const res = await axios.patch('https://localhost:443/user/profile', {
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
         userInfo: {
           userId: signinReducer.userInfo?.id,
           profileImage,
@@ -545,7 +555,7 @@ export default function Mypage () {
       }
     } 
     else if (password !== '') {
-      const res = await axios.patch('https://localhost:443/user/profile', {
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
         userInfo: {
           userId: signinReducer.userInfo?.id,
           profileImage,
@@ -595,7 +605,7 @@ export default function Mypage () {
 
   const handleSignOut = async () => {
     const { token, signupType, location } = cookieParser();
-    await axios.post("https://localhost:443/signout", {
+    await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {
       access_token: token, 
       signup_type: signupType
     });
@@ -604,12 +614,12 @@ export default function Mypage () {
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
-    navigate("http://localhost:3000");
+    navigate("/");
   };
   const handleWithdrawal = async () => {
     const { token, signupType, location } = cookieParser();
     const userId = signinReducer.userInfo?.id;
-    await axios.delete(`https://localhost:443/user/${userId}/${signupType}`, {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}/${signupType}`, {
       headers: {
         access_token: token
       }
@@ -619,7 +629,7 @@ export default function Mypage () {
     document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
     document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
-    navigate("http://localhost:3000");
+    navigate("/");
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
     setFrom(from);
@@ -644,7 +654,21 @@ export default function Mypage () {
   useEffect(() => {
     setIsLoading(true);
     (async () => {
-      const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
+      const { token, signupType, location } = cookieParser();
+      await requestKeepLoggedIn(token, signupType).then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/mypage`;
+      });
+    })();
+  }, []);
+
+  
+  useEffect(() => {
+    (async () => {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
         withCredentials: true,
       });
       const userInfo = res.data.userInfo;
@@ -655,21 +679,13 @@ export default function Mypage () {
         level: userInfo.level,
         exp: userInfo.exp
       });
-      console.log(res);
     })();
     fetchJoinParty();
-  },[]);
-
+  }, [ userInfoFromStore ]);
+  
   useEffect(() => {
     setIsLoading(false);
   }, [ basicInfo ]);
-  
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
-  if(!isLoggedIn){
-    return <Navigate to="/" />
-  }
 
   if(isLoading) {
     return <Loading />
@@ -685,9 +701,9 @@ export default function Mypage () {
             <img
               src={basicInfo.profileImage}
               alt='thumbnail'
-              onError={() => {
-                return(imgRef.current.src = '/img/bubble.png')
-              }}
+              // onError={() => {
+              //   return(imgRef.current.src = 'img/bubble.png')
+              // }}
             />
           </div>
         </div>
@@ -742,6 +758,7 @@ export default function Mypage () {
                         <input
                           name='userName'
                           value={changeInfo.userName}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                         ></input>
                         <div className='error'>{isError.nameMsg}</div>
@@ -781,6 +798,7 @@ export default function Mypage () {
                           max={getCurrentDate()}
                           name='birth'
                           value={changeInfo.birth}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                         ></input>
                       </td>
@@ -813,6 +831,7 @@ export default function Mypage () {
                         <input
                           name='address'
                           value={changeInfo.address}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                           onKeyUp={(e) => handleSearchLocation(e)}
                         ></input>
@@ -824,6 +843,7 @@ export default function Mypage () {
                         <input
                           name='mobile'
                           value={changeInfo.mobile}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                           placeholder="'-'을 포함해 입력하세요"
                         ></input>

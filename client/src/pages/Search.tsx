@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
+import { cookieParser, requestKeepLoggedIn } from "../App";
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
@@ -88,6 +90,7 @@ export const SearchContent = styled.div`
 export default function Search () {
   const navigate = useNavigate();
   const params = useParams();
+  const dispatch = useDispatch();
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
@@ -121,6 +124,20 @@ export default function Search () {
   }
   
   useEffect(() => {
+    setIsLoading(true);
+    (async () => {
+      const { token, signupType, location } = cookieParser();
+      await requestKeepLoggedIn(token, signupType).then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+        document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/search`;
+      });
+    })();
+  }, []);
+
+  useEffect(() => {
     let isComponentMounted = true;
     setIsLoading(true);
     if(params.tag){
@@ -135,7 +152,8 @@ export default function Search () {
         }
       }
       searchData();
-    } else if(params.keyword){
+    } 
+    else if(params.keyword){
       const keyword = params.keyword;
       const searchData = async () => {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${keyword}&region=${searchRegion}&userId=${userId}`)
@@ -159,9 +177,7 @@ export default function Search () {
     setIsLoading(false);
   }, [ parties ]);
   
-  if(!isLoggedIn){
-    return <Navigate to="/" />
-  } else if(isLoading){
+  if(isLoading){
     return <Loading />
   }
 
@@ -171,6 +187,7 @@ export default function Search () {
         <input
           name='word'
           value={word}
+          autoComplete='off'
           onChange={(e) => handleInputChange(e)}
           onKeyUp={(e) => enterKey(e)}
           placeholder='검색어를 입력해주세요'
