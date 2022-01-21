@@ -243,8 +243,8 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
       withCredentials: true
     });
 
-    userInfoModalHandler();
     navigate(`../party/${partyId}`);
+    userInfoModalHandler();
   }
 
   return(
