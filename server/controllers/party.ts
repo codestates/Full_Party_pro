@@ -201,7 +201,6 @@ export const createSubComment = async (req: Request, res: Response) => {
     const user = await findUser({ id: userId }, [ "userName" ]);
     const partyId = await getPartyId(commentId);
     const party = await getPartyInformation(Number(partyId));
-    console.log("123123123", party);
     if (userId === Number(party.leaderId)) {
       const notificationInfo: NotificationAttributes = {
         content: "answer", 

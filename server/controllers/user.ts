@@ -107,8 +107,8 @@ export const verifyUser = async (req: Request, res: Response) => {
 
 export const modifyUserInfo = async (req: Request, res: Response) => {
   try {
-    const { userId, password, userName, birth, gender, region, mobile, profileImage } = req.body.userInfo;
-    const userInfo: any = { userName, password, birth, gender, region, mobile, profileImage };
+    const { userId, password, userName, birth, gender, address, mobile, profileImage } = req.body.userInfo;
+    const userInfo: any = { userName, password, birth, gender, address, mobile, profileImage };
     const updated = await updateUser(userId, userInfo);
     const updatedUserInfo = await findUser({ id: userId }, [ "userName", "password", "birth", "gender", "address", "mobile", "profileImage" ]);
     if (updated) return SuccessfulResponse(res, { message: "Successfully Modified", userInfo: updatedUserInfo });

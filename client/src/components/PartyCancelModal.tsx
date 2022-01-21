@@ -106,7 +106,6 @@ const PartyCancelModal = ({ from, partyCancelModalHandler, cancelHandler, quitHa
       quitHandler();
     } else if(from === "fullParty"){
       fullPartyHandler();
-      window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyInfoId}`)
     } else {
       dismissHandler();
     }

@@ -28,6 +28,8 @@ export const NotificationContainer = styled.div`
     color: #000;
     border-bottom: 1px solid #d5d5d5;
 
+    cursor: pointer;
+
     .contentWrapper {
       display: flex;
 
@@ -204,6 +206,23 @@ export default function Notification () {
                 <div className="time">{timeForToday(noti.createdAt)}</div>
               </div>
             </Link>
+          );
+        } else if(noti.content === "dismiss"){
+          return (
+            <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
+              <div className="contentWrapper">
+                <div className="iconContainer">
+                  <FontAwesomeIcon icon={ faBullhorn } className="icon horn" /> 
+                </div>
+                <div className="titleContainer">
+                  <div className="partyNameContainer">
+                    [<div className="partyName">{noti.partyName}</div>]
+                  </div>
+                  <div className="content">{message[noti.content]}</div> 
+                </div> 
+              </div>
+              <div className="time">{timeForToday(noti.createdAt)}</div>
+            </div>  
           );
         } else {
           return (

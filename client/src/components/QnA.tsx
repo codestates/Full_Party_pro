@@ -244,6 +244,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
     }, {
       withCredentials: true
     });
+    setNewComment({ ...newComment, comment: "" });
     navigate(`../party/${partyId}`);
   }
 
@@ -253,6 +254,8 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
     }, {
       withCredentials: true
     });
+    setNewComment({ ...newComment, subcomment: "" });
+    navigate(`../party/${partyId}`);
   }
 
   function commentDeleteModalHandler(event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId: number): void {
@@ -396,6 +399,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
         <CommentDeleteModal 
           commentDeleteModalHandler={commentDeleteModalHandler}
           commentToDelete={commentToDelete}
+          partyId={partyId}
         /> 
       : null}
     </QnAContainer>

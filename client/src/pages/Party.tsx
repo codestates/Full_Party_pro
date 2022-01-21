@@ -189,6 +189,8 @@ export const FavAndTag = styled.section`
       border-radius: 20px;
 
       margin-left: 10px;
+
+      cursor: pointer;
     }
 
     @media screen and (max-width: 699px) {
@@ -242,6 +244,10 @@ export const MembersContainer = styled.section`
     .label {
       font-size: 1.2rem;
       font-weight: bold;
+
+      &.waitingList {
+        cursor: pointer;
+      }
     }
   }
 `;
@@ -378,9 +384,44 @@ export default function Party () {
       message: ""
     }]
   });
+
   const [ comments, setComments ] = useState([]);
   
   const formatDate = (date: String) => date.slice(0, 11);
+
+  function handlePartyInfoChange(key: string, value: any){
+    setPartyInfo({
+      ...partyInfo,
+      [key]: value,
+    })
+  }
+
+  function handleMemberListChange(userInfo: any, action: string){
+    if(action === "accept"){
+      setPartyInfo({
+        ...partyInfo,
+        members: [ ...partyInfo.members, { ...userInfo, joinDate: new Date().toISOString(), isReviewd: false } ]
+      })
+    } else if(action === "refuse"){
+      setPartyInfo({
+        ...partyInfo,
+        waitingQueue: partyInfo.waitingQueue.filter((waiter) => waiter.id !== userInfo)
+      })
+    } else if(action === "expel"){
+      setPartyInfo({
+        ...partyInfo,
+        members: partyInfo.members.filter((member) => member.id !== userInfo)
+      })
+    }
+  }
+
+  function handleMemberInfoChange(userId: number, key: string, value: any){
+    const newMemberInfo = partyInfo.members.map((member) => (member.id === userId ? { ...member, [key]: value } : member));
+    setPartyInfo({
+      ...partyInfo,
+      members: newMemberInfo,
+    })
+  }
 
   async function favoriteHandler(event: React.MouseEvent<HTMLButtonElement>) {
     const response = await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${partyInfo.id}`, { 
@@ -388,7 +429,20 @@ export default function Party () {
      }, {
       withCredentials: true
     });
-    navigate(`../party/${partyInfo.id}`);
+    if(partyInfo.isFavorite){
+      setPartyInfo({
+        ...partyInfo,
+        favorite: partyInfo.favorite - 1,
+        isFavorite: false,
+      })
+    } else {
+      setPartyInfo({
+        ...partyInfo,
+        favorite: partyInfo.favorite + 1,
+        isFavorite: true,
+      }) 
+    }
+    
   }
 
   function shareHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -463,20 +517,35 @@ export default function Party () {
   }
 
   const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // [FEAT] 기능 확인 필요
     console.log("가입 신청을 취소합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyInfo.id}/cancel/${userId}`);
-    navigate(`../home`);
+    const waiterLeft = partyInfo.waitingQueue.filter((waiter) => waiter.id !== userId);
+    setPartyInfo({
+      ...partyInfo,
+      waitingQueue: waiterLeft,
+    });
+    setUserState({
+      ...userState,
+      isWaiting: false,
+    });
   }
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // [FEAT] 기능 확인 필요
     console.log("파티를 탈퇴합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
-    navigate(`../home`);
+    const memberLeft = partyInfo.members.filter((member) => member.id !== userId);
+    setPartyInfo({
+      ...partyInfo,
+      members: memberLeft,
+    })
+    setUserState({
+      ...userState,
+      isMember: false,
+    });
   }
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    console.log("파티 모집을 완료합니다.")
     const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
       partyId: partyInfo.id
     });
@@ -489,6 +558,7 @@ export default function Party () {
   }
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    console.log("파티 모집을 재개합니다.")
     const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
       partyId: partyInfo.id
     });
@@ -501,6 +571,7 @@ export default function Party () {
   }
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    console.log("파티를 해산합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/${partyInfo.id}`);
     navigate('../home');
   }
@@ -509,7 +580,6 @@ export default function Party () {
     setIsLoading(true);
     axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`)
     .then(res => {
-      console.log(res.data);
       setPartyInfo(res.data.partyInfo);
       setComments(res.data.comments);
     })
@@ -550,7 +620,6 @@ export default function Party () {
   
   useEffect(() => {
     setIsLoading(false);
-    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
   }, [ userState ]);
 
   if(isLoggedIn === "0"){
@@ -707,7 +776,7 @@ export default function Party () {
         {isLeader && partyInfo.partyState <= 0 && partyInfo.memberLimit > partyInfo.members.length ? 
           <MembersContainer>
             <div className="members">
-              <div className="label" onClick={waitingListHandler}>
+              <div className="label waitingList" onClick={waitingListHandler}>
                 퀘스트 지원자&ensp;<FontAwesomeIcon icon={isWaitingListOpen? faAngleUp : faAngleDown} />
               </div> 
               {isWaitingListOpen ?
@@ -728,7 +797,7 @@ export default function Party () {
             partyId={partyInfo.id}
             isLeader={isLeader}
             leaderId={partyInfo.leaderId}
-            comments={comments.reverse()}
+            comments={comments}
             findComment={findComment}
           /> 
         </section>
@@ -755,7 +824,7 @@ export default function Party () {
           : null}
 
           {/* 파티원 */}
-          {!isLeader && isMember ? 
+          {!isLeader && isMember && partyInfo.partyState === 0 ? 
             <button onClick={(e) => partyCancelModalHandler(e, "quit")}>파티 탈퇴</button> 
           : null}
 
@@ -793,6 +862,8 @@ export default function Party () {
           isMember={isMember}
           from={from}
           userInfo={userInfo}
+          handleMemberListChange={handleMemberListChange}
+          handleMemberInfoChange={handleMemberInfoChange}
         /> 
       :  null}
       {isPartyJoinModalOpen? 
@@ -810,6 +881,7 @@ export default function Party () {
           isLeader={isLeader}
           userId={userId}
           partyId={partyInfo.id}
+          handlePartyInfoChange={handlePartyInfoChange}
         /> 
       : null}
       {isPartyCancelModalOpen? 
