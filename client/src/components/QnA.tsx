@@ -389,7 +389,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
               </CommentDetails>  
             : null}
           </div>
-        )}
+        ).reverse()}
       </Comments>
 
       {isCommentDeleteModalOpen? 
