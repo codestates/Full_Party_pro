@@ -16,6 +16,7 @@ import searchRouter from "./router/search";
 import notificationRouter from "./router/notification";
 import mailVerification from "./router/mailVerification";
 
+const path = require('path');
 const app = express();
 
 const corsOption = {
@@ -29,11 +30,19 @@ app.use(cors(corsOption));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "..", "client", "build")));
 
+// app.get('/*', function (req, res) {
+//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// });
 
-app.get("/", (req: Request, res: Response) => {
-  res.status(200).send("Welcome to Full Party!");
+app.get("/*", (req: Request, res: Response) => {
+  res.status(200).sendFile(path.join(__dirname, "..", "client", "build", "index.html"));
 });
+
+// app.get("/*", (req: Request, res: Response) => {
+//   res.status(200).send("Welcome to Full Party!");
+// });
 
 app.use("/", authRouter);
 app.use("/mailVerification", mailVerification);
