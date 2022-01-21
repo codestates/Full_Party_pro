@@ -55,6 +55,10 @@ export default function App() {
     (state: AppState) => state.signinReducer.userInfo
   )
 
+  const isLoggedIn = useSelector(
+    (state: AppState) => state.signinReducer.isLoggedIn
+  );
+
   const { Kakao } = window;
   const modalReducer = useSelector((state: RootReducerType) => state.modalReducer)
 
@@ -92,7 +96,7 @@ export default function App() {
               <Fragment>
                 <Route path="/" element={<Home />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/home" element={cookieParser().isLoggedIn === "1" ? <List /> : <Home />} />
+                <Route path="/home" element={isLoggedIn ? <List /> : <Home />} />
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
                 </Route>
@@ -107,7 +111,7 @@ export default function App() {
               </Fragment>
             </Routes>
           </section>
-          {cookieParser().isLoggedIn === "1" ? <BottomNav /> : null}
+          {isLoggedIn ? <BottomNav /> : null}
         </main>
       </div>
     </BrowserRouter>

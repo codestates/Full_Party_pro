@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import styled from 'styled-components';
@@ -87,6 +88,10 @@ export const ModalView = styled.div`
       min-height: 20px;
 
       text-align: center;
+
+      &:focus {
+        outline-style:none;
+      }
     }
   }
 
@@ -185,6 +190,8 @@ type Props = {
 
 const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLeader, isMember, from, userInfo }: Props) => {
 
+  const navigate = useNavigate();
+
   const { id, userName, profileImage, level, message, joinDate } = userInfo;
 
   const [isEditMode, setIsEditMode] = useState(false);
@@ -204,23 +211,25 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     setIsEditMode(!isEditMode);
   }
 
-  async function confirmHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [FEAT] 기능 확인 필요
+  async function editConfirmHandler(event: React.MouseEvent<HTMLButtonElement>) {
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/message`, {
       userId: userInfo.id, partyId, message: newMsg,
     });
+    navigate(`../party/${partyId}`);
     setIsEditMode(!isEditMode);
   }
 
   async function expelHandler(event: React.MouseEvent<HTMLButtonElement>) {
     // [FEAT] 기능 확인 필요
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userInfo.id}`);
+    navigate(`../party/${partyId}`);
     userInfoModalHandler();
   }
 
   async function refuseHandler(event: React.MouseEvent<HTMLButtonElement>) {
     // [FEAT] 기능 확인 필요
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userInfo.id}`);
+    navigate(`../party/${partyId}`);
     userInfoModalHandler();
   }
 
@@ -235,7 +244,7 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     });
 
     userInfoModalHandler();
-    closeModal();
+    navigate(`../party/${partyId}`);
   }
 
   return(
@@ -285,7 +294,7 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
               <button onClick={editHandler}>메시지 수정</button> 
             : null}
             {id === userId && isEditMode ? 
-              <button onClick={confirmHandler}>변경 사항 적용</button> 
+              <button onClick={editConfirmHandler}>변경 사항 적용</button> 
             : null}
             {/* 클라이언트가 리더이며, 본인이 아닌 파티원 정보를 보는 경우 */}
             {isLeader && id !== userId && from === "members" ? 
