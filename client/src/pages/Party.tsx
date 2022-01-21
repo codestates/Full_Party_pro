@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart, faAngleDown, faAngleUp, faBullhorn, faBirthdayCake, faCalendarCheck, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 import Loading from '../components/Loading';
 import UserInfoModal from '../components/UserInfoModal';
 import PartyJoinModal from '../components/PartyJoinModal';
@@ -135,6 +134,8 @@ export const Main = styled.section`
     border-top: 1px solid #d5d5d5;
 
     .content {
+      font-family: "-apple-system";
+      
       padding: 30px 30px 10px 30px;
       font-size: 1.2rem;
       line-height: 2rem;
@@ -387,7 +388,7 @@ export default function Party () {
      }, {
       withCredentials: true
     });
-    navigate(`/party/${partyInfo.id}`)
+    navigate(`../party/${partyInfo.id}`);
   }
 
   function shareHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -465,14 +466,14 @@ export default function Party () {
     // [FEAT] 기능 확인 필요
     console.log("가입 신청을 취소합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyInfo.id}/cancel/${userId}`);
-    navigate('/');
+    navigate(`../party/${partyInfo.id}`);
   }
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     // [FEAT] 기능 확인 필요
     console.log("파티를 탈퇴합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
-    navigate('/');
+    navigate(`../party/${partyInfo.id}`);
   }
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -485,7 +486,6 @@ export default function Party () {
         partyState: 1
       })
     }
-    navigate(`../party/${partyInfo.id}`);
   }
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -498,7 +498,6 @@ export default function Party () {
         partyState: 0
       })
     }
-    navigate(`../party/${partyInfo.id}`);
   }
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -509,16 +508,18 @@ export default function Party () {
 
   useEffect(() => {
     setIsLoading(true);
-    (async () => {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`);
-      if(response.status === 404){
+    axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`)
+    .then(res => {
+      console.log(res.data.partyInfo);
+      setPartyInfo(res.data.partyInfo);
+      setComments(res.data.comments);
+    })
+    .catch(err => {
+      if(err.response.status){
         setNotFound(true);
         setIsLoading(false);
-      } else {
-        setPartyInfo(response.data.partyInfo);
-        setComments(response.data.comments);
       }
-    })();
+    });
   }, [params]);
   
   useEffect(() => {
@@ -762,7 +763,7 @@ export default function Party () {
           {isLeader && partyInfo.partyState === 0 && partyInfo.memberLimit > partyInfo.members.length ? 
             <button onClick={editHandler}>정보 수정</button> 
           : null}
-          {isLeader && partyInfo.partyState === 0 && partyInfo.memberLimit > partyInfo.members.length && partyInfo.members.length !== 1 ? 
+          {isLeader && partyInfo.partyState === 0 && partyInfo.members.length > 1 && partyInfo.memberLimit > partyInfo.members.length ? 
             <button onClick={(e) => partyCancelModalHandler(e, "fullParty")}>모집 완료</button> 
           : null}
           {isLeader && partyInfo.partyState === 1 && partyInfo.memberLimit > partyInfo.members.length ? 

@@ -17,7 +17,7 @@ export const ListContainer = styled.div`
   height: 100%;
 
   margin: 70px 0 60px 0;
-  padding: 20px 25px;
+  padding: 5px 25px;
 
   section.listSection {
 
