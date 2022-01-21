@@ -50,12 +50,14 @@ export const requestKeepLoggedIn = async (token: string, signupType: string) => 
 
 export default function App() {
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
+
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo
   )
+
+  const isLoggedIn = useSelector(
+    (state: AppState) => state.signinReducer.isLoggedIn
+  );
 
   const { Kakao } = window;
   const modalReducer = useSelector((state: RootReducerType) => state.modalReducer)
@@ -94,14 +96,14 @@ export default function App() {
               <Fragment>
                 <Route path="/" element={<Home />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/home" element={cookieParser().isLoggedIn === "1" ? <List /> : <Home />} />
+                <Route path="/home" element={isLoggedIn ? <List /> : <Home />} />
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
                 </Route>
                 <Route path="/post" element={<Post />} />
                 <Route path="/search" element={<Search />} />
-                  <Route path="/search/keyword/:keyword" element={<Search />} />
-                  <Route path="/search/tag/:tag" element={<Search />} />
+                <Route path="/search/keyword/:keyword" element={<Search />} />
+                <Route path="/search/tag/:tag" element={<Search />} />
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/favorite" element={<Favorite />} />
                 <Route path="/mypage" element={<Mypage />} />

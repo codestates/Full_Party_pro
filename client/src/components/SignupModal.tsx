@@ -85,10 +85,19 @@ export const ModalView = styled.div`
         height: 25px;
 
         text-align: center; 
+
+        &:focus {
+          outline-style:none;
+        }
       }
 
       input[type=date] {
         font-family: "-apple-system";
+        background-color: #fff;
+
+        &:focus {
+          outline-style:none;
+        }
       }
 
       select {
@@ -97,6 +106,11 @@ export const ModalView = styled.div`
 
         border: none;
         border-bottom: 1px solid #d5d5d5;
+        background-color: #fff;
+
+        &:focus {
+          outline-style:none;
+        }
       }
     }
   }
@@ -150,6 +164,10 @@ export const MapContainer = styled.section`
     border-bottom: 1px solid #d5d5d5;
 
     margin: 15px 0;
+
+    &:focus {
+      outline-style:none;
+    }
   }
 
 `
@@ -726,7 +744,6 @@ const SignupModal = () => {
                       <input
                         type='tel'
                         name='mobile'
-                        maxLength={13}
                         value={userInfo.mobile}
                         autoComplete='off'
                         onChange={(e) => handleInputChange(e)}

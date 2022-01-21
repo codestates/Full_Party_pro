@@ -9,7 +9,6 @@ import { modalChanger } from '../actions/modal';
 import { faClipboardCheck, faMapMarkedAlt, faStreetView, faBirthdayCake, faCodeBranch, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import AOS from "aos";
 import "../../node_modules/aos/dist/aos.css";
-import { cookieParser, requestKeepLoggedIn } from "../App";
 
 export const HomeContainer = styled.div`
 
@@ -44,7 +43,6 @@ export const HomeContainer = styled.div`
     margin-bottom: 5vh;
 
     h1 {
-      font-family: Rubik;
       font-style: normal;
       font-weight: bold;
       font-size: 2.5rem;
@@ -57,7 +55,6 @@ export const HomeContainer = styled.div`
     }
 
     p {
-      font-family: Rubik;
       font-style: normal;
       font-weight: normal;
       font-size: 1.4rem;
@@ -116,7 +113,6 @@ export const AppInfo = styled.section`
   }
 
   h2 {
-    font-family: Rubik;
     color: #1F1F1F;
     font-size: 2rem;
     font-weight: bold;
@@ -127,7 +123,6 @@ export const AppInfo = styled.section`
   }
 
   p {
-    font-family: Karla;
     font-style: normal;
     font-weight: normal;
     font-size: 21px;
@@ -140,7 +135,6 @@ export const AppInfo = styled.section`
   .signinModalBtn {
     border: 0;
     
-    font-family: Karla;
     font-style: normal;
     font-weight: bold;
     font-size: 1.1rem;
@@ -183,7 +177,6 @@ export const Features = styled.section`
   height: 100vh;
 
   h5 {
-    font-family: Rubik;
     font-style: normal;
     font-weight: bold;
     font-size: 1.8rem;
@@ -193,7 +186,6 @@ export const Features = styled.section`
   }
 
   .contentArea p {
-    font-family: Karla;
     font-style: normal;
     font-weight: normal;
     font-size: 1.1rem;
@@ -245,7 +237,6 @@ export const SignIn = styled.section`
   }
 
   h2 {
-    font-family: Rubik;
     font-style: normal;
     font-weight: bold;
     font-size: 2.5rem;
@@ -499,7 +490,7 @@ function Home () {
         </div>
         <div className="contact">
           <div className="title">Contact Us</div>
-          <FontAwesomeIcon icon={ faEnvelope } className="icon" />fullparty.gm@gmail.com
+          <FontAwesomeIcon icon={ faEnvelope } className="icon" />gmfullparty@gmail.com
           <br /><FontAwesomeIcon icon={ faCodeBranch } className="icon" /><a href="https://github.com/codestates/Full_Party_pro/wiki" target="_blank" rel="noreferrer">github.com/codestates/Full_Party_pro</a>
         </div>      
       </Footer>

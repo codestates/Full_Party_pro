@@ -115,6 +115,8 @@ const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
       partyId,
       message,
     });
+    
+    closeModal();
   }
 
   return(

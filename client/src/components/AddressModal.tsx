@@ -50,65 +50,6 @@ export const ModalView = styled.div`
   justify-content: center;
   align-items: center;
 
-  header {
-    font-size: 25px;
-    margin-bottom: 15px;
-
-    font-family: 'SilkscreenBold';
-  }
-
-  table {
-    td {
-      height: 50px;
-    }
-
-    .label {
-      font-size: 0.9rem;
-      font-weight: bold;
-    }
-
-    .input, .info {
-      width: 186px;
-      font-size: 0.9rem;
-    }
-
-    .input {
-      padding: 0 8px;
-
-      input {
-        border: none;
-        border-bottom: 1px solid #d5d5d5;
-
-        width: 170px;
-        height: 25px;
-
-        text-align: center; 
-      }
-
-      input[type=date] {
-        font-family: "-apple-system";
-      }
-
-      select {
-        width: 170px;
-        text-align: center;
-
-        border: none;
-        border-bottom: 1px solid #d5d5d5;
-      }
-    }
-  }
-
-  .profileImage {
-    width: 100px;
-    height: 100px;
-  }
-
-  .confirm {
-    margin: 8px 0;
-    font-size: 0.9rem;
-  }
-
   .error {
     font-size: 0.7rem;
     color: #f34508;
@@ -153,6 +94,10 @@ export const MapContainer = styled.section`
     border-bottom: 1px solid #d5d5d5;
 
     margin: 15px 0;
+
+    &:focus {
+      outline-style:none;
+    }
   }
 
 `

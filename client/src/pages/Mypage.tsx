@@ -3,10 +3,9 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import AWS from 'aws-sdk';
-import { cookieParser, requestKeepLoggedIn } from "../App";
+import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
 
 import { RootReducerType } from '../store/store';
@@ -110,9 +109,9 @@ export const MypageHeader = styled.header`
     justify-content: center;
 
     .userName {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
     }
 
     .icon {
@@ -214,10 +213,15 @@ export const InfoTable = styled.table`
       height: 25px;
 
       text-align: center; 
+
+      &:focus {
+        outline-style:none;
+      }
     }
 
     input[type=date] {
       font-family: "-apple-system";
+      background-color: #fff;
     }
 
     select {
@@ -226,6 +230,11 @@ export const InfoTable = styled.table`
 
       border: none;
       border-bottom: 1px solid #d5d5d5;
+      background-color: #fff;
+
+      &:focus {
+        outline-style:none;
+      }
     }
   }
 
@@ -301,10 +310,6 @@ export default function Mypage () {
   const fileRef = useRef<any>();
   const imgRef=useRef<any>(null);
   const { signupType } = cookieParser();
-  
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
 
   const userInfoFromStore = useSelector(
     (state: AppState) => state.signinReducer.userInfo
@@ -361,6 +366,8 @@ export default function Mypage () {
     confirmPasswordMsg: '',
   })
 
+  const userRegion = basicInfo.address.split(" ").length < 2 ? "지역 미설정" : basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1]
+  
   // [CAUTION] 이미지 서버 관련 코드 => 범님 외 수정 X
   AWS.config.update({
     region: "ap-northeast-2",
@@ -444,6 +451,12 @@ export default function Mypage () {
           ...isError,
           isName: false,
           nameMsg: "두 글자 이상 입력해주세요."
+        })
+      } else {
+        setIsError({
+          ...isError,
+          isName: true,
+          nameMsg: ''
         })
       }
     }
@@ -580,7 +593,7 @@ export default function Mypage () {
     const myParty = res.data.myParty
     setParties(myParty)
   }
-  const fetchRecruiteParty = async () => {
+  const fetchRecruitParty = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
@@ -593,10 +606,10 @@ export default function Mypage () {
 
   const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     if(e.currentTarget.value === 0) {
-      fetchJoinParty()
+      fetchRecruitParty();
     }
     else if(e.currentTarget.value === 1) {
-      fetchRecruiteParty()
+      fetchJoinParty()
     }
     else if(e.currentTarget.value === 2) {
       fetchCompleteParty()
@@ -666,16 +679,20 @@ export default function Mypage () {
         level: userInfo.level,
         exp: userInfo.exp
       });
+      setChangeInfo({
+        ...changeInfo,
+        profileImage: userInfo.profileImage
+      })
     })();
-    fetchJoinParty();
+    fetchRecruitParty();
   }, [ userInfoFromStore ]);
   
   useEffect(() => {
     setIsLoading(false);
   }, [ basicInfo ]);
 
-  if(!cookieParser().isLoggedIn){
-    return <Navigate to="/" />
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
   }
 
   if(isLoading) {
@@ -701,7 +718,7 @@ export default function Mypage () {
         <p className='mainProfile'>
           <div className='userName'>{basicInfo.userName}</div>
           <div className="info">
-            <FontAwesomeIcon icon={faMapMarkerAlt} className='icon'/>{basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1]}
+            <FontAwesomeIcon icon={faMapMarkerAlt} className='icon'/>{userRegion}
           </div>
           <div className="info">
             <FontAwesomeIcon icon={faTrophy} className='icon'/>Lv. {basicInfo.level}
@@ -869,11 +886,11 @@ export default function Mypage () {
           <div className='subject'>내 파티</div>
           <fieldset className='cardTabContainer'>
             <ol className='cardTab'>
-              <li value={0} className={`tab ${curTab === 0 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>참여중 파티</li>
+              <li value={0} className={`tab ${curTab === 0 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>운영중 파티</li>
               <li> | </li>
-              <li value={1} className={`tab ${curTab === 1 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>운영중 파티</li>
+              <li value={1} className={`tab ${curTab === 1 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>참여중 파티</li>
               <li> | </li>
-              <li value={2} className={`tab ${curTab === 2 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>완료 파티</li>
+              <li value={2} className={`tab ${curTab === 2 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>완료된 파티</li>
             </ol>
           </fieldset>
             {(() => {

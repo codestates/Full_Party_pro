@@ -183,8 +183,8 @@ export default function PartySlide ({ myParty }: Props) {
             const { id, name, image, startDate, endDate, isOnline, location } = party;
             return (
               <div key={idx} className="cover" onClick={() => navigate(`../party/${id}`)}>
-                <h3 style={{ backgroundImage: `url(${image})`, backgroundSize: "cover" }} >
-                  <div className="partyImg" style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}>
+                <h3 style={{ backgroundImage: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center" }} >
+                  <div className="partyImg" style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}>
                     <div className="title">{name}</div>
                     <div className="location">
                       {isOnline ? <><FontAwesomeIcon icon={ faGlobe } className="icon" /> 온라인 퀘스트</>

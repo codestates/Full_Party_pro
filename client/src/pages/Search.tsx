@@ -41,6 +41,10 @@ export const SearchBar = styled.div`
     border: 1px solid #d5d5d5;
     border-radius: 20px;
     font-size: 1.1rem;
+
+    &:focus {
+      outline-style:none;
+    }
   }
   .faSearch {
     position: absolute;
@@ -104,7 +108,7 @@ export default function Search () {
   const [isLoading, setIsLoading] = useState(false);
 
   //[dev] 더미데이터입니다.
-  // const [tag, setTag] = useState(['태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333'])
+  // const [tag, setTag] = useState(['공동구매', '무료나눔', '배달음식'])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value)
@@ -163,7 +167,9 @@ export default function Search () {
     setIsLoading(false);
   }, [ parties ]);
   
-  if(isLoading){
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
+  } else if(isLoading){
     return <Loading />
   }
 

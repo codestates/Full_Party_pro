@@ -4,7 +4,7 @@ import axios from 'axios';
 import AWS from 'aws-sdk';
 import { useDispatch } from 'react-redux';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
-import { cookieParser, requestKeepLoggedIn } from "../App";
+import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
@@ -150,6 +150,10 @@ export const PostCard = styled.div`
       border-bottom: 1px solid #d5d5d5;
 
       padding: 5px;
+
+      &:focus {
+        outline-style:none;
+      }
     }
 
     .details {
@@ -187,6 +191,11 @@ export const PostCard = styled.div`
     }
 
     fieldset {
+
+      &:focus {
+        outline-style:none;
+      }
+
       .date {
         font-size: 0.8rem;
         font-weight: bold;
@@ -195,6 +204,7 @@ export const PostCard = styled.div`
 
       input[type=date] {
         font-family: "-apple-system";
+        background-color: #fff;
       }
 
       div.startDate {
@@ -233,6 +243,10 @@ export const PostCard = styled.div`
 
     border: 1px solid #d5d5d5;
     font-family: "-apple-system";
+
+    &:focus {
+      outline-style:none;
+    }
   }
 
   .error {
@@ -658,9 +672,6 @@ export default function Post () {
     })
   })
 
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
 
   const [partyInfo, setPartyInfo] = useState({
@@ -961,6 +972,8 @@ export default function Post () {
         privateLink: partyInfo.privateLink,
         tag: tags
       }
+    }, {
+      withCredentials: true
     })
 
     return res;
@@ -984,8 +997,13 @@ export default function Post () {
     }
   }, [isPosted])
 
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
+  }
+
   return (
     <PostContainer>
+      {imgLoading ? <Loading /> : null}
       {cancelModal ?
         <PostCancelModal 
           postCancelHandler={postCancelHandler}
@@ -1009,7 +1027,7 @@ export default function Post () {
       <PostCard>
         <section className="basicInfo">
           <div className="imageContainer">
-            {imgLoading ? <Loading /> :
+            {imgLoading ? null :
             <>
               <img className="preview" src={partyInfo.image} alt="thumbnail"
                 onError={() => {
