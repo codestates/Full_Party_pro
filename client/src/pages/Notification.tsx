@@ -9,6 +9,8 @@ import { faHeart, faBullhorn, faScroll, faTrophy, faStar, faBellSlash } from '@f
 import { useSelector } from 'react-redux';
 import { AppState } from '../reducers';
 
+import { cookieParser } from '../App';
+
 import Loading from '../components/Loading';
 
 // [dev] 더미데이터: 서버 통신되면 삭제
@@ -100,10 +102,6 @@ export default function Notification () {
     (state: AppState) => state.signinReducer.userInfo.id
   );
 
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
-
   const isBadgeOn = useSelector(
     (state: AppState) => state.notifyReducer.isBadgeOn
   );
@@ -171,8 +169,8 @@ export default function Notification () {
     // document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
   }, [ notification ]);
 
-  if(!isLoggedIn){
-    return <Navigate to="/" />
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
   } else if(isLoading){
     return <Loading />
   }

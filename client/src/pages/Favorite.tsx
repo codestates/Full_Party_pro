@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { cookieParser, requestKeepLoggedIn } from "../App"
+import { cookieParser } from "../App"
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
@@ -53,8 +53,8 @@ export default function Favorite () {
     setIsLoading(false);
   }, [ favoriteList ]);
 
-  if(!cookieParser().isLoggedIn){
-    return <Navigate to="/" />
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
   } else if(isLoading){
     return <Loading />
   }

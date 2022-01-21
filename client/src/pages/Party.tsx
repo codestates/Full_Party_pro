@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { requestKeepLoggedIn, cookieParser } from "../App";
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart, faAngleDown, faAngleUp, faBullhorn, faBirthdayCake, faCalendarCheck, faGlobe } from '@fortawesome/free-solid-svg-icons';
@@ -301,15 +301,13 @@ export default function Party () {
 
   const params = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const commentRef = useRef<HTMLElement>(null);
 
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
   );
+
+  const isLoggedIn = cookieParser().isLoggedIn;
 
   const { Kakao } = window;
 
@@ -531,12 +529,14 @@ export default function Party () {
     // document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
   }, [ userState ]);
 
-  if(isLoading) {
+  if(isLoggedIn === "0"){
+    return <Navigate to="../" />
+  } else if(isLoading) {
     return <Loading />
   }
 
   return (
-    <PartyContainer style={isLoggedIn ? {} : { marginBottom: "50px" }}>
+    <PartyContainer style={isLoggedIn === "1" ? {} : { marginBottom: "50px" }}>
 
       {/* 뒤로가기, 관심파티, 공유 버튼 */}
       <CVBtns>
@@ -545,7 +545,7 @@ export default function Party () {
             <FontAwesomeIcon icon={ faArrowLeft } className="icon" /> 
           </button>
           <div className="rightWrapper">
-            {isLoggedIn?
+            {isLoggedIn === "1" ?
               <button onClick={favoriteHandler}>
                 <FontAwesomeIcon 
                   icon={partyInfo.isFavorite ? faHeart : blankFaHeart} 
@@ -600,8 +600,8 @@ export default function Party () {
         <FavAndTag>
           <button className="favoriteContainer" 
             onClick={favoriteHandler}
-            style={isLoggedIn ? { cursor: "pointer" } : { cursor: "default" }}
-            disabled={!isLoggedIn}
+            style={isLoggedIn === "1" ? { cursor: "pointer" } : { cursor: "default" }}
+            disabled={isLoggedIn === "0"}
           >
             <FontAwesomeIcon 
               icon={partyInfo.isFavorite ? faHeart : blankFaHeart}
@@ -615,8 +615,8 @@ export default function Party () {
                 key={idx} 
                 className="tag" 
                 onClick={() => tagSearchHandler(t)}
-                style={isLoggedIn ? { cursor: "pointer" } : { cursor: "default" }}
-                disabled={!isLoggedIn}
+                style={isLoggedIn === "1" ? { cursor: "pointer" } : { cursor: "default" }}
+                disabled={isLoggedIn === "0"}
               >
                 #{t}
               </button>
@@ -709,7 +709,7 @@ export default function Party () {
         
         <PartyStateBtns>
           {/* 비로그인 상태 */}
-          {!isLoggedIn ?
+          {isLoggedIn === "0" ?
             <div className="signinMsgContainer">
               <div className="signinMsg">
                 <b>로그인</b>해서 이 파티의 회원이 되어보세요! 🥳
@@ -719,7 +719,7 @@ export default function Party () {
           : null}
 
           {/* 가입 전 */}
-          {isLoggedIn && !isMember && !isWaiting && partyInfo.partyState <= 0  ? 
+          {isLoggedIn === "1" && !isMember && !isWaiting && partyInfo.partyState <= 0  ? 
             <button onClick={partyJoinModalHandler}>가입 신청</button> 
           : null}
 
