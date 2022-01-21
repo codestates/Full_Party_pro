@@ -158,11 +158,7 @@ export const getNotification = async (userId: number) => {
     attributes: { exclude: [ "updatedAt" ] },
     raw: true
   });
-  let notifications = [];
-  for (let i = 0; i < notificationArr.length; i++) {
-    if (i < 20) notifications[i] = notificationArr[i];
-    else break;
-  }
+  let notifications = notificationArr.slice(-20, -1)
   await Notification.update({ isRead: true }, {
     where: { userId }
   });

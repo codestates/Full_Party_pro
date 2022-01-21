@@ -249,7 +249,7 @@ export default function Notification () {
             </Link>   
           );
         }
-      })}
+      }).reverse()}
     </NotificationContainer>
   );
 }
