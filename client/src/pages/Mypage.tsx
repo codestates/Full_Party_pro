@@ -445,6 +445,12 @@ export default function Mypage () {
           isName: false,
           nameMsg: "두 글자 이상 입력해주세요."
         })
+      } else {
+        setIsError({
+          ...isError,
+          isName: true,
+          nameMsg: ''
+        })
       }
     }
 
@@ -666,6 +672,10 @@ export default function Mypage () {
         level: userInfo.level,
         exp: userInfo.exp
       });
+      setChangeInfo({
+        ...changeInfo,
+        profileImage: userInfo.profileImage
+      })
     })();
     fetchJoinParty();
   }, [ userInfoFromStore ]);
