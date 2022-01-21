@@ -202,6 +202,16 @@ export const createTag = async (tag: Tag[], partyId: number) => {
   }
 };
 
+export const findTag = async (partyId: number) => {
+  const tagsArr = await Tag.findAll({
+    where: { partyId },
+    attributes: [ "name" ],
+    raw: true
+  });
+  const tag = tagsArr.map(item => item.name);
+  return tag;
+};
+
 export const deleteTag = async (partyId: number) => {
   await Tag.destroy({
     where: { partyId }
@@ -222,11 +232,12 @@ export const createNewParty = async (userId: number, partyInfo: PartyInfo) => {
   const newParty = await Parties.create({ ...partyInfo, partyState: 0, leaderId: userId });
   const withoutTag = partyInfo;
   delete withoutTag.tag;
-  const party = await Parties.findOne({
+  const party: any = await Parties.findOne({
     where: { ...withoutTag },
     attributes: [ "id" ],
     raw: true
   })
+  console.log("🌈", party);
   await UserParty.create({ userId, partyId: Number(party?.id), message: "", isReviewed: false });
   if (partyInfo.tag) await createTag(partyInfo.tag, newParty.id);
   return { partyId: newParty.id, location: newParty.location };
@@ -473,6 +484,15 @@ export const removeSubComment = async (subCommentId: number) => {
     where: { id: subCommentId }
   });
   return subCommentDeleted;
+};
+
+export const findPartyId = async (partyInfo: object) => {
+  const partyIdObj = await Parties.findOne({
+    where: { ...partyInfo },
+    attributes: [ "id" ],
+    raw: true
+  });
+  return partyIdObj?.id;
 };
 
 export const getPartyId = async (commentId: number) => {

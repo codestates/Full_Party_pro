@@ -65,7 +65,8 @@ if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
       .then(async () => console.log("✅ DB connection success"))
       .catch(error => console.log(error))
   });
-} else {
+} 
+else {
   server = app.listen(HTTPS_PORT, () => console.log('✅ http server running'));
 }
 export default server;
