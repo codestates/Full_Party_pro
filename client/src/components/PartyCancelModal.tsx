@@ -102,15 +102,12 @@ const PartyCancelModal = ({ from, partyCancelModalHandler, cancelHandler, quitHa
   function functionController(){
     if(from === "cancel"){
       cancelHandler();
-      window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyInfoId}`)
     } else if(from === "quit"){
       quitHandler();
     } else if(from === "fullParty"){
       fullPartyHandler();
-      window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyInfoId}`)
     } else {
       dismissHandler();
-      window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/home`)
     }
 
     partyCancelModalHandler();

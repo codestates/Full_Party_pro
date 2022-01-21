@@ -727,6 +727,7 @@ const SignupModal = () => {
                         type='tel'
                         name='mobile'
                         value={userInfo.mobile}
+                        maxLength={13}
                         autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                         placeholder="'-'을 포함하여 입력해주세요."
