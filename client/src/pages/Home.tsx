@@ -9,7 +9,6 @@ import { modalChanger } from '../actions/modal';
 import { faClipboardCheck, faMapMarkedAlt, faStreetView, faBirthdayCake, faCodeBranch, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import AOS from "aos";
 import "../../node_modules/aos/dist/aos.css";
-import { cookieParser, requestKeepLoggedIn } from "../App";
 
 export const HomeContainer = styled.div`
 
@@ -499,7 +498,7 @@ function Home () {
         </div>
         <div className="contact">
           <div className="title">Contact Us</div>
-          <FontAwesomeIcon icon={ faEnvelope } className="icon" />fullparty.gm@gmail.com
+          <FontAwesomeIcon icon={ faEnvelope } className="icon" />gmfullparty@gmail.com
           <br /><FontAwesomeIcon icon={ faCodeBranch } className="icon" /><a href="https://github.com/codestates/Full_Party_pro/wiki" target="_blank" rel="noreferrer">github.com/codestates/Full_Party_pro</a>
         </div>      
       </Footer>

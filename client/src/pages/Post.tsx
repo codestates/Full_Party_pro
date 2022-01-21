@@ -4,7 +4,7 @@ import axios from 'axios';
 import AWS from 'aws-sdk';
 import { useDispatch } from 'react-redux';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
-import { cookieParser, requestKeepLoggedIn } from "../App";
+import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
@@ -658,9 +658,6 @@ export default function Post () {
     })
   })
 
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
 
   const [partyInfo, setPartyInfo] = useState({
@@ -983,6 +980,10 @@ export default function Post () {
       })
     }
   }, [isPosted])
+
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
+  }
 
   return (
     <PostContainer>

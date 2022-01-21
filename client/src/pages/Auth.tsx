@@ -5,6 +5,7 @@ import axios from 'axios';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
+import { cookieParser } from '../App';
 
 export const LoadingContainer = styled.div`
   width: 100vw;
@@ -90,6 +91,10 @@ export default function Auth() {
       console.log(error);
     }
   };
+
+  if(cookieParser().isLoggedIn === "1"){
+    navigate('../home');
+  }
   
   return (
     <LoadingContainer>

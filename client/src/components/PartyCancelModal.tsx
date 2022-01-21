@@ -90,9 +90,10 @@ type Props = {
   quitHandler: Function,
   fullPartyHandler: Function,
   dismissHandler: Function,
+  partyInfoId: number
 }
 
-const PartyCancelModal = ({ from, partyCancelModalHandler, cancelHandler, quitHandler, fullPartyHandler, dismissHandler }: Props) => {
+const PartyCancelModal = ({ from, partyCancelModalHandler, cancelHandler, quitHandler, fullPartyHandler, dismissHandler, partyInfoId }: Props) => {
 
   const closeModal =() => {
     partyCancelModalHandler();

@@ -50,9 +50,7 @@ export const requestKeepLoggedIn = async (token: string, signupType: string) => 
 
 export default function App() {
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
+
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo
   )
@@ -100,8 +98,8 @@ export default function App() {
                 </Route>
                 <Route path="/post" element={<Post />} />
                 <Route path="/search" element={<Search />} />
-                  <Route path="/search/keyword/:keyword" element={<Search />} />
-                  <Route path="/search/tag/:tag" element={<Search />} />
+                <Route path="/search/keyword/:keyword" element={<Search />} />
+                <Route path="/search/tag/:tag" element={<Search />} />
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/favorite" element={<Favorite />} />
                 <Route path="/mypage" element={<Mypage />} />
@@ -109,7 +107,7 @@ export default function App() {
               </Fragment>
             </Routes>
           </section>
-          {isLoggedIn ? <BottomNav /> : null}
+          {cookieParser().isLoggedIn === "1" ? <BottomNav /> : null}
         </main>
       </div>
     </BrowserRouter>

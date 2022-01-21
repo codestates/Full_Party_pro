@@ -76,7 +76,7 @@ export default function NotFound () {
           <br />페이지가 삭제되었을 수 있습니다.
           <br />주소를 다시 한 번 확인해주세요.
         </div>
-        <button id="return" onClick={() => navigate('../')}>return to home</button>    
+        <button id="return" onClick={() => navigate('../home')}>return to home</button>    
       </main>
     </Container>
   );
