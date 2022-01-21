@@ -5,7 +5,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import config from "./config";
 import sequelize from "./models";
-// import express_async_errors from "express-async-errors"; // module not found
 
 import authRouter from "./router/auth";
 import listRouter from "./router/list";
@@ -27,20 +26,10 @@ const corsOption = {
 };
 
 app.use(cors(corsOption));
-// app.use(express.static(path.join(__dirname, "..", "client", "public")));
 app.use(express.static("public"));
-app.use(express.static("build"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-// app.get('/*', function (req, res) {
-//   res.sendFile(path.join(__dirname, 'build', 'index.html'));
-// });
-
-// app.get("/*", (req: Request, res: Response) => {
-//   res.status(200).sendFile(path.join(__dirname, "..", "client", "public", "index.html"));
-// });
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).send("Welcome to Full Party!");
