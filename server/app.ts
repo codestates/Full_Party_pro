@@ -27,7 +27,8 @@ const corsOption = {
 };
 
 app.use(cors(corsOption));
-app.use(express.static(path.join(__dirname, "..", "client", "public")));
+// app.use(express.static(path.join(__dirname, "..", "client", "public")));
+app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -36,13 +37,13 @@ app.use(cookieParser());
 //   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 // });
 
-app.get("/*", (req: Request, res: Response) => {
-  res.status(200).sendFile(path.join(__dirname, "..", "client", "public", "index.html"));
-});
-
 // app.get("/*", (req: Request, res: Response) => {
-//   res.status(200).send("Welcome to Full Party!");
+//   res.status(200).sendFile(path.join(__dirname, "..", "client", "public", "index.html"));
 // });
+
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).send("Welcome to Full Party!");
+});
 
 app.use("/", authRouter);
 app.use("/mailVerification", mailVerification);
