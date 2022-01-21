@@ -13,8 +13,6 @@ import { cookieParser } from '../App';
 
 import Loading from '../components/Loading';
 
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyNotification from '../static/dummyNotification';
 
 export const NotificationContainer = styled.div`
 
