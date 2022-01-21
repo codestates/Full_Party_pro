@@ -153,11 +153,16 @@ export const getMembers = async (partyId: number, attributes: string[] = [ "id",
 };
 
 export const getNotification = async (userId: number) => {
-  const notifications = await Notification.findAll({
+  const notificationArr = await Notification.findAll({
     where: { userId },
     attributes: { exclude: [ "updatedAt" ] },
     raw: true
   });
+  let notifications = [];
+  for (let i = 0; i < notificationArr.length; i++) {
+    if (i < 20) notifications[i] = notificationArr[i];
+    else break;
+  }
   await Notification.update({ isRead: true }, {
     where: { userId }
   });
