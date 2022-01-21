@@ -387,7 +387,7 @@ export default function Party () {
      }, {
       withCredentials: true
     });
-    setPartyInfo(response.data.partyInfo.isFavorite);
+    navigate(`/party/${partyInfo.id}`)
   }
 
   function shareHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -476,19 +476,29 @@ export default function Party () {
   }
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
-    await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
+    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
       partyId: partyInfo.id
     });
-    navigate('/');
+    if(res.status === 200) {
+      setPartyInfo({
+        ...partyInfo,
+        partyState: 1
+      })
+    }
+    navigate(`../party/${partyInfo.id}`);
   }
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
-    await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
+    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
       partyId: partyInfo.id
     });
-    navigate('/');
+    if(res.status === 200) {
+      setPartyInfo({
+        ...partyInfo,
+        partyState: 0
+      })
+    }
+    navigate(`../party/${partyInfo.id}`);
   }
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -639,9 +649,9 @@ export default function Party () {
 
         {/* 글 내용 */}
         <section className="contentContainer">
-          <div className="content">
+          <pre className="content">
             { partyInfo.content }
-          </div>
+          </pre>
         </section>
 
         {/* 지역과 일정 */}
@@ -752,7 +762,7 @@ export default function Party () {
           {isLeader && partyInfo.partyState === 0 && partyInfo.memberLimit > partyInfo.members.length ? 
             <button onClick={editHandler}>정보 수정</button> 
           : null}
-          {isLeader && partyInfo.partyState === 0 && partyInfo.memberLimit > partyInfo.members.length ? 
+          {isLeader && partyInfo.partyState === 0 && partyInfo.memberLimit > partyInfo.members.length && partyInfo.members.length !== 1 ? 
             <button onClick={(e) => partyCancelModalHandler(e, "fullParty")}>모집 완료</button> 
           : null}
           {isLeader && partyInfo.partyState === 1 && partyInfo.memberLimit > partyInfo.members.length ? 
@@ -801,7 +811,7 @@ export default function Party () {
       : null}
       {isPartyCancelModalOpen? 
         <PartyCancelModal 
-          from={from}
+          from={from} 
           partyCancelModalHandler={partyCancelModalHandler}
           cancelHandler={cancelHandler}
           quitHandler={quitHandler}
