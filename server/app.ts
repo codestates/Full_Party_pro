@@ -28,7 +28,7 @@ const corsOption = {
 
 app.use(cors(corsOption));
 // app.use(express.static(path.join(__dirname, "..", "client", "public")));
-app.use(express.static('public'));
+app.use('/static', express.static(__dirname + '../client/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
