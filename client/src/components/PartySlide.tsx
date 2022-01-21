@@ -182,7 +182,7 @@ export default function PartySlide ({ myParty }: Props) {
 				<Slider {...settings}>
           {myParty.map((party, idx) => {
             const { id, name, image, startDate, endDate, isOnline, location } = party;
-            const region = location.split(" ").length >= 2 ? location.split(" ")[0] + " " + location.split(" ")[1] : location;
+            const region = location && location.split(" ").length >= 2 ? location.split(" ")[0] + " " + location.split(" ")[1] : location;
             return (
               <div key={idx} className="cover" onClick={() => navigate(`../party/${id}`)}>
                 <h3 style={{ backgroundImage: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center" }} >

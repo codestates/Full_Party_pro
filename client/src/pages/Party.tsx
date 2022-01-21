@@ -501,7 +501,6 @@ export default function Party () {
   }
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/${partyInfo.id}`);
     navigate('../home');
   }
@@ -510,19 +509,21 @@ export default function Party () {
     setIsLoading(true);
     axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`)
     .then(res => {
-      console.log(res.data.partyInfo);
+      console.log(res.data);
       setPartyInfo(res.data.partyInfo);
       setComments(res.data.comments);
     })
     .catch(err => {
-      if(err.response.status){
+      if(err.response.status === 404){
         setNotFound(true);
         setIsLoading(false);
       }
     });
+    setIsLoading(false);
   }, [params]);
   
   useEffect(() => {
+    setIsLoading(true);
     if (userId === partyInfo.leaderId) {
       setUserState({
         isLeader: true,
@@ -544,11 +545,12 @@ export default function Party () {
         isWaiting: true
       });
     };
+    setIsLoading(false);
   }, [ partyInfo ]);
   
   useEffect(() => {
     setIsLoading(false);
-    // document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
+    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
   }, [ userState ]);
 
   if(isLoggedIn === "0"){

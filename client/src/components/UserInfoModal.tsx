@@ -215,8 +215,8 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/message`, {
       userId: userInfo.id, partyId, message: newMsg,
     });
-    navigate(`../party/${partyId}`);
     setIsEditMode(!isEditMode);
+    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyId}`)
   }
 
   async function expelHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -224,6 +224,7 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userInfo.id}`);
     navigate(`../party/${partyId}`);
     userInfoModalHandler();
+    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyId}`)
   }
 
   async function refuseHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -231,6 +232,7 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userInfo.id}`);
     navigate(`../party/${partyId}`);
     userInfoModalHandler();
+    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyId}`)
   }
 
   async function acceptHandler(event: React.MouseEvent<HTMLButtonElement>) {
@@ -244,7 +246,7 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     });
 
     userInfoModalHandler();
-    navigate(`../party/${partyId}`);
+    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyId}`)
   }
 
   return(
