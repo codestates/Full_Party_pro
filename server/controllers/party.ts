@@ -14,6 +14,7 @@ export const getPartyInfo = async (req: Request, res: Response) => {
     const { partyId, userId } = req.params;
     const partyInfo = await getPartyInformation(Number(partyId), Number(userId));
     const comments = await compileComments(Number(partyId));
+    if (!partyInfo) return FailedResponse(res, 404, "Not Found");
     return SuccessfulResponse(res, { message: "Party Information Loaded", partyInfo, comments });
   }
   catch (error) {

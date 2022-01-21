@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
-import { findUser, getLeadingParty, getParticipatingParty, getLocalParty, checkIsRead, createNewParty } from "./functions/sequelize";
+import { findUser, findPartyId, getLeadingParty, getParticipatingParty, getLocalParty, checkIsRead, createNewParty, findTag } from "./functions/sequelize";
 
 export const getPartyList = async (req: Request, res: Response) => {
   try {
@@ -29,10 +29,11 @@ export const getPartyList = async (req: Request, res: Response) => {
 export const createParty = async (req: Request, res: Response) => {
   try {
     const { userId, partyInfo } = req.body;
-    console.log("🌈", userId);
     const latlng = JSON.stringify(partyInfo.latlng);
     const newParty = await createNewParty(Number(userId), { ...partyInfo, latlng });
-    return SuccessfulResponse(res, { message: "Successfully Created", newParty });
+    const partyId = await findPartyId(partyInfo);
+    const tag = await findTag(Number(partyId));
+    return SuccessfulResponse(res, { message: "Successfully Created", newParty: { ...newParty, tag } });
   }
   catch (error) {
     return InternalServerError(res, error);
