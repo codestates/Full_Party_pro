@@ -182,7 +182,7 @@ export default function Notification () {
       <div className="notificationList">
         <div className="contentWrapper">
           <div className="iconContainer">
-            <FontAwesomeIcon icon={ faBellSlash } className="icon bell" />
+            <FontAwesomeIcon icon={ faBellSlash } className="icon bell"/>
           </div>
           <div className="titleContainer">
             <div className="partyNameContainer">

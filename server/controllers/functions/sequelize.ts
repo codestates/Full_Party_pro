@@ -372,6 +372,7 @@ export const getMessage = async (userId: number, partyId: number) => {
     attributes: [ "message" ],
     raw: true
   });
+  console.log(userId)
   return waitingQueue?.message;
 };
 

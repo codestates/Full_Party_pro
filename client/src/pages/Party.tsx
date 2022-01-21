@@ -485,6 +485,7 @@ export default function Party () {
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
       partyId: partyInfo.id
     });
+    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`)
   }
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -793,6 +794,7 @@ export default function Party () {
           quitHandler={quitHandler}
           fullPartyHandler={fullPartyHandler}
           dismissHandler={dismissHandler}
+          partyInfoId={partyInfo.id}
         /> 
       : null}
       {isEdit?
