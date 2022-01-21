@@ -1003,6 +1003,7 @@ export default function Post () {
 
   return (
     <PostContainer>
+      {imgLoading ? <Loading /> : null}
       {cancelModal ?
         <PostCancelModal 
           postCancelHandler={postCancelHandler}
@@ -1026,7 +1027,7 @@ export default function Post () {
       <PostCard>
         <section className="basicInfo">
           <div className="imageContainer">
-            {imgLoading ? <Loading /> :
+            {imgLoading ? null :
             <>
               <img className="preview" src={partyInfo.image} alt="thumbnail"
                 onError={() => {

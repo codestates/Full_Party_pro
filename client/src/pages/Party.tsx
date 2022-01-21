@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart, faAngleDown, faAngleUp, faBullhorn, faBirthdayCake, faCalendarCheck, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 import Loading from '../components/Loading';
 import UserInfoModal from '../components/UserInfoModal';
 import PartyJoinModal from '../components/PartyJoinModal';
@@ -478,25 +477,33 @@ export default function Party () {
   }
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
-    await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
+    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
       partyId: partyInfo.id
     });
-    navigate(`../party/${partyInfo.id}`);
+    if(res.status === 200) {
+      setPartyInfo({
+        ...partyInfo,
+        partyState: 1
+      })
+    }
   }
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
-    await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
+    const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
       partyId: partyInfo.id
     });
-    navigate(`../party/${partyInfo.id}`);
+    if(res.status === 200) {
+      setPartyInfo({
+        ...partyInfo,
+        partyState: 0
+      })
+    }
   }
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/${partyInfo.id}`);
-    navigate(`../party/${partyInfo.id}`);
+    navigate('../home');
   }
 
   useEffect(() => {
@@ -805,7 +812,7 @@ export default function Party () {
       : null}
       {isPartyCancelModalOpen? 
         <PartyCancelModal 
-          from={from}
+          from={from} 
           partyCancelModalHandler={partyCancelModalHandler}
           cancelHandler={cancelHandler}
           quitHandler={quitHandler}
