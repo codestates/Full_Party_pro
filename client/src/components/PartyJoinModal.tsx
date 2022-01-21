@@ -4,6 +4,7 @@ import axios from 'axios';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { useNavigate } from 'react-router-dom'
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -98,6 +99,7 @@ type Props = {
 
 const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
 
+  const navigate = useNavigate()
   const [message, setMessage] = useState("");
 
   const closeModal =() => {
@@ -109,7 +111,6 @@ const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
   }
 
   async function joinHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [FEAT] 기능 확인 필요
     await axios.post(`${process.env.REACT_APP_API_URL}/party/enqueued`, {
       userId,
       partyId,
@@ -117,6 +118,7 @@ const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
     });
     
     closeModal();
+    navigate(`../party/${partyId}`);
   }
 
   return(

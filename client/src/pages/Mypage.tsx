@@ -17,8 +17,6 @@ import VerificationModal from '../components/VerificationModal';
 import UserMap from '../components/UserMap';
 import EmptyParty from '../components/EmptyParty';
 
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyList from '../static/dummyList';
 import { SIGNIN_FAIL } from '../actions/signinType';
 
 export const MypageContainer = styled.div`
@@ -557,7 +555,6 @@ export default function Mypage () {
           userId: signinReducer.userInfo?.id,
           profileImage,
           userName,
-          password: nowPwd,
           birth,
           gender,
           address: formatAddress,
@@ -654,6 +651,13 @@ export default function Mypage () {
     setIsVerificationModalOpen(!isVerificationModalOpen);
   }
 
+  // function handlePwd(pwd: string) {
+  //   setChangeInfo({
+  //     ...changeInfo,
+  //     password: pwd
+  //   });
+  // };
+
   const handleFormatAddressChange = (address: string) => {
     setFormatAddress(address);
   }
@@ -709,9 +713,6 @@ export default function Mypage () {
             <img
               src={basicInfo.profileImage ? basicInfo.profileImage : 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
               alt='thumbnail'
-              // onError={() => {
-              //   return(imgRef.current.src = 'img/bubble.png')
-              // }}
             />
           </div>
         </div>
