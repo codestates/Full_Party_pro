@@ -18,6 +18,7 @@ import PartyEdit from '../components/PartyEdit';
 import PartyMap from '../components/PartyMap';
 import MemberList from '../components/MemberList';
 import QnA from '../components/QnA';
+import NotFound from '../pages/NotFound';
 
 import { AppState } from '../reducers';
 
@@ -312,6 +313,7 @@ export default function Party () {
   const { Kakao } = window;
 
   const [isLoading, setIsLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [ userState, setUserState ] = useState({
     isLeader: false,
     isMember: false,
@@ -463,12 +465,14 @@ export default function Party () {
     // [FEAT] 기능 확인 필요
     console.log("가입 신청을 취소합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyInfo.id}/cancel/${userId}`);
+    navigate('/');
   }
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     // [FEAT] 기능 확인 필요
     console.log("파티를 탈퇴합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
+    navigate('/');
   }
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -476,6 +480,7 @@ export default function Party () {
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
       partyId: partyInfo.id
     });
+    navigate('/');
   }
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -483,20 +488,26 @@ export default function Party () {
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
       partyId: partyInfo.id
     });
-    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`)
+    navigate('/');
   }
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     // [FIX] : 파티 모집 재개 시 버튼 구성이 바뀌지 않음.
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/${partyInfo.id}`);
+    navigate('../home');
   }
 
   useEffect(() => {
     setIsLoading(true);
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`);
-      setPartyInfo(response.data.partyInfo);
-      setComments(response.data.comments);
+      if(response.status === 404){
+        setNotFound(true);
+        setIsLoading(false);
+      } else {
+        setPartyInfo(response.data.partyInfo);
+        setComments(response.data.comments);
+      }
     })();
   }, [params]);
   
@@ -533,6 +544,8 @@ export default function Party () {
     return <Navigate to="../" />
   } else if(isLoading) {
     return <Loading />
+  } else if(notFound) {
+    return <NotFound />
   }
 
   return (
