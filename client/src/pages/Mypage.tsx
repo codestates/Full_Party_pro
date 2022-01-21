@@ -17,8 +17,6 @@ import VerificationModal from '../components/VerificationModal';
 import UserMap from '../components/UserMap';
 import EmptyParty from '../components/EmptyParty';
 
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyList from '../static/dummyList';
 import { SIGNIN_FAIL } from '../actions/signinType';
 
 export const MypageContainer = styled.div`
@@ -544,6 +542,7 @@ export default function Mypage () {
       })
     }
     else if(password === '') {      
+      console.log(formatAddress);
       setIsError({
         isName: true,
         isMobile: true,
@@ -557,7 +556,6 @@ export default function Mypage () {
           userId: signinReducer.userInfo?.id,
           profileImage,
           userName,
-          password: nowPwd,
           birth,
           gender,
           address: formatAddress,
@@ -574,7 +572,7 @@ export default function Mypage () {
           userId: signinReducer.userInfo?.id,
           profileImage,
           userName,
-          password,
+          password: nowPwd,
           birth,
           gender,
           address: formatAddress,
