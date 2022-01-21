@@ -797,7 +797,7 @@ export default function Party () {
             partyId={partyInfo.id}
             isLeader={isLeader}
             leaderId={partyInfo.leaderId}
-            comments={comments.reverse()}
+            comments={comments}
             findComment={findComment}
           /> 
         </section>
