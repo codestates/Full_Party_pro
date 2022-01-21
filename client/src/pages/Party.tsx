@@ -18,6 +18,7 @@ import PartyEdit from '../components/PartyEdit';
 import PartyMap from '../components/PartyMap';
 import MemberList from '../components/MemberList';
 import QnA from '../components/QnA';
+import NotFound from '../pages/NotFound';
 
 import { AppState } from '../reducers';
 
@@ -312,6 +313,7 @@ export default function Party () {
   const { Kakao } = window;
 
   const [isLoading, setIsLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [ userState, setUserState ] = useState({
     isLeader: false,
     isMember: false,
@@ -494,8 +496,13 @@ export default function Party () {
     setIsLoading(true);
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`);
-      setPartyInfo(response.data.partyInfo);
-      setComments(response.data.comments);
+      if(response.status === 404){
+        setNotFound(true);
+        setIsLoading(false);
+      } else {
+        setPartyInfo(response.data.partyInfo);
+        setComments(response.data.comments);
+      }
     })();
   }, [params]);
   
@@ -532,6 +539,8 @@ export default function Party () {
     return <Navigate to="../" />
   } else if(isLoading) {
     return <Loading />
+  } else if(notFound) {
+    return <NotFound />
   }
 
   return (
