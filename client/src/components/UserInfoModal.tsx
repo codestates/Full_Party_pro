@@ -230,10 +230,12 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     // partyState를 1로 바꿉니다.
     const response = await axios.post(`${process.env.REACT_APP_API_URL}/party/approval`, { 
       userId, partyId
-     }, {
+      }, {
       withCredentials: true
     });
+
     userInfoModalHandler();
+    closeModal();
   }
 
   return(

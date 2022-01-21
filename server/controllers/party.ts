@@ -43,6 +43,7 @@ export const modifyPartyInfo = async (req: Request, res: Response) => {
 export const enqueue = async (req: Request, res: Response) => {
   try {
     const { userId, partyId, message } = req.body;
+    console.log(req.body)
     const created = await createWaitingQueue(userId, partyId, message);
     if (created) return SuccessfulResponse(res, { message: "Enqueued Successfully" });
     return FailedResponse(res, 400, "Bad Request");
@@ -77,6 +78,7 @@ export const approveMember = async (req: Request, res: Response) => {
   try {
     const { userId, partyId } = req.body;
     const created = await createUserParty(userId, partyId);
+    console.log(userId)
     const deleted = await deleteWaitingQueue(userId, partyId);
     const party = await getPartyInformation(partyId);
     const notificationInfo: NotificationAttributes = {

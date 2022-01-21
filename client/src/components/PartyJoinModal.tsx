@@ -115,6 +115,9 @@ const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
       partyId,
       message,
     });
+    
+    closeModal();
+    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyId}`)
   }
 
   return(
