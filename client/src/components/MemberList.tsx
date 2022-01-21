@@ -26,6 +26,8 @@ export const MemberListContainer = styled.div`
 
       margin: 10px;
       overflow-wrap: normal;
+
+      cursor: pointer;
     }
 
     .profileImage {

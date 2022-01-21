@@ -18,6 +18,7 @@ import UserMap from '../components/UserMap';
 import EmptyParty from '../components/EmptyParty';
 
 import { SIGNIN_FAIL } from '../actions/signinType';
+import { MODIFY_USERINFO } from '../actions/modify';
 
 export const MypageContainer = styled.div`
   width: 100%;
@@ -562,8 +563,13 @@ export default function Mypage () {
           mobile
         }
       })
-      if(res.data.message === "Successfully Modified") {
-        setIsChange(false)
+      if(res.status === 200) {
+        //[dev] 기능 완성되면 콘솔 로그 삭제해주세요.
+        setIsChange(false);
+        const payload = { userName, profileImage, address }
+        console.log(payload);
+        dispatch({ type: MODIFY_USERINFO, payload });
+        navigate('/mypage');
       }
     } 
     else if (password !== '') {
@@ -579,8 +585,11 @@ export default function Mypage () {
           mobile
         }
       })
-      if(res.data.message === "Successfully Modified") {
-        setIsChange(false)
+      if(res.status === 200) {
+        setIsChange(false);
+        const payload = { userName, profileImage, address }
+        dispatch({ type: MODIFY_USERINFO, payload });
+        navigate('/mypage');
       }
     }
   }
@@ -774,32 +783,36 @@ export default function Mypage () {
                         <div className='error'>{isError.nameMsg}</div>
                       </td>
                     </tr>
-                    <tr>
-                      <td className='label'>비밀번호</td>
-                      <td className='input'>
-                        <input
-                          placeholder='비밀번호 수정시에만 입력하세요'
-                          name='password'
-                          type='password'
-                          value={changeInfo.password}
-                          onChange={(e) => handleInputChange(e)}
-                        ></input>
-                        <div className='error'>{isPassword.passwordMsg}</div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className='label'>비밀번호<br />확인</td>
-                      <td className='input'>
-                        <input
-                          placeholder='비밀번호 수정시에만 입력하세요'
-                          name='confirm'
-                          type='password'
-                          value={changeInfo.confirm}
-                          onChange={(e) => handleInputChange(e)}
-                        ></input>
-                        <div className='error'>{isConfirmPassword.confirmPasswordMsg}</div>
-                      </td>
-                    </tr>
+                    {signupType === 'general' ? 
+                      <>
+                        <tr>
+                          <td className='label'>비밀번호</td>
+                          <td className='input'>
+                            <input
+                              placeholder='비밀번호 수정시에만 입력하세요'
+                              name='password'
+                              type='password'
+                              value={changeInfo.password}
+                              onChange={(e) => handleInputChange(e)}
+                            ></input>
+                            <div className='error'>{isPassword.passwordMsg}</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className='label'>비밀번호<br />확인</td>
+                          <td className='input'>
+                            <input
+                              placeholder='비밀번호 수정시에만 입력하세요'
+                              name='confirm'
+                              type='password'
+                              value={changeInfo.confirm}
+                              onChange={(e) => handleInputChange(e)}
+                            ></input>
+                            <div className='error'>{isConfirmPassword.confirmPasswordMsg}</div>
+                          </td>
+                        </tr>
+                      </>
+                    : null}
                     <tr>
                       <td className='label'>생일</td>
                       <td className='input'>
