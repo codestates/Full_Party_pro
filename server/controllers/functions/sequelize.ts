@@ -230,14 +230,13 @@ export const getTag = async (partyId: number) => {
 
 export const createNewParty = async (userId: number, partyInfo: PartyInfo) => {
   const newParty = await Parties.create({ ...partyInfo, partyState: 0, leaderId: userId });
-  const withoutTag = partyInfo;
+  const withoutTag = { ...partyInfo };
   delete withoutTag.tag;
   const party: any = await Parties.findOne({
     where: { ...withoutTag },
     attributes: [ "id" ],
     raw: true
   })
-  console.log("🌈", party);
   await UserParty.create({ userId, partyId: Number(party?.id), message: "", isReviewed: false });
   if (partyInfo.tag) await createTag(partyInfo.tag, newParty.id);
   return { partyId: newParty.id, location: newParty.location };
@@ -383,7 +382,6 @@ export const getMessage = async (userId: number, partyId: number) => {
     attributes: [ "message" ],
     raw: true
   });
-  console.log(userId)
   return waitingQueue?.message;
 };
 
@@ -486,9 +484,11 @@ export const removeSubComment = async (subCommentId: number) => {
   return subCommentDeleted;
 };
 
-export const findPartyId = async (partyInfo: object) => {
+export const findPartyId = async (partyInfo: any) => {
+  delete partyInfo.tag
+  const latlng = JSON.stringify(partyInfo.latlng)
   const partyIdObj = await Parties.findOne({
-    where: { ...partyInfo },
+    where: { ...partyInfo, latlng},
     attributes: [ "id" ],
     raw: true
   });
@@ -639,7 +639,7 @@ export const findCompletedParty = async (userId: number) => {
   let partyIdArr = userParty.map(item => item.partyId);
   const completedParty = await Parties.findAll({
     where: { [Op.or]: [ { leaderId: userId }, { id: partyIdArr } ], partyState: 2 },
-    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location" ],
     raw: true
   });
   return completedParty;

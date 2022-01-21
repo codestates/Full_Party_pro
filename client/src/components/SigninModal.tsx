@@ -115,8 +115,6 @@ export const ModalView = styled.div`
   }
 
   .notUser{
-    display: none;
-
     color: #f34508;
     font-size: 10px;
 
@@ -219,10 +217,12 @@ const SigninModal = () => {
   }
 
   const handleSignin = () => {
-    dispatch(fetchUserdata(userInfo));
-    dispatch({
-      type: CLOSE_MODAL
-    })
+    dispatch(fetchUserdata(userInfo))
+    if(signinReducer.isLoggedIn){
+      dispatch({
+        type: CLOSE_MODAL
+      })
+    }
   }
 
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {

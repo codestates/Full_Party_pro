@@ -253,13 +253,11 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
     }, {
       withCredentials: true
     });
-    navigate(`../party/${partyId}`);
   }
 
   function commentDeleteModalHandler(event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId: number): void {
     setCommentToDelete({ idx: idx, commentId: commentId })
     setIsCommentDeleteModalOpen(!isCommentDeleteModalOpen);
-    navigate(`../party/${partyId}`);
   }
 
   useEffect(() => {
