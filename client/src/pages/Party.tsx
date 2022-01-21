@@ -466,14 +466,14 @@ export default function Party () {
     // [FEAT] 기능 확인 필요
     console.log("가입 신청을 취소합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyInfo.id}/cancel/${userId}`);
-    navigate(`../party/${partyInfo.id}`);
+    navigate(`../home`);
   }
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     // [FEAT] 기능 확인 필요
     console.log("파티를 탈퇴합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
-    navigate(`../party/${partyInfo.id}`);
+    navigate(`../home`);
   }
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {

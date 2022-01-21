@@ -216,27 +216,25 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
       userId: userInfo.id, partyId, message: newMsg,
     });
     setIsEditMode(!isEditMode);
-    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyId}`)
+    navigate(`../party/${partyId}`);
   }
 
   async function expelHandler(event: React.MouseEvent<HTMLButtonElement>) {
     // [FEAT] 기능 확인 필요
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userInfo.id}`);
-    navigate(`../party/${partyId}`);
     userInfoModalHandler();
-    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyId}`)
+    navigate(`../party/${partyId}`);
   }
 
   async function refuseHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [FEAT] 기능 확인 필요
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userInfo.id}`);
-    navigate(`../party/${partyId}`);
     userInfoModalHandler();
-    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyId}`)
+    navigate(`../party/${partyId}`);
   }
 
   async function acceptHandler(event: React.MouseEvent<HTMLButtonElement>) {
     // [FEAT] 기능 확인 필요
+    // 일단 DB변경은 됨
     // 이 멤버의 가입을 승인했을 때, 멤버 수가 멤버 정원에 도달했을 경우 
     // partyState를 1로 바꿉니다.
     const response = await axios.post(`${process.env.REACT_APP_API_URL}/party/approval`, { 
@@ -245,8 +243,8 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
       withCredentials: true
     });
 
+    navigate(`../party/${partyId}`);
     userInfoModalHandler();
-    window.location.assign(`${process.env.REACT_APP_CLIENT_URL}/party/${partyId}`)
   }
 
   return(

@@ -652,6 +652,13 @@ export default function Mypage () {
     setIsVerificationModalOpen(!isVerificationModalOpen);
   }
 
+  // function handlePwd(pwd: string) {
+  //   setChangeInfo({
+  //     ...changeInfo,
+  //     password: pwd
+  //   });
+  // };
+
   const handleFormatAddressChange = (address: string) => {
     setFormatAddress(address);
   }
@@ -707,9 +714,6 @@ export default function Mypage () {
             <img
               src={basicInfo.profileImage ? basicInfo.profileImage : 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
               alt='thumbnail'
-              // onError={() => {
-              //   return(imgRef.current.src = 'img/bubble.png')
-              // }}
             />
           </div>
         </div>

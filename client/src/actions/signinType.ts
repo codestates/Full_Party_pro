@@ -1,5 +1,6 @@
 export const SIGNIN_SUCCESS = 'SIGNIN_SUCCESS'
 export const SIGNIN_FAIL = 'SIGNIN_FAIL'
+export const CLOSE_MODAL = 'CLOSE_MODAL'
 
 export type UserInfo = {
   id: number
@@ -18,4 +19,8 @@ export interface signinSuccessDispatch {
   payload: UserInfo
 }
 
-export type UserInfoDispatchType = signinFailDispatch | signinSuccessDispatch
+export interface closeModalDispatch {
+  type: typeof CLOSE_MODAL
+}
+
+export type UserInfoDispatchType = signinFailDispatch | signinSuccessDispatch | closeModalDispatch
