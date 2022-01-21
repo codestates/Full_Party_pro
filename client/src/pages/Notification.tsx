@@ -13,7 +13,6 @@ import { cookieParser } from '../App';
 
 import Loading from '../components/Loading';
 
-
 export const NotificationContainer = styled.div`
 
   margin: 60px 0;

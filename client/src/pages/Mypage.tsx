@@ -542,6 +542,7 @@ export default function Mypage () {
       })
     }
     else if(password === '') {      
+      console.log(formatAddress);
       setIsError({
         isName: true,
         isMobile: true,
@@ -571,7 +572,7 @@ export default function Mypage () {
           userId: signinReducer.userInfo?.id,
           profileImage,
           userName,
-          password,
+          password: nowPwd,
           birth,
           gender,
           address: formatAddress,

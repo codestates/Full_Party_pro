@@ -63,6 +63,12 @@ export const ModalView = styled.div`
     border: 1px solid #d5d5d5;
 
     margin-bottom: 20px;
+
+    font-family: "-apple-system";
+
+    &:focus {
+      outline-style:none;
+    }
   }
 
   #join {

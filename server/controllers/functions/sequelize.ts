@@ -230,7 +230,7 @@ export const getTag = async (partyId: number) => {
 
 export const createNewParty = async (userId: number, partyInfo: PartyInfo) => {
   const newParty = await Parties.create({ ...partyInfo, partyState: 0, leaderId: userId });
-  const withoutTag = partyInfo;
+  const withoutTag = { ...partyInfo };
   delete withoutTag.tag;
   const party: any = await Parties.findOne({
     where: { ...withoutTag },
@@ -639,7 +639,7 @@ export const findCompletedParty = async (userId: number) => {
   let partyIdArr = userParty.map(item => item.partyId);
   const completedParty = await Parties.findAll({
     where: { [Op.or]: [ { leaderId: userId }, { id: partyIdArr } ], partyState: 2 },
-    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location" ],
     raw: true
   });
   return completedParty;

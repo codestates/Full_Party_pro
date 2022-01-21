@@ -657,6 +657,16 @@ export const Button = styled.button`
   color: white;
 
   margin-bottom: 30px;
+
+  cursor: pointer;
+
+  &:disabled {
+    border: 1px solid #50C9C3;
+    color: #50C9C3;
+    background-color: #fff;
+
+    cursor: default;
+  }
 `
 
 export default function Post () {
