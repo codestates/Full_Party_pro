@@ -205,14 +205,15 @@ type Props = {
   leaderId: number,
   isLeader: boolean,
   userId: number,
-  partyId: number
+  partyId: number,
+  handlePartyInfoChange: Function
 };
 
 interface keyable {
  [key: string]: any  
 };
 
-const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, partyId }: Props) => {
+const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, partyId, handlePartyInfoChange }: Props) => {
 
   const [curIdx, setCurIdx] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -230,7 +231,7 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
   function reviewHandler(event: React.MouseEvent<HTMLButtonElement>) {
     const reviewedExp = (event.currentTarget as HTMLButtonElement).value;
     setReviewMembers(reviewMembers.map((member, idx) => (idx === curIdx ? { ...member, exp: Number(reviewedExp) } : member)));
-    setProgress((members.length - memberToReview + 1)/members.length*100);
+    setProgress(memberToReview > 0 ? ((members.length - memberToReview + 1)/members.length*100) : 100);
   }
 
   function handleMemberChange(event: React.MouseEvent<HTMLButtonElement>) {
@@ -258,6 +259,8 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
       }, {
         withCredentials: true
       });
+
+      handlePartyInfoChange("partyState", 2)
     }
 
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/review`, { 
@@ -267,6 +270,8 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
     }, {
       withCredentials: true
     });
+
+    handlePartyInfoChange("isReviewed", true);
 
     confetti();
     reviewModalHandler();

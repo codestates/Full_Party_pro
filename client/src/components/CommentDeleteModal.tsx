@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -86,9 +87,12 @@ export const CloseBtn = styled.button`
 type Props = {
   commentDeleteModalHandler: Function,
   commentToDelete: { [key: string] : number },
+  partyId: number,
 }
 
-const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete }: Props) => {
+const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete, partyId }: Props) => {
+
+  const navigate = useNavigate();
 
   const { idx, commentId } = commentToDelete;
 
@@ -108,6 +112,7 @@ const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete }: Prop
     }
 
     commentDeleteModalHandler();
+    navigate(`../party/${partyId}`);
   }
 
   return(
