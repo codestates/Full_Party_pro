@@ -17,8 +17,7 @@ import VerificationModal from '../components/VerificationModal';
 import UserMap from '../components/UserMap';
 import EmptyParty from '../components/EmptyParty';
 
-import { SIGNIN_FAIL } from '../actions/signinType';
-import { MODIFY_USERINFO } from '../actions/modify';
+import { SIGNIN_FAIL, SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const MypageContainer = styled.div`
   width: 100%;
@@ -542,8 +541,7 @@ export default function Mypage () {
         axiosMsg: '입력하신 정보를 확인해주세요.',
       })
     }
-    else if(password === '') {      
-      console.log(formatAddress);
+    else if(password === '') {
       setIsError({
         isName: true,
         isMobile: true,
@@ -564,11 +562,15 @@ export default function Mypage () {
         }
       })
       if(res.status === 200) {
-        //[dev] 기능 완성되면 콘솔 로그 삭제해주세요.
         setIsChange(false);
-        const payload = { userName, profileImage, address }
-        console.log(payload);
-        dispatch({ type: MODIFY_USERINFO, payload });
+        const payload = {
+          id: signinReducer.userInfo?.id,
+          userName: changeInfo.userName,
+          profileImage: changeInfo.profileImage,
+          address: changeInfo.address,
+          signupType: signinReducer.userInfo?.signupType
+        }
+        dispatch({ type: SIGNIN_SUCCESS, payload });
         navigate('/mypage');
       }
     } 
@@ -587,8 +589,14 @@ export default function Mypage () {
       })
       if(res.status === 200) {
         setIsChange(false);
-        const payload = { userName, profileImage, address }
-        dispatch({ type: MODIFY_USERINFO, payload });
+        const payload = {
+          id: signinReducer.userInfo.id,
+          userName,
+          profileImage,
+          address: formatAddress,
+          signupType,
+        }
+        dispatch({ type: SIGNIN_SUCCESS, payload });
         navigate('/mypage');
       }
     }

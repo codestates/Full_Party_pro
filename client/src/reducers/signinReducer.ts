@@ -1,5 +1,4 @@
 import { SIGNIN_FAIL, SIGNIN_SUCCESS, UserInfo, UserInfoDispatchType } from "../actions/signinType";
-import { MODIFY_USERINFO, ModifyUserInfoDispatchType } from "../actions/modify";
 
 interface InitialState {
   isLoggedIn?: boolean | null
@@ -17,7 +16,7 @@ const initialState: InitialState = {
   }
 }
 
-const signinReducer = (state = initialState, action: UserInfoDispatchType | ModifyUserInfoDispatchType): InitialState => {
+const signinReducer = (state = initialState, action: UserInfoDispatchType): InitialState => {
   switch (action.type) {
     case SIGNIN_FAIL:
       return {
@@ -45,18 +44,6 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType | Modi
           signupType
         }
       }
-
-    // [dev] 추가한 액션
-    case MODIFY_USERINFO:
-      return {
-        ...state,
-        userInfo: {
-          ...state.userInfo,
-          userName,
-          profileImage,
-          address,
-        }
-      }  
       
     default:
       return state;
