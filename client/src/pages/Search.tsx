@@ -7,7 +7,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-
+import { NOTIFY } from '../actions/notify';
 import { useSelector } from 'react-redux';
 import { AppState } from '../reducers';
 import { RootReducerType } from '../store/store';
@@ -136,10 +136,17 @@ export default function Search () {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${tag}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
         const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
+        dispatch({
+          type: NOTIFY,
+          payload: {
+            isBadgeOn: res.data.notification
+          }
+        });
         if (isComponentMounted) {
           setWord(tag);
           setParties(parsedData);
         }
+
       }
       searchData();
     } 
@@ -149,6 +156,12 @@ export default function Search () {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${keyword}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
         const parsedData = partyData.map((party: any) => ({ ...party, latlng: JSON.parse(party.latlng) }));
+        dispatch({
+          type: NOTIFY,
+          payload: {
+            isBadgeOn: res.data.notification
+          }
+        });
         if (isComponentMounted) {
           setWord(keyword);
           setParties(parsedData);

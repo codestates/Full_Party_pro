@@ -8,6 +8,7 @@ import Loading from '../components/Loading';
 import QuestCard from '../components/QuestCard';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
 import axios from 'axios';
+import { NOTIFY } from "../actions/notify"
 
 export const FavoriteContainer = styled.div`
   width: 100%;
@@ -44,6 +45,12 @@ export default function Favorite () {
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/favorite/${userId}`, {
         withCredentials: true
+      });
+      dispatch({
+        type: NOTIFY,
+        payload: {
+          isBadgeOn: response.data.notification
+        }
       });
       setFavoriteList(response.data.partyList);
     })();

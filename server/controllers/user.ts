@@ -1,19 +1,18 @@
-import { UsersAttributes } from './../models/users';
 import { Request, Response } from "express";
 import axios from 'axios';
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { deleteUser, findCompletedParty, findLeadingParty, findParticipatingParty, findUser, getNotification, updateUser } from "./functions/sequelize";
+import { deleteUser, findCompletedParty, findLeadingParty, findParticipatingParty, findUser, getNotification, updateUser, checkIsRead } from "./functions/sequelize";
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 
 export const getUserInfo = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const notifications = await getNotification(Number(userId));
+    const notification = await checkIsRead(Number(userId));
     const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "address", "exp", "level", "signupType" ]);
-    if (userInfo && notifications) return SuccessfulResponse(res, {
+    if (userInfo && notification) return SuccessfulResponse(res, {
       message: "Loaded Successfully",
       userInfo,
-      notifications
+      notification
     });
     return FailedResponse(res, 400, "Bad Request");
   }

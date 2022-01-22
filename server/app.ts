@@ -60,13 +60,14 @@ if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
 
   server = https.createServer(credentials, app);
   server.listen(HTTPS_PORT, async () => {
-    console.log(`✅ https server running in ${HTTPS_PORT}`);
     await sequelize.authenticate()
       .then(async () => console.log("✅ DB connection success"))
-      .catch(error => console.log(error))
+      .catch(error => console.log(error));
+    console.log(`✅ https server running in ${HTTPS_PORT}`);
   });
 } 
 else {
   server = app.listen(HTTPS_PORT, () => console.log('✅ http server running'));
 }
+
 export default server;

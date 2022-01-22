@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,7 +13,7 @@ import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
 import PartyCancelModal from '../components/PartyCancelModal';
 import PartyEdit from '../components/PartyEdit';
-
+import { NOTIFY } from '../actions/notify';
 import PartyMap from '../components/PartyMap';
 import MemberList from '../components/MemberList';
 import QnA from '../components/QnA';
@@ -308,6 +308,7 @@ export const PartyStateBtns = styled.section`
 export default function Party () {
 
   const params = useParams();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const commentRef = useRef<HTMLElement>(null);
 
@@ -582,6 +583,12 @@ export default function Party () {
     .then(res => {
       setPartyInfo(res.data.partyInfo);
       setComments(res.data.comments);
+      dispatch({
+        type: NOTIFY,
+        payload: {
+          isBadgeOn: res.data.notification
+        }
+      });
     })
     .catch(err => {
       if(err.response.status === 404){

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import axios from 'axios';
-
+import { NOTIFY } from "../actions/notify"
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faBullhorn, faScroll, faTrophy, faStar, faBellSlash } from '@fortawesome/free-solid-svg-icons';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
 
 import { cookieParser } from '../App';
@@ -96,7 +96,7 @@ export const NotificationContainer = styled.div`
 `
 
 export default function Notification () {
-
+  const dispatch = useDispatch();
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
   );
@@ -159,6 +159,12 @@ export default function Notification () {
     //[FEAT] 기능확인 필요
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/notification/${userId}`);
+      dispatch({
+        type: NOTIFY,
+        payload: {
+          isBadgeOn: response.data.notification
+        }
+      });
       setNotification(response.data.notifications);
     })();
   }, []);
