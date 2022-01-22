@@ -5,7 +5,7 @@ import {
   getPartyInformation, compileComments, createWaitingQueue, deleteWaitingQueue, createNotification, 
   createUserParty, deleteParty, deleteUserParty, findUser, updatePartyState, makeComment, makeSubComment,
   getPartyId, removeComment, removeSubComment, updateUserParty, createNotificationsAtOnce, getMembers,
-  updatePartyInformation, updateExpAtOnce,
+  updatePartyInformation, updateExpAtOnce, checkIsRead
 } from "./functions/sequelize";
 import { NotificationAttributes } from "../models/notification";
 
@@ -13,11 +13,12 @@ export const getPartyInfo = async (req: Request, res: Response) => {
   try {
     const { partyId, userId } = req.params;
     const partyInfo = await getPartyInformation(Number(partyId), Number(userId));
+    const notification = await checkIsRead(Number(userId));
     if(!partyInfo.id){
       return FailedResponse(res, 404, "Not Found");
     } else {
       const comments = await compileComments(Number(partyId));
-      return SuccessfulResponse(res, { message: "Party Information Loaded", partyInfo, comments });
+      return SuccessfulResponse(res, { message: "Party Information Loaded", partyInfo, comments, notification });
     }
   }
   catch (error) {

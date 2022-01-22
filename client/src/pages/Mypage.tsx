@@ -7,7 +7,7 @@ import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
-
+import { NOTIFY } from "../actions/notify";
 import { RootReducerType } from '../store/store';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
@@ -675,6 +675,12 @@ export default function Mypage () {
     (async () => {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
         withCredentials: true,
+      });
+      dispatch({
+        type: NOTIFY,
+        payload: {
+          isBadgeOn: res.data.notification
+        }
       });
       const userInfo = res.data.userInfo;
       setBasicInfo({

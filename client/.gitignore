@@ -19,6 +19,10 @@
 .env.test.local
 .env.production.local
 .env.production
+
+key.pem
+cert.pem
+
 /src/config/key.tsx
 
 npm-debug.log*
