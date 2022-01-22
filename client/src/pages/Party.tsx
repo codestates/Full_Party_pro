@@ -579,6 +579,9 @@ export default function Party () {
 
   useEffect(() => {
     setIsLoading(true);
+    if(params.commentId){
+      setFindComment(Number(params.commentId));
+    }
     axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`)
     .then(res => {
       setPartyInfo(res.data.partyInfo);
@@ -804,7 +807,7 @@ export default function Party () {
             partyId={partyInfo.id}
             isLeader={isLeader}
             leaderId={partyInfo.leaderId}
-            comments={comments}
+            comments={comments.map(comment => comment).reverse()}
             findComment={findComment}
           /> 
         </section>
