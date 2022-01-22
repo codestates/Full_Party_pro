@@ -639,10 +639,9 @@ export default function Mypage () {
       signup_type: signupType
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
   const handleWithdrawal = async () => {
@@ -654,10 +653,9 @@ export default function Mypage () {
       }
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {

@@ -66,9 +66,8 @@ export default function Auth() {
       type: SIGNIN_SUCCESS,
       payload: response.data.userInfo
     });
-    document.cookie = "signupType=google";
-    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
-    document.cookie = "isLoggedIn=1;"
+    document.cookie = `signupType=google; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("../home");
   };
 
@@ -82,9 +81,8 @@ export default function Auth() {
         type: SIGNIN_SUCCESS,
         payload: response.data.userInfo
       });
-      document.cookie = "signupType=kakao";
-      document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home;`;
-      document.cookie = "isLoggedIn=1;"
+      document.cookie = `signupType=kakao; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
       navigate("../home");
     }
     catch (error) {

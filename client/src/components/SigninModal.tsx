@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -255,9 +254,8 @@ const SigninModal = () => {
     dispatch({
       type: CLOSE_MODAL
     });
-    document.cookie = "signupType=guest";
-    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
-    document.cookie = "isLoggedIn=1;"
+    document.cookie = `signupType=guest; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate('/home');
   }
   

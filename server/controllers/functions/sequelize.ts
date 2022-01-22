@@ -92,7 +92,7 @@ export const invertFavorite = async (userId: number, partyId: number) => {
 export const getLeadingParty = async (userId: number) => {
   const leadingParty = await Parties.findAll({
     where: { leaderId: userId },
-    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline", "location" ]
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ]
   });
   return leadingParty;
 };
@@ -128,7 +128,7 @@ export const findParticipatingParty = async (userId: number) => {
         [Op.not]: userId
       }
     },
-    attributes: [ "id", "name", "image", "startDate", "endDate", "location" ],
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ],
     raw: true
   });
   return participatingParty;
@@ -446,7 +446,7 @@ export const updatePartyState = async (partyId: number, partyState: number) => {
   const updated = await Parties.update({ partyState }, {
     where: { id: partyId }
   });
-  let notificationContent;
+  let notificationContent = "";
   switch (partyState) {
     case 0: notificationContent = "reparty"; break;
     case 1: notificationContent = "fullparty"; break;
@@ -486,8 +486,8 @@ export const removeSubComment = async (subCommentId: number) => {
 };
 
 export const findPartyId = async (partyInfo: any) => {
-  delete partyInfo.tag
-  const latlng = JSON.stringify(partyInfo.latlng)
+  delete partyInfo.tag;
+  const latlng = JSON.stringify(partyInfo.latlng);
   const partyIdObj = await Parties.findOne({
     where: { ...partyInfo, latlng},
     attributes: [ "id" ],

@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse } from "./functions/response";
-import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 import { getNotification, checkIsRead } from "./functions/sequelize";
 
 export const getNotifications = async (req: Request, res: Response) => {

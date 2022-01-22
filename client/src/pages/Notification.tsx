@@ -171,7 +171,6 @@ export default function Notification () {
   
   useEffect(() => {
     setIsLoading(false);
-    // document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
   }, [ notification ]);
 
   if(cookieParser().isLoggedIn === "0"){

@@ -13,16 +13,14 @@ import partyRouter from "./router/party";
 import favoriteRouter from "./router/favorite";
 import searchRouter from "./router/search";
 import notificationRouter from "./router/notification";
-import mailVerification from "./router/mailVerification";
 
-const path = require('path');
 const app = express();
 
 const corsOption = {
   origin: config.cors.allowedOrigin,
   optionsSuccessStatus: 200,
   "Access-Control-Allow-Credentials" : true,
-  credentials: true,
+  credentials: true
 };
 
 app.use(cors(corsOption));
@@ -36,7 +34,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/", authRouter);
-app.use("/mailVerification", mailVerification);
 app.use("/list", listRouter);
 app.use("/user", userRouter);
 app.use("/party", partyRouter);
