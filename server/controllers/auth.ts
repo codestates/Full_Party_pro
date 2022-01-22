@@ -4,10 +4,10 @@ import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
 import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 import { findUser, createUser, deleteUser } from "./functions/sequelize";
-import { JwtPayload } from "jsonwebtoken";
-import qs from "qs";
 import config from "../config"
-import { Users } from "../models/users";
+import nodemailer from "nodemailer"
+import dotenv from "dotenv"
+dotenv.config();
 
 export const signin = async (req: Request, res: Response) => {
   try {
@@ -89,11 +89,11 @@ export const guest = async (req: Request, res: Response) => {
 
 export const googleSignIn = async (req: Request, res: Response) => {
   try {
-    let newAuthorization = ""
-    if ( req.body.authorizationCode[1] === "/" ) {
-      newAuthorization = req.body.authorizationCode.replace("/", "%2F") 
-    }
     const { authorizationCode } = req.body;
+    let newAuthorization = ""
+    if ( authorizationCode[1] === "/" ) {
+      newAuthorization = authorizationCode.replace("/", "%2F");
+    }
     const { googleClientId, googleClientSecret } = config.google;
     const params = {
       code: authorizationCode,
@@ -125,8 +125,8 @@ export const googleSignIn = async (req: Request, res: Response) => {
         email,
         gender: "기타",
         birth: new Date(),
-        address: "unidentified",
-        mobile: "unidentified",
+        address: "Google",
+        mobile: "Google",
         exp: 25,
         level: 1,
         signupType: "google"
@@ -134,7 +134,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
     }
     const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
     setCookie(res, "token", String(accessToken));
-    return SuccessfulResponse(res, { message: "You have successfully signed in with Google Account", userInfo });
+    return SuccessfulResponse(res, { message: "You Have Successfully Signed In With Google Account", userInfo });
   } catch (error) {
     InternalServerError(res, error);
   }
@@ -176,8 +176,8 @@ export const kakao = async (req: Request, res: Response) => {
           email,
           gender: "기타",
           birth: new Date(),
-          address: "KAKAO",
-          mobile: "KAKAO",
+          address: "Kakao",
+          mobile: "Kakao",
           exp: 25,
           level: 1,
           signupType: "kakao"
@@ -185,7 +185,7 @@ export const kakao = async (req: Request, res: Response) => {
       }
       const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
       setCookie(res, "token", String(accessToken));
-      SuccessfulResponse(res, { message: "You have successfully signed in", userInfo });
+      SuccessfulResponse(res, { message: "You Have Successfully Signed In With Kakao Account", userInfo });
     }
     catch (error) {
       console.log(error)
@@ -244,4 +244,70 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
   catch (error) {
     InternalServerError(res, error);
   }
+};
+
+export const mailVerification = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    const code = String(Math.floor(Math.random()*1000000)).padStart(6,"0");
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.NODEMAILER_USER,
+        pass: process.env.NODEMAILER_PASS
+      }
+    });
+
+    const mailOptions = {
+      from: 'Full Party! 풀팟 <fullparty.gm@gmail.com>',    
+      to: email,                     
+      subject: '[풀팟] 이메일 인증을 진행해주세요.',   
+      html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+      <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+          <title>FullParty Verification Email</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        </head>
+        <body style="margin: 0; padding: 0;">
+          <table cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+              <td align="center"style="padding: 40px 0 10px 0;">
+                <img src="https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png" alt="fullParty Thumbnial" width="500" height="200" style="display: block;" />
+             </td>
+            </tr>
+            <tr>
+              <td align="center">
+                풀팟 회원가입을 위한 인증코드입니다.
+                <br />아래의 인증 코드를 입력하여 이메일 인증을 완료해주세요.
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding: 20px 0 20px 0;">
+                <font size="5pt" color="#50C9C3"><b>${code}</b></font>
+              </td>
+            </tr>
+          </table>
+        </body>
+      </html>`,
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      }
+      else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+  
+    // res.redirect("/");
+    return SuccessfulResponse(res, { message: "Authentication Email Sent", code });
+  }
+  catch (error) {
+    return InternalServerError(res, error);
+  };
 };

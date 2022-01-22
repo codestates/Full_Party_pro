@@ -123,9 +123,9 @@ export const updateUserAddress = async (req: Request, res: Response) => {
     const { userId, address } = req.body;
     const updated = await updateUser(userId, { address });
     if (!updated) return FailedResponse(res, 400, "Bad Request");
-    SuccessfulResponse(res, { message: "Successfully modified" });
+    return SuccessfulResponse(res, { message: "Successfully modified" });
   }
   catch (error) {
-    InternalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
