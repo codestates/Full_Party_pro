@@ -244,6 +244,9 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
     }, {
       withCredentials: true
     });
+    setIsEditMode(false);
+    setCommentIdx(0);
+    setIsCommentOpen(true);
     setNewComment({ ...newComment, comment: "" });
     navigate(`../party/${partyId}`);
   }
@@ -269,7 +272,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
       setCommentIdx(idx);
       setIsCommentOpen(true);
     }
-  }, [findComment])
+  }, [comments])
 
   if(comments.length <= 0){
     return (
@@ -392,7 +395,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
               </CommentDetails>  
             : null}
           </div>
-        ).reverse()}
+        )}
       </Comments>
 
       {isCommentDeleteModalOpen? 
