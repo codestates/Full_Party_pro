@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import axios from 'axios';
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { deleteUser, findCompletedParty, findLeadingParty, findParticipatingParty, findUser, getNotification, updateUser, checkIsRead } from "./functions/sequelize";
-import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
+import { deleteUser, findCompletedParty, findLeadingParty, findParticipatingParty, findUser, updateUser, checkIsRead } from "./functions/sequelize";
+import { verifyAccessToken } from "./functions/token";
 
 export const getUserInfo = async (req: Request, res: Response) => {
   try {

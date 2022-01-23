@@ -1,11 +1,9 @@
 import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 import { 
   getPartyInformation, compileComments, createWaitingQueue, deleteWaitingQueue, createNotification, 
   createUserParty, deleteParty, deleteUserParty, findUser, updatePartyState, makeComment, makeSubComment,
-  getPartyId, removeComment, removeSubComment, updateUserParty, createNotificationsAtOnce, getMembers,
-  updatePartyInformation, updateExpAtOnce, checkIsRead
+  getPartyId, removeComment, removeSubComment, updateUserParty, updatePartyInformation, updateExpAtOnce, checkIsRead
 } from "./functions/sequelize";
 import { NotificationAttributes } from "../models/notification";
 
@@ -58,30 +56,6 @@ export const enqueue = async (req: Request, res: Response) => {
   }
 };
 
-<<<<<<< HEAD
-export const dequeue = async (req: Request, res: Response) => {
-  try {
-    const { userId, partyId, action } = req.params;
-    const party = await getPartyInformation(Number(partyId));
-    if (action === "deny") {
-      const notificationInfo: NotificationAttributes = {
-        content: "deny", 
-        userId: Number(userId), 
-        partyId: Number(partyId),
-        partyName: party.name, 
-        isRead: false
-      };
-      await createNotification(notificationInfo);
-    }
-    const deleted = await deleteWaitingQueue(Number(userId), Number(partyId));
-    if (deleted) return SuccessfulResponse(res, { message: "Dequeued Successfully" });
-    return FailedResponse(res, 400, "Bad Request");
-  }
-  catch (error) {
-    return InternalServerError(res, error);
-  }
-};
-=======
   export const dequeue = async (req: Request, res: Response) => {
     try {
       const { userId, partyId, action } = req.params;
@@ -104,7 +78,6 @@ export const dequeue = async (req: Request, res: Response) => {
       return InternalServerError(res, error);
     }
   };
->>>>>>> 04be997e06dbe2f96eb190db221db84f59347d72
 
 export const approveMember = async (req: Request, res: Response) => {
   try {
