@@ -61,16 +61,18 @@ export const enqueue = async (req: Request, res: Response) => {
 export const dequeue = async (req: Request, res: Response) => {
   try {
     const { userId, partyId, action } = req.params;
-    const deleted = await deleteWaitingQueue(Number(userId), Number(partyId));
+    const party = await getPartyInformation(Number(partyId));
     if (action === "deny") {
       const notificationInfo: NotificationAttributes = {
         content: "deny", 
         userId: Number(userId), 
         partyId: Number(partyId),
+        partyName: party.name, 
         isRead: false
       };
       await createNotification(notificationInfo);
     }
+    const deleted = await deleteWaitingQueue(Number(userId), Number(partyId));
     if (deleted) return SuccessfulResponse(res, { message: "Dequeued Successfully" });
     return FailedResponse(res, 400, "Bad Request");
   }

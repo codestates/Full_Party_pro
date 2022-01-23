@@ -170,6 +170,7 @@ export default function Search () {
       searchData();
     }
 
+    setIsLoading(false)
     return () => {
       isComponentMounted = false
     }

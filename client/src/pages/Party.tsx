@@ -850,10 +850,10 @@ export default function Party () {
           {isLeader && partyInfo.partyState === 1 && partyInfo.memberLimit > partyInfo.members.length ? 
             <button onClick={rePartyHandler}>모집 재개</button> 
           : null}
-          {isLeader ? 
+          {isLeader && !partyInfo.isReviewed ? 
             <button onClick={(e) => partyCancelModalHandler(e, "dismiss")}>파티 해산</button>
           : null}
-          {isLeader && ( partyInfo.partyState === 1 || partyInfo.memberLimit === partyInfo.members.length ) ? 
+          {isLeader && ( partyInfo.partyState === 1 || partyInfo.memberLimit === partyInfo.members.length ) && !partyInfo.isReviewed? 
             <button id="completeBtn" onClick={reviewModalHandler}>퀘스트 완료</button>
           : null}
           {isMember && partyInfo.partyState === 2 && !partyInfo.isReviewed ? 
