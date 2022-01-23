@@ -1,6 +1,5 @@
 import axios from "axios";
 import { Dispatch } from 'redux'
-import { cookieParser } from "../App";
 import { CLOSE_MODAL } from "./modalType";
 import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "./signinType";
 

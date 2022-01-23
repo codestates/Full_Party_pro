@@ -540,23 +540,7 @@ const SignupModal = () => {
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
   }
-
-  const handleImgLoad = async (e: any) => {
-    setIsLoading(true)
-    e.preventDefault();
-    let file = e.target.files[0];
-    const formData = new FormData();
-    formData.append('profileImage', file)
-    await axios.post('이미지서버', formData)
-    //res.data.location 에 있는 url을 img의 src로 바꿔야 합니다.
-    setIsLoading(false)
-  }
-
-  const handleRefClick = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    e.preventDefault();
-    cameraRef.current.click();
-  }
-
+  
   if(isLoading){
     return <Loading />
   }
