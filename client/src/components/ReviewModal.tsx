@@ -260,7 +260,7 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
         withCredentials: true
       });
 
-      handlePartyInfoChange("partyState", 2)
+      handlePartyInfoChange("partyState", 2);
     }
 
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/review`, { 

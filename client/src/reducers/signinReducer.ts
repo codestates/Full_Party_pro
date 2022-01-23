@@ -1,3 +1,4 @@
+import exp from "constants";
 import { SIGNIN_FAIL, SIGNIN_SUCCESS, UserInfo, UserInfoDispatchType } from "../actions/signinType";
 
 interface InitialState {
@@ -12,7 +13,8 @@ const initialState: InitialState = {
     userName: "",
     profileImage: "https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png",
     address: "",
-    signupType: ""
+    signupType: "",
+
   }
 }
 
@@ -27,7 +29,7 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
           userName: "",
           profileImage: "",
           address: "",
-          signupType: "",
+          signupType: ""
         }
       }
 
@@ -44,7 +46,7 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
           signupType
         }
       }
-      
+
     default:
       return state;
   }

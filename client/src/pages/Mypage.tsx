@@ -632,7 +632,7 @@ export default function Mypage () {
   }
 
   const handleSignOut = async () => {
-    const { token, signupType, location } = cookieParser();
+    const { token, signupType } = cookieParser();
     await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {
       access_token: token, 
       signup_type: signupType
@@ -644,7 +644,7 @@ export default function Mypage () {
     navigate("/");
   };
   const handleWithdrawal = async () => {
-    const { token, signupType, location } = cookieParser();
+    const { token, signupType } = cookieParser();
     const userId = signinReducer.userInfo?.id;
     await axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}/${signupType}`, {
       headers: {
@@ -678,7 +678,7 @@ export default function Mypage () {
 
   useEffect(() => {
     (async () => {
-      if (userInfoFromStore.id !== 0.1) {
+      if (userInfoFromStore.id >= 1) {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
           withCredentials: true,
         });

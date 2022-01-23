@@ -486,7 +486,6 @@ export default function Party () {
   const userInfoModalHandler = (event: React.MouseEvent<HTMLDivElement>, from: string, listIdx: number): void => {
    
     setFrom(from);
-  
     if (from === "members") {
       setUserInfo(partyInfo.members[listIdx]);
     } 
@@ -578,6 +577,7 @@ export default function Party () {
   }
 
   useEffect(() => {
+    setIsUserInfoModalOpen(false);
     setIsLoading(true);
     if(params.commentId){
       setFindComment(Number(params.commentId));

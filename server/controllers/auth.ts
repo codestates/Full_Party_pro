@@ -248,7 +248,6 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
 
 export const mailVerification = async (req: Request, res: Response) => {
   try {
-    console.log("🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈");
     const { email } = req.body;
     const code = String(Math.floor(Math.random()*1000000)).padStart(6,"0");
     const transporter = nodemailer.createTransport({
