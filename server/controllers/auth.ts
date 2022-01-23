@@ -262,9 +262,9 @@ export const mailVerification = async (req: Request, res: Response) => {
     });
 
     const mailOptions = {
-      from: 'Full Party! 풀팟 <fullparty.gm@gmail.com>',    
-      to: email,                     
-      subject: '[풀팟] 이메일 인증을 진행해주세요.',   
+      from: 'Full Party! 풀팟 <fullparty.gm@gmail.com>',
+      to: email,
+      subject: '[풀팟] 이메일 인증을 진행해주세요.',
       html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
       <html xmlns="http://www.w3.org/1999/xhtml">
         <head>
@@ -296,15 +296,9 @@ export const mailVerification = async (req: Request, res: Response) => {
     };
 
     transporter.sendMail(mailOptions, function(error, info){
-      if (error) {
-        console.log(error);
-      }
-      else {
-        console.log('Email sent: ' + info.response);
-      }
+      if (error) console.log(error);
+      else console.log('✅ Email sent: ' + info.response);
     });
-  
-    // res.redirect("/");
     return SuccessfulResponse(res, { message: "Authentication Email Sent", code });
   }
   catch (error) {

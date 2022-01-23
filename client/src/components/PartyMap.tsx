@@ -103,14 +103,15 @@ export default function PartyMap ({ isMember, location, image }: Props) {
   useEffect(() => {
 
     const geocoder = new kakao.maps.services.Geocoder();
-
-    geocoder.addressSearch(location, function(result: any, status: any) {
-      if (status === kakao.maps.services.Status.OK) {
-        const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
-        const { La, Ma } = coordinates;
-        setCoords({ lat: Ma, lng: La });
-      }
-    });
+    if (location) {
+      geocoder.addressSearch(location, function(result: any, status: any) {
+        if (status === kakao.maps.services.Status.OK) {
+          const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
+          const { La, Ma } = coordinates;
+          setCoords({ lat: Ma, lng: La });
+        }
+      });
+    }
 
   }, [location]);
 

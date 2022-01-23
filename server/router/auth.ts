@@ -1,6 +1,5 @@
 import express from "express";
 const router = express.Router();
-
 import {
    signin, signout, signup, guest, googleSignIn, kakao, keepLoggedIn, mailVerification
 } from "../controllers/auth";

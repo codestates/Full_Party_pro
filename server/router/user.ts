@@ -1,6 +1,8 @@
 import express from "express";
 const router = express.Router();
-import { getUserInfo, withdrawUser, getRecruitingParty, getParticipatingParty, getCompletedParty, getUserProfile, verifyUser, modifyUserInfo, updateUserAddress } from "../controllers/user";
+import { getUserInfo, withdrawUser, getRecruitingParty, getParticipatingParty, 
+  getCompletedParty, getUserProfile, verifyUser, modifyUserInfo, updateUserAddress 
+} from "../controllers/user";
 
 router.get("/:userId", getUserInfo);
 router.patch("/address/:userId", updateUserAddress);

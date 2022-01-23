@@ -208,12 +208,11 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     setNewMsg(event.target.value);
   }
 
-  function editHandler(event: React.MouseEvent<HTMLButtonElement>): void {
+  function editHandler(): void {
     setIsEditMode(!isEditMode);
   }
 
-  async function editConfirmHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    console.log("유저 상태메세지를 수정합니다.");
+  async function editConfirmHandler() {
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/message`, {
       userId: userInfo.id, partyId, message: newMsg,
     });
@@ -221,28 +220,22 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     setIsEditMode(!isEditMode);
   }
 
-  async function expelHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    console.log("파티원을 추방합니다.");
+  async function expelHandler() {
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userInfo.id}`);
-    // handleMemberListChange(userInfo.id, "expel");
     navigate(`../party/${partyId}`);
   }
 
-  async function refuseHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    console.log("가입 신청을 거절합니다.");
+  async function refuseHandler() {
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userInfo.id}`);
-    // handleMemberListChange(userInfo.id, "refuse");
     navigate(`../party/${partyId}`);
   }
 
-  async function acceptHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    console.log("가입신청을 승인합니다.");
+  async function acceptHandler() {
     await axios.post(`${process.env.REACT_APP_API_URL}/party/approval`, { 
       userId: userInfo.id, partyId
       }, {
       withCredentials: true
     });
-    // handleMemberListChange(userInfo.id, "accept");
     navigate(`../party/${partyId}`);
   }
 

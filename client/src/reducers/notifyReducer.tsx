@@ -1,12 +1,4 @@
 import { NOTIFY } from "../actions/notify";
-// import { initialState } from "./initialState";
-
-// let user = JSON.parse(localStorage.getItem('user'));
-// const initialState = user ? { isLoggedIn: true, user } : { isLoggedIn: false };
-
-// interface keyable {
-//   [key: string]: any  
-// }
 
 const initialState = { isBadgeOn: false };
 

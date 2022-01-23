@@ -741,7 +741,7 @@ export default function PartyEdit ({ party, editHandler }: Props) {
 
     promise.then(
       function (data) {
-        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
+        console.log("✅ Uploaded Successfully");
         setPartyInfo({
           ...partyInfo,
           image: data.Location

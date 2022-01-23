@@ -475,7 +475,6 @@ export default function Party () {
   }
 
   const tagSearchHandler = (tag: string) => {
-    console.log(tag + "를 검색합니다.");
     navigate(`../search/tag/${tag}`);
   }
 
@@ -517,7 +516,6 @@ export default function Party () {
   }
 
   const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("가입 신청을 취소합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyInfo.id}/cancel/${userId}`);
     const waiterLeft = partyInfo.waitingQueue.filter((waiter) => waiter.id !== userId);
     setPartyInfo({
@@ -531,7 +529,6 @@ export default function Party () {
   }
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("파티를 탈퇴합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
     const memberLeft = partyInfo.members.filter((member) => member.id !== userId);
     setPartyInfo({
@@ -545,7 +542,6 @@ export default function Party () {
   }
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("파티 모집을 완료합니다.")
     const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
       partyId: partyInfo.id
     });
@@ -558,7 +554,6 @@ export default function Party () {
   }
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("파티 모집을 재개합니다.")
     const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
       partyId: partyInfo.id
     });
@@ -571,7 +566,6 @@ export default function Party () {
   }
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("파티를 해산합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/${partyInfo.id}`);
     navigate('../home');
   }

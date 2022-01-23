@@ -752,19 +752,19 @@ export default function Post () {
         Body: file,
       }
     })
-    const promise = upload.promise()
+    const promise = upload.promise();
 
     promise.then(
       function (data) {
-        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
+        console.log("✅ Uploaded Successfully");
         setPartyInfo({
           ...partyInfo,
           image: data.Location
         })
-        setImgLoading(false)
+        setImgLoading(false);
       },
       function (err) {
-        return console.log('오류가 발생했습니다: ', err.message)
+        return console.log('🚫 Upload Failed:', err.message);
       }
     )
   }

@@ -318,7 +318,6 @@ export default function Mypage () {
   const [parties, setParties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInfoLoading, setIsInfoLoading] = useState(true);
-  //img 상태가 제대로 반영이 안되면 로딩창 넣어주세요
   const [imgLoading, setImgLoading] = useState(false);
   const [isChange, setIsChange] = useState(false);
   const [callModal, setCallModal] = useState(false);
@@ -327,9 +326,9 @@ export default function Mypage () {
   const [fixedLocation, setFixedLocation] = useState('');
   const [formatAddress, setFormatAddress] = useState('');
   const [basicInfo, setBasicInfo] = useState({
-    userName: signinReducer.userInfo.userName,
-    profileImage: signinReducer.userInfo.profileImage,
-    address: signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1],
+    userName: "",
+    profileImage: "",
+    address: "",
     level: 0,
     exp: 0
   });
@@ -391,7 +390,7 @@ export default function Mypage () {
 
     promise.then(
       function (data: any) {
-        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
+        console.log("✅ Uploaded Successfully");
         setChangeInfo({
           ...changeInfo,
           profileImage: data.Location
@@ -403,7 +402,7 @@ export default function Mypage () {
         setImgLoading(false)
       },
       function (err: any) {
-        return console.log('오류가 발생했습니다: ', err.message)
+        return console.log("🚫 Upload Failed:", err.message);
       }
     )
   }
@@ -633,9 +632,11 @@ export default function Mypage () {
 
   const handleSignOut = async () => {
     const { token, signupType } = cookieParser();
-    await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {
-      access_token: token, 
-      signup_type: signupType
+    await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {}, {
+      headers: {
+        access_token: token, 
+        signup_type: signupType
+      }
     });
     dispatch({ type: SIGNIN_FAIL });
     document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;

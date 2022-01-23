@@ -525,8 +525,6 @@ export const updateUserParty = async (userId: number, partyId: number, isReviewe
 
 export const updateLevel = async (userId: number, exp: number, level: number) => {
   let levelRange:number[] = [ 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200 ];
-  console.log("🌈 EXP :", exp);
-  console.log("🌈 LV  :", level);
   for (let i = 0; i < levelRange.length; i++) {
     if ((exp - levelRange[i]) < 20) {
       await Users.update({ level: i }, {
@@ -540,7 +538,7 @@ export const updateLevel = async (userId: number, exp: number, level: number) =>
           level: i
         };
         createNotification(notificationInfo);
-        break;
+        return;
       }
       else if (level > i) {
         const notificationInfo: NotificationAttributes = {
@@ -550,8 +548,9 @@ export const updateLevel = async (userId: number, exp: number, level: number) =>
           level: i
         };
         createNotification(notificationInfo);
-        break;
+        return;
       }
+      else return;
     }
   }
 };

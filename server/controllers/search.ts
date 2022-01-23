@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
 import { searchPartiesByKeyword, searchPartiesByTagName, checkIsRead } from './functions/sequelize';
-import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 
 export const searchByTagNameOrKeyword = async (req: Request, res: Response) => {
   try {

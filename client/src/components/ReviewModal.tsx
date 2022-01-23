@@ -250,7 +250,6 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
 
     // [dev] exp 키로 전송해줄 데이터
     const reviewedMembers = reviewMembers.map((member) => ({ userId: member.id, exp: member.exp}));
-    console.log("퀘스트를 완료합니다.");
 
     // [FEAT] 기능 확인 필요
     if(isLeader){

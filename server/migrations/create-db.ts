@@ -22,7 +22,7 @@ let dbName = config.development.database;
 
 const dbCreateSequelize = new Sequelize(createDBOptions);
 
-console.log(`======Create DataBase : ${dbName}======`);
+console.log(`====== Create DataBase : ${dbName} ======`);
 
 dbCreateSequelize.getQueryInterface().createDatabase(dbName)
   .then(() => console.log("✅ db create success!"))
