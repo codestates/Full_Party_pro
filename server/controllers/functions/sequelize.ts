@@ -92,7 +92,8 @@ export const invertFavorite = async (userId: number, partyId: number) => {
 export const getLeadingParty = async (userId: number) => {
   const leadingParty = await Parties.findAll({
     where: { leaderId: userId, partyState: [ 0, 1 ] },
-    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ]
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ],
+    raw: true
   });
   return leadingParty;
 };
@@ -110,7 +111,9 @@ export const getParticipatingParty = async (userId: number) => {
       raw: true
     });
   }
-  return !party[0] && !party[1] ? [] : party;
+  let removeNull: any[] = [];
+  party.map(item => item ? removeNull.push(item) : item);
+  return !party[0] && !party[1] ? [] : removeNull;
 };
 
 export const findParticipatingParty = async (userId: number) => {
@@ -165,10 +168,10 @@ export const getNotification = async (userId: number) => {
 };
 
 export const checkIsRead = async (userId: number) => {
-  const notifications = await getNotification(userId);
-  for (let i = 0; i < notifications.length; i++) {
-    if (notifications[i].isRead) return true;
-  }
+  const notifications = await Notification.findAll({
+    where: { userId, isRead: false }
+  });
+  if (notifications.length) return true;
   return false;
 };
 
@@ -520,39 +523,53 @@ export const updateUserParty = async (userId: number, partyId: number, isReviewe
   return updated;
 };
 
-export const updateLevel = async (userId: number, exp: number) => {
+export const updateLevel = async (userId: number, exp: number, level: number) => {
   let levelRange:number[] = [ 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200 ];
+  console.log("🌈 EXP :", exp);
+  console.log("🌈 LV  :", level);
   for (let i = 0; i < levelRange.length; i++) {
-    if (exp - levelRange[i] < 20) {
+    if ((exp - levelRange[i]) < 20) {
       await Users.update({ level: i }, {
         where: { id: userId }
       });
-      const notificationInfo: NotificationAttributes = {
-        content: "levelup",
-        userId,
-        isRead: false,
-        level: i
-      };
-      createNotification(notificationInfo);
-      break;
+      if (level < i) {
+        const notificationInfo: NotificationAttributes = {
+          content: "levelup",
+          userId,
+          isRead: false,
+          level: i
+        };
+        createNotification(notificationInfo);
+        break;
+      }
+      else if (level > i) {
+        const notificationInfo: NotificationAttributes = {
+          content: "leveldown",
+          userId,
+          isRead: false,
+          level: i
+        };
+        createNotification(notificationInfo);
+        break;
+      }
     }
   }
 };
 
 export const updateExp = async (userId: number, exp: number) => {
-  const presentExp = await Users.findOne({
+  const presentExpAndLv = await Users.findOne({
     where: { id: userId },
-    attributes: [ "exp" ],
+    attributes: [ "exp", "level" ],
     raw: true
   });
   let updated: [number, Users[]] | boolean;
   let newExp: number;
-  if (presentExp) {
-    newExp = presentExp.exp + exp;
+  if (presentExpAndLv) {
+    newExp = presentExpAndLv.exp + exp;
     updated = await Users.update({ exp: newExp }, {
       where: { id: userId }
     });
-    await updateLevel(userId, newExp);
+    await updateLevel(userId, newExp, presentExpAndLv.level);
   }
   else updated = false;
   return updated;

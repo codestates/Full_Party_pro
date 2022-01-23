@@ -8,7 +8,7 @@ import { NOTIFY } from "../actions/notify";
 //   [key: string]: any  
 // }
 
-const initialState = { isBadgeOn: true };
+const initialState = { isBadgeOn: false };
 
 function notifyReducer(state = initialState, action: { type: string; payload: { isBadgeOn: boolean }; }) {
 

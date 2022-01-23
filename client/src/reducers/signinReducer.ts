@@ -13,8 +13,7 @@ const initialState: InitialState = {
     userName: "",
     profileImage: "https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png",
     address: "",
-    signupType: "",
-
+    signupType: ""
   }
 }
 
