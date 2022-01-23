@@ -72,19 +72,14 @@ type Props = {
   location: string,
   name: string,
   image: string,
-  handleCoordsChange: Function,
-  handleFormatLocationChange: Function
+  handleCoordsChange: Function
 };
 
-export default function PostMap({ location, name, image, handleCoordsChange, handleFormatLocationChange }: Props) {
+export default function PostMap({ location, name, image, handleCoordsChange }: Props) {
   const { kakao } = window;
   const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
   const geocoder = new kakao.maps.services.Geocoder();
-
-  const searchAddrFromCoords = (coords: { lat: number, lng: number }, callback: Function) => {
-    geocoder.coord2RegionCode(coords.lng, coords.lat, callback);
-  };
 
   useEffect(() => {
     if (location) {
@@ -99,17 +94,7 @@ export default function PostMap({ location, name, image, handleCoordsChange, han
     }
   }, [ location ]);
 
-  useEffect(() => {
-    searchAddrFromCoords(coords, (result: any, status: any) => {
-      if (status === kakao.maps.services.Status.OK) {
-        const address = result[0].address_name;
-        const region = address.split(" ")[0] + " " + address.split(" ")[1];
-        handleFormatLocationChange(region);
-      }
-   });
-  }, [ coords ]);
-
-  if (!location) {
+  if(!location){
     return (
       <MapContainer>
         <Map

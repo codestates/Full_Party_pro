@@ -66,24 +66,19 @@ export const MapContainer = styled.div`
 `;
 
 type Props = {
-  location: string,
   image: string,
-  handleFormatAddressChange: Function
+  address: string
 };
 
-export default function UserMap({ location, image, handleFormatAddressChange }: Props) {
+export default function UserMap({ image, address }: Props) {
   const { kakao } = window;
   const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
   const geocoder = new kakao.maps.services.Geocoder();
 
-  const searchDetailAddrFromCoords = (coords: { lat: number, lng: number }, callback: Function) => {
-    geocoder.coord2Address(coords.lng, coords.lat, callback);
-  };
-
   useEffect(() => {
-    if (location) {
-      geocoder.addressSearch(location, function(result: any, status: any) {
+    if (address) {
+      geocoder.addressSearch(address, (result: any, status: any) => {
         if (status === kakao.maps.services.Status.OK) {
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
           const { La, Ma } = coordinates;
@@ -91,21 +86,9 @@ export default function UserMap({ location, image, handleFormatAddressChange }: 
         }
       });
     }
-  }, [ location ]);
+  },[ address ]);
 
-  useEffect(() => {
-    searchDetailAddrFromCoords(coords, (result: any, status: any) => {
-      if (status === kakao.maps.services.Status.OK) {
-        const address =
-          !!result[0].road_address ?
-            result[0].road_address.address_name
-          : result[0].address.address_name;
-        handleFormatAddressChange(address);
-      }
-   });
-  },[ coords ]);
-
-  if (!location) {
+  if (!address) {
     return (
       <MapContainer>
         <Map

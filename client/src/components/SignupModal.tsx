@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
-import styled from 'styled-components';
 import axios from 'axios';
+import styled from 'styled-components';
 import Loading from './Loading';
-import UserMap from './UserMap';
+import UserAddressInput from './UserAddressInput'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { modalChanger } from '../actions/modal';
+import { faTimes, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -116,13 +116,14 @@ export const ModalView = styled.div`
     color: #f34508;
     margin-top: 5px;
   }
-`
+`;
 
 export const MapContainer = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 90%;
+  margin-bottom: 10px;
 
   .mapTitle {
     font-weight: bold;
@@ -136,21 +137,21 @@ export const MapContainer = styled.section`
     margin-bottom: 20px;
   }
 
-  #map {
-    width: 100%;
-    height: 150px;
-  }
-
   input {
     width: 100%;
     height: 25px;
     border: none;
     border-bottom: 1px solid #d5d5d5;
-    margin: 15px 0;
+    margin: 8px 0;
 
     &:focus {
       outline-style:none;
     }
+  }
+
+  .mapInput {
+    width: 100%;
+    height: 200px;
   }
 `;
 
@@ -222,7 +223,7 @@ export const ProgressBar = styled.section`
     border-radius: inherit;
     text-align: right;
   }
-`
+`;
 
 export default function SignupModal() {
   type Info = {
@@ -281,12 +282,16 @@ export default function SignupModal() {
     confirmPasswordMsg: '',
   });
 
-  const [ fixedLocation, setFixedLocation ] = useState('');
-  const [ formatAddress, setFormatAddress ] = useState('');
+  
+  const [ isSearch, setIsSearch ] = useState(false);
   const [ isSent, setIsSent ] = useState(false);
   const [ isTimeOut, setIsTimeOut ] = useState(false);
   const [ isRequested, setIsRequested ] = useState(false);
+
+  const [ fixedLocation, setFixedLocation ] = useState('');
+  const [ formatAddress, setFormatAddress ] = useState('');
   const [ inputCode, setInputCode ] = useState('');
+
   const [ verificationData, setVerificationData ] = useState({
     email: userInfo.email,
     code: '',
@@ -395,22 +400,21 @@ export default function SignupModal() {
     let month = newDate.getMonth() + 1;
     let year = newDate.getFullYear();
     return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
-  }
-
-  const handleFormatAddressChange = (address: string) => {
-    setFormatAddress(address);
   };
 
-  const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') setFixedLocation(userInfo.address);
+  const handleAddressChange = (address: string) => {
+    setUserInfo({
+      ...userInfo,
+      address,
+    });
   };
+
+  const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
 
   const mailVerification = async () => {
     const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification`, {
       email: userInfo.email
-    }, {
-      withCredentials: true
-    });
+    }, { withCredentials: true });
     setIsSent(true);
     setVerificationData({ email: userInfo.email, code: res.data.code });
     setTimeout(handleCodeExpire, 1000 * 60 * 5);
@@ -679,22 +683,15 @@ export default function SignupModal() {
                     <div className="mapTitle">주소</div>
                     <div className="details">이 위치를 기반으로 퀘스트가 검색됩니다.</div>
                   </div>
-                  <div id='map' className='mapDesc'>
-                    <UserMap 
-                      location={fixedLocation} 
-                      image={userInfo.profileImage} 
-                      handleFormatAddressChange={handleFormatAddressChange}
+                  <div className='mapInput'>
+                    <UserAddressInput 
+                      profileImage={userInfo.profileImage}
+                      address={userInfo.address}
+                      handleAddressChange={handleAddressChange}
+                      isSearch={isSearch}
+                      searchHandler={searchHandler}
                     />
                   </div>
-                  <input 
-                    className='mapInput'
-                    name='address'
-                    type='text'
-                    value={userInfo.address}
-                    autoComplete='off'
-                    onChange={(e) => handleInputChange(e)}
-                    onKeyUp={(e) => handleSearchLocation(e)}
-                  />
                 </MapContainer>
               )
             }
@@ -725,7 +722,7 @@ export default function SignupModal() {
                     </tr>
                     <tr>
                       <td className='label'>주소</td>
-                      <td className='info'>{!userInfo.address ? '' : formatAddress}</td>
+                      <td className='info'>{userInfo.address}</td>
                     </tr>
                   </table>
                   <div className='error'>{isError.axiosMsg}</div>
@@ -749,6 +746,15 @@ export default function SignupModal() {
                 <BtnContainer style={{ justifyContent: "flex-end" }}>
                   <button onClick={handlePageChange} value="next">다음 <FontAwesomeIcon icon={faAngleRight} className="icon right" /></button>
                 </BtnContainer> 
+              )
+            } 
+            else if(pageIdx === 3){
+              return (
+                <BtnContainer>
+                  <button onClick={handlePageChange} value="prev"><FontAwesomeIcon icon={faAngleLeft} className="icon left" /> 이전</button>
+                  <button onClick={searchHandler} className="request">주소 검색</button>
+                  <button onClick={handlePageChange} value="next">다음 <FontAwesomeIcon icon={faAngleRight} className="icon right" /></button>
+                </BtnContainer>
               )
             }
             else if (pageIdx === 4) {

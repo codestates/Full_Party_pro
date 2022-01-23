@@ -6,7 +6,7 @@ import Loading from '../components/Loading';
 import UserCancelModal from '../components/UserCancelModal'
 import PartySlide from '../components/PartySlide';
 import VerificationModal from '../components/VerificationModal';
-import UserMap from '../components/UserMap';
+import PostCodeModal from '../components/PostCodeModal';
 import EmptyParty from '../components/EmptyParty';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -179,6 +179,19 @@ export const InfoTable = styled.table`
     padding-right: 15px;
     text-align: center;
     font-weight: bold;
+
+    &.search {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      #search {
+        width: 80px;
+        height: 30px;
+        margin: 0;
+        margin-top: 5px;
+      }
+    }
   }
 
   .input {
@@ -194,6 +207,10 @@ export const InfoTable = styled.table`
 
       &:focus {
         outline-style:none;
+      }
+
+      &:disabled {
+        background-color: #fff;
       }
     }
 
@@ -291,18 +308,18 @@ export default function Mypage() {
     (state: AppState) => state.signinReducer.userInfo
   );
 
-  const [ curTab, setCurTab ] = useState(0);
-  const [ parties, setParties ] = useState([]);
   const [ isLoading, setIsLoading ] = useState(true);
   const [ isInfoLoading, setIsInfoLoading ] = useState(true);
   const [ imgLoading, setImgLoading ] = useState(false);
-
+  const [ isSearch, setIsSearch ] = useState(false);
   const [ isChange, setIsChange ] = useState(false);
-  const [ callModal, setCallModal ] = useState(false);
   const [ isVerificationModalOpen, setIsVerificationModalOpen ] = useState(false);
+  const [ callModal, setCallModal ] = useState(false);
+
+  const [ curTab, setCurTab ] = useState(0);
+  const [ parties, setParties ] = useState([]);
   const [ from, setFrom ] = useState('');
   const [ fixedLocation, setFixedLocation ] = useState('');
-
   const [ formatAddress, setFormatAddress ] = useState('');
   const [ basicInfo, setBasicInfo ] = useState({
     userName: "",
@@ -339,9 +356,31 @@ export default function Mypage() {
     confirmPasswordMsg: '',
   });
 
+  const [ fullAddress, setFullAddress ] = useState({
+    address: "",
+    detailedAddress: "",
+    extraAddress: "",
+  });
+
   const userRegion = basicInfo.address.split(" ").length < 2 ?
     "지역 미설정" :
     basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1];
+
+  const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
+
+  const autoCompleteHandler = (address: string, extraAddress: string) => {
+    if(!!fullAddress.detailedAddress)
+      setChangeInfo({ ...changeInfo, address: `${address} ${fullAddress.detailedAddress} ${extraAddress ? `(${extraAddress})` : ''}` });
+    else
+      setChangeInfo({ ...changeInfo, address: `${address} ${extraAddress ? `(${extraAddress})` : ''}` });
+
+    setFullAddress({
+      ...fullAddress,
+      address,
+      extraAddress,
+    })
+    setIsSearch(false);
+  };
 
   AWS.config.update({
     region: "ap-northeast-2",
@@ -380,7 +419,7 @@ export default function Mypage() {
         setImgLoading(false)
       },
       (err: any) => console.log("🚫 Upload Failed:", err.message)
-    )
+    );
   };
 
   const handleIsChange = async () => {
@@ -533,7 +572,7 @@ export default function Mypage() {
           userName,
           birth,
           gender,
-          address: formatAddress,
+          address,
           mobile
         }
       });
@@ -559,7 +598,7 @@ export default function Mypage() {
           password: nowPwd,
           birth,
           gender,
-          address: formatAddress,
+          address,
           mobile
         }
       });
@@ -569,7 +608,7 @@ export default function Mypage() {
           id: signinReducer.userInfo.id,
           userName,
           profileImage,
-          address: formatAddress,
+          address,
           signupType,
         };
         dispatch({ type: SIGNIN_SUCCESS, payload });
@@ -690,6 +729,12 @@ export default function Mypage() {
     <MypageContainer>
       {callModal? <UserCancelModal from={from} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} /> : null}
       {isVerificationModalOpen? <VerificationModal userId={userInfoFromStore?.id} handleIsChange={handleIsChange} verficationModalHandler={verficationModalHandler} /> : null}
+      {isSearch ?
+        <PostCodeModal
+          searchHandler={searchHandler}
+          autoCompleteHandler={autoCompleteHandler}
+        />
+      : null}
       <MypageHeader>
         <div className="leftWrapper">
           <div className='profileImageContainer'>
@@ -815,22 +860,22 @@ export default function Mypage() {
                       </td>
                     </tr>
                     <tr>
-                      <td className='label'>주소</td>
-                      <td className='input'>
-                        <div className="map">
-                          <UserMap
-                            location={fixedLocation} 
-                            image={basicInfo.profileImage} 
-                            handleFormatAddressChange={handleFormatAddressChange}
-                          />
+                      <td className='label search'>
+                        주소
+                        <button id="search" onClick={searchHandler}>주소 검색</button>
+                      </td>
+                      <td className='input' id="address">
+                        <div className="addressInput">
+                          <div className="inputs">
+                            <input id="fullAddress" type="text" value={changeInfo.address} placeholder="주소" disabled={true} /><br />
+                            <input type="text" 
+                              onChange={(e) => setFullAddress({...fullAddress, detailedAddress: e.target.value})}
+                              value={fullAddress.detailedAddress} 
+                              placeholder="상세주소" 
+                              autoComplete="off"
+                            />
+                          </div>
                         </div>
-                        <input
-                          name='address'
-                          value={changeInfo.address}
-                          autoComplete='off'
-                          onChange={(e) => handleInputChange(e)}
-                          onKeyUp={(e) => handleSearchLocation(e)}
-                        ></input>
                       </td>
                     </tr>
                     <tr>

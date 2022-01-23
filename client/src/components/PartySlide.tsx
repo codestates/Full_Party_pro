@@ -38,11 +38,11 @@ export const PartySlideContainer = styled.div`
     }
 
     .title {
-      height: 30px;
+      height: 35px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-size: 1.5rem;
+      font-size: 28px;
       font-weight: bold;
       margin-bottom: 3.5px;
     }
