@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { 
-  getPartyInformation, compileComments, createWaitingQueue, deleteWaitingQueue, createNotification, 
+import { NotificationAttributes } from "../models/notification";
+import {
+  getPartyInformation, compileComments, createWaitingQueue, deleteWaitingQueue, createNotification,
   createUserParty, deleteParty, deleteUserParty, findUser, updatePartyState, makeComment, makeSubComment,
   getPartyId, removeComment, removeSubComment, updateUserParty, updatePartyInformation, updateExpAtOnce, checkIsRead
 } from "./functions/sequelize";
-import { NotificationAttributes } from "../models/notification";
 
 export const getPartyInfo = async (req: Request, res: Response) => {
   try {

@@ -1,48 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
-import AWS from 'aws-sdk';
-import { useDispatch } from 'react-redux';
-import { cookieParser } from "../App";
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
-
-import { useSelector } from 'react-redux';
-import { RootReducerType } from '../store/store';
-
+import AWS from 'aws-sdk';
 import PostCancelModal from '../components/PostCancelModal';
 import Slider from 'rc-slider';
 import ErrorModal from '../components/ErrorModal';
 import Loading from '../components/Loading';
 import AddressInput from '../components/AddressInput';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { cookieParser } from "../App";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
+import { useSelector } from 'react-redux';
+import { RootReducerType } from '../store/store';
 
 export const PostContainer = styled.div`
   width: 100%;
   background-color: #fff;
   position: absolute;
   left: 0;
-
   z-index: 910;
-
   margin: 60px 0;
   overflow: hidden;
-`
+`;
 
 export const TopNavigation = styled.nav`
   width: 100vw;
   height: 60px;
-
   padding: 0 20px;
-
   position: fixed;
   left: 0;
   top: 0;
   z-index: 920;
-
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -52,7 +43,6 @@ export const TopNavigation = styled.nav`
     color: #777;
     font-size: 12pt;
     font-weight: bold;
-
     background-color: white;
     border: none;
     cursor: pointer;
@@ -65,22 +55,18 @@ export const TopNavigation = styled.nav`
       }
     }
   }
-`
+`;
 
 export const BottomNavigation = styled.nav`
   width: 100vw;
   height: 60px;
-
   padding: 0 20px;
-
   position: fixed;
   left: 0;
   bottom: 0;
   z-index: 920;
-
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -88,18 +74,14 @@ export const BottomNavigation = styled.nav`
 
   button {
     width: 25vw;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     color: #777;
     font-size: 10pt;
-
     background-color: #fff;
     border: none;
-
     cursor: pointer;
 
     .icon {
@@ -107,13 +89,11 @@ export const BottomNavigation = styled.nav`
       margin-bottom: 3px;
     }
   }
-`
+`;
 
 export const PostCard = styled.div`
-
   width: 100%;
   padding: 40px 10%;
-
   display: flex;
   flex-direction: column;
 
@@ -128,7 +108,6 @@ export const PostCard = styled.div`
 
       &.content {
         margin-bottom: 15px;
-        
         display: flex;
         align-items: center;
 
@@ -143,10 +122,8 @@ export const PostCard = styled.div`
     input {
       width: 100%;
       height: 25px;
-
       border: none;
       border-bottom: 1px solid #d5d5d5;
-
       padding: 5px;
 
       &:focus {
@@ -157,7 +134,6 @@ export const PostCard = styled.div`
     .details {
       font-size: 0.8rem;
       color: #777;
-
       margin-bottom: 5px;
     }
   }
@@ -165,7 +141,6 @@ export const PostCard = styled.div`
   .basicInfo {
 
     .imageContainer {
-
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -189,7 +164,6 @@ export const PostCard = styled.div`
     }
 
     fieldset {
-
       &:focus {
         outline-style:none;
       }
@@ -215,7 +189,6 @@ export const PostCard = styled.div`
   .mapDesc {
     width: 100%;
     height: 230px;
-
     margin: 20px 0;
   }
 
@@ -223,7 +196,6 @@ export const PostCard = styled.div`
     width: 100%;
     height: 300px;
     padding: 15px;
-
     border: 1px solid #d5d5d5;
     font-family: "-apple-system";
 
@@ -242,17 +214,15 @@ export const PostCard = styled.div`
     width: 100%;
     display: flex;
     justify-content: center;
-
     margin: 15px 0;
   }
 
   @media screen and (min-width: 790px) {
     padding: 40px 20%;
   }
-`
+`;
 
 export const SliderContainer = styled.div`
-
   .sign {
     opacity: 0;
     position: absolute;
@@ -594,11 +564,9 @@ export const SliderContainer = styled.div`
     border-width: 4px 4px 0;
     border-top-color: #6c6c6c;
   }
-  
-`
+`;
 
 export const TagInput = styled.div`
-
   > ul {
     display: flex;
     flex-wrap: wrap;
@@ -624,49 +592,45 @@ export const TagInput = styled.div`
       }
     }
   }
- 
-`
+`;
 
 export const Button = styled.button`
   width: 250px;
   height: 60px;
-
   border: none;
   border-radius: 20px;
   background-color: #50C9C3;
-
   font-family: 'SilkscreenBold';
   font-size: 1.5rem;
   color: white;
-
   margin-bottom: 30px;
-
   cursor: pointer;
 
   &:disabled {
     border: 1px solid #50C9C3;
     color: #50C9C3;
     background-color: #fff;
-
     cursor: default;
   }
-`
+`;
 
-export default function Post () {
+export default function Post() {
   const navigate = useNavigate();
   const fileRef = useRef<any>();
   const imgRef = useRef<any>(null);
+
+  const signinReducer = useSelector(
+    (state: RootReducerType) => state.signinReducer
+  );
 
   AWS.config.update({
     region: "ap-northeast-2",
     credentials: new AWS.CognitoIdentityCredentials({
       IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
     })
-  })
+  });
 
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
-
-  const [partyInfo, setPartyInfo] = useState({
+  const [ partyInfo, setPartyInfo ] = useState({
     image: 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png',
     name: '',
     startDate: '',
@@ -678,91 +642,88 @@ export default function Post () {
     content: ''
   });
 
-  const [isName, setIsName] = useState({
+  const [ isName, setIsName ] = useState({
     err: false,
     msg: ''
-  })
+  });
 
-  const [isStrDate, setIsStrDate] = useState({
+  const [ isStrDate, setIsStrDate ] = useState({
     err: false,
     msg: ''
-  })
+  });
 
-  const [isEndDate, setIsEndDate] = useState({
+  const [ isEndDate, setIsEndDate ] = useState({
     err: false,
     msg: ''
-  })
+  });
 
   const [isContent, setIsContent] = useState({
     err: false,
     msg: ''
-  })
+  });
 
-  const [isPLink, setIsPLink] = useState({
+  const [ isPLink, setIsPLink ] = useState({
     err: false,
     msg: ''
-  })
+  });
 
-  const [isLocation, setIsLocation] = useState({
+  const [ isLocation, setIsLocation ] = useState({
     err: false,
     msg: ''
-  })
+  });
 
-  const [tags, setTags] = useState<string[]>([]);
-  const [inputTxt, setInputTxt] = useState('');
-  const [isOnline, setIsOnline] = useState(false);
-  const [isPosted, setIsPosted] = useState(false);
-  const [imgLoading, setImgLoading] = useState(false);
-
-  const [cancelModal, setCancelModal] = useState(false);
-  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [ fixedLocation, setFixedLocation ] = useState('');
+  const [ formatLocation, setFormatLocation ] = useState('');
+  const [ tags, setTags ] = useState<string[]>([]);
+  const [ inputTxt, setInputTxt ] = useState('');
+  const [ isOnline, setIsOnline ] = useState(false);
+  const [ isPosted, setIsPosted ] = useState(false);
+  const [ imgLoading, setImgLoading ] = useState(false);
+  const [ cancelModal, setCancelModal ] = useState(false);
+  const [ isErrorModalOpen, setIsErrorModalOpen ] = useState(false);
 
   const handleRefClick = (e: any) => {
     e.preventDefault();
     fileRef.current.click();
-  }
-  const handleImgLoad = async (e: any) => {
-    setImgLoading(true)
-    let file = e.target.files[0]
+  };
 
+  const handleImgLoad = async (e: any) => {
+    setImgLoading(true);
+    let file = e.target.files[0]
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
         Key: `${signinReducer.userInfo.id}_${partyInfo.name}_image.jpg`,
         Body: file,
       }
-    })
-    const promise = upload.promise()
-
+    });
+    const promise = upload.promise();
     promise.then(
-      function (data) {
-        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
+      (data) => {
+        console.log("✅ Uploaded Successfully");
         setPartyInfo({
           ...partyInfo,
           image: data.Location
         })
-        setImgLoading(false)
+        setImgLoading(false);
       },
-      function (err) {
-        return console.log('오류가 발생했습니다: ', err.message)
+      (err) => {
+        return console.log('🚫 Upload Failed:', err.message);
       }
-    )
-  }
+    );
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    
     const {name, value} = e.target;
-
     setPartyInfo({
       ...partyInfo,
       [name]: value
     });
-
-    if(partyInfo.name) { setIsName({ err: false, msg: ''}) }
-    if(partyInfo.location) { setIsLocation({ err: false, msg: '' }) }
-    if(partyInfo.privateLink) { setIsPLink({ err: false, msg: '' }) }
-    if(partyInfo.content) { setIsContent({ err: false, msg: '' }) }
-  }
+    if (partyInfo.name) setIsName({ err: false, msg: ''});
+    if (partyInfo.location) setIsLocation({ err: false, msg: '' });
+    if (partyInfo.privateLink) setIsPLink({ err: false, msg: '' });
+    if (partyInfo.content) setIsContent({ err: false, msg: '' });
+  };
 
   const handleLocationChange = (location: string) => {
     setPartyInfo({
@@ -771,211 +732,203 @@ export default function Post () {
     });
   }
 
-  function getCurrentDate() {
+  const getCurrentDate = () => {
     let newDate = new Date();
     let date = newDate.getDate();
     let month = newDate.getMonth() + 1;
     let year = newDate.getFullYear();
-    
-    return `${year}-${month<10?`0${month}`:`${month}`}-${date}`
-  }
+    return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
+  };
 
-  function validationCheck(){
-    if(partyInfo.startDate > partyInfo.endDate){
+  const validationCheck = () => {
+    if (partyInfo.startDate > partyInfo.endDate) {
       setIsEndDate({
         err: true,
         msg: '종료일이 시작일보다 빠를 수 없습니다.'
-      })
-    } else {
+      });
+    }
+    else {
       setIsStrDate({
         err: false,
         msg: '',
-      })
-      
+      });
       setIsEndDate({
         err: false,
         msg: ''
-      })
+      });
     }
 
-    if(partyInfo.startDate > partyInfo.endDate){
+    if (partyInfo.startDate > partyInfo.endDate) {
       setIsEndDate({
         err: true,
         msg: '종료일이 시작일보다 빠를 수 없습니다.'
-      })
-    } else {
+      });
+    }
+    else {
       setIsEndDate({
         err: false,
         msg: ''
-      })
+      });
     }
-  }
+  };
 
   const handleSlider = (value: number) => {
     setPartyInfo({
       ...partyInfo,
       memberLimit: value
-    })
-  }
+    });
+  };
 
   const handleCoordsChange = (lat: number, lng: number) => {
     setPartyInfo({
       ...partyInfo,
       latlng: { lat: lat, lng: lng }
-    })
-  }
+    });
+  };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const {name, value} = e.target
-
+    const { name, value } = e.target;
     setPartyInfo({
       ...partyInfo,
       [name]: value
-    })
-
-    if(partyInfo.content !== '') {
+    });
+    if (partyInfo.content !== '') {
       setIsContent({
         err: false,
         msg: ''
-      })
+      });
     }
-  }
+  };
 
   const handleOnOff = (isOnline: boolean) => {
-    if(isOnline === true){
-      setIsOnline(true);
-    } else {
-      setIsOnline(false);
-    }
+    if (isOnline === true) setIsOnline(true);
+    else setIsOnline(false);
   }
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space') {
-      if(!tags.includes(inputTxt) && inputTxt && tags.length < 3) {
-        setTags([...tags, inputTxt])
-        setInputTxt('')
+    if (e.code === 'Enter' || e.code === 'Space') {
+      if (!tags.includes(inputTxt) && inputTxt && tags.length < 3) {
+        setTags([...tags, inputTxt]);
+        setInputTxt('');
       }
     }
-  }
+  };
 
   const removeTag = (index: number) => {
     setTags(tags.filter((tag) => {
       return tags.indexOf(tag) !== index
-    }))
-  }
+    }));
+  };
 
   const postCancelHandler = () => {
-    if(cancelModal) {
-      setCancelModal(false)
-    } else {
-      setCancelModal(true)
-    }
-  }
+    if (cancelModal) setCancelModal(false);
+    else setCancelModal(true);
+  };
 
   const errorModalHandler = () => {
-    if(isErrorModalOpen) {
-      setIsErrorModalOpen(false);
-    } else{
-      setIsErrorModalOpen(true);
-    }
-  }
-
+    if (isErrorModalOpen) setIsErrorModalOpen(false);
+    else setIsErrorModalOpen(true);
+  };
 
   const backToPage = () => {
-    if(partyInfo.location){
-      navigate(-2);
-    } else {
-      navigate(-1);
-    }
+    if (partyInfo.location) navigate(-2);
+    else navigate(-1);
   }
-  
+
   const createParty = () => {
-    const regex = {        
+    const regex = {
       url: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
     };
-
-    if(partyInfo.name === '') {
+    if (partyInfo.name === '') {
       setIsName({
         err: true,
         msg: '퀘스트 제목을 입력해주세요.'
-      })
-    } else {
+      });
+    }
+    else {
       setIsName({
         err: false,
         msg: ''
-      })
+      });
     }
 
-    if(partyInfo.startDate === '') {
+    if (partyInfo.startDate === '') {
       setIsStrDate({
         err: true,
         msg: '퀘스트 시작하는 날을 선택해주세요.'
-      })
-    } else {
+      });
+    }
+    else {
       setIsStrDate({
         err: false,
         msg: ''
-      })
+      });
     }
 
-    if(partyInfo.endDate === '') {
+    if (partyInfo.endDate === '') {
       setIsEndDate({
         err: true,
         msg: '퀘스트가 끝나는 날을 선택해주세요.'
-      })
-    } else {
+      });
+    }
+    else {
       setIsEndDate({
         err: false,
         msg: ''
-      })
+      });
     }
 
-    if(partyInfo.content === '') {
+    if (partyInfo.content === '') {
       setIsContent({
         err: true,
         msg: '퀘스트 내용을 입력해주세요.'
-      })
-    } else {
+      });
+    }
+    else {
       setIsContent({
         err: false,
         msg: ''
-      })
+      });
     }
 
-    if(partyInfo.location === '') {
+    if (partyInfo.location === '') {
       setIsLocation({
         err: true,
         msg: '퀘스트 장소를 입력해주세요.'
-      })
-    } else {
+      });
+    }
+    else {
       setIsLocation({
         err: false,
         msg: ''
-      })
+      });
     }
 
-    if(partyInfo.privateLink === '') {
+    if (partyInfo.privateLink === '') {
       setIsPLink({
         err: true,
         msg: '오픈채팅방 링크를 입력해주세요.'
-      })
-    } else if(!regex.url.test(partyInfo.privateLink)) {
+      });
+    }
+    else if (!regex.url.test(partyInfo.privateLink)) {
       setIsPLink({
         err: true,
         msg: "유효한 링크를 입력해주세요. 링크는 'https://'를 포함합니다."
-      })
-    } else {
+      });
+    }
+    else {
       setIsPLink({
         err: false,
         msg: ''
-      })
+      });
     }
 
-    if(partyInfo.name && partyInfo.startDate && partyInfo.endDate && partyInfo.location && partyInfo.privateLink && regex.url.test(partyInfo.privateLink) && partyInfo.content &&
-      !isName.err && !isStrDate.err && !isEndDate.err && !isContent.err && !isLocation.err && !isPLink.err){
+    if (partyInfo.name && partyInfo.startDate && partyInfo.endDate && partyInfo.location &&
+      partyInfo.privateLink && regex.url.test(partyInfo.privateLink) && partyInfo.content &&
+      !isName.err && !isStrDate.err && !isEndDate.err && !isContent.err && !isLocation.err && !isPLink.err) {
         setIsPosted(true);
     }
-  }
+  };
 
   const postParty = async () => {
     const res = await axios.post(`${process.env.REACT_APP_API_URL}/list/creation`, {
@@ -986,7 +939,7 @@ export default function Post () {
         memberLimit: partyInfo.memberLimit,
         content: partyInfo.content,
         region:
-          isOnline? 
+          isOnline?
           signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
           : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
         location: partyInfo.location,
@@ -999,17 +952,16 @@ export default function Post () {
       }
     }, {
       withCredentials: true
-    })
-
+    });
     return res;
   }
 
   useEffect(() => {
     validationCheck();
-  }, [partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink]);
+  }, [ partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink ]);
 
   useEffect(() => {
-    if(isPosted){
+    if (isPosted){
       postParty()
       .then((res) => {
         setIsPosted(false);
@@ -1018,13 +970,11 @@ export default function Post () {
       .catch((err) => {
         setIsErrorModalOpen(true);
         setIsPosted(false);
-      })
+      });
     }
-  }, [isPosted])
+  }, [ isPosted ]);
 
-  if(cookieParser().isLoggedIn === "0"){
-    return <Navigate to="../" />
-  }
+  if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />
 
   return (
     <PostContainer>

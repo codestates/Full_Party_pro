@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
 
 export const MapContainer = styled.div`
@@ -16,7 +15,6 @@ export const MapContainer = styled.div`
     float:left;
     border: 1px solid #ccc;
     border-bottom:2px solid #ddd;
-
     width: 100px;
   }
 
@@ -24,7 +22,7 @@ export const MapContainer = styled.div`
     border: 0; 
     box-shadow: 0px 1px 2px #999;
   }
-  
+
   .infoWindow div {
     display:block;
     text-decoration:none;
@@ -65,37 +63,32 @@ export const MapContainer = styled.div`
     border-radius: 100%;
     border: 2px solid #fff;
   }
-`
+`;
 
 type Props = {
   image: string,
-  address: string,
-}
+  address: string
+};
 
-const UserMap = ({ image, address }: Props) => {
-  
+export default function UserMap({ image, address }: Props) {
   const { kakao } = window;
-
-  const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
+  const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
-
   const geocoder = new kakao.maps.services.Geocoder();
 
   useEffect(() => {
-
-    if(address){
-      geocoder.addressSearch(address, function(result: any, status: any) {
+    if (address) {
+      geocoder.addressSearch(address, (result: any, status: any) => {
         if (status === kakao.maps.services.Status.OK) {
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
           const { La, Ma } = coordinates;
           setCoords({ lat: Ma, lng: La });
         }
-      });  
+      });
     }
-    
-  },[address])
+  },[ address ]);
 
-  if(!address){
+  if (!address) {
     return (
       <MapContainer>
         <Map
@@ -105,7 +98,7 @@ const UserMap = ({ image, address }: Props) => {
           onZoomChanged={(map) => map.setLevel(map.getLevel() > 7 ? 7 : map.getLevel())}
         />
       </MapContainer>
-    )
+    );
   }
 
   return (
@@ -142,7 +135,5 @@ const UserMap = ({ image, address }: Props) => {
         </CustomOverlayMap>
       </Map>
     </MapContainer>
-  )
+  );
 }
-
-export default UserMap;

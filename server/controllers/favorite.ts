@@ -33,7 +33,7 @@ export const getFavoriteParty = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const partyList = await findFavoriteParties(Number(userId));
     const notification = await checkIsRead(Number(userId));
-    return SuccessfulResponse(res, { message: "Successfully loaded", partyList, notification });
+    return SuccessfulResponse(res, { message: "Successfully Loaded", partyList, notification });
   }
   catch (error) {
     return InternalServerError(res, error);

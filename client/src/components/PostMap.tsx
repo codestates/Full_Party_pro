@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
 
 export const MapContainer = styled.div`
@@ -16,15 +15,14 @@ export const MapContainer = styled.div`
     float:left;
     border: 1px solid #ccc;
     border-bottom:2px solid #ddd;
-
     width: 130px;
   }
 
   .infoWindow:nth-of-type(n) {
-    border: 0; 
+    border: 0;
     box-shadow: 0px 1px 2px #999;
   }
-  
+
   .infoWindow div {
     display:block;
     text-decoration:none;
@@ -46,7 +44,6 @@ export const MapContainer = styled.div`
     padding:10px 15px;
     font-size:14px;
     font-weight:bold;
-
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -69,38 +66,33 @@ export const MapContainer = styled.div`
     border-radius: 100%;
     border: 2px solid #fff;
   }
-`
+`;
 
 type Props = {
   location: string,
   name: string,
   image: string,
-  handleCoordsChange: Function,
-}
+  handleCoordsChange: Function
+};
 
-const PostMap = ({ location, name, image, handleCoordsChange }: Props) => {
-  
+export default function PostMap({ location, name, image, handleCoordsChange }: Props) {
   const { kakao } = window;
-
-  const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
+  const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
-
   const geocoder = new kakao.maps.services.Geocoder();
 
   useEffect(() => {
-
-    if(location){
-      geocoder.addressSearch(location, function(result: any, status: any) {
+    if (location) {
+      geocoder.addressSearch(location, (result: any, status: any) => {
         if (status === kakao.maps.services.Status.OK) {
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
           const { La, Ma } = coordinates;
           setCoords({ lat: Ma, lng: La });
           handleCoordsChange(Ma, La);
         }
-      });  
+      });
     }
-    
-  },[location])
+  }, [ location ]);
 
   if(!location){
     return (
@@ -112,7 +104,7 @@ const PostMap = ({ location, name, image, handleCoordsChange }: Props) => {
           onZoomChanged={(map) => map.setLevel(map.getLevel() > 7 ? 7 : map.getLevel())}
         />
       </MapContainer>
-    )
+    );
   }
 
   return (
@@ -149,7 +141,5 @@ const PostMap = ({ location, name, image, handleCoordsChange }: Props) => {
         </CustomOverlayMap>
       </Map>
     </MapContainer>
-  )
+  );
 }
-
-export default PostMap;

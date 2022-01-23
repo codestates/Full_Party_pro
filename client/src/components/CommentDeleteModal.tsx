@@ -1,14 +1,13 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 export const ModalContainer = styled.div`
   width: 100vw;
   height: 100vh;
-
   position: fixed;
   left: 0;
   top: 0;
@@ -20,22 +19,16 @@ export const ModalBackdrop = styled.div`
   height: 100%;
   position: absolute;
   background-color: rgba(0,0,0,0.4);
-
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
-/* 
-  width: 350px; */
-
   border-radius: 30px;
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   padding: 30px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -46,14 +39,11 @@ export const ModalView = styled.div`
   }
 
   .buttons {
-
     button {
       width: 100px;
       height: 50px;
       padding: 10px 20px;
-      
       margin: 0 5px;
-
       border-radius: 20px;
     }
 
@@ -69,48 +59,36 @@ export const ModalView = styled.div`
       color: #50C9C3; 
     }
   }
-`
+`;
 
 export const CloseBtn = styled.button`
-
   width: 100%;
   text-align: right;
-
   cursor: pointer;
   margin-bottom: 20px;
-
   background-color: white;
   border: none;
-
-`
+`;
 
 type Props = {
   commentDeleteModalHandler: Function,
   commentToDelete: { [key: string] : number },
   partyId: number,
-}
+};
 
-const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete, partyId }: Props) => {
-
+export default function CommentDeleteModal({ commentDeleteModalHandler, commentToDelete, partyId }: Props) {
   const navigate = useNavigate();
-
   const { idx, commentId } = commentToDelete;
-
   const closeModal =() => {
     commentDeleteModalHandler();
-  }
+  };
 
-  async function deleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    if (idx === 0){
-      await axios.delete(`${process.env.REACT_APP_API_URL}/party/comment/${commentId}`);
-    } 
-    else {
-      await axios.delete(`${process.env.REACT_APP_API_URL}/party/subComment/${commentId}`);
-    }
-
+  const deleteHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (idx === 0) await axios.delete(`${process.env.REACT_APP_API_URL}/party/comment/${commentId}`);
+    else await axios.delete(`${process.env.REACT_APP_API_URL}/party/subComment/${commentId}`);
     commentDeleteModalHandler();
     navigate(`../party/${partyId}`);
-  }
+  };
 
   return(
     <ModalContainer>
@@ -124,12 +102,10 @@ const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete, partyI
             </button>
             <button className="cancel" onClick={closeModal}>
                 취소
-            </button>    
+            </button>
           </div>
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
   )
 }
-
-export default CommentDeleteModal;

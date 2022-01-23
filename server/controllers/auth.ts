@@ -1,13 +1,13 @@
-import { UsersAttributes } from './../models/users';
 import axios from "axios";
-import { Request, Response } from "express";
-import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { generateAccessToken, verifyAccessToken, setCookie } from "./functions/token";
-import { findUser, createUser, deleteUser } from "./functions/sequelize";
 import config from "../config"
 import nodemailer from "nodemailer"
 import dotenv from "dotenv"
 dotenv.config();
+import { UsersAttributes } from './../models/users';
+import { Request, Response } from "express";
+import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
+import { generateAccessToken, verifyAccessToken, setCookie } from "./functions/token";
+import { findUser, createUser, deleteUser } from "./functions/sequelize";
 
 export const signin = async (req: Request, res: Response) => {
   try {
@@ -143,6 +143,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
 export const kakao = async (req: Request, res: Response) => {
   try {
     const { authorizationCode } = req.body;
+    const { kakaoClientId, kakaoClientSecret } = config.kakao;
     try {
       const response = await axios({
         method: "POST",
@@ -152,8 +153,8 @@ export const kakao = async (req: Request, res: Response) => {
         },
         params : {
           grant_type: "authorization_code",
-          client_id: "dfdae48bc5a2f6e1f3326d50455762b3",
-          client_secret: "eHYGMf3Vm2V5IbA0frZ1qfvdsgJwgZcv",
+          client_id: kakaoClientId,
+          client_secret: kakaoClientSecret,
           redirect_uri: process.env.REACT_APP_REDIRECT_URI,
           code: authorizationCode
         }
@@ -262,9 +263,9 @@ export const mailVerification = async (req: Request, res: Response) => {
     });
 
     const mailOptions = {
-      from: 'Full Party! 풀팟 <fullparty.gm@gmail.com>',    
-      to: email,                     
-      subject: '[풀팟] 이메일 인증을 진행해주세요.',   
+      from: 'Full Party! 풀팟 <fullparty.gm@gmail.com>',
+      to: email,
+      subject: '[풀팟] 이메일 인증을 진행해주세요.',
       html: `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
       <html xmlns="http://www.w3.org/1999/xhtml">
         <head>
@@ -296,14 +297,9 @@ export const mailVerification = async (req: Request, res: Response) => {
     };
 
     transporter.sendMail(mailOptions, function(error, info){
-      if (error) {
-        console.log(error);
-      }
-      else {
-        console.log('Email sent: ' + info.response);
-      }
+      if (error) console.log(error);
+      else console.log('✅ Email sent: ' + info.response);
     });
-
     return SuccessfulResponse(res, { message: "Authentication Email Sent", code });
   }
   catch (error) {

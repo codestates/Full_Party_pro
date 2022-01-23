@@ -1,10 +1,6 @@
-import React, { useEffect, Fragment } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import { useSelector, useDispatch } from 'react-redux';
-import { AppState } from './reducers';
-import { RootReducerType } from './store/store';
-import { SIGNIN_SUCCESS } from './actions/signinType';
+import React, { useEffect, Fragment } from 'react';
+import axios from "axios";
 import Home from './pages/Home';
 import List from './pages/List';
 import Party from './pages/Party';
@@ -15,20 +11,24 @@ import Favorite from './pages/Favorite';
 import Mypage from './pages/Mypage';
 import NotFound from './pages/NotFound';
 import Auth from './pages/Auth';
-import axios from "axios";
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
 import SigninModal from './components/SigninModal';
 import SignupModal from './components/SignupModal';
-
 import initialize from './config/initialize';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppState } from './reducers';
+import { RootReducerType } from './store/store';
+import { SIGNIN_SUCCESS } from './actions/signinType';
 
 declare global {
   interface Window {
     Kakao: any;
     kakao: any;
   }
-}
+};
+
 export const cookieParser = () => {
   const cookieString = document.cookie.split("; ");
   const keyAndValue = cookieString.map(item => item.split("="));
@@ -50,21 +50,15 @@ export const requestKeepLoggedIn = async (token: string, signupType: string) => 
 export default function App() {
   const dispatch = useDispatch();
 
-  const userInfo = useSelector(
-    (state: AppState) => state.signinReducer.userInfo
-  )
-
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const { Kakao } = window;
-  const modalReducer = useSelector((state: RootReducerType) => state.modalReducer)
+  const modalReducer = useSelector((state: RootReducerType) => state.modalReducer);
 
   useEffect(() => {
-    if(!Kakao.isInitialized()){
-      initialize();
-    }
+    if (!Kakao.isInitialized()) initialize();
     if (!document.cookie) {
       document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
       document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;

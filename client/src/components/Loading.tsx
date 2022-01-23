@@ -1,11 +1,9 @@
 import React from 'react';
-
 import styled from 'styled-components';
 
 export const LoadingContainer = styled.div`
   width: 100vw;
   height: 100vh;
-
   position: fixed;
   left: 0;
   top: 0;
@@ -21,9 +19,7 @@ export const LoadingBackdrop = styled.div`
   height: 100%;
   position: absolute;
   background-color: rgba(255,255,255,0.8);
-
   padding-top: 40vh;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -37,13 +33,11 @@ export const LoadingBackdrop = styled.div`
   img {
     width: 50px;
     height: 50px;
-
     margin-bottom: 15px;
   }
 `;
 
 export default function Loading() {
-
   return (
     <LoadingContainer>
       <LoadingBackdrop>

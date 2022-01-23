@@ -1,7 +1,7 @@
-import { combineReducers } from 'redux';
 import signinReducer from './signinReducer';
 import modalReducer from './modalReducer';
 import notifyReducer from './notifyReducer';
+import { combineReducers } from 'redux';
 
 const rootReducer = combineReducers({
   signinReducer,

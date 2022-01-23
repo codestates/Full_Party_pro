@@ -1,44 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { cookieParser } from "../App";
+import axios from 'axios';
 import styled from 'styled-components';
-import { AppState } from '../reducers';
 import Loading from '../components/Loading';
 import PartySlide from '../components/PartySlide';
 import LocalQuest from '../components/LocalQuest';
 import EmptyCard from '../components/EmptyCard';
 import AddressModal from '../components/AddressModal';
-import axios from 'axios';
+import { Navigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { cookieParser } from "../App";
+import { AppState } from '../reducers';
 import { NOTIFY } from '../actions/notify';
 
 export const ListContainer = styled.div`
   width: 100%;
   height: 100%;
-
   margin: 70px 0 60px 0;
   padding: 5px 25px;
 
   section.listSection {
-
     margin-bottom: 20px;
-
     header.listHeader {
       font-size: 1.7rem;
       font-weight: bold;
-
       margin-bottom: 10px;
 
       main {
         display: flex;
         justify-content: center;
       }
-    } 
+    }
   }
-`
+`;
 
-export default function List () {
-
+export default function List() {
   const dispatch = useDispatch();
 
   const userInfo = useSelector(
@@ -46,7 +41,7 @@ export default function List () {
   );
 
   const searchRegion = userInfo.address.split(" ")[0] + " " + userInfo.address.split(" ")[1];
-  const [isLoading, setIsLoading] = useState(true);
+  const [ isLoading, setIsLoading ] = useState(true);
   const [ myParty, setMyParty ] = useState([]);
   const [ localParty, setLocalParty ] = useState([]);
 
@@ -74,17 +69,12 @@ export default function List () {
     setIsLoading(false);
   }, [ localParty, myParty ]);
 
-  if(isLoading) {
-    return <Loading />
-  }
+  if (isLoading) return <Loading />
 
-  if(!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "Google" || userInfo.address === "Kakao"){
+  if (!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "Google" || userInfo.address === "Kakao")
     return <AddressModal />
-  }
 
-  if(cookieParser().isLoggedIn === "0"){
-    return <Navigate to="../" />
-  }
+  if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />
 
   return (
     <ListContainer>

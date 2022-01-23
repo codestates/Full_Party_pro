@@ -1,16 +1,12 @@
 import React, { useState, useRef } from 'react';
-import styled from 'styled-components';
 import axios from 'axios';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
-
-import { useDispatch } from 'react-redux';
-import { modalChanger } from '../actions/modal';
-
+import styled from 'styled-components';
 import Loading from './Loading';
 import UserAddressInput from './UserAddressInput'
-import { url } from 'inspector';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useDispatch } from 'react-redux';
+import { modalChanger } from '../actions/modal';
+import { faTimes, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -26,25 +22,21 @@ export const ModalBackdrop = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: rgba(0,0,0,0.4);
-
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   width: 80%;
   max-width: 350px;
   max-height: 90vh;
   overflow: auto;
-
   border-radius: 30px;
   background-color: white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   padding: 30px;
   text-align: center;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -53,7 +45,6 @@ export const ModalView = styled.div`
   header {
     font-size: 25px;
     margin-bottom: 15px;
-
     font-family: 'SilkscreenBold';
   }
 
@@ -78,10 +69,8 @@ export const ModalView = styled.div`
       input {
         border: none;
         border-bottom: 1px solid #d5d5d5;
-
         width: 170px;
         height: 25px;
-
         text-align: center; 
 
         &:focus {
@@ -101,7 +90,6 @@ export const ModalView = styled.div`
       select {
         width: 170px;
         text-align: center;
-
         border: none;
         border-bottom: 1px solid #d5d5d5;
         background-color: #fff;
@@ -126,16 +114,14 @@ export const ModalView = styled.div`
   .error {
     font-size: 0.7rem;
     color: #f34508;
-
     margin-top: 5px;
   }
-`
+`;
 
 export const MapContainer = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   width: 90%;
   margin-bottom: 10px;
 
@@ -156,7 +142,6 @@ export const MapContainer = styled.section`
     height: 25px;
     border: none;
     border-bottom: 1px solid #d5d5d5;
-
     margin: 8px 0;
 
     &:focus {
@@ -168,38 +153,30 @@ export const MapContainer = styled.section`
     width: 100%;
     height: 200px;
   }
-
-`
+`;
 
 export const CloseBtn = styled.button`
   width: 100%;
   text-align: right;
-
   cursor: pointer;
   margin-bottom: 10px;
-
   background-color: white;
   border: none;
-`
+`;
 
 export const BtnContainer = styled.section`
   width: 100%;
   margin-top: 20px;
-
   display: flex;
   justify-content: space-between;
 
   button {
     width: 100px;
     height: 40px;
-
     border: none;
     border-radius: 10px;
-
     background-color: white;
-
     cursor: pointer;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -226,10 +203,9 @@ export const BtnContainer = styled.section`
       }
     }
   }
-`
+`;
 
 export const ProgressBar = styled.section`
-
   width: 100%;
   margin: 15px 0;
   padding: 0 25px;
@@ -237,7 +213,6 @@ export const ProgressBar = styled.section`
   .barContainer {
     height: 5px;
     width: 100%;
-    /* border: 1px solid #e9e7e7; */
     border-radius: 50px;
     background-color: #e9e7e7;
   }
@@ -248,14 +223,9 @@ export const ProgressBar = styled.section`
     border-radius: inherit;
     text-align: right;
   }
-`
+`;
 
-const SignupModal = () => {
-  const dispatch = useDispatch();
-  const cameraRef = useRef<any>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [pageIdx, setPageIdx] = useState(0)
-
+export default function SignupModal() {
   type Info = {
     profileImage: any;
     email: string;
@@ -268,7 +238,12 @@ const SignupModal = () => {
     address: string;
   };
 
-  const [userInfo, setUserInfo] = useState<Info>({
+  const dispatch = useDispatch();
+  const cameraRef = useRef<any>();
+  const [ isLoading, setIsLoading ] = useState(false);
+  const [ pageIdx, setPageIdx ] = useState(0);
+
+  const [ userInfo, setUserInfo ] = useState<Info>({
     profileImage: 'img/defaultProfile.png',
     email: '',
     password: '',
@@ -280,7 +255,7 @@ const SignupModal = () => {
     address: ''
   });
 
-  const [isError, setIsError] = useState({
+  const [ isError, setIsError ] = useState({
     isEmail: true,
     isName: true,
     isGender: true,
@@ -288,7 +263,6 @@ const SignupModal = () => {
     isMobile: true,
     isAxios: true,
     isVerificationCode: false,
-
     emailMsg: '',
     nameMsg: '',
     genderMsg: '',
@@ -298,166 +272,171 @@ const SignupModal = () => {
     verificationMsg: '',
   });
 
-  const [isPassword, setIsPassword] = useState({
+  const [ isPassword, setIsPassword ] = useState({
     isValid: false,
     passwordMsg: '',
-  })
+  });
 
-  const [isConfirmPassword, setIsConfirmPassword] = useState({
+  const [ isConfirmPassword, setIsConfirmPassword ] = useState({
     isValid: false,
     confirmPasswordMsg: '',
-  })
+  });
 
-  const [isSent, setIsSent] = useState(false);
-  const [isTimeOut, setIsTimeOut] = useState(false);
-  const [isSearch, setIsSearch] = useState(false);
-  const [isRequested, setIsRequested] = useState(false);
+  
+  const [ isSearch, setIsSearch ] = useState(false);
+  const [ isSent, setIsSent ] = useState(false);
+  const [ isTimeOut, setIsTimeOut ] = useState(false);
+  const [ isRequested, setIsRequested ] = useState(false);
 
-  const [inputCode, setInputCode] = useState('');
-  const [verificationData, setVerificationData] = useState({
+  const [ fixedLocation, setFixedLocation ] = useState('');
+  const [ formatAddress, setFormatAddress ] = useState('');
+  const [ inputCode, setInputCode ] = useState('');
+
+  const [ verificationData, setVerificationData ] = useState({
     email: userInfo.email,
     code: '',
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    
-    const {name, value} = e.target;
-
+    const { name, value } = e.target;
     const regex={
       email: /\S+@\S+\.\S+/,
       password: /^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W).{8,16}$)/,
       mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4,4}/
     };
-
     setUserInfo({
       ...userInfo,
       [name]: value
     });
-
-    if(name === 'email'){
-      if(!regex.email.test(value)){
+    if (name === 'email') {
+      if (!regex.email.test(value)) {
         setIsError({
           ...isError,
           isEmail: false,
           emailMsg: '유효하지 않은 이메일 형식입니다.'
-        })
-      } else {
+        });
+      }
+      else {
         setIsError({
           ...isError,
           isEmail: true,
           emailMsg: ''
-        })
+        });
       }
     };
 
-    if(name === 'password'){
-      if(!regex.password.test(value)){
+    if (name === 'password') {
+      if (!regex.password.test(value)) {
         setIsPassword({
           isValid: false,
           passwordMsg: '숫자/영문자/특수문자를 포함한 8~16자리의 비밀번호여야 합니다.'
-        })
-      } else {
+        });
+      }
+      else {
         setIsPassword({
           isValid: true,
           passwordMsg: '',
-        })
+        });
       }
 
-      if(userInfo.confirmPassword !== value){
+      if (userInfo.confirmPassword !== value) {
         setIsConfirmPassword({
           isValid: false,
           confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
-        })
-      } else {
+        });
+      }
+      else {
         setIsConfirmPassword({
           isValid: true,
           confirmPasswordMsg: '',
-        })
+        });
       }
     };
 
-    if(name === 'confirmPassword'){
-      if(userInfo.password !== value){
+    if (name === 'confirmPassword') {
+      if (userInfo.password !== value) {
         setIsConfirmPassword({
           isValid: false,
           confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
-        })
-      } else {
+        });
+      }
+      else {
         setIsConfirmPassword({
           isValid: true,
           confirmPasswordMsg: '',
-        })
+        });
       }
     };
 
-    if(name === 'mobile'){
-      if(!regex.mobile.test(value)){
+    if (name === 'mobile') {
+      if (!regex.mobile.test(value)) {
         setIsError({
           ...isError,
           isMobile: false,
           mobileMsg: "'-'를 포함하여 입력해주세요."
-        })
-      } else {
+        });
+      }
+      else {
         setIsError({
           ...isError,
           isMobile: true,
           mobileMsg: ''
-        })
+        });
       }
     };
   }
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const {name, value} = e.target
+    const { name, value } = e.target;
     setUserInfo({
       ...userInfo,
       [name]: value
     });
-  }
+  };
 
-  function getCurrentDate() {
+  const getCurrentDate = () => {
     let newDate = new Date();
     let date = newDate.getDate();
     let month = newDate.getMonth() + 1;
     let year = newDate.getFullYear();
-    
-    return `${year}-${month<10?`0${month}`:`${month}`}-${date}`
-  }
+    return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
+  };
 
   const handleAddressChange = (address: string) => {
     setUserInfo({
       ...userInfo,
       address,
     });
-  }
+  };
 
-  function searchHandler(event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>){
-    setIsSearch(!isSearch);
-  }
+  const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
 
   const mailVerification = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification`, { email: userInfo.email }, { withCredentials: true });
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification`, {
+      email: userInfo.email
+    }, { withCredentials: true });
     setIsSent(true);
     setVerificationData({ email: userInfo.email, code: res.data.code });
     setTimeout(handleCodeExpire, 1000 * 60 * 5);
-  }
+  };
 
-  function codeVerification() {
-    if(userInfo.email === verificationData.email && verificationData.code === inputCode){
+  const codeVerification = () => {
+    if (userInfo.email === verificationData.email && verificationData.code === inputCode) {
       setPageIdx(pageIdx + 1);
       setIsError({
         ...isError,
         isVerificationCode: true,
         verificationMsg: '',
-      })
-    } else {
+      });
+    }
+    else {
       setIsError({
         ...isError,
         isVerificationCode: false,
         verificationMsg: '인증번호가 틀렸습니다.',
-      })
+      });
     }
-  }
+  };
 
   const remailVerification = async () => {
     setIsTimeOut(false);
@@ -466,35 +445,35 @@ const SignupModal = () => {
       isVerificationCode: false,
       verificationMsg: '',
     });
-
     mailVerification();
-  }
+  };
 
-  function handleCodeExpire() {
+  const handleCodeExpire = () => {
     setIsTimeOut(true);
     setIsError({
       ...isError,
       isVerificationCode: false,
       verificationMsg: '인증시간이 만료됐습니다.',
-    })
-  }
+    });
+  };
 
   const handleSignup = () => {
-    const {profileImage, email, password, name, gender, birth, mobile, address} = userInfo
-    const {isEmail, isName, isGender, isBirth, isMobile} = isError
+    const { profileImage, email, password, name, gender, birth, mobile, address } = userInfo;
+    const { isEmail, isName, isGender, isBirth, isMobile } = isError;
 
-    if(!email || !password || !name || gender === "none" || !birth || !mobile || !address) {
+    if (!email || !password || !name || gender === "none" || !birth || !mobile || !address) {
       setIsError({
         ...isError,
         isAxios: true,
         axiosMsg: '작성이 완료되지 않은 정보가 있습니다.'
-      })
-    } else if(!isEmail || !isPassword.isValid || !isConfirmPassword.isValid || !isName || !isGender || !isBirth || !isMobile) {
+      });
+    }
+    else if(!isEmail || !isPassword.isValid || !isConfirmPassword.isValid || !isName || !isGender || !isBirth || !isMobile) {
       setIsError({
         ...isError,
         isAxios: true,
         axiosMsg: '입력하신 정보가 올바른지 확인해주세요.'
-      })
+      });
     }
     else {
       setIsRequested(true);
@@ -509,42 +488,33 @@ const SignupModal = () => {
           mobile,
           address
         }
-      }, {
-        withCredentials: true
-      })
+      }, { withCredentials: true })
       .then((res) => {
-        if(res.data.message === 'Already Signed Up') {
+        if (res.data.message === 'Already Signed Up') {
           setIsError({
             ...isError,
             isAxios: true,
             axiosMsg: '이미 가입된 이메일 주소입니다.'
           })
-        } else {
-          dispatch(modalChanger('signinModalBtn'))
         }
-
+        else dispatch(modalChanger('signinModalBtn'));
         setIsRequested(false);
       })
       .catch((err) => console.log(err))
     }
-  }
+  };
 
-  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {    
+  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     const toGo = (event.currentTarget as HTMLButtonElement).value;
-    if(toGo === "next"){
-      setPageIdx(pageIdx + 1);
-    } else {
-      setPageIdx(pageIdx - 1);
-    }
-  }
+    if (toGo === "next") setPageIdx(pageIdx + 1);
+    else setPageIdx(pageIdx - 1);
+  };
 
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
-  }
-  
-  if(isLoading){
-    return <Loading />
-  }
+  };
+
+  if (isLoading) return <Loading />
 
   return(
     <ModalContainer>
@@ -562,7 +532,7 @@ const SignupModal = () => {
           </ProgressBar>
 
           {(() => {
-            if(pageIdx === 0) {
+            if (pageIdx === 0) {
               return (
                 <table>
                   <tr>
@@ -596,7 +566,7 @@ const SignupModal = () => {
                 </table>
               )
             }
-            else if(pageIdx === 1) {
+            else if (pageIdx === 1) {
               return (
                 <table>
                   <tr>
@@ -642,7 +612,7 @@ const SignupModal = () => {
                 </table>
               )
             }
-            else if(pageIdx === 2) {
+            else if (pageIdx === 2) {
               return (
                 <table>
                   <tr>
@@ -725,7 +695,7 @@ const SignupModal = () => {
                 </MapContainer>
               )
             }
-            else if(pageIdx === 4) {
+            else if (pageIdx === 4) {
               return (
                 <>
                   <div className='confirm'>이 정보가 맞나요?</div>
@@ -762,7 +732,7 @@ const SignupModal = () => {
           })()}
 
           {(() => {
-            if(pageIdx === 0) {
+            if (pageIdx === 0) {
               return (
                 <BtnContainer style={{ justifyContent: "flex-end" }}>
                   {!isSent? <button onClick={mailVerification} className="request">인증번호 요청</button> : null}
@@ -771,7 +741,7 @@ const SignupModal = () => {
                 </BtnContainer>
               )
             }
-            else if(pageIdx === 1){
+            else if (pageIdx === 1){
               return (
                 <BtnContainer style={{ justifyContent: "flex-end" }}>
                   <button onClick={handlePageChange} value="next">다음 <FontAwesomeIcon icon={faAngleRight} className="icon right" /></button>
@@ -787,7 +757,7 @@ const SignupModal = () => {
                 </BtnContainer>
               )
             }
-            else if(pageIdx === 4) {
+            else if (pageIdx === 4) {
               return (
                 <BtnContainer>
                   <button onClick={handlePageChange} value="prev"><FontAwesomeIcon icon={faAngleLeft} className="icon left" /> 이전</button>
@@ -807,7 +777,5 @@ const SignupModal = () => {
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
-  )
+  );
 }
-
-export default SignupModal;

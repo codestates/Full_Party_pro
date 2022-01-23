@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-
 import PostMap from '../components/PostMap';
 import PostCodeModal from '../components/PostCodeModal';
 
 export const AddressInputContainer = styled.div`
-
   input:disabled {
     background-color: white;
   }
-
 `;
 
 export const Tab = styled.div`
-
   height: 35px;
-  
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -23,7 +18,6 @@ export const Tab = styled.div`
   .tabButton {
     button {
       width: 50px;
-
       color: #000;
       background-color: white;
       border: none;
@@ -40,74 +34,62 @@ export const Tab = styled.div`
   .searchBtn {
     width: 100px;
     height: 35px;
-
     border: none;
     border-radius: 20px;
-
     background-color: #50C9C3;
     color: white;
     cursor: pointer;
   }
-
 `;
 
 type Props = {
   partyInfo: {[key: string]: any},
   handleCoordsChange: Function,
   handleLocationChange: Function,
-  handleOnOff: Function,
-}
+  handleOnOff: Function
+};
 
 const AddressInput = ({ partyInfo, handleCoordsChange, handleLocationChange, handleOnOff }: Props) => {
-
-  const [isSearch, setIsSearch] = useState(false);
-  const [isOnline, setIsOnline] = useState(false);
-
-  const [fullAddress, setFullAddress] = useState({
+  const [ isSearch, setIsSearch ] = useState(false);
+  const [ isOnline, setIsOnline ] = useState(false);
+  const [ onlineLocation, setOnlineLocation ] = useState('');
+  const [ fullAddress, setFullAddress ] = useState({
     address: "",
     detailedAddress: "",
     extraAddress: "",
   });
-  const [onlineLocation, setOnlineLocation] = useState('');
 
-  function searchHandler(event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>){
-    setIsSearch(!isSearch);
-  }
+  const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>){
-
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { address, extraAddress } = fullAddress;
-
     setFullAddress({
       ...fullAddress,
       detailedAddress: event.target.value,
     });
-
     handleLocationChange(`${address} ${event.target.value} ${extraAddress ? `(${extraAddress})` : ''}`);
   }
-  
-  function autoCompleteHandler(address: string, extraAddress: string){
-    if(!!fullAddress.detailedAddress){
-      handleLocationChange(`${address} ${fullAddress.detailedAddress} ${extraAddress ? `(${extraAddress})` : ''}`);
-    } else {
-      handleLocationChange(`${address} ${extraAddress ? `(${extraAddress})` : ''}`);
-    }
 
+  const autoCompleteHandler = (address: string, extraAddress: string) => {
+    if (!!fullAddress.detailedAddress)
+      handleLocationChange(`${address} ${fullAddress.detailedAddress} ${extraAddress ? `(${extraAddress})` : ''}`);
+    else
+      handleLocationChange(`${address} ${extraAddress ? `(${extraAddress})` : ''}`);
     setFullAddress({
       ...fullAddress,
       address,
       extraAddress,
-    })
+    });
     setIsSearch(false);
   }
 
-  function onlineLocationHandler(event: React.ChangeEvent<HTMLInputElement>){
+  const onlineLocationHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setOnlineLocation(event.target.value);
     handleLocationChange(event.target.value);
   }
 
   const handleIsOnline = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if(e.currentTarget.className === 'isOnline' || e.currentTarget.className === 'isOnline unfocused') {
+    if (e.currentTarget.className === 'isOnline' || e.currentTarget.className === 'isOnline unfocused') {
       setIsOnline(true);
       setFullAddress({
         address: '',
@@ -116,7 +98,8 @@ const AddressInput = ({ partyInfo, handleCoordsChange, handleLocationChange, han
       });
       handleOnOff(true);
       handleLocationChange('');
-    } else {
+    }
+    else {
       setIsOnline(false);
       setOnlineLocation('');
       handleOnOff(false);
@@ -124,7 +107,7 @@ const AddressInput = ({ partyInfo, handleCoordsChange, handleLocationChange, han
     }
   }
 
-  const inputValue = fullAddress.address === '' ? '' : fullAddress.address + " " + (fullAddress.extraAddress ? `(${fullAddress.extraAddress})` : '')
+  const inputValue = fullAddress.address === '' ? '' : fullAddress.address + " " + (fullAddress.extraAddress ? `(${fullAddress.extraAddress})` : '');
 
   return (
     <AddressInputContainer>

@@ -1,22 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import AWS from 'aws-sdk';
-import { cookieParser } from "../App";
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
-import { NOTIFY } from "../actions/notify";
-import { RootReducerType } from '../store/store';
-import { AppState } from '../reducers';
+import AWS from 'aws-sdk';
 import Loading from '../components/Loading';
 import UserCancelModal from '../components/UserCancelModal'
 import PartySlide from '../components/PartySlide';
 import VerificationModal from '../components/VerificationModal';
 import PostCodeModal from '../components/PostCodeModal';
 import EmptyParty from '../components/EmptyParty';
-
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { cookieParser } from "../App";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
+import { NOTIFY } from "../actions/notify";
+import { RootReducerType } from '../store/store';
+import { AppState } from '../reducers';
 import { SIGNIN_FAIL, SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const MypageContainer = styled.div`
@@ -25,7 +24,6 @@ export const MypageContainer = styled.div`
 
   .imgChange {
     width: 90%;
-
     display: flex;
     justify-content: flex-end;
 
@@ -33,14 +31,11 @@ export const MypageContainer = styled.div`
       margin-top: 0;
       width: 150px;
       height: 40px;
-
       border: 1px solid #50C9C3;
       border-radius: 30px;
       color: #50C9C3;
       background-color: #fff;
-
       padding: 0 10px;
-
       cursor: pointer;
     }
   }
@@ -48,7 +43,6 @@ export const MypageContainer = styled.div`
   .subject {
     font-size: 1.2rem;
     font-weight: bold;
-
     margin-bottom: 10px;
   }
 
@@ -62,30 +56,25 @@ export const MypageContainer = styled.div`
     font-size: 0.7rem;
     color: #f34508;
   }
-`
+`;
 
 export const MypageHeader = styled.header`
   width: 100%;
   display: flex;
-
   margin: 30px 0;
   padding: 0 10%;
 
   .leftWrapper {
     width: 40%;
     height: 100%;
-
     display: flex;
     justify-content: flex-end;
 
     .profileImageContainer {
-
       width: 100px;
       height: 100px;
-
       border-radius: 100%;
       overflow: hidden;
-
       border: 1px solid #d5d5d5;
 
       img {
@@ -98,10 +87,8 @@ export const MypageHeader = styled.header`
   .mainProfile {
     margin: 0 30px;
     margin-top: 5px;
-
     width: 60%;
     height: 100%;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -122,7 +109,7 @@ export const MypageHeader = styled.header`
     }
 
   }
-`
+`;
 
 export const MypageInfo = styled.section`
   width: 100%;
@@ -134,18 +121,15 @@ export const MypageInfo = styled.section`
     display: flex;
     flex-direction: column;
     justify-content: center;
-    /* align-items: center; */
   }
 
   button {
     width: 120px;
     height: 40px;
-
     border: none;
     border-radius: 30px;
     color: #fff;
     background-color: #50C9C3;
-
     margin: 10px 20px 0 0;
     cursor: pointer;
   }
@@ -174,9 +158,7 @@ export const MypageInfo = styled.section`
     .buttons {
       display: flex;
       flex-direction: column;
-
       width: 100%;
-
       margin: 10px 0;
 
       button {
@@ -184,7 +166,8 @@ export const MypageInfo = styled.section`
       }
     }
   }
-`
+`;
+
 export const InfoTable = styled.table`
   margin: 10px 0 20px 0;
 
@@ -195,7 +178,6 @@ export const InfoTable = styled.table`
   .label {
     padding-right: 15px;
     text-align: center;
-
     font-weight: bold;
 
     &.search {
@@ -219,10 +201,8 @@ export const InfoTable = styled.table`
     input {
       border: none;
       border-bottom: 1px solid #d5d5d5;
-
       width: 100%;
       height: 25px;
-
       text-align: center; 
 
       &:focus {
@@ -242,7 +222,6 @@ export const InfoTable = styled.table`
     select {
       width: 100%;
       text-align: center;
-
       border: none;
       border-bottom: 1px solid #d5d5d5;
       background-color: #fff;
@@ -256,7 +235,7 @@ export const InfoTable = styled.table`
   .error {
     margin-top: 5px;
   }
-  
+
   .map {
     display: none;
   }
@@ -266,7 +245,7 @@ export const InfoTable = styled.table`
       max-width: 200px;
     }
   }
-`
+`;
 
 export const ProgressBar = styled.div`
   margin-top: 5px;
@@ -275,7 +254,6 @@ export const ProgressBar = styled.div`
     height: 10px;
     width: 100%;
     max-width: 200px;
-    /* border: 1px solid #e9e7e7; */
     border-radius: 50px;
     background-color: #e9e7e7;
   }
@@ -286,18 +264,16 @@ export const ProgressBar = styled.div`
     border-radius: inherit;
     text-align: right;
   }
-
-
-`
+`;
 
 export const MypartyCards = styled.section`
   width: 100%;
-  
+
   fieldset {
     border: none;
     margin-bottom: 10px;
   }
-  
+
   .cardTab {
     list-style: none;
 
@@ -309,45 +285,50 @@ export const MypartyCards = styled.section`
     .tab {
       cursor: pointer;
       color: #d5d5d5;
-      
+
       &.focus {
         color: black;
         font-weight: bold;
       }
     }
   }
-`
+`;
 
-export default function Mypage () {
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
+export default function Mypage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const fileRef = useRef<any>();
+
   const { signupType } = cookieParser();
 
+  const signinReducer = useSelector(
+    (state: RootReducerType) => state.signinReducer
+  );
   const userInfoFromStore = useSelector(
     (state: AppState) => state.signinReducer.userInfo
   );
 
-  const [curTab, setCurTab] = useState(0);
-  const [parties, setParties] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isInfoLoading, setIsInfoLoading] = useState(true);
-  const [imgLoading, setImgLoading] = useState(false);
-  const [isChange, setIsChange] = useState(false);
-  const [callModal, setCallModal] = useState(false);
-  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
-  const [from, setFrom] = useState('');
-  const [fixedLocation, setFixedLocation] = useState('');
-  const [formatAddress, setFormatAddress] = useState('');
-  const [basicInfo, setBasicInfo] = useState({
-    userName: signinReducer.userInfo.userName,
-    profileImage: signinReducer.userInfo.profileImage,
-    address: signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1],
+  const [ isLoading, setIsLoading ] = useState(true);
+  const [ isInfoLoading, setIsInfoLoading ] = useState(true);
+  const [ imgLoading, setImgLoading ] = useState(false);
+  const [ isSearch, setIsSearch ] = useState(false);
+  const [ isChange, setIsChange ] = useState(false);
+  const [ isVerificationModalOpen, setIsVerificationModalOpen ] = useState(false);
+  const [ callModal, setCallModal ] = useState(false);
+
+  const [ curTab, setCurTab ] = useState(0);
+  const [ parties, setParties ] = useState([]);
+  const [ from, setFrom ] = useState('');
+  const [ fixedLocation, setFixedLocation ] = useState('');
+  const [ formatAddress, setFormatAddress ] = useState('');
+  const [ basicInfo, setBasicInfo ] = useState({
+    userName: "",
+    profileImage: "",
+    address: "",
     level: 0,
     exp: 0
   });
-  const [changeInfo, setChangeInfo] = useState({
+  const [ changeInfo, setChangeInfo ] = useState({
     userName: '',
     profileImage: '',
     password: '',
@@ -358,8 +339,7 @@ export default function Mypage () {
     mobile: '',
     nowPwd: ''
   });
-
-  const [isError, setIsError] = useState({
+  const [ isError, setIsError ] = useState({
     isName: true,
     isMobile: true,
     isAxios: true,
@@ -367,34 +347,32 @@ export default function Mypage () {
     mobileMsg: '',
     axiosMsg: '',
   });
-
-  const [isPassword, setIsPassword] = useState({
+  const [ isPassword, setIsPassword ] = useState({
     isValid: false,
     passwordMsg: '',
-  })
-
-  const [isConfirmPassword, setIsConfirmPassword] = useState({
+  });
+  const [ isConfirmPassword, setIsConfirmPassword ] = useState({
     isValid: false,
     confirmPasswordMsg: '',
-  })
+  });
 
-  const [fullAddress, setFullAddress] = useState({
+  const [ fullAddress, setFullAddress ] = useState({
     address: "",
     detailedAddress: "",
     extraAddress: "",
   });
-  const [isSearch, setIsSearch] = useState(false);
 
-  function searchHandler(event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>){
-    setIsSearch(!isSearch);
-  }
+  const userRegion = basicInfo.address.split(" ").length < 2 ?
+    "지역 미설정" :
+    basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1];
 
-  function autoCompleteHandler(address: string, extraAddress: string){
-    if(!!fullAddress.detailedAddress){
+  const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
+
+  const autoCompleteHandler = (address: string, extraAddress: string) => {
+    if(!!fullAddress.detailedAddress)
       setChangeInfo({ ...changeInfo, address: `${address} ${fullAddress.detailedAddress} ${extraAddress ? `(${extraAddress})` : ''}` });
-    } else {
+    else
       setChangeInfo({ ...changeInfo, address: `${address} ${extraAddress ? `(${extraAddress})` : ''}` });
-    }
 
     setFullAddress({
       ...fullAddress,
@@ -402,59 +380,54 @@ export default function Mypage () {
       extraAddress,
     })
     setIsSearch(false);
-  }
+  };
 
-  const userRegion = basicInfo.address.split(" ").length < 2 ? "지역 미설정" : basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1]
-  
   AWS.config.update({
     region: "ap-northeast-2",
     credentials: new AWS.CognitoIdentityCredentials({
       IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
     })
-  })
+  });
+
   const handleRefClick = (e: any) => {
     e.preventDefault();
     fileRef.current.click();
-  }
-  const handleImgLoad = async (e: any) => {
-    setImgLoading(true)
-    let file = e.target.files[0]
+  };
 
+  const handleImgLoad = async (e: any) => {
+    setImgLoading(true);
+    let file = e.target.files[0];
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
         Key: `${signinReducer.userInfo.id}_profileImage.jpg`,
         Body: file,
       }
-    })
-    const promise = upload.promise()
-
+    });
+    const promise = upload.promise();
     promise.then(
-      function (data: any) {
-        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
+      (data: any) => {
+        console.log("✅ Uploaded Successfully");
         setChangeInfo({
           ...changeInfo,
           profileImage: data.Location
-        })
+        });
         setBasicInfo({
           ...basicInfo,
           profileImage: data.Location
-        })
+        });
         setImgLoading(false)
       },
-      function (err: any) {
-        return console.log('오류가 발생했습니다: ', err.message)
-      }
-    )
-  }
+      (err: any) => console.log("🚫 Upload Failed:", err.message)
+    );
+  };
 
   const handleIsChange = async () => {
-    if(isChange) {
-      setIsChange(false)
-    } else {
-      setIsInfoLoading(true)
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/profile/${signinReducer.userInfo?.id}`)
-      const userInfo = res.data.userInfo
+    if (isChange) setIsChange(false);
+    else {
+      setIsInfoLoading(true);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/profile/${signinReducer.userInfo?.id}`);
+      const userInfo = res.data.userInfo;
       setChangeInfo({
         ...changeInfo,
         userName: userInfo.userName,
@@ -466,121 +439,124 @@ export default function Mypage () {
       setIsInfoLoading(false);
       setIsChange(true);
     }
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
     const { name, value } = e.target;
-
-    setChangeInfo({
-      ...changeInfo,
-      [name]: value,
-    })
-
     const regex={
       password: /^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W).{8,16}$)/,
       mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/
     };
 
-    if(name === 'userName'){
-      if(value.length < 2){
+    setChangeInfo({
+      ...changeInfo,
+      [name]: value,
+    });
+
+    if (name === 'userName') {
+      if (value.length < 2) {
         setIsError({
           ...isError,
           isName: false,
           nameMsg: "두 글자 이상 입력해주세요."
-        })
-      } else {
+        });
+      }
+      else {
         setIsError({
           ...isError,
           isName: true,
           nameMsg: ''
-        })
+        });
       }
     }
 
-    if(name === 'password'){
-      if(!regex.password.test(value)){
+    if (name === 'password') {
+      if (!regex.password.test(value)) {
         setIsPassword({
           isValid: false,
           passwordMsg: '숫자/영문자/특수문자를 포함한 8~16자리의 비밀번호여야 합니다.'
-        })
-      } else {
+        });
+      }
+      else {
         setIsPassword({
           isValid: true,
           passwordMsg: '',
-        })
+        });
       }
 
       if(changeInfo.confirm !== value){
         setIsConfirmPassword({
           isValid: false,
-          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
-        })
-      } else {
+          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.'
+        });
+      }
+      else {
         setIsConfirmPassword({
           isValid: true,
           confirmPasswordMsg: '',
-        })
+        });
       }
     };
 
-    if(name === 'confirmPassword'){
-      if(changeInfo.password !== value){
+    if (name === 'confirmPassword') {
+      if (changeInfo.password !== value) {
         setIsConfirmPassword({
           isValid: false,
           confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
-        })
-      } else {
+        });
+      }
+      else {
         setIsConfirmPassword({
           isValid: true,
           confirmPasswordMsg: '',
-        })
+        });
       }
     };
 
-    if(name === 'mobile'){
-      if(!regex.mobile.test(value)){
+    if (name === 'mobile') {
+      if (!regex.mobile.test(value)) {
         setIsError({
           ...isError,
           isMobile: false,
           mobileMsg: "'-'를 포함하여 입력해주세요."
-        })
-      } else {
+        });
+      }
+      else {
         setIsError({
           ...isError,
           isMobile: true,
           mobileMsg: ''
-        })
+        });
       }
     };
   }
+
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setChangeInfo({
       ...changeInfo,
       [e.target.name]: e.target.value
-    })
-  }
+    });
+  };
 
-  function getCurrentDate() {
+  const getCurrentDate = () => {
     let newDate = new Date();
     let date = newDate.getDate();
     let month = newDate.getMonth() + 1;
     let year = newDate.getFullYear();
-    
-    return `${year}-${month<10?`0${month}`:`${month}`}-${date}`
-  }
+    return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
+  };
 
   const submitInfo = async () => {
     const { userName, profileImage, password, confirm, birth, gender, address, mobile, nowPwd } = changeInfo;
     const { isName, isMobile } = isError;
-    if(password !== confirm || !isName || !isMobile) {
+    if (password !== confirm || !isName || !isMobile) {
       setIsError({
         ...isError,
         isAxios: false,
         axiosMsg: '입력하신 정보를 확인해주세요.',
-      })
+      });
     }
-    else if(password === '') {
+    else if (password === '') {
       setIsError({
         isName: true,
         isMobile: true,
@@ -588,7 +564,7 @@ export default function Mypage () {
         nameMsg: '',
         mobileMsg: '',
         axiosMsg: '',
-      })
+      });
       const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
         userInfo: {
           userId: signinReducer.userInfo?.id,
@@ -599,8 +575,8 @@ export default function Mypage () {
           address,
           mobile
         }
-      })
-      if(res.status === 200) {
+      });
+      if (res.status === 200) {
         setIsChange(false);
         const payload = {
           id: signinReducer.userInfo?.id,
@@ -612,7 +588,7 @@ export default function Mypage () {
         dispatch({ type: SIGNIN_SUCCESS, payload });
         navigate('/mypage');
       }
-    } 
+    }
     else if (password !== '') {
       const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
         userInfo: {
@@ -625,8 +601,8 @@ export default function Mypage () {
           address,
           mobile
         }
-      })
-      if(res.status === 200) {
+      });
+      if (res.status === 200) {
         setIsChange(false);
         const payload = {
           id: signinReducer.userInfo.id,
@@ -634,48 +610,45 @@ export default function Mypage () {
           profileImage,
           address,
           signupType,
-        }
+        };
         dispatch({ type: SIGNIN_SUCCESS, payload });
         navigate('/mypage');
       }
     }
   }
 
-  //파티 데이터
   const fetchJoinParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`);
+    const myParty = res.data.myParty;
+    setParties(myParty);
+  };
+
   const fetchRecruitParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`);
+    const myParty = res.data.myParty;
+    setParties(myParty);
+  };
+
   const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${signinReducer.userInfo?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${signinReducer.userInfo?.id}`);
+    const myParty = res.data.myParty;
+    setParties(myParty);
+  };
 
   const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
-    if(e.currentTarget.value === 0) {
-      fetchRecruitParty();
-    }
-    else if(e.currentTarget.value === 1) {
-      fetchJoinParty()
-    }
-    else if(e.currentTarget.value === 2) {
-      fetchCompleteParty()
-    }
-    setCurTab(e.currentTarget.value)
-  }
+    if (e.currentTarget.value === 0) fetchRecruitParty();
+    else if (e.currentTarget.value === 1) fetchJoinParty();
+    else if (e.currentTarget.value === 2) fetchCompleteParty();
+    setCurTab(e.currentTarget.value);
+  };
 
   const handleSignOut = async () => {
     const { token, signupType } = cookieParser();
-    await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {
-      access_token: token, 
-      signup_type: signupType
+    await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {}, {
+      headers: {
+        access_token: token,
+        signup_type: signupType
+      }
     });
     dispatch({ type: SIGNIN_FAIL });
     document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
@@ -683,6 +656,7 @@ export default function Mypage () {
     document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
+
   const handleWithdrawal = async () => {
     const { token, signupType } = cookieParser();
     const userId = signinReducer.userInfo?.id;
@@ -697,24 +671,23 @@ export default function Mypage () {
     document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
+
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
     setFrom(from);
     setCallModal(!callModal);
   };
 
-  function verficationModalHandler(e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>){
+  const verficationModalHandler = (e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>) => {
     setIsVerificationModalOpen(!isVerificationModalOpen);
-  }
+  };
 
   const handleFormatAddressChange = (address: string) => {
     setFormatAddress(address);
-  }
+  };
 
   const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
-      setFixedLocation(changeInfo.address);
-    }
-  }
+    if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') setFixedLocation(changeInfo.address);
+  };
 
   useEffect(() => {
     (async () => {
@@ -744,18 +717,13 @@ export default function Mypage () {
     })();
     fetchRecruitParty();
   }, [ userInfoFromStore ]);
-  
+
   useEffect(() => {
     setIsLoading(false);
   }, [ basicInfo ]);
 
-  if(cookieParser().isLoggedIn === "0"){
-    return <Navigate to="../" />
-  }
-
-  if(isLoading) {
-    return <Loading />
-  }
+  if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />
+  if (isLoading) return <Loading />
 
   return (
     <MypageContainer>
@@ -791,15 +759,15 @@ export default function Mypage () {
           </ProgressBar>
         </p>
       </MypageHeader>
-      {isChange ? 
+      {isChange ?
           <div className="imgChange">
-            <button 
+            <button
               className='imgChangeBtn'
               onClick={(e) => handleRefClick(e)
             }>
             프로필 이미지 수정
             </button>
-            <input 
+            <input
               ref={fileRef}
               type='file'
               className='imgInput'
@@ -833,7 +801,7 @@ export default function Mypage () {
                         <div className='error'>{isError.nameMsg}</div>
                       </td>
                     </tr>
-                    {signupType === 'general' ? 
+                    {signupType === 'general' ?
                       <>
                         <tr>
                           <td className='label'>비밀번호</td>

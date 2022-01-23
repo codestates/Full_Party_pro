@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-
 import UserMap from '../components/UserMap';
 import PostCodeModal from '../components/PostCodeModal';
 
 export const AddressInputContainer = styled.div`
-
   input:disabled {
     background-color: white;
   }
@@ -22,43 +20,38 @@ type Props = {
   address: string,
   handleAddressChange: Function,
   isSearch: boolean,
-  searchHandler: Function,
-}
+  searchHandler: Function
+};
 
-const UserAddressInput = ({ profileImage, address, handleAddressChange, isSearch, searchHandler }: Props) => {
-
-  const [fullAddress, setFullAddress] = useState({
+export default function UserAddressInput({ profileImage, address, handleAddressChange, isSearch, searchHandler }: Props) {
+  const [ fullAddress, setFullAddress ] = useState({
     address: "",
     detailedAddress: "",
     extraAddress: "",
   });
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>){
-
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { address, extraAddress } = fullAddress;
-
     setFullAddress({
       ...fullAddress,
       detailedAddress: event.target.value,
     });
-
     handleAddressChange(`${address} ${event.target.value} ${extraAddress ? `(${extraAddress})` : ''}`);
-  }
-  
-  function autoCompleteHandler(address: string, extraAddress: string){
-    if(!!fullAddress.detailedAddress){
+  };
+
+  const autoCompleteHandler = (address: string, extraAddress: string) => {
+    if (!!fullAddress.detailedAddress)
       handleAddressChange(`${address} ${fullAddress.detailedAddress} ${extraAddress ? `(${extraAddress})` : ''}`);
-    } else {
+    else
       handleAddressChange(`${address} ${extraAddress ? `(${extraAddress})` : ''}`);
-    }
 
     setFullAddress({
       ...fullAddress,
       address,
       extraAddress,
-    })
+    });
     searchHandler();
-  }
+  };
 
   const inputValue = fullAddress.address === '' ? '' : fullAddress.address + " " + (fullAddress.extraAddress ? `(${fullAddress.extraAddress})` : '')
 
@@ -72,7 +65,7 @@ const UserAddressInput = ({ profileImage, address, handleAddressChange, isSearch
           />
         </div>
       </div>
-        
+
       <input id="fullAddress" type="text" value={inputValue} placeholder="주소" disabled={true} /><br />
       <input type="text" 
         onChange={handleInputChange}
@@ -80,7 +73,7 @@ const UserAddressInput = ({ profileImage, address, handleAddressChange, isSearch
         placeholder="상세주소" 
         autoComplete='off'
       />
-    
+
       {isSearch ?
         <PostCodeModal
           searchHandler={searchHandler}
@@ -90,5 +83,3 @@ const UserAddressInput = ({ profileImage, address, handleAddressChange, isSearch
     </AddressInputContainer>
   );
 }
-
-export default UserAddressInput;

@@ -1,11 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { cookieParser } from "../App";
+import axios from 'axios';
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart, faAngleDown, faAngleUp, faBullhorn, faBirthdayCake, faCalendarCheck, faGlobe } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
 import Loading from '../components/Loading';
 import UserInfoModal from '../components/UserInfoModal';
 import PartyJoinModal from '../components/PartyJoinModal';
@@ -13,18 +8,22 @@ import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
 import PartyCancelModal from '../components/PartyCancelModal';
 import PartyEdit from '../components/PartyEdit';
-import { NOTIFY } from '../actions/notify';
 import PartyMap from '../components/PartyMap';
 import MemberList from '../components/MemberList';
 import QnA from '../components/QnA';
 import NotFound from '../pages/NotFound';
-
 import { AppState } from '../reducers';
-
-import axios from 'axios';
+import { NOTIFY } from '../actions/notify';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { cookieParser } from "../App";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
+import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart,
+  faAngleDown, faAngleUp, faBullhorn, faBirthdayCake, faCalendarCheck, faGlobe
+} from '@fortawesome/free-solid-svg-icons';
 
 export const PartyContainer = styled.div`
-
   margin: 60px 0 80px 0;
 
   button {
@@ -42,7 +41,6 @@ export const PartyContainer = styled.div`
 
 export const CVBtns = styled.div`
   position: fixed;
-
   width: 100%;
   padding: 20px;
 
@@ -59,11 +57,9 @@ export const CVBtns = styled.div`
     width: 45px;
     height: 45px;
     border-radius: 100%;
-
     background: rgba(255, 255, 255, 0.9);
     border: none;
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
     font-size: 1.1rem;
   }
 
@@ -72,7 +68,7 @@ export const CVBtns = styled.div`
       margin-left: 10px;
     }
   }
-`
+`;
 
 export const Main = styled.section`
   section {
@@ -86,9 +82,7 @@ export const Main = styled.section`
     }
 
     .titleContainer {
-
       width: 100%;
-
       margin: 20px 0;
       padding: 0 20px;
 
@@ -101,7 +95,6 @@ export const Main = styled.section`
         display: flex;
         justify-content: space-between;
         align-items: center;
-
         font-size: 20pt;
         font-weight: bold;
 
@@ -109,23 +102,19 @@ export const Main = styled.section`
           display: flex;
           align-items: center;
           white-space: pre-wrap;
-
           max-width: 80%;
         }
 
         .privateLink {
           width: 50px;
           height: 50px;
-
           border: 1px solid #d5d5d5;
           border-radius: 100%;
           background-color: white;
-
           font-size: 1.2rem;
           color: #000;
-
           margin: 0 2vw;
-        } 
+        }
       }
     }
   }
@@ -135,7 +124,6 @@ export const Main = styled.section`
 
     .content {
       font-family: "-apple-system";
-      
       padding: 30px 30px 10px 30px;
       font-size: 1.2rem;
       line-height: 2rem;
@@ -147,12 +135,11 @@ export const Main = styled.section`
     font-size: 0.8rem;
     color: #777;
   }
-`
+`;
 
 export const FavAndTag = styled.section`
   display: flex;
   justify-content: space-between;
-
   width: 100%;
   padding: 0 20px 20px 20px;
 
@@ -161,7 +148,6 @@ export const FavAndTag = styled.section`
     max-width: 80px;
     height: 30px;
     padding: 0 10px;
-
     border: 1px solid #d5d5d5;
     border-radius: 20px;
     background-color: white;
@@ -169,32 +155,24 @@ export const FavAndTag = styled.section`
 
   .tagContainer {
     display: flex;
-
     margin: 0 2vw;
-
     overflow-x: auto;
 
     .tag {
       max-width: 180px;
-
       height: 30px;
       padding: 0 10px;
-
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-
       background-color: #d5d5d5;
       border: none;
       border-radius: 20px;
-
       margin-left: 10px;
-
       cursor: pointer;
     }
 
     @media screen and (max-width: 699px) {
-
       max-width: 100%;
 
       .tag {
@@ -206,7 +184,6 @@ export const FavAndTag = styled.section`
 
 export const TimeandLocation = styled.section`
   padding: 0 30px;
-
   color: #777;
 
   a {
@@ -222,7 +199,6 @@ export const TimeandLocation = styled.section`
     margin-bottom: 10px;
     margin-right: 15px;
     word-break: break-all;
-
     display: flex;
   }
 
@@ -234,7 +210,6 @@ export const TimeandLocation = styled.section`
 `;
 
 export const MembersContainer = styled.section`
-
   border-top: 1px solid #d5d5d5;
   margin-top: 30px;
 
@@ -256,12 +231,10 @@ export const PartyStateBtns = styled.section`
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-
   margin-top: 30px;
 
   .signinMsgContainer {
     font-size: 1.1rem;
-
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -271,11 +244,9 @@ export const PartyStateBtns = styled.section`
       height: 60px;
       border: none;
       box-shadow: rgba(80, 201, 195, 0.4) 0px 8px 24px;
-
       font-family: "silkScreenBold";
       font-size: 1.1rem;
       color: #50C9C3;
-
       margin-top: 25px;
       margin-bottom: 0;
 
@@ -289,11 +260,9 @@ export const PartyStateBtns = styled.section`
   button {
     min-width: 100px;
     height: 50px;
-
     border: 1px solid #d5d5d5;
     border-radius: 20px;
     background-color: white; 
-
     margin: 8px;
     padding: 10px 20px;
   }
@@ -305,11 +274,10 @@ export const PartyStateBtns = styled.section`
   }
 `;
 
-export default function Party () {
-
-  const params = useParams();
+export default function Party() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const params = useParams();
   const commentRef = useRef<HTMLElement>(null);
 
   const userId = useSelector(
@@ -317,30 +285,29 @@ export default function Party () {
   );
 
   const isLoggedIn = cookieParser().isLoggedIn;
-
   const { Kakao } = window;
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
+  const [ isWaitingListOpen, setIsWaitingListOpen ] = useState(false);
+  const [ isUserInfoModalOpen, setIsUserInfoModalOpen ] = useState(false);
+  const [ isPartyJoinModalOpen, setIsPartyJoinModalOpen ] = useState(false);
+  const [ isSigninModalOpen, setIsSigninModalOpen ] = useState(false);
+  const [ isReviewModalOpen, setIsReviewModalOpen ] = useState(false);
+
+  const [ isPartyCancelModalOpen, setIsPartyCancelModalOpen ] = useState(false);
+  const [ isEdit, setIsEdit ] = useState(false);
+  const [ from, setFrom ] = useState("");
+  const [ userInfo, setUserInfo ] = useState({});
+  const [ findComment, setFindComment ] = useState(-1);
+
+  const [ comments, setComments ] = useState([]);
+  const [ isLoading, setIsLoading ] = useState(true);
+  const [ notFound, setNotFound ] = useState(false);
   const [ userState, setUserState ] = useState({
     isLeader: false,
     isMember: false,
     isWaiting: false
   });
   const { isLeader, isMember, isWaiting } = userState;
-
-  const [isWaitingListOpen, setIsWaitingListOpen] = useState(false);
-  const [isUserInfoModalOpen, setIsUserInfoModalOpen] = useState(false);
-  const [isPartyJoinModalOpen, setIsPartyJoinModalOpen] = useState(false);
-  const [isSigninModalOpen, setIsSigninModalOpen] = useState(false);
-  const [isReviewModalOpen, setIsReviewModalOpen]  = useState(false);
-  const [isPartyCancelModalOpen, setIsPartyCancelModalOpen]  = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
-
-  const [from, setFrom] = useState("");
-  const [userInfo, setUserInfo] = useState({});
-  const [findComment, setFindComment] = useState(-1);
-
   const [ partyInfo, setPartyInfo ] = useState({
     name: "",
     startDate: "",
@@ -377,68 +344,67 @@ export default function Party () {
     }]
   });
 
-  const [ comments, setComments ] = useState([]);
-  
   const formatDate = (date: String) => date.slice(0, 11);
 
-  function handlePartyInfoChange(key: string, value: any){
+  const handlePartyInfoChange = (key: string, value: any) => {
     setPartyInfo({
       ...partyInfo,
       [key]: value,
-    })
-  }
+    });
+  };
 
-  function handleMemberListChange(userInfo: any, action: string){
-    if(action === "accept"){
+  const handleMemberListChange = (userInfo: any, action: string) => {
+    if (action === "accept") {
       setPartyInfo({
         ...partyInfo,
         members: [ ...partyInfo.members, { ...userInfo, joinDate: new Date().toISOString(), isReviewd: false } ]
-      })
-    } else if(action === "refuse"){
+      });
+    }
+    else if (action === "refuse") {
       setPartyInfo({
         ...partyInfo,
         waitingQueue: partyInfo.waitingQueue.filter((waiter) => waiter.id !== userInfo)
-      })
-    } else if(action === "expel"){
+      });
+    }
+    else if (action === "expel") {
       setPartyInfo({
         ...partyInfo,
         members: partyInfo.members.filter((member) => member.id !== userInfo)
-      })
+      });
     }
-  }
+  };
 
-  function handleMemberInfoChange(userId: number, key: string, value: any){
+  const handleMemberInfoChange = (userId: number, key: string, value: any) => {
     const newMemberInfo = partyInfo.members.map((member) => (member.id === userId ? { ...member, [key]: value } : member));
     setPartyInfo({
       ...partyInfo,
       members: newMemberInfo,
-    })
-  }
+    });
+  };
 
-  async function favoriteHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${partyInfo.id}`, { 
+  const favoriteHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${partyInfo.id}`, {
       userId, partyId: partyInfo.id
      }, {
       withCredentials: true
     });
-    if(partyInfo.isFavorite){
+    if (partyInfo.isFavorite) {
       setPartyInfo({
         ...partyInfo,
         favorite: partyInfo.favorite - 1,
         isFavorite: false,
-      })
-    } else {
+      });
+    }
+    else {
       setPartyInfo({
         ...partyInfo,
         favorite: partyInfo.favorite + 1,
         isFavorite: true,
-      }) 
+      });
     }
-    
-  }
+  };
 
-  function shareHandler(event: React.MouseEvent<HTMLButtonElement>) {
-
+  const shareHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     const leader = partyInfo.members.filter((member) => member.id === partyInfo.leaderId)[0];
     const hashtags = partyInfo.tag.map((t) => `#${t}`).join(" ");
 
@@ -446,7 +412,7 @@ export default function Party () {
       objectType: 'feed',
       itemContent: {
         profileText: `${leader.userName}님의 지원 요청!`,
-        profileImageUrl: leader.profileImage, 
+        profileImageUrl: leader.profileImage,
       },
       content: {
         title: `[퀘스트] ${partyInfo.name}`,
@@ -457,58 +423,45 @@ export default function Party () {
           webUrl: `https://fullpartypro.com/party/${params.partyId}`,
         },
       },
-      social: { 
+      social: {
         likeCount: partyInfo.favorite,
-        subscriberCount: partyInfo.members.length 
+        subscriberCount: partyInfo.members.length
       },
       buttonTitle: '퀘스트 참여하기'
-    })
-  }
+    });
+  };
 
-  const tagSearchHandler = (tag: string) => {
-    console.log(tag + "를 검색합니다.");
-    navigate(`../search/tag/${tag}`);
-  }
+  const tagSearchHandler = (tag: string) => navigate(`../search/tag/${tag}`);
 
-  const waitingListHandler = (event: React.MouseEvent<HTMLDivElement>): void =>{
-    setIsWaitingListOpen(!isWaitingListOpen);
-  }
+  const waitingListHandler = (): void => setIsWaitingListOpen(!isWaitingListOpen);
+
+  const editHandler = (event: React.MouseEvent<HTMLButtonElement>) => setIsEdit(!isEdit);
 
   const userInfoModalHandler = (event: React.MouseEvent<HTMLDivElement>, from: string, listIdx: number): void => {
-   
     setFrom(from);
-    if (from === "members") {
-      setUserInfo(partyInfo.members[listIdx]);
-    } 
-    else {
-      setUserInfo(partyInfo.waitingQueue[listIdx]);
-    }
+    if (from === "members") setUserInfo(partyInfo.members[listIdx]);
+    else setUserInfo(partyInfo.waitingQueue[listIdx]);
     setIsUserInfoModalOpen(!isUserInfoModalOpen);
-  }
+  };
 
   const partyJoinModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsPartyJoinModalOpen(!isPartyJoinModalOpen);
-  }
+  };
 
   const signinModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsSigninModalOpen(!isSigninModalOpen);
-  }
+  };
 
   const reviewModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsReviewModalOpen(!isReviewModalOpen);
-  }
+  };
 
   const partyCancelModalHandler = (event: React.MouseEvent<HTMLButtonElement>, from: string): void => {
     setFrom(from);
     setIsPartyCancelModalOpen(!isPartyCancelModalOpen);
-  }
-  
-  const editHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setIsEdit(!isEdit);
-  }
+  };
 
   const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("가입 신청을 취소합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyInfo.id}/cancel/${userId}`);
     const waiterLeft = partyInfo.waitingQueue.filter((waiter) => waiter.id !== userId);
     setPartyInfo({
@@ -519,60 +472,54 @@ export default function Party () {
       ...userState,
       isWaiting: false,
     });
-  }
+  };
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("파티를 탈퇴합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
     const memberLeft = partyInfo.members.filter((member) => member.id !== userId);
     setPartyInfo({
       ...partyInfo,
       members: memberLeft,
-    })
+    });
     setUserState({
       ...userState,
       isMember: false,
     });
-  }
+  };
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("파티 모집을 완료합니다.")
     const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
       partyId: partyInfo.id
     });
-    if(res.status === 200) {
+    if (res.status === 200) {
       setPartyInfo({
         ...partyInfo,
         partyState: 1
-      })
+      });
     }
-  }
+  };
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("파티 모집을 재개합니다.")
     const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
       partyId: partyInfo.id
     });
-    if(res.status === 200) {
+    if (res.status === 200) {
       setPartyInfo({
         ...partyInfo,
         partyState: 0
-      })
+      });
     }
-  }
+  };
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("파티를 해산합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/${partyInfo.id}`);
     navigate('../home');
-  }
+  };
 
   useEffect(() => {
     setIsUserInfoModalOpen(false);
     setIsLoading(true);
-    if(params.commentId){
-      setFindComment(Number(params.commentId));
-    }
+    if (params.commentId) setFindComment(Number(params.commentId));
     axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`)
     .then(res => {
       setPartyInfo(res.data.partyInfo);
@@ -585,14 +532,14 @@ export default function Party () {
       });
     })
     .catch(err => {
-      if(err.response.status === 404){
+      if (err.response.status === 404) {
         setNotFound(true);
         setIsLoading(false);
       }
     });
     setIsLoading(false);
-  }, [params]);
-  
+  }, [ params ]);
+
   useEffect(() => {
     setIsLoading(true);
     if (userId === partyInfo.leaderId) {
@@ -619,14 +566,11 @@ export default function Party () {
     setIsLoading(false);
   }, [ partyInfo ]);
 
-  if(isLoggedIn === "0"){
-    return <Navigate to="../" />
-  } else if(isLoading) {
-    return <Loading />
-  } else if(notFound) {
-    return <NotFound />
-  } else if(isEdit) {
-    return <PartyEdit
+  if (isLoggedIn === "0") return <Navigate to="../" />
+  else if (isLoading) return <Loading />
+  else if (notFound) return <NotFound />
+  else if (isEdit) {
+    <PartyEdit
       party={partyInfo}
       editHandler={editHandler}
     />
@@ -634,8 +578,6 @@ export default function Party () {
 
   return (
     <PartyContainer style={isLoggedIn === "1" ? {} : { marginBottom: "50px" }}>
-
-      {/* 뒤로가기, 관심파티, 공유 버튼 */}
       <CVBtns>
         <div className="flexBox">
           <button onClick={() => navigate(-1)}>
@@ -718,7 +660,6 @@ export default function Party () {
           </div>
         </FavAndTag>
 
-        {/* 글 내용 */}
         <section className="contentContainer">
           <pre className="content">
             { partyInfo.content }
@@ -796,14 +737,14 @@ export default function Party () {
             findComment={findComment}
           /> 
         </section>
-        
+
         <PartyStateBtns>
           {isLoggedIn === "0" ?
             <div className="signinMsgContainer">
               <div className="signinMsg">
                 <b>로그인</b>해서 이 파티의 회원이 되어보세요! 🥳
               </div>
-              <button id="signin" onClick={signinModalHandler}>press start</button>    
+              <button id="signin" onClick={signinModalHandler}>press start</button>
             </div>
           : null}
 

@@ -1,21 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
-import AWS from 'aws-sdk';
-
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
-
-import { useSelector } from 'react-redux';
-import { AppState } from '../reducers';
-import { RootReducerType } from '../store/store';
-
+import AWS from 'aws-sdk';
 import PostCancelModal from '../components/PostCancelModal';
 import Slider from 'rc-slider';
 import ErrorModal from '../components/ErrorModal';
 import Loading from '../components/Loading';
 import AddressInput from '../components/AddressInput';
+import { Navigate, useNavigate } from 'react-router';
+import { useSelector } from 'react-redux';
+import { AppState } from '../reducers';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
+import { RootReducerType } from '../store/store';
 
 export const PostContainer = styled.div`
   width: 100%;
@@ -26,7 +23,7 @@ export const PostContainer = styled.div`
   z-index: 910;
   margin: 60px 0;
   overflow: hidden;
-`
+`;
 
 export const TopNavigation = styled.nav`
   width: 100vw;
@@ -56,7 +53,7 @@ export const TopNavigation = styled.nav`
       }
     }
   }
-`
+`;
 
 export const BottomNavigation = styled.nav`
   width: 100vw;
@@ -88,7 +85,7 @@ export const BottomNavigation = styled.nav`
       margin-bottom: 3px;
     }
   }
-`
+`;
 
 export const PostCard = styled.div`
   width: 100%;
@@ -104,7 +101,6 @@ export const PostCard = styled.div`
       font-weight: bold;
       &.content {
         margin-bottom: 15px;
-        
         display: flex;
         align-items: center;
         .error {
@@ -211,7 +207,7 @@ export const PostCard = styled.div`
   @media screen and (min-width: 790px) {
     padding: 40px 20%;
   }
-`
+`;
 
 export const SliderContainer = styled.div`
   .sign {
@@ -507,8 +503,7 @@ export const SliderContainer = styled.div`
     border-width: 4px 4px 0;
     border-top-color: #6c6c6c;
   }
-  
-`
+`;
 
 export const TagInput = styled.div`
   > ul {
@@ -534,8 +529,7 @@ export const TagInput = styled.div`
       }
     }
   }
- 
-`
+`;
 
 export const Button = styled.button`
   width: 250px;
@@ -547,14 +541,14 @@ export const Button = styled.button`
   font-size: 1.5rem;
   color: white;
   margin-bottom: 30px;
-`
+`;
 
 type Props = {
   party: { [key: string]: any },
-  editHandler: Function,
-}
+  editHandler: Function
+};
 
-export default function PartyEdit ({ party, editHandler }: Props) {
+export default function PartyEdit({ party, editHandler }: Props) {
   const navigate = useNavigate();
   const fileRef = useRef<any>();
   const imgRef = useRef<any>(null);
@@ -564,100 +558,72 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     credentials: new AWS.CognitoIdentityCredentials({
       IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
     })
-  })
+  });
 
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
+  const signinReducer = useSelector(
+    (state: RootReducerType) => state.signinReducer
+  );
 
-  const [partyInfo, setPartyInfo] = useState(party);
+  const [  isName, setIsName  ] = useState({ err: false, msg: '' });
+  const [ isStrDate, setIsStrDate ] = useState({ err: false, msg: '' });
+  const [ isEndDate, setIsEndDate ] = useState({ err: false, msg: '' });
+  const [ isContent, setIsContent ] = useState({ err: false, msg: '' });
+  const [ isPLink, setIsPLink ] = useState({ err: false, msg: '' });
+  const [ isLocation, setIsLocation ] = useState({ err: false, msg: '' });
 
-  const [isName, setIsName] = useState({
-    err: false,
-    msg: ''
-  })
+  const [ partyInfo, setPartyInfo ] = useState(party);
+  const [ tags, setTags ] = useState<string[]>(partyInfo.tag);
+  const [ inputTxt, setInputTxt ] = useState('');
 
-  const [isStrDate, setIsStrDate] = useState({
-    err: false,
-    msg: ''
-  })
-
-  const [isEndDate, setIsEndDate] = useState({
-    err: false,
-    msg: ''
-  })
-
-  const [isContent, setIsContent] = useState({
-    err: false,
-    msg: ''
-  })
-
-  const [isPLink, setIsPLink] = useState({
-    err: false,
-    msg: ''
-  })
-
-  const [isLocation, setIsLocation] = useState({
-    err: false,
-    msg: ''
-  })
-  
-  const [tags, setTags] = useState<string[]>(partyInfo.tag);
-  const [inputTxt, setInputTxt] = useState('');
-  const [isOnline, setIsOnline] = useState(false);
-  const [isPosted, setIsPosted] = useState(false);
-  const [imgLoading, setImgLoading] = useState(false);
-
-  const [cancelModal, setCancelModal] = useState(false);
-  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [ isOnline, setIsOnline ] = useState(false);
+  const [ isPosted, setIsPosted ] = useState(false);
+  const [ imgLoading, setImgLoading ] = useState(false);
+  const [ cancelModal, setCancelModal ] = useState(false);
+  const [ isErrorModalOpen, setIsErrorModalOpen] = useState(false);
 
   const handleRefClick = (e: any) => {
     e.preventDefault();
     fileRef.current.click();
-  }
-  const handleImgLoad = async (e: any) => {
-    setImgLoading(true)
-    let file = e.target.files[0]
+  };
 
+  const handleImgLoad = async (e: any) => {
+    setImgLoading(true);
+    let file = e.target.files[0];
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
         Key: `${signinReducer.userInfo.id}_${partyInfo.name}_edit_image`,
         Body: file,
       }
-    })
-    const promise = upload.promise()
-
+    });
+    const promise = upload.promise();
     promise.then(
-      function (data) {
-        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
+      (data) => {
+        console.log("✅ Uploaded Successfully")
         setPartyInfo({
           ...partyInfo,
           image: data.Location
         })
         setImgLoading(false)
       },
-      function (err) {
-        return console.log('오류가 발생했습니다: ', err.message)
-      }
-    )
-  }
+      (err) => console.log("🚫 Upload Failed")
+    );
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    
-    const {name, value} = e.target;
-
+    const { name, value } = e.target;
     setPartyInfo({
       ...partyInfo,
       [name]: value
     });
-
-    if(partyInfo.name) { setIsName({ err: false, msg: ''}) }
-    if(partyInfo.location) { setIsLocation({ err: false, msg: '' }) }
-    if(partyInfo.privateLink) { setIsPLink({ err: false, msg: '' }) }
-    if(partyInfo.content) { setIsContent({ err: false, msg: '' }) }
-  }
+    if (partyInfo.name) setIsName({ err: false, msg: ''});
+    if (partyInfo.location) setIsLocation({ err: false, msg: '' });
+    if (partyInfo.privateLink) setIsPLink({ err: false, msg: '' });
+    if (partyInfo.content) setIsContent({ err: false, msg: '' });
+  };
 
   const handleLocationChange = (location: string) => {
     setPartyInfo({
@@ -666,43 +632,43 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     });
   }
 
-  function getCurrentDate() {
+  const getCurrentDate = () => {
     let newDate = new Date();
     let date = newDate.getDate();
     let month = newDate.getMonth() + 1;
     let year = newDate.getFullYear();
-    
-    return `${year}-${month<10?`0${month}`:`${month}`}-${date}`
-  }
+    return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
+  };
 
-  function validationCheck(){
-    if(partyInfo.startDate > partyInfo.endDate){
+  const validationCheck = () => {
+    if (partyInfo.startDate > partyInfo.endDate) {
       setIsEndDate({
         err: true,
         msg: '종료일이 시작일보다 빠를 수 없습니다.'
-      })
-    } else {
+      });
+    }
+    else {
       setIsStrDate({
         err: false,
         msg: '',
-      })
-      
+      });
       setIsEndDate({
         err: false,
         msg: ''
-      })
+      });
     }
 
-    if(partyInfo.startDate > partyInfo.endDate){
+    if (partyInfo.startDate > partyInfo.endDate) {
       setIsEndDate({
         err: true,
         msg: '종료일이 시작일보다 빠를 수 없습니다.'
-      })
-    } else {
+      });
+    }
+    else {
       setIsEndDate({
         err: false,
         msg: ''
-      })
+      });
     }
   }
 
@@ -710,136 +676,118 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     setPartyInfo({
       ...partyInfo,
       memberLimit: value
-    })
-  }
+    });
+  };
 
   const handleCoordsChange = (lat: number, lng: number) => {
     setPartyInfo({
       ...partyInfo,
       latlng: { lat: lat, lng: lng }
-    })
-  }
+    });
+  };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const {name, value} = e.target
-
+    const { name, value } = e.target;
     setPartyInfo({
       ...partyInfo,
       [name]: value
-    })
-
-    if(partyInfo.content !== '') {
+    });
+    if (partyInfo.content !== '') {
       setIsContent({
         err: false,
         msg: ''
-      })
+      });
     }
-  }
+  };
 
   const handleOnOff = (isOnline: boolean) => {
-    if(isOnline === true){
-      setIsOnline(true);
-    } else {
-      setIsOnline(false);
-    }
-  }
+    if(isOnline === true) setIsOnline(true);
+    else setIsOnline(false);
+  };
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space') {
-      if(!tags.includes(inputTxt) && inputTxt && tags.length < 3) {
-        setTags([...tags, inputTxt])
-        setInputTxt('')
+    if (e.code === 'Enter' || e.code === 'Space') {
+      if (!tags.includes(inputTxt) && inputTxt && tags.length < 3) {
+        setTags([...tags, inputTxt]);
+        setInputTxt('');
       }
     }
-  }
+  };
 
   const removeTag = (index: number) => {
-    setTags(tags.filter((tag) => {
-      return tags.indexOf(tag) !== index
-    }))
-  }
+    setTags(tags.filter((tag) => tags.indexOf(tag) !== index));
+  };
 
   const postCancelHandler = () => {
-    if(cancelModal) {
-      setCancelModal(false)
-    } else{
-      setCancelModal(true)
-    }
-  }
+    if (cancelModal) setCancelModal(false);
+    else setCancelModal(true);
+  };
 
   const errorModalHandler = () => {
-    if(isErrorModalOpen) {
-      setIsErrorModalOpen(false);
-    } else{
-      setIsErrorModalOpen(true);
-    }
-  }
-
+    if (isErrorModalOpen) setIsErrorModalOpen(false);
+    else setIsErrorModalOpen(true);
+  };
 
   const backToPage = () => {
-    if(partyInfo.location){
-      navigate(-2);
-    } else {
-      navigate(-1);
-    }
-  }
-  
+    editHandler();
+  };
+
   const editParty = () => {
-    const regex = {        
+    const regex = {
       url: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
     };
-
-    if(partyInfo.name === '') {
+    if (partyInfo.name === '') {
       setIsName({
         err: true,
         msg: '퀘스트 제목을 입력해주세요.'
-      })
+      });
     }
-    if(partyInfo.startDate === '') {
+    if (partyInfo.startDate === '') {
       setIsStrDate({
         err: true,
         msg: '퀘스트 시작하는 날을 선택해주세요.'
-      })
+      });
     }
-    if(partyInfo.endDate === '') {
+    if (partyInfo.endDate === '') {
       setIsEndDate({
         err: true,
         msg: '퀘스트가 끝나는 날을 선택해주세요.'
-      })
+      });
     }
-    if(partyInfo.content === '') {
+    if (partyInfo.content === '') {
       setIsContent({
         err: true,
         msg: '퀘스트 내용을 입력해주세요.'
-      })
+      });
     }
-    if(partyInfo.location === '') {
+    if (partyInfo.location === '') {
       setIsLocation({
         err: true,
         msg: '퀘스트 장소를 입력해주세요.'
-      })
+      });
     }
-
-    if(partyInfo.privateLink === '') {
+    if (partyInfo.privateLink === '') {
       setIsPLink({
         err: true,
         msg: '오픈채팅방 링크를 입력해주세요.'
-      })
-    } else if(!regex.url.test(partyInfo.privateLink)) {
+      });
+    }
+    else if (!regex.url.test(partyInfo.privateLink)) {
       setIsPLink({
         err: true,
         msg: "유효한 링크를 입력해주세요. 링크는 'https://'를 포함합니다."
-      })
+      });
     }
 
-    if(partyInfo.name && partyInfo.startDate && partyInfo.endDate && partyInfo.location && partyInfo.privateLink && regex.url.test(partyInfo.privateLink) && partyInfo.content &&
-      !isName.err && !isStrDate.err && !isEndDate.err && !isContent.err && !isLocation.err && !isPLink.err){
+    if (partyInfo.name && partyInfo.startDate && partyInfo.endDate && partyInfo.location &&
+      partyInfo.privateLink && regex.url.test(partyInfo.privateLink) && partyInfo.content &&
+      !isName.err && !isStrDate.err && !isEndDate.err && !isContent.err && !isLocation.err &&
+      !isPLink.err) {
         setIsPosted(true);
-    }
+      }
   }
 
   const patchParty = async () => {
-
     const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/edit/${partyInfo.id}`, {
       userId: signinReducer.userInfo?.id,
       partyId: partyInfo.id,
@@ -859,20 +807,16 @@ export default function PartyEdit ({ party, editHandler }: Props) {
         privateLink: partyInfo.privateLink,
         tag: tags
       }
-    }, {
-      withCredentials: true
-    });
-    console.log(res);
-
+    }, { withCredentials: true });
     return res;
   }
 
-    useEffect(() => {
-      validationCheck();
-    }, [partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink]);
+  useEffect(() => {
+    validationCheck();
+  }, [ partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink ]);
 
   useEffect(() => {
-    if(isPosted){
+    if (isPosted) {
       patchParty()
       .then((res) => {
         setIsPosted(false);
@@ -884,196 +828,194 @@ export default function PartyEdit ({ party, editHandler }: Props) {
         setIsPosted(false);
       })
     }
-  }, [isPosted])
+  }, [ isPosted ]);
 
-    if(!isLoggedIn){
-      return <Navigate to="/" />
-    }
-    
-    return (
-      <PostContainer>
-        {cancelModal ?
-          <PostCancelModal 
-            postCancelHandler={postCancelHandler}
-            backToPage={backToPage}
-          />
-        : null}
-        {isErrorModalOpen ?
-          <ErrorModal 
-            errorModalHandler={errorModalHandler}
-          />
-        : null}
-        <TopNavigation>
-          <button className="cancelBtn" onClick={postCancelHandler}>
-            <FontAwesomeIcon icon={ faArrowLeft } className="icon" /> 
-          </button>
-          <div className="partyName">{partyInfo.name}</div>
-          <button className="post" onClick={editParty}>
-            수정
-          </button>
-        </TopNavigation>
-        <PostCard>
-          <section className="basicInfo">
-            <div className="imageContainer">
-              {imgLoading ? <Loading /> :
-              <>
-                <img className="preview" src={partyInfo.image} alt="thumbnail"
-                  onError={() => {
-                    return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
-                  }}
-                />
-                <input 
-                  ref={fileRef}
-                  type='file'
-                  className='imgInput'
-                  id='partyImg'
-                  accept='image/*'
-                  name='file'
-                  hidden={true}
-                  onChange={handleImgLoad}
-                />
-              </>
-              }
-            </div>
-            <div className="infoContainer">
-              <fieldset>
-                <div className='label'>퀘스트 제목</div>
-                <input
-                  name='name'
-                  type='text'
-                  value={partyInfo.name}
-                  maxLength={30}
-                  onChange={(e) => {handleInputChange(e)}}
-                />
-                {isName.err ?
-                <div className='error'>{isName.msg}</div> : null}
-              </fieldset>
-              <fieldset>
-                <div className='label'>퀘스트 기간</div>
-                <div className="startDate">
-                  <div className='date'>시작일</div>
-                  <input
-                    name='startDate'
-                    type='date'
-                    className="startDate"
-                    min={getCurrentDate()}
-                    value={partyInfo.startDate}
-                    onChange={(e) => {handleInputChange(e)}}
-                  />
-                  {isStrDate.err ?
-                  <div className='error'>{isStrDate.msg}</div> : null}
-                </div>
-                <div className="endDate">
-                  <div className='date'>종료일</div>
-                  <input
-                    name='endDate'
-                    type='date'
-                    min={partyInfo.startDate}
-                    value={partyInfo.endDate}
-                    onChange={(e) => {handleInputChange(e)}}
-                  />
-                  {isEndDate.err ?
-                  <div className='error'>{isEndDate.msg}</div> : null}
-                </div>
-              </fieldset>
+  if (!isLoggedIn) return <Navigate to="/" />
 
-              <fieldset>
-                <div className='label'>파티 정원 <span style={{ fontWeight: "normal" }}>(1/{partyInfo.memberLimit})</span></div>
-                <SliderContainer>
-                  <Slider 
-                    min={2}
-                    max={10}
-                    step={1}
-                    value={partyInfo.memberLimit}
-                    onChange={handleSlider}
-                  >
-                    <div className="sign" style={{ left: `${(partyInfo.memberLimit)*12.5-26}%` }}>
-                      <span id="value">{partyInfo.memberLimit}</span>
-                    </div>
-                  </Slider>
-                </SliderContainer>
-              </fieldset>
-
-            </div>
-          </section>
-
-          <section className="infoDetails">
-            <fieldset>
-              <div className='locationTitle'>
-                <div className='label'>퀘스트 장소</div>
-              </div>
-              <AddressInput 
-                partyInfo={partyInfo}
-                handleCoordsChange={handleCoordsChange}
-                handleLocationChange={handleLocationChange}
-                handleOnOff={handleOnOff}
+  return (
+    <PostContainer>
+      {cancelModal ?
+        <PostCancelModal 
+          postCancelHandler={postCancelHandler}
+          backToPage={backToPage}
+        />
+      : null}
+      {isErrorModalOpen ?
+        <ErrorModal 
+          errorModalHandler={errorModalHandler}
+        />
+      : null}
+      <TopNavigation>
+        <button className="cancelBtn" onClick={postCancelHandler}>
+          <FontAwesomeIcon icon={ faArrowLeft } className="icon" /> 
+        </button>
+        <div className="partyName">{partyInfo.name}</div>
+        <button className="post" onClick={editParty}>
+          수정
+        </button>
+      </TopNavigation>
+      <PostCard>
+        <section className="basicInfo">
+          <div className="imageContainer">
+            {imgLoading ? <Loading /> :
+            <>
+              <img className="preview" src={partyInfo.image} alt="thumbnail"
+                onError={() => {
+                  return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
+                }}
               />
-              {isLocation.err ?
-                <div className='error'>{isLocation.msg}</div> 
-              : null}
-            </fieldset>
+              <input 
+                ref={fileRef}
+                type='file'
+                className='imgInput'
+                id='partyImg'
+                accept='image/*'
+                name='file'
+                hidden={true}
+                onChange={handleImgLoad}
+              />
+            </>
+            }
+          </div>
+          <div className="infoContainer">
             <fieldset>
-              <div className='label'>오픈채팅방 링크</div>
-              <div className="details">
-                파티원들간의 소통을 위한 오픈채팅방 링크를 입력해주세요.
-              </div>
+              <div className='label'>퀘스트 제목</div>
               <input
-                name='privateLink'
+                name='name'
                 type='text'
-                value={partyInfo.privateLink}
+                value={partyInfo.name}
+                maxLength={30}
                 onChange={(e) => {handleInputChange(e)}}
               />
-              {isPLink.err ?
-              <div className='error'>{isPLink.msg}</div> : null}
+              {isName.err ?
+              <div className='error'>{isName.msg}</div> : null}
             </fieldset>
             <fieldset>
-              <div className='label'>태그</div>
-              <TagInput>
-                <ul id='tags'>
-                  {tags.map((tag, index) => (
-                    <li key={index} className='tag'>
-                      <span className='tagTitle'>{tag}</span>
-                      <span className='tagIcon' onClick={() => {removeTag(index)}}>
-                        <FontAwesomeIcon icon={faTimes} />
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+              <div className='label'>퀘스트 기간</div>
+              <div className="startDate">
+                <div className='date'>시작일</div>
                 <input
-                  className='tag-input'
-                  name='tagInput'
-                  type='text'
-                  maxLength={10}
-                  value={inputTxt}
-                  placeholder={tags.length === 3 ? '' : '최대 3개까지 추가할 수 있습니다.'}
-                  onChange={(e) => setInputTxt(e.target.value)}
-                  onKeyUp={(e) => addTag(e)}
+                  name='startDate'
+                  type='date'
+                  className="startDate"
+                  min={getCurrentDate()}
+                  value={partyInfo.startDate}
+                  onChange={(e) => {handleInputChange(e)}}
                 />
-              </TagInput>
-            </fieldset>
-            <fieldset>
-              <div className='label content'>
-                퀘스트 내용
-                {isContent.err ? <div className='error'>{isContent.msg}</div> : null}  
+                {isStrDate.err ?
+                <div className='error'>{isStrDate.msg}</div> : null}
               </div>
-              <textarea
-                placeholder='파티원들이 퀘스트 내용을 이해할 수 있도록 자세히 작성해주세요.'
-                name='content'
-                value={partyInfo.content}
-                onChange={(e) => {handleTextareaChange(e)}}
-              />
+              <div className="endDate">
+                <div className='date'>종료일</div>
+                <input
+                  name='endDate'
+                  type='date'
+                  min={partyInfo.startDate}
+                  value={partyInfo.endDate}
+                  onChange={(e) => {handleInputChange(e)}}
+                />
+                {isEndDate.err ?
+                <div className='error'>{isEndDate.msg}</div> : null}
+              </div>
             </fieldset>
-          </section>
 
-          <div className='btn'>
-            <Button onClick={editParty} disabled={isPosted}>QUEST</Button>
+            <fieldset>
+              <div className='label'>파티 정원 <span style={{ fontWeight: "normal" }}>(1/{partyInfo.memberLimit})</span></div>
+              <SliderContainer>
+                <Slider 
+                  min={2}
+                  max={10}
+                  step={1}
+                  value={partyInfo.memberLimit}
+                  onChange={handleSlider}
+                >
+                  <div className="sign" style={{ left: `${(partyInfo.memberLimit)*12.5-26}%` }}>
+                    <span id="value">{partyInfo.memberLimit}</span>
+                  </div>
+                </Slider>
+              </SliderContainer>
+            </fieldset>
+
           </div>
-        </PostCard>
-        <BottomNavigation>
-          <button className="button" onClick={(e) => handleRefClick(e)}>
-            <FontAwesomeIcon icon={ faCamera } className="icon" /> 사진 등록
-          </button>
-        </BottomNavigation>
-      </PostContainer>
-    );
-  }
+        </section>
+
+        <section className="infoDetails">
+          <fieldset>
+            <div className='locationTitle'>
+              <div className='label'>퀘스트 장소</div>
+            </div>
+            <AddressInput 
+              partyInfo={partyInfo}
+              handleCoordsChange={handleCoordsChange}
+              handleLocationChange={handleLocationChange}
+              handleOnOff={handleOnOff}
+            />
+            {isLocation.err ?
+              <div className='error'>{isLocation.msg}</div> 
+            : null}
+          </fieldset>
+          <fieldset>
+            <div className='label'>오픈채팅방 링크</div>
+            <div className="details">
+              파티원들간의 소통을 위한 오픈채팅방 링크를 입력해주세요.
+            </div>
+            <input
+              name='privateLink'
+              type='text'
+              value={partyInfo.privateLink}
+              onChange={(e) => {handleInputChange(e)}}
+            />
+            {isPLink.err ?
+            <div className='error'>{isPLink.msg}</div> : null}
+          </fieldset>
+          <fieldset>
+            <div className='label'>태그</div>
+            <TagInput>
+              <ul id='tags'>
+                {tags.map((tag, index) => (
+                  <li key={index} className='tag'>
+                    <span className='tagTitle'>{tag}</span>
+                    <span className='tagIcon' onClick={() => {removeTag(index)}}>
+                      <FontAwesomeIcon icon={faTimes} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <input
+                className='tag-input'
+                name='tagInput'
+                type='text'
+                maxLength={10}
+                value={inputTxt}
+                placeholder={tags.length === 3 ? '' : '최대 3개까지 추가할 수 있습니다.'}
+                onChange={(e) => setInputTxt(e.target.value)}
+                onKeyUp={(e) => addTag(e)}
+              />
+            </TagInput>
+          </fieldset>
+          <fieldset>
+            <div className='label content'>
+              퀘스트 내용
+              {isContent.err ? <div className='error'>{isContent.msg}</div> : null}  
+            </div>
+            <textarea
+              placeholder='파티원들이 퀘스트 내용을 이해할 수 있도록 자세히 작성해주세요.'
+              name='content'
+              value={partyInfo.content}
+              onChange={(e) => {handleTextareaChange(e)}}
+            />
+          </fieldset>
+        </section>
+
+        <div className='btn'>
+          <Button onClick={editParty} disabled={isPosted}>QUEST</Button>
+        </div>
+      </PostCard>
+      <BottomNavigation>
+        <button className="button" onClick={(e) => handleRefClick(e)}>
+          <FontAwesomeIcon icon={ faCamera } className="icon" /> 사진 등록
+        </button>
+      </BottomNavigation>
+    </PostContainer>
+  );
+}

@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
-
 import styled from 'styled-components';
-
 import { Map, MapMarker, CustomOverlayMap, Circle } from 'react-kakao-maps-sdk';
 
 export const MapContainer = styled.section`
-
   width: 100%;
   display: flex;
   justify-content: center;
@@ -24,10 +21,10 @@ export const MapContainer = styled.section`
   }
 
   .infoWindow:nth-of-type(n) {
-    border: 0; 
+    border: 0;
     box-shadow: 0px 1px 2px #999;
   }
-  
+
   .infoWindow a {
     display:block;
     text-decoration:none;
@@ -52,20 +49,6 @@ export const MapContainer = styled.section`
   }
 
   .infoWindow:after {
-    /* // 그림자 없는 것
-    content: '';
-    position:absolute;
-    margin-left:-12px;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border: 10px solid transparent;
-    border-top-color: #fff;
-    border-bottom: 0;
-    margin-left: -10px;
-    margin-bottom: -10px; */
-
     content:'';
     position:absolute;
     margin-left:-12px;
@@ -87,32 +70,28 @@ export const MapContainer = styled.section`
 type Props = {
   isMember: boolean,
   location: string,
-  image: string,
+  image: string
 };
 
-export default function PartyMap ({ isMember, location, image }: Props) {
-
+export default function PartyMap({ isMember, location, image }: Props) {
   const { kakao } = window;
-
-  const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
+  const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
-
   const level = (isMember ? 4 : 5);
   const zoomable = (isMember ? true : false);
 
   useEffect(() => {
-
     const geocoder = new kakao.maps.services.Geocoder();
-
-    geocoder.addressSearch(location, function(result: any, status: any) {
-      if (status === kakao.maps.services.Status.OK) {
-        const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
-        const { La, Ma } = coordinates;
-        setCoords({ lat: Ma, lng: La });
-      }
-    });
-
-  }, [location]);
+    if (location) {
+      geocoder.addressSearch(location, (result: any, status: any) => {
+        if (status === kakao.maps.services.Status.OK) {
+          const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
+          const { La, Ma } = coordinates;
+          setCoords({ lat: Ma, lng: La });
+        }
+      });
+    }
+  }, [ location ]);
 
   return (
     <MapContainer>
@@ -140,7 +119,7 @@ export default function PartyMap ({ isMember, location, image }: Props) {
               <div className="partyImg" style={{background: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center"}} />
             </CustomOverlayMap>
           </>
-        : 
+        :
           <Circle
             center={coords}
             radius={800}
@@ -164,7 +143,7 @@ export default function PartyMap ({ isMember, location, image }: Props) {
               >
                 <span className="title">퀘스트 장소</span>
               </a>
-            : 
+            :
               <a href="#" onClick={e => e.preventDefault()}>
                 <span className="title">퀘스트 장소</span>
               </a>
@@ -173,5 +152,5 @@ export default function PartyMap ({ isMember, location, image }: Props) {
         </CustomOverlayMap>
       </Map>
     </MapContainer>
-  )
+  );
 }

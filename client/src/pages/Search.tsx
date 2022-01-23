@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import styled from 'styled-components';
+import LocalQuest from '../components/LocalQuest';
+import EmptyCard from '../components/EmptyCard';
+import Loading from '../components/Loading';
 import { useDispatch } from 'react-redux';
 import { cookieParser, requestKeepLoggedIn } from "../App";
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { NOTIFY } from '../actions/notify';
 import { useSelector } from 'react-redux';
 import { AppState } from '../reducers';
 import { RootReducerType } from '../store/store';
-
-import LocalQuest from '../components/LocalQuest';
-import EmptyCard from '../components/EmptyCard';
-import Loading from '../components/Loading';
 
 export const SearchContainer = styled.div`
   width: 100%;
@@ -23,7 +22,7 @@ export const SearchContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`
+`;
 
 export const SearchBar = styled.div`
   width: 100%;
@@ -32,6 +31,7 @@ export const SearchBar = styled.div`
   margin: 15px 0;
   justify-content: center;
   align-items: center;
+
   input {
     width: 90%;
     max-width: 1100px;
@@ -45,36 +45,42 @@ export const SearchBar = styled.div`
       outline-style:none;
     }
   }
+
   .faSearch {
     position: absolute;
     right: 10%;
     color: #888;
     cursor: pointer;
   }
+
   @media screen and (min-width: 650px) {
     .faSearch {
       right: 8%;
     }
   }
+
   @media screen and (min-width: 1000px) {
     .faSearch {
       right: 20%;
     }
   }
-`
+`;
 
 export const SearchContent = styled.div`
   padding: 16px 1%;
   padding-top: 16px;
+
   .result {
     width: 100%;
     height: 100%;
+
     .resultLabel {
       font-size: 1.7rem;
       font-weight: bold;
       margin-bottom: 15px;
     }
   }
+
   .tag {
     padding: 8px 15px;
     margin: 0 10px 15px 0;
@@ -85,51 +91,48 @@ export const SearchContent = styled.div`
     color: #777;
     cursor: pointer;
   }
+
   @media screen and (min-width: 700px) {
     padding: 16px 4%;
   }
-`
+`;
 
-export default function Search () {
+export default function Search() {
   const navigate = useNavigate();
-  const params = useParams();
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
+  const params = useParams();
+
+  const signinReducer = useSelector(
+    (state: RootReducerType) => state.signinReducer
   );
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
+  const userId = useSelector(
+    (state: AppState) => state.signinReducer.userInfo?.id
+  );
+
   const userAddress = signinReducer.userInfo?.address;
   const searchRegion = userAddress.split(" ")[0] + " " + userAddress.split(" ")[1];
-  const userId = useSelector((state: AppState) => state.signinReducer.userInfo?.id);
 
-  const [word, setWord] = useState<string | undefined>('');
-  const [parties, setParties] = useState<any>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [ word, setWord ] = useState<string | undefined>('');
+  const [ parties, setParties ] = useState<any>([]);
+  const [ isLoading, setIsLoading ] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWord(e.target.value)
-  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setWord(e.target.value);
+
+  const searchQuest = () => navigate(`../search/keyword/${word}`);
+
+  const hashtagHandler = (tag: string) => navigate(`/search/tag/${tag}`);
+
   const enterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.key === 'Enter') {
-      searchQuest()
-    }
-  }
-
-  const searchQuest = () => {
-    navigate(`../search/keyword/${word}`)
-  }
-
-  const hashtagHandler = (tag: string) => {
-    navigate(`/search/tag/${tag}`)
-  }
+    if (e.key === 'Enter') searchQuest();
+  };
 
   useEffect(() => {
     let isComponentMounted = true;
     setIsLoading(true);
-    if(params.tag){
+    if (params.tag) {
       const tag = params.tag;
       const searchData = async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${tag}&region=${searchRegion}&userId=${userId}`)
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${tag}&region=${searchRegion}&userId=${userId}`);
         const partyData = res.data.result;
         const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
         dispatch({
@@ -142,14 +145,13 @@ export default function Search () {
           setWord(tag);
           setParties(parsedData);
         }
-
       }
       searchData();
-    } 
-    else if(params.keyword){
+    }
+    else if (params.keyword) {
       const keyword = params.keyword;
       const searchData = async () => {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${keyword}&region=${searchRegion}&userId=${userId}`)
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${keyword}&region=${searchRegion}&userId=${userId}`);
         const partyData = res.data.result;
         const parsedData = partyData.map((party: any) => ({ ...party, latlng: JSON.parse(party.latlng) }));
         dispatch({
@@ -165,19 +167,14 @@ export default function Search () {
       }
       searchData();
     }
-
     setIsLoading(false)
     return () => {
       isComponentMounted = false
     }
+  }, [ params ]);
 
-  },[params])
-  
-  if(cookieParser().isLoggedIn === "0"){
-    return <Navigate to="../" />
-  } else if(isLoading){
-    return <Loading />
-  }
+  if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />
+  else if (isLoading) return <Loading />
 
   return (
     <SearchContainer>
@@ -196,20 +193,20 @@ export default function Search () {
       </SearchBar>
       <SearchContent>
         {(() => {
-          if(!params.tag && !params.keyword) {
+          if (!params.tag && !params.keyword) {
             return (
               <div className='result'>
               </div>
             )
           }
-          else if(parties.length !== 0) {
+          else if (parties.length !== 0) {
             return(
               <div className='result'>
                 <LocalQuest location={userAddress} localParty={parties} /> 
               </div>
             )
           }
-          else if(parties.length === 0) {
+          else if (parties.length === 0) {
             return (
               <EmptyCard from="search" />
             )

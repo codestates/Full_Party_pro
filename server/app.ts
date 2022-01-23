@@ -40,15 +40,15 @@ app.use("/party", partyRouter);
 app.use("/favorite", favoriteRouter);
 app.use("/search", searchRouter);
 app.use("/notification", notificationRouter);
+
 app.use((req, res) => {
-  res.status(400).json({ message: "Invalid request" });
+  res.status(400).json({ message: "Invalid Request" });
 });
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  res.status(500).json({ message: `Something went wrong: ${err}` });
+  res.status(500).json({ message: `Something Went Wrong: ${err}` });
 });
 
 const HTTPS_PORT = config.port || 80;
-
 let server;
 if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
   const privateKey = fs.readFileSync(__dirname + '/key.pem', 'utf8');
@@ -62,9 +62,7 @@ if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
       .catch(error => console.log(error));
     console.log(`✅ https server running in ${HTTPS_PORT}`);
   });
-} 
-else {
-  server = app.listen(HTTPS_PORT, () => console.log('✅ http server running'));
 }
+else server = app.listen(HTTPS_PORT, () => console.log('✅ http server running'));
 
 export default server;

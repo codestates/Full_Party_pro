@@ -538,7 +538,7 @@ export const updateLevel = async (userId: number, exp: number, level: number) =>
           level: i
         };
         createNotification(notificationInfo);
-        break;
+        return;
       }
       else if (level > i) {
         const notificationInfo: NotificationAttributes = {
@@ -548,8 +548,9 @@ export const updateLevel = async (userId: number, exp: number, level: number) =>
           level: i
         };
         createNotification(notificationInfo);
-        break;
+        return;
       }
+      else return;
     }
   }
 };
