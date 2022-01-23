@@ -329,15 +329,6 @@ export default function Party () {
   });
   const { isLeader, isMember, isWaiting } = userState;
 
-  //[dev] 모달 관련 코드 객체 하나로 합쳐보기
-  // const [isModalOpen, setIsModalOpen] = useState({
-  //   userInfoModal: false,
-  //   partyJoinModal: false,
-  //   signinModal: false,
-  //   reviewModal: false,
-  //   partyCancelModal: false,
-  // })
-
   const [isWaitingListOpen, setIsWaitingListOpen] = useState(false);
   const [isUserInfoModalOpen, setIsUserInfoModalOpen] = useState(false);
   const [isPartyJoinModalOpen, setIsPartyJoinModalOpen] = useState(false);
@@ -638,6 +629,11 @@ export default function Party () {
     return <Loading />
   } else if(notFound) {
     return <NotFound />
+  } else if(isEdit) {
+    <PartyEdit
+      party={partyInfo}
+      editHandler={editHandler}
+    />
   }
 
   return (
@@ -666,8 +662,6 @@ export default function Party () {
       </CVBtns>
 
       <Main>
-
-        {/* 썸네일과 타이틀, 채팅방 링크 */}
         <header>
           <img src={partyInfo.image} className="thumbnail" alt="thumbnail" />
           <div className="titleContainer">
@@ -701,7 +695,6 @@ export default function Party () {
           </div>
         </header>
 
-        {/* 관심 파티와 해쉬태그 */}
         <FavAndTag>
           <button className="favoriteContainer" 
             onClick={favoriteHandler}
@@ -736,7 +729,6 @@ export default function Party () {
           </pre>
         </section>
 
-        {/* 지역과 일정 */}
         <TimeandLocation>
           <div className="topWrapper">
             <div className="details">
@@ -758,7 +750,6 @@ export default function Party () {
           : null}
         </TimeandLocation>
 
-        {/* 지도 */}
         {!partyInfo.isOnline? 
           <div className="mapDesc">
             <PartyMap
@@ -770,7 +761,6 @@ export default function Party () {
           </div> 
         : null}
 
-        {/* 파티원과 대기자 리스트 */}
         <MembersContainer>
           <div className="members">
             <div className="label">파티원 목록</div>
@@ -801,7 +791,6 @@ export default function Party () {
           </MembersContainer> 
         : null}
 
-        {/* 문의 게시판 */}
         <section id="qna" ref={commentRef}>
           <QnA 
             partyId={partyInfo.id}
@@ -813,7 +802,6 @@ export default function Party () {
         </section>
         
         <PartyStateBtns>
-          {/* 비로그인 상태 */}
           {isLoggedIn === "0" ?
             <div className="signinMsgContainer">
               <div className="signinMsg">
@@ -823,31 +811,25 @@ export default function Party () {
             </div>
           : null}
 
-          {/* 가입 전 */}
           {isLoggedIn === "1" && !isMember && !isWaiting && partyInfo.partyState <= 0  ? 
             <button onClick={partyJoinModalHandler}>가입 신청</button> 
           : null}
 
-          {/* 대기중 */}
           {isWaiting ? 
             <button onClick={(e) => partyCancelModalHandler(e, "cancel")}>가입 신청 취소</button>
           : null}
 
-          {/* 파티원 */}
           {!isLeader && isMember && partyInfo.partyState === 0 ? 
             <button onClick={(e) => partyCancelModalHandler(e, "quit")}>파티 탈퇴</button> 
           : null}
 
-          {/* 파티장 */}
-
-          {/* [dev] 대기자 리스트에서 승인했을 때, 바로 partyState가 변경되면 세번째 조건은 필요 없음 */}
-          {isLeader && partyInfo.partyState === 0 && partyInfo.memberLimit > partyInfo.members.length ? 
+          {isLeader && partyInfo.partyState === 0 ? 
             <button onClick={editHandler}>정보 수정</button> 
           : null}
           {isLeader && partyInfo.partyState === 0 && partyInfo.members.length > 1 && partyInfo.memberLimit > partyInfo.members.length ? 
             <button onClick={(e) => partyCancelModalHandler(e, "fullParty")}>모집 완료</button> 
           : null}
-          {isLeader && partyInfo.partyState === 1 && partyInfo.memberLimit > partyInfo.members.length ? 
+          {isLeader && partyInfo.partyState === 1 && partyInfo.memberLimit > partyInfo.members.length && !partyInfo.isReviewed ? 
             <button onClick={rePartyHandler}>모집 재개</button> 
           : null}
           {isLeader && !partyInfo.isReviewed ? 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { cookieParser } from "../App";
 import styled from 'styled-components';
@@ -40,7 +40,6 @@ export const ListContainer = styled.div`
 export default function List () {
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo
@@ -64,7 +63,9 @@ export default function List () {
         }
       });
       const parsedLocalParty = response.data.localParty.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
-      setLocalParty(parsedLocalParty);
+      setLocalParty(parsedLocalParty.filter((party: any) => {
+        return party.memberLimit !== party.members.length
+      }));
       setMyParty(response.data.myParty);
     })();
   }, [ userInfo ]);

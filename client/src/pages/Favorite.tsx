@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
 import QuestCard from '../components/QuestCard';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 import axios from 'axios';
 import { NOTIFY } from "../actions/notify"
 

@@ -224,14 +224,12 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
   async function expelHandler(event: React.MouseEvent<HTMLButtonElement>) {
     console.log("파티원을 추방합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userInfo.id}`);
-    // handleMemberListChange(userInfo.id, "expel");
     navigate(`../party/${partyId}`);
   }
 
   async function refuseHandler(event: React.MouseEvent<HTMLButtonElement>) {
     console.log("가입 신청을 거절합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userInfo.id}`);
-    // handleMemberListChange(userInfo.id, "refuse");
     navigate(`../party/${partyId}`);
   }
 
@@ -242,7 +240,6 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
       }, {
       withCredentials: true
     });
-    // handleMemberListChange(userInfo.id, "accept");
     navigate(`../party/${partyId}`);
   }
 
@@ -288,18 +285,15 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
             </div>
           </section>
           <UserStateBtns>
-            {/* 내 정보인 경우 */}
             {id === userId && !isEditMode ? 
               <button onClick={editHandler}>메시지 수정</button> 
             : null}
             {id === userId && isEditMode ? 
               <button onClick={editConfirmHandler}>변경 사항 적용</button> 
             : null}
-            {/* 클라이언트가 리더이며, 본인이 아닌 파티원 정보를 보는 경우 */}
             {isLeader && id !== userId && from === "members" ? 
               <button onClick={expelHandler}>파티원 퇴출</button> 
             : null} 
-            {/* 클라이언트가 리더이며, 대기자 리스트를 보는 경우 */}
             {isLeader && from === "waitingQueue" ? 
               <div>
                 <button onClick={refuseHandler}>가입 거절</button> 

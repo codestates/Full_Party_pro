@@ -19,7 +19,6 @@ import Loading from '../components/Loading';
 
 export const PostContainer = styled.div`
   width: 100%;
-  height: 100%;
   background-color: #fff;
   position: absolute;
   left: 0;
