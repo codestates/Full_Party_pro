@@ -296,7 +296,7 @@ const SignupModal = () => {
   const dispatch = useDispatch();
   const cameraRef = useRef<any>();
   const [isLoading, setIsLoading] = useState(false);
-  const [pageIdx, setPageIdx] = useState(4)
+  const [pageIdx, setPageIdx] = useState(0)
 
   type Info = {
     profileImage: any;
