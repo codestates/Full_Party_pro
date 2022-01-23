@@ -330,8 +330,8 @@ export default function Mypage () {
     userName: signinReducer.userInfo.userName,
     profileImage: signinReducer.userInfo.profileImage,
     address: signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1],
-    level: signinReducer.userInfo.level,
-    exp: 0
+    level: 0,
+    exp: signinReducer.userInfo.exp
   });
   const [changeInfo, setChangeInfo] = useState({
     userName: '',
