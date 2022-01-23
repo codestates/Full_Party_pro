@@ -81,7 +81,6 @@ export default function App() {
           payload: res.data.userInfo
         });
       });
-      document.cookie = "isLoggedIn=1;";
     }
   }, []);
 
