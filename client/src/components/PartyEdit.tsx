@@ -11,15 +11,14 @@ import { useSelector } from 'react-redux';
 import { AppState } from '../reducers';
 import { RootReducerType } from '../store/store';
 
-import PostMap from '../components/PostMap';
 import PostCancelModal from '../components/PostCancelModal';
 import Slider from 'rc-slider';
 import ErrorModal from '../components/ErrorModal';
 import Loading from '../components/Loading';
+import AddressInput from '../components/AddressInput';
 
 export const PostContainer = styled.div`
   width: 100%;
-  height: 100%;
   background-color: #fff;
   position: absolute;
   left: 0;
@@ -711,11 +710,10 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     err: false,
     msg: ''
   })
-
-  const [fixedLocation, setFixedLocation] = useState(partyInfo.location);
-  const [formatLocation, setFormatLocation] = useState('');
+  
   const [tags, setTags] = useState<string[]>(partyInfo.tag);
   const [inputTxt, setInputTxt] = useState('');
+  const [isOnline, setIsOnline] = useState(false);
   const [isPosted, setIsPosted] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
 
@@ -767,6 +765,13 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     if(partyInfo.location) { setIsLocation({ err: false, msg: '' }) }
     if(partyInfo.privateLink) { setIsPLink({ err: false, msg: '' }) }
     if(partyInfo.content) { setIsContent({ err: false, msg: '' }) }
+  }
+
+  const handleLocationChange = (location: string) => {
+    setPartyInfo({
+      ...partyInfo,
+      location,
+    });
   }
 
   function getCurrentDate() {
@@ -823,16 +828,6 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     })
   }
 
-  const handleFormatLocationChange = (address: string) => {
-    setFormatLocation(address);
-  }
-
-  const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
-      setFixedLocation(partyInfo.location);
-    }
-  }
-
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const {name, value} = e.target
 
@@ -849,17 +844,11 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     }
   }
 
-  const handleIsOnline = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if(e.currentTarget.className === 'isOnline' || e.currentTarget.className === 'isOnline unfocused') {
-      setPartyInfo({
-        ...partyInfo,
-        isOnline: true,  
-      })
+  const handleOnOff = (isOnline: boolean) => {
+    if(isOnline === true){
+      setIsOnline(true);
     } else {
-      setPartyInfo({
-        ...partyInfo,
-        isOnline: false,  
-      })
+      setIsOnline(false);
     }
   }
 
@@ -896,7 +885,11 @@ export default function PartyEdit ({ party, editHandler }: Props) {
 
 
   const backToPage = () => {
-    editHandler();
+    if(partyInfo.location){
+      navigate(-2);
+    } else {
+      navigate(-1);
+    }
   }
   
   const editParty = () => {
@@ -962,12 +955,12 @@ export default function PartyEdit ({ party, editHandler }: Props) {
         name: partyInfo.name,
         image: partyInfo.image,
         memberLimit: partyInfo.memberLimit,
-        region: 
-          partyInfo.isOnline ? 
+        region:
+          isOnline? 
           signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
-          : formatLocation,
+          : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
         location: partyInfo.location,
-        latlng: JSON.stringify(partyInfo.latlng),
+        latlng: isOnline? JSON.stringify({lat: 0, lng: 0}) : JSON.stringify(partyInfo.latlng),
         startDate: partyInfo.startDate,
         endDate: partyInfo.endDate,
         isOnline: partyInfo.isOnline,
@@ -1116,42 +1109,16 @@ export default function PartyEdit ({ party, editHandler }: Props) {
             <fieldset>
               <div className='locationTitle'>
                 <div className='label'>퀘스트 장소</div>
-                <div className="details">
-                  <button className={partyInfo.isOnline ? 'unfocused' : ''} onClick={(e) => {handleIsOnline(e)}}>오프라인</button>
-                  <span> | </span>
-                  <button className={partyInfo.isOnline ? 'isOnline' : 'isOnline unfocused'} onClick={(e) => {handleIsOnline(e)}}>온라인</button>
-                </div>
               </div>
-              {!partyInfo.isOnline ? 
-                <div className='mapContainer'>
-                  <div id='map' className='mapDesc'>
-                    <PostMap 
-                      location={fixedLocation} 
-                      name={partyInfo.name}
-                      image={partyInfo.image} 
-                      handleCoordsChange={handleCoordsChange}
-                      handleFormatLocationChange={handleFormatLocationChange}
-                    />
-                  </div>
-                  <input 
-                    className='mapInput'
-                    name='location'
-                    type='text'
-                    value={partyInfo.location}
-                    onChange={(e) => handleInputChange(e)}
-                    onKeyUp={(e) => handleSearchLocation(e)}
-                  />
-                </div>
-              :
-                <input 
-                  name='location'
-                  type='text'
-                  value={partyInfo.location}
-                  onChange={(e) => {handleInputChange(e)}}
-                />
-              }
+              <AddressInput 
+                partyInfo={partyInfo}
+                handleCoordsChange={handleCoordsChange}
+                handleLocationChange={handleLocationChange}
+                handleOnOff={handleOnOff}
+              />
               {isLocation.err ?
-              <div className='error'>{isLocation.msg}</div> : null}
+                <div className='error'>{isLocation.msg}</div> 
+              : null}
             </fieldset>
             <fieldset>
               <div className='label'>오픈채팅방 링크</div>
