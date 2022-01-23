@@ -330,7 +330,7 @@ export default function Mypage () {
     userName: signinReducer.userInfo.userName,
     profileImage: signinReducer.userInfo.profileImage,
     address: signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1],
-    level: 0,
+    level: signinReducer.userInfo.level,
     exp: 0
   });
   const [changeInfo, setChangeInfo] = useState({
@@ -632,7 +632,7 @@ export default function Mypage () {
   }
 
   const handleSignOut = async () => {
-    const { token, signupType, location } = cookieParser();
+    const { token, signupType } = cookieParser();
     await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {
       access_token: token, 
       signup_type: signupType
@@ -644,7 +644,7 @@ export default function Mypage () {
     navigate("/");
   };
   const handleWithdrawal = async () => {
-    const { token, signupType, location } = cookieParser();
+    const { token, signupType } = cookieParser();
     const userId = signinReducer.userInfo?.id;
     await axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}/${signupType}`, {
       headers: {
