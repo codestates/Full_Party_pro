@@ -1,10 +1,6 @@
 import './App.css';
 import React, { useEffect, Fragment } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { AppState } from './reducers';
-import { RootReducerType } from './store/store';
-import { SIGNIN_SUCCESS } from './actions/signinType';
+import axios from "axios";
 import Home from './pages/Home';
 import List from './pages/List';
 import Party from './pages/Party';
@@ -15,12 +11,16 @@ import Favorite from './pages/Favorite';
 import Mypage from './pages/Mypage';
 import NotFound from './pages/NotFound';
 import Auth from './pages/Auth';
-import axios from "axios";
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
 import SigninModal from './components/SigninModal';
 import SignupModal from './components/SignupModal';
 import initialize from './config/initialize';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppState } from './reducers';
+import { RootReducerType } from './store/store';
+import { SIGNIN_SUCCESS } from './actions/signinType';
 
 declare global {
   interface Window {

@@ -38,7 +38,6 @@ export const LoadingBackdrop = styled.div`
 `;
 
 export default function Loading() {
-
   return (
     <LoadingContainer>
       <LoadingBackdrop>

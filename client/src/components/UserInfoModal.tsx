@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faFlag, faAward, faCalendarCheck } from '@fortawesome/free-solid-svg-icons';
 
@@ -22,7 +22,7 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   width: 320px;
@@ -122,7 +122,7 @@ export const ModalView = styled.div`
       margin-bottom: 5px;
     }
   }
-`
+`;
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -131,8 +131,7 @@ export const CloseBtn = styled.button`
   margin-bottom: 10px;
   background-color: white;
   border: none;
-
-`
+`;
 
 export const UserStateBtns = styled.section`
   display: flex;
@@ -165,8 +164,8 @@ type Props = {
   from: string,
   userInfo: { [key: string]: any },
   handleMemberListChange: Function,
-  handleMemberInfoChange: Function,
-}
+  handleMemberInfoChange: Function
+};
 
 export default function UserInfoModal({ userInfoModalHandler, partyId, userId, leaderId, isLeader, isMember, from,
   userInfo, handleMemberListChange, handleMemberInfoChange }: Props) {
@@ -181,51 +180,49 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
     userInfoModalHandler();
   };
 
-  function inputHandler(event: React.ChangeEvent<HTMLInputElement>): void {
+  const inputHandler = (event: React.ChangeEvent<HTMLInputElement>): void => {
     setNewMsg(event.target.value);
-  }
+  };
 
-  function editHandler(): void {
+  const editHandler = (): void => {
     setIsEditMode(!isEditMode);
-  }
+  };
 
-  async function editConfirmHandler() {
+  const editConfirmHandler = async () => {
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/message`, {
       userId: userInfo.id, partyId, message: newMsg,
     });
     handleMemberInfoChange(userInfo.id, "message", newMsg);
     setIsEditMode(!isEditMode);
-  }
+  };
 
-  async function expelHandler() {
+  const expelHandler = async () => {
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userInfo.id}`);
     navigate(`../party/${partyId}`);
-  }
+  };
 
-  async function refuseHandler() {
+  const refuseHandler = async () => {
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userInfo.id}`);
     navigate(`../party/${partyId}`);
-  }
+  };
 
-  async function acceptHandler() {
-    await axios.post(`${process.env.REACT_APP_API_URL}/party/approval`, { 
+  const acceptHandler = async () => {
+    await axios.post(`${process.env.REACT_APP_API_URL}/party/approval`, {
       userId: userInfo.id, partyId
-      }, {
-      withCredentials: true
-    });
+      }, { withCredentials: true });
     navigate(`../party/${partyId}`);
   }
 
-  return(
+  return (
     <ModalContainer>
       <ModalBackdrop onClick={closeModal}>
         <ModalView onClick={(e) => e.stopPropagation()}>
           <CloseBtn onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
           <header>{from === "members"? <>Party<br />Member</> : <>Quest<br />Volunteer</>}</header>
-          {isMember ? 
+          {isMember ?
             <section className="speechBubble">
               {isEditMode ?
-                <input 
+                <input
                   type="text"
                   name="newMsg"
                   autoComplete='off'
@@ -270,12 +267,12 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
             {isLeader && from === "waitingQueue" ? 
               <div>
                 <button onClick={refuseHandler}>가입 거절</button> 
-                <button id="acceptBtn" onClick={acceptHandler}>가입 승인</button>    
+                <button id="acceptBtn" onClick={acceptHandler}>가입 승인</button>
               </div>
             : null}
           </UserStateBtns>
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
-  )
+  );
 }

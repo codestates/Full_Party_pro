@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faPlusCircle, faBookmark, faUser } from '@fortawesome/free-solid-svg-icons';
 
@@ -38,29 +38,28 @@ export const NavContainer = styled.nav`
   }
 `;
 
-export default function BottomNav () {
-
+export default function BottomNav() {
   return (
     <NavContainer>
       <Link to="/home" style={{ textDecoration: 'none' }}>
         <div className="button">
           <FontAwesomeIcon icon={ faHome } className="icon" /> 홈
-        </div>  
+        </div>
       </Link>
       <Link to="/post" style={{ textDecoration: 'none' }}>
         <div className="button">
           <FontAwesomeIcon icon={ faPlusCircle } className="icon" /> 파티 개설
-        </div>  
+        </div>
       </Link>
       <Link to="/favorite" style={{ textDecoration: 'none' }}>
         <div className="button">
           <FontAwesomeIcon icon={ faBookmark } className="icon" /> 관심 파티
-        </div>  
+        </div>
       </Link>
       <Link to="/mypage" style={{ textDecoration: 'none' }}>
         <div className="button">
           <FontAwesomeIcon icon={ faUser } className="icon" /> 마이페이지
-        </div>  
+        </div>
       </Link>
     </NavContainer>
   );

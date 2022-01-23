@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import UserMap from './UserMap';
 import styled from 'styled-components';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
-import UserMap from './UserMap';
 import { AppState } from '../reducers';
 import { useDispatch, useSelector } from 'react-redux';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
@@ -26,7 +26,7 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   width: 80%;
@@ -48,7 +48,7 @@ export const ModalView = styled.div`
     color: #f34508;
     margin-top: 5px;
   }
-`
+`;
 
 export const MapContainer = styled.section`
   display: flex;
@@ -89,8 +89,7 @@ export const MapContainer = styled.section`
       outline-style:none;
     }
   }
-
-`
+`;
 
 export const BtnContainer = styled.section`
   width: 100%;
@@ -123,7 +122,7 @@ export const BtnContainer = styled.section`
       color: #fff;
     }
   }
-`
+`;
 
 export default function  AddressModal() {
   const navigate = useNavigate();
@@ -140,21 +139,21 @@ export default function  AddressModal() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress(e.target.value);
-  }
+  };
 
   const handleFormatAddressChange = (address: string) => {
     setFormatAddress(address);
-  }
+  };
 
   const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') setFixedLocation(address);
-  }
+  };
 
   const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     const toGo = (event.currentTarget as HTMLButtonElement).value;
     if (toGo === "next") setPageIdx(pageIdx + 1);
     else setPageIdx(pageIdx - 1);
-  }
+  };
 
   const handleAddressRegister = async () => {
     if (address) {
@@ -162,7 +161,6 @@ export default function  AddressModal() {
       const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/address/${userInfo.id}`, {
         userId: userInfo.id, address: formatAddress
       });
-
       if (res.status === 200) {
         dispatch({
           type: SIGNIN_SUCCESS,
@@ -190,13 +188,13 @@ export default function  AddressModal() {
                     <div className="details">이 위치를 기반으로 퀘스트가 검색됩니다.</div>
                 </div>
                 <div id='map' className='mapDesc'>
-                    <UserMap 
-                    location={fixedLocation} 
-                    image={userInfo.profileImage} 
+                    <UserMap
+                    location={fixedLocation}
+                    image={userInfo.profileImage}
                     handleFormatAddressChange={handleFormatAddressChange}
                     />
                 </div>
-                <input 
+                <input
                     className='mapInput'
                     name='address'
                     type='text'
@@ -207,7 +205,7 @@ export default function  AddressModal() {
               </MapContainer>
               <BtnContainer style={{ justifyContent: "flex-end" }}>
                 <button onClick={handlePageChange} value="next">다음 <FontAwesomeIcon icon={faAngleRight} className="icon right" /></button>
-              </BtnContainer> 
+              </BtnContainer>
             </>
           : null}
           {pageIdx === 1 ?

@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
+import Loading from './Loading';
+import UserMap from './UserMap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch } from 'react-redux';
 import { modalChanger } from '../actions/modal';
-import Loading from './Loading';
-import UserMap from './UserMap';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -25,7 +25,7 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   width: 80%;
@@ -152,8 +152,7 @@ export const MapContainer = styled.section`
       outline-style:none;
     }
   }
-
-`
+`;
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -162,7 +161,7 @@ export const CloseBtn = styled.button`
   margin-bottom: 10px;
   background-color: white;
   border: none;
-`
+`;
 
 export const BtnContainer = styled.section`
   width: 100%;
@@ -203,7 +202,7 @@ export const BtnContainer = styled.section`
       }
     }
   }
-`
+`;
 
 export const ProgressBar = styled.section`
   width: 100%;
@@ -294,18 +293,16 @@ export default function SignupModal() {
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
+    const { name, value } = e.target;
     const regex={
       email: /\S+@\S+\.\S+/,
       password: /^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W).{8,16}$)/,
       mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4,4}/
     };
-
     setUserInfo({
       ...userInfo,
       [name]: value
     });
-
     if (name === 'email') {
       if (!regex.email.test(value)) {
         setIsError({
@@ -392,7 +389,7 @@ export default function SignupModal() {
     });
   };
 
-  function getCurrentDate() {
+  const getCurrentDate = () => {
     let newDate = new Date();
     let date = newDate.getDate();
     let month = newDate.getMonth() + 1;
@@ -419,7 +416,7 @@ export default function SignupModal() {
     setTimeout(handleCodeExpire, 1000 * 60 * 5);
   };
 
-  function codeVerification() {
+  const codeVerification = () => {
     if (userInfo.email === verificationData.email && verificationData.code === inputCode) {
       setPageIdx(pageIdx + 1);
       setIsError({
@@ -435,7 +432,7 @@ export default function SignupModal() {
         verificationMsg: '인증번호가 틀렸습니다.',
       });
     }
-  }
+  };
 
   const remailVerification = async () => {
     setIsTimeOut(false);
@@ -445,20 +442,20 @@ export default function SignupModal() {
       verificationMsg: '',
     });
     mailVerification();
-  }
+  };
 
-  function handleCodeExpire() {
+  const handleCodeExpire = () => {
     setIsTimeOut(true);
     setIsError({
       ...isError,
       isVerificationCode: false,
       verificationMsg: '인증시간이 만료됐습니다.',
     });
-  }
+  };
 
   const handleSignup = () => {
-    const { profileImage, email, password, name, gender, birth, mobile, address } = userInfo
-    const { isEmail, isName, isGender, isBirth, isMobile } = isError
+    const { profileImage, email, password, name, gender, birth, mobile, address } = userInfo;
+    const { isEmail, isName, isGender, isBirth, isMobile } = isError;
 
     if (!email || !password || !name || gender === "none" || !birth || !mobile || !address) {
       setIsError({
@@ -487,11 +484,9 @@ export default function SignupModal() {
           mobile,
           address
         }
-      }, {
-        withCredentials: true
-      })
+      }, { withCredentials: true })
       .then((res) => {
-        if(res.data.message === 'Already Signed Up') {
+        if (res.data.message === 'Already Signed Up') {
           setIsError({
             ...isError,
             isAxios: true,
@@ -503,17 +498,17 @@ export default function SignupModal() {
       })
       .catch((err) => console.log(err))
     }
-  }
+  };
 
   const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     const toGo = (event.currentTarget as HTMLButtonElement).value;
     if (toGo === "next") setPageIdx(pageIdx + 1);
     else setPageIdx(pageIdx - 1);
-  }
+  };
 
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
-  }
+  };
 
   if (isLoading) return <Loading />
 
@@ -533,7 +528,7 @@ export default function SignupModal() {
           </ProgressBar>
 
           {(() => {
-            if(pageIdx === 0) {
+            if (pageIdx === 0) {
               return (
                 <table>
                   <tr>
@@ -567,7 +562,7 @@ export default function SignupModal() {
                 </table>
               )
             }
-            else if(pageIdx === 1) {
+            else if (pageIdx === 1) {
               return (
                 <table>
                   <tr>
@@ -613,7 +608,7 @@ export default function SignupModal() {
                 </table>
               )
             }
-            else if(pageIdx === 2) {
+            else if (pageIdx === 2) {
               return (
                 <table>
                   <tr>
@@ -703,7 +698,7 @@ export default function SignupModal() {
                 </MapContainer>
               )
             }
-            else if(pageIdx === 4) {
+            else if (pageIdx === 4) {
               return (
                 <>
                   <div className='confirm'>이 정보가 맞나요?</div>
@@ -776,5 +771,5 @@ export default function SignupModal() {
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
-  )
+  );
 }

@@ -1,21 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import AWS from 'aws-sdk';
-import { cookieParser } from "../App";
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
-import { NOTIFY } from "../actions/notify";
-import { RootReducerType } from '../store/store';
-import { AppState } from '../reducers';
+import AWS from 'aws-sdk';
 import Loading from '../components/Loading';
 import UserCancelModal from '../components/UserCancelModal'
 import PartySlide from '../components/PartySlide';
 import VerificationModal from '../components/VerificationModal';
 import UserMap from '../components/UserMap';
 import EmptyParty from '../components/EmptyParty';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { cookieParser } from "../App";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
+import { NOTIFY } from "../actions/notify";
+import { RootReducerType } from '../store/store';
+import { AppState } from '../reducers';
 import { SIGNIN_FAIL, SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const MypageContainer = styled.div`
@@ -56,7 +56,7 @@ export const MypageContainer = styled.div`
     font-size: 0.7rem;
     color: #f34508;
   }
-`
+`;
 
 export const MypageHeader = styled.header`
   width: 100%;
@@ -109,7 +109,7 @@ export const MypageHeader = styled.header`
     }
 
   }
-`
+`;
 
 export const MypageInfo = styled.section`
   width: 100%;
@@ -166,7 +166,8 @@ export const MypageInfo = styled.section`
       }
     }
   }
-`
+`;
+
 export const InfoTable = styled.table`
   margin: 10px 0 20px 0;
 
@@ -227,7 +228,7 @@ export const InfoTable = styled.table`
       max-width: 200px;
     }
   }
-`
+`;
 
 export const ProgressBar = styled.div`
   margin-top: 5px;
@@ -246,7 +247,7 @@ export const ProgressBar = styled.div`
     border-radius: inherit;
     text-align: right;
   }
-`
+`;
 
 export const MypartyCards = styled.section`
   width: 100%;
@@ -274,29 +275,34 @@ export const MypartyCards = styled.section`
       }
     }
   }
-`
+`;
 
 export default function Mypage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const fileRef = useRef<any>();
+
   const { signupType } = cookieParser();
+
   const signinReducer = useSelector(
     (state: RootReducerType) => state.signinReducer
   );
   const userInfoFromStore = useSelector(
     (state: AppState) => state.signinReducer.userInfo
   );
+
   const [ curTab, setCurTab ] = useState(0);
   const [ parties, setParties ] = useState([]);
   const [ isLoading, setIsLoading ] = useState(true);
   const [ isInfoLoading, setIsInfoLoading ] = useState(true);
   const [ imgLoading, setImgLoading ] = useState(false);
+
   const [ isChange, setIsChange ] = useState(false);
   const [ callModal, setCallModal ] = useState(false);
   const [ isVerificationModalOpen, setIsVerificationModalOpen ] = useState(false);
   const [ from, setFrom ] = useState('');
   const [ fixedLocation, setFixedLocation ] = useState('');
+
   const [ formatAddress, setFormatAddress ] = useState('');
   const [ basicInfo, setBasicInfo ] = useState({
     userName: "",
@@ -316,7 +322,6 @@ export default function Mypage() {
     mobile: '',
     nowPwd: ''
   });
-
   const [ isError, setIsError ] = useState({
     isName: true,
     isMobile: true,
@@ -325,12 +330,10 @@ export default function Mypage() {
     mobileMsg: '',
     axiosMsg: '',
   });
-
   const [ isPassword, setIsPassword ] = useState({
     isValid: false,
     passwordMsg: '',
   });
-
   const [ isConfirmPassword, setIsConfirmPassword ] = useState({
     isValid: false,
     confirmPasswordMsg: '',
@@ -345,11 +348,13 @@ export default function Mypage() {
     credentials: new AWS.CognitoIdentityCredentials({
       IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
     })
-  })
+  });
+
   const handleRefClick = (e: any) => {
     e.preventDefault();
     fileRef.current.click();
   };
+
   const handleImgLoad = async (e: any) => {
     setImgLoading(true);
     let file = e.target.files[0];
@@ -374,11 +379,9 @@ export default function Mypage() {
         });
         setImgLoading(false)
       },
-      (err: any) => {
-        return console.log("🚫 Upload Failed:", err.message);
-      }
+      (err: any) => console.log("🚫 Upload Failed:", err.message)
     )
-  }
+  };
 
   const handleIsChange = async () => {
     if (isChange) setIsChange(false);
@@ -445,7 +448,7 @@ export default function Mypage() {
       if(changeInfo.confirm !== value){
         setIsConfirmPassword({
           isValid: false,
-          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
+          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.'
         });
       }
       else {
@@ -494,7 +497,7 @@ export default function Mypage() {
       ...changeInfo,
       [e.target.name]: e.target.value
     });
-  }
+  };
 
   const getCurrentDate = () => {
     let newDate = new Date();
@@ -502,7 +505,7 @@ export default function Mypage() {
     let month = newDate.getMonth() + 1;
     let year = newDate.getFullYear();
     return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
-  }
+  };
 
   const submitInfo = async () => {
     const { userName, profileImage, password, confirm, birth, gender, address, mobile, nowPwd } = changeInfo;
@@ -568,7 +571,7 @@ export default function Mypage() {
           profileImage,
           address: formatAddress,
           signupType,
-        }
+        };
         dispatch({ type: SIGNIN_SUCCESS, payload });
         navigate('/mypage');
       }
@@ -579,24 +582,26 @@ export default function Mypage() {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`);
     const myParty = res.data.myParty;
     setParties(myParty);
-  }
+  };
+
   const fetchRecruitParty = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`);
     const myParty = res.data.myParty;
     setParties(myParty);
-  }
+  };
+
   const fetchCompleteParty = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${signinReducer.userInfo?.id}`);
     const myParty = res.data.myParty;
     setParties(myParty);
-  }
+  };
 
   const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     if (e.currentTarget.value === 0) fetchRecruitParty();
     else if (e.currentTarget.value === 1) fetchJoinParty();
     else if (e.currentTarget.value === 2) fetchCompleteParty();
     setCurTab(e.currentTarget.value);
-  }
+  };
 
   const handleSignOut = async () => {
     const { token, signupType } = cookieParser();
@@ -612,6 +617,7 @@ export default function Mypage() {
     document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
+
   const handleWithdrawal = async () => {
     const { token, signupType } = cookieParser();
     const userId = signinReducer.userInfo?.id;
@@ -632,7 +638,7 @@ export default function Mypage() {
     setCallModal(!callModal);
   };
 
-  function verficationModalHandler(e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>){
+  const verficationModalHandler = (e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>) => {
     setIsVerificationModalOpen(!isVerificationModalOpen);
   };
 
@@ -672,7 +678,7 @@ export default function Mypage() {
     })();
     fetchRecruitParty();
   }, [ userInfoFromStore ]);
-  
+
   useEffect(() => {
     setIsLoading(false);
   }, [ basicInfo ]);

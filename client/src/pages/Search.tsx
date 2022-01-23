@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import styled from 'styled-components';
+import LocalQuest from '../components/LocalQuest';
+import EmptyCard from '../components/EmptyCard';
+import Loading from '../components/Loading';
 import { useDispatch } from 'react-redux';
 import { cookieParser, requestKeepLoggedIn } from "../App";
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { NOTIFY } from '../actions/notify';
 import { useSelector } from 'react-redux';
 import { AppState } from '../reducers';
 import { RootReducerType } from '../store/store';
-import LocalQuest from '../components/LocalQuest';
-import EmptyCard from '../components/EmptyCard';
-import Loading from '../components/Loading';
 
 export const SearchContainer = styled.div`
   width: 100%;
@@ -22,7 +22,7 @@ export const SearchContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`
+`;
 
 export const SearchBar = styled.div`
   width: 100%;
@@ -64,7 +64,7 @@ export const SearchBar = styled.div`
       right: 20%;
     }
   }
-`
+`;
 
 export const SearchContent = styled.div`
   padding: 16px 1%;
@@ -95,7 +95,7 @@ export const SearchContent = styled.div`
   @media screen and (min-width: 700px) {
     padding: 16px 4%;
   }
-`
+`;
 
 export default function Search() {
   const navigate = useNavigate();
@@ -116,21 +116,15 @@ export default function Search() {
   const [ parties, setParties ] = useState<any>([]);
   const [ isLoading, setIsLoading ] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWord(e.target.value)
-  };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setWord(e.target.value);
+
+  const searchQuest = () => navigate(`../search/keyword/${word}`);
+
+  const hashtagHandler = (tag: string) => navigate(`/search/tag/${tag}`);
 
   const enterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') searchQuest();
-  }
-
-  const searchQuest = () => {
-    navigate(`../search/keyword/${word}`);
-  }
-
-  const hashtagHandler = (tag: string) => {
-    navigate(`/search/tag/${tag}`);
-  }
+  };
 
   useEffect(() => {
     let isComponentMounted = true;

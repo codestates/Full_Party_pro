@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
-import AWS from 'aws-sdk';
-import { cookieParser } from "../App";
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
-import { useSelector } from 'react-redux';
-import { RootReducerType } from '../store/store';
+import AWS from 'aws-sdk';
 import PostMap from '../components/PostMap';
 import PostCancelModal from '../components/PostCancelModal';
 import Slider from 'rc-slider';
 import ErrorModal from '../components/ErrorModal';
 import Loading from '../components/Loading';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { cookieParser } from "../App";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
+import { useSelector } from 'react-redux';
+import { RootReducerType } from '../store/store';
 
 export const PostContainer = styled.div`
   width: 100%;
@@ -22,7 +22,7 @@ export const PostContainer = styled.div`
   z-index: 910;
   margin: 60px 0;
   overflow: hidden;
-`
+`;
 
 export const TopNavigation = styled.nav`
   width: 100vw;
@@ -55,7 +55,7 @@ export const TopNavigation = styled.nav`
       }
     }
   }
-`
+`;
 
 export const BottomNavigation = styled.nav`
   width: 100vw;
@@ -89,7 +89,7 @@ export const BottomNavigation = styled.nav`
       margin-bottom: 3px;
     }
   }
-`
+`;
 
 export const PostCard = styled.div`
   width: 100%;
@@ -235,7 +235,7 @@ export const PostCard = styled.div`
   @media screen and (min-width: 790px) {
     padding: 40px 20%;
   }
-`
+`;
 
 export const SliderContainer = styled.div`
   .sign {
@@ -579,7 +579,7 @@ export const SliderContainer = styled.div`
     border-width: 4px 4px 0;
     border-top-color: #6c6c6c;
   }
-`
+`;
 
 export const TagInput = styled.div`
   > ul {
@@ -607,7 +607,7 @@ export const TagInput = styled.div`
       }
     }
   }
-`
+`;
 
 export const Button = styled.button`
   width: 250px;
@@ -627,7 +627,7 @@ export const Button = styled.button`
     background-color: #fff;
     cursor: default;
   }
-`
+`;
 
 export default function Post() {
   const navigate = useNavigate();
@@ -700,7 +700,7 @@ export default function Post() {
   const handleRefClick = (e: any) => {
     e.preventDefault();
     fileRef.current.click();
-  }
+  };
 
   const handleImgLoad = async (e: any) => {
     setImgLoading(true);
@@ -726,21 +726,19 @@ export default function Post() {
         return console.log('🚫 Upload Failed:', err.message);
       }
     );
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target;
-
     setPartyInfo({
       ...partyInfo,
       [name]: value
     });
-
     if (partyInfo.name) setIsName({ err: false, msg: ''});
     if (partyInfo.location) setIsLocation({ err: false, msg: '' });
     if (partyInfo.privateLink) setIsPLink({ err: false, msg: '' });
     if (partyInfo.content) setIsContent({ err: false, msg: '' });
-  }
+  };
 
   const getCurrentDate = () => {
     let newDate = new Date();
@@ -748,7 +746,7 @@ export default function Post() {
     let month = newDate.getMonth() + 1;
     let year = newDate.getFullYear();
     return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
-  }
+  };
 
   const validationCheck = () => {
     if (partyInfo.startDate > partyInfo.endDate) {
@@ -780,51 +778,47 @@ export default function Post() {
         msg: ''
       });
     }
-  }
+  };
 
   const handleSlider = (value: number) => {
     setPartyInfo({
       ...partyInfo,
       memberLimit: value
     });
-  }
+  };
 
   const handleCoordsChange = (lat: number, lng: number) => {
     setPartyInfo({
       ...partyInfo,
       latlng: { lat: lat, lng: lng }
     });
-  }
+  };
 
-  const handleFormatLocationChange = (address: string) => {
-    setFormatLocation(address);
-  }
+  const handleFormatLocationChange = (address: string) => setFormatLocation(address);
 
   const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') setFixedLocation(partyInfo.location);
-  }
+  };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
     setPartyInfo({
       ...partyInfo,
       [name]: value
     });
-
     if (partyInfo.content !== '') {
       setIsContent({
         err: false,
         msg: ''
       });
     }
-  }
+  };
 
   const handleIsOnline = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.className === 'isOnline' || e.currentTarget.className === 'isOnline unfocused')
       setIsOnline(true);
     else setIsOnline(false);
-  }
+  };
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === 'Enter' || e.code === 'Space') {
@@ -833,23 +827,23 @@ export default function Post() {
         setInputTxt('');
       }
     }
-  }
+  };
 
   const removeTag = (index: number) => {
     setTags(tags.filter((tag) => {
       return tags.indexOf(tag) !== index
     }));
-  }
+  };
 
   const postCancelHandler = () => {
     if (cancelModal) setCancelModal(false);
     else setCancelModal(true);
-  }
+  };
 
   const errorModalHandler = () => {
     if (isErrorModalOpen) setIsErrorModalOpen(false);
     else setIsErrorModalOpen(true);
-  }
+  };
 
   const backToPage = () => {
     navigate(-1);

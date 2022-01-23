@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import AWS from 'aws-sdk';
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
-import { useSelector } from 'react-redux';
-import { AppState } from '../reducers';
-import { RootReducerType } from '../store/store';
 import PostMap from '../components/PostMap';
 import PostCancelModal from '../components/PostCancelModal';
 import Slider from 'rc-slider';
 import ErrorModal from '../components/ErrorModal';
 import Loading from '../components/Loading';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
+import { useSelector } from 'react-redux';
+import { AppState } from '../reducers';
+import { RootReducerType } from '../store/store';
 
 export const PostContainer = styled.div`
   width: 100%;
@@ -23,7 +23,7 @@ export const PostContainer = styled.div`
   z-index: 910;
   margin: 60px 0;
   overflow: hidden;
-`
+`;
 
 export const TopNavigation = styled.nav`
   width: 100vw;
@@ -56,7 +56,7 @@ export const TopNavigation = styled.nav`
       }
     }
   }
-`
+`;
 
 export const BottomNavigation = styled.nav`
   width: 100vw;
@@ -66,10 +66,8 @@ export const BottomNavigation = styled.nav`
   left: 0;
   bottom: 0;
   z-index: 920;
-
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -92,7 +90,7 @@ export const BottomNavigation = styled.nav`
       margin-bottom: 3px;
     }
   }
-`
+`;
 
 export const PostCard = styled.div`
   width: 100%;
@@ -238,7 +236,7 @@ export const PostCard = styled.div`
   @media screen and (min-width: 790px) {
     padding: 40px 20%;
   }
-`
+`;
 
 export const SliderContainer = styled.div`
   .sign {
@@ -582,7 +580,7 @@ export const SliderContainer = styled.div`
     border-width: 4px 4px 0;
     border-top-color: #6c6c6c;
   }
-`
+`;
 
 export const TagInput = styled.div`
   > ul {
@@ -610,8 +608,7 @@ export const TagInput = styled.div`
       }
     }
   }
- 
-`
+`;
 
 export const Button = styled.button`
   width: 250px;
@@ -623,14 +620,14 @@ export const Button = styled.button`
   font-size: 1.5rem;
   color: white;
   margin-bottom: 30px;
-`
+`;
 
 type Props = {
   party: { [key: string]: any },
-  editHandler: Function,
-}
+  editHandler: Function
+};
 
-export default function PartyEdit ({ party, editHandler }: Props) {
+export default function PartyEdit({ party, editHandler }: Props) {
   const navigate = useNavigate();
   const fileRef = useRef<any>();
   const imgRef = useRef<any>(null);
@@ -640,7 +637,7 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     credentials: new AWS.CognitoIdentityCredentials({
       IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
     })
-  })
+  });
 
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
@@ -649,79 +646,55 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     (state: RootReducerType) => state.signinReducer
   );
 
-  const [isName, setIsName] = useState({
-    err: false,
-    msg: ''
-  })
-  
-  const [isStrDate, setIsStrDate] = useState({
-    err: false,
-    msg: ''
-  })
-  
-  const [isEndDate, setIsEndDate] = useState({
-    err: false,
-    msg: ''
-  })
-  
-  const [isContent, setIsContent] = useState({
-    err: false,
-    msg: ''
-  })
-  
-  const [isPLink, setIsPLink] = useState({
-    err: false,
-    msg: ''
-  })
-  
-  const [isLocation, setIsLocation] = useState({
-    err: false,
-    msg: ''
-  })
+  const [ isName, setIsName ] = useState({ err: false, msg: '' });
+  const [ isStrDate, setIsStrDate ] = useState({ err: false, msg: '' });
+  const [ isEndDate, setIsEndDate ] = useState({ err: false, msg: '' });
+  const [ isContent, setIsContent ] = useState({ err: false, msg: '' });
+  const [ isPLink, setIsPLink ] = useState({ err: false, msg: '' });
+  const [ isLocation, setIsLocation ] = useState({ err: false, msg: '' });
 
-  const [partyInfo, setPartyInfo] = useState(party);
-  const [fixedLocation, setFixedLocation] = useState(partyInfo.location);
-  const [formatLocation, setFormatLocation] = useState('');
-  const [tags, setTags] = useState<string[]>(partyInfo.tag);
-  const [inputTxt, setInputTxt] = useState('');
-  const [isPosted, setIsPosted] = useState(false);
-  const [imgLoading, setImgLoading] = useState(false);
-  const [cancelModal, setCancelModal] = useState(false);
-  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [ partyInfo, setPartyInfo ] = useState(party);
+  const [ fixedLocation, setFixedLocation ] = useState(partyInfo.location);
+  const [ formatLocation, setFormatLocation ] = useState('');
+  const [ tags, setTags ] = useState<string[]>(partyInfo.tag);
+  const [ inputTxt, setInputTxt ] = useState('');
+
+  const [ isPosted, setIsPosted ] = useState(false);
+  const [ imgLoading, setImgLoading ] = useState(false);
+  const [ cancelModal, setCancelModal ] = useState(false);
+  const [ isErrorModalOpen, setIsErrorModalOpen ] = useState(false);
 
   const handleRefClick = (e: any) => {
     e.preventDefault();
     fileRef.current.click();
-  }
+  };
 
   const handleImgLoad = async (e: any) => {
-    setImgLoading(true)
-    let file = e.target.files[0]
+    setImgLoading(true);
+    let file = e.target.files[0];
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
         Key: `${signinReducer.userInfo.id}_${partyInfo.name}_edit_image`,
         Body: file,
       }
-    })
-    const promise = upload.promise()
+    });
+    const promise = upload.promise();
     promise.then(
-      function (data) {
-        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
+      (data) => {
+        console.log("✅ Uploaded Successfully")
         setPartyInfo({
           ...partyInfo,
           image: data.Location
         })
         setImgLoading(false)
       },
-      function (err) {
-        return console.log('오류가 발생했습니다: ', err.message)
-      }
-    )
-  }
+      (err) => console.log("🚫 Upload Failed")
+    );
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
+    const { name, value } = e.target;
     setPartyInfo({
       ...partyInfo,
       [name]: value
@@ -730,23 +703,23 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     if (partyInfo.location) setIsLocation({ err: false, msg: '' });
     if (partyInfo.privateLink) setIsPLink({ err: false, msg: '' });
     if (partyInfo.content) setIsContent({ err: false, msg: '' });
-  }
+  };
 
-  function getCurrentDate() {
+  const getCurrentDate = () => {
     let newDate = new Date();
     let date = newDate.getDate();
     let month = newDate.getMonth() + 1;
     let year = newDate.getFullYear();
     return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
-  }
+  };
 
-  function validationCheck() {
+  const validationCheck = () => {
     if (partyInfo.startDate > partyInfo.endDate) {
       setIsEndDate({
         err: true,
         msg: '종료일이 시작일보다 빠를 수 없습니다.'
       });
-    } 
+    }
     else {
       setIsStrDate({
         err: false,
@@ -763,7 +736,7 @@ export default function PartyEdit ({ party, editHandler }: Props) {
         err: true,
         msg: '종료일이 시작일보다 빠를 수 없습니다.'
       });
-    } 
+    }
     else {
       setIsEndDate({
         err: false,
@@ -777,90 +750,86 @@ export default function PartyEdit ({ party, editHandler }: Props) {
       ...partyInfo,
       memberLimit: value
     });
-  }
+  };
 
   const handleCoordsChange = (lat: number, lng: number) => {
     setPartyInfo({
       ...partyInfo,
       latlng: { lat: lat, lng: lng }
     });
-  }
+  };
 
   const handleFormatLocationChange = (address: string) => {
     setFormatLocation(address);
-  }
+  };
 
   const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
+    if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight')
       setFixedLocation(partyInfo.location);
-    }
-  }
+  };
 
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target
-
     setPartyInfo({
       ...partyInfo,
       [name]: value
     });
-
     if (partyInfo.content !== '') {
       setIsContent({
         err: false,
         msg: ''
       });
     }
-  }
+  };
 
   const handleIsOnline = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.className === 'isOnline' || e.currentTarget.className === 'isOnline unfocused') {
       setPartyInfo({
         ...partyInfo,
-        isOnline: true,  
+        isOnline: true,
       });
-    } 
+    }
     else {
       setPartyInfo({
         ...partyInfo,
-        isOnline: false,  
+        isOnline: false,
       });
     }
-  }
+  };
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === 'Enter' || e.code === 'Space') {
       if (!tags.includes(inputTxt) && inputTxt && tags.length < 3) {
-        setTags([...tags, inputTxt])
-        setInputTxt('')
+        setTags([...tags, inputTxt]);
+        setInputTxt('');
       }
     }
-  }
+  };
 
   const removeTag = (index: number) => {
     setTags(tags.filter((tag) => {
       return tags.indexOf(tag) !== index
-    }))
-  }
+    }));
+  };
 
   const postCancelHandler = () => {
     if (cancelModal) setCancelModal(false);
     else setCancelModal(true);
-  }
+  };
 
   const errorModalHandler = () => {
     if (isErrorModalOpen) setIsErrorModalOpen(false);
     else setIsErrorModalOpen(true);
-  }
+  };
 
   const backToPage = () => {
     editHandler();
-  }
-  
+  };
+
   const editParty = () => {
-    const regex = {        
+    const regex = {
       url: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/,
     };
-
     if (partyInfo.name === '') {
       setIsName({
         err: true,
@@ -891,13 +860,12 @@ export default function PartyEdit ({ party, editHandler }: Props) {
         msg: '퀘스트 장소를 입력해주세요.'
       });
     }
-
     if (partyInfo.privateLink === '') {
       setIsPLink({
         err: true,
         msg: '오픈채팅방 링크를 입력해주세요.'
       });
-    } 
+    }
     else if (!regex.url.test(partyInfo.privateLink)) {
       setIsPLink({
         err: true,
@@ -907,7 +875,7 @@ export default function PartyEdit ({ party, editHandler }: Props) {
 
     if (partyInfo.name && partyInfo.startDate && partyInfo.endDate && partyInfo.location &&
       partyInfo.privateLink && regex.url.test(partyInfo.privateLink) && partyInfo.content &&
-      !isName.err && !isStrDate.err && !isEndDate.err && !isContent.err && !isLocation.err && 
+      !isName.err && !isStrDate.err && !isEndDate.err && !isContent.err && !isLocation.err &&
       !isPLink.err) {
         setIsPosted(true);
       }
@@ -933,15 +901,13 @@ export default function PartyEdit ({ party, editHandler }: Props) {
         privateLink: partyInfo.privateLink,
         tag: tags
       }
-    }, {
-      withCredentials: true
-    });
+    }, { withCredentials: true });
     return res;
   }
 
   useEffect(() => {
     validationCheck();
-  }, [partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink]);
+  }, [ partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink ]);
 
   useEffect(() => {
     if (isPosted) {
@@ -956,26 +922,26 @@ export default function PartyEdit ({ party, editHandler }: Props) {
         setIsPosted(false);
       })
     }
-  }, [isPosted]);
+  }, [ isPosted ]);
 
-  if(!isLoggedIn) return <Navigate to="/" />
-  
+  if (!isLoggedIn) return <Navigate to="/" />
+
   return (
     <PostContainer>
       {cancelModal ?
-        <PostCancelModal 
+        <PostCancelModal
           postCancelHandler={postCancelHandler}
           backToPage={backToPage}
         />
       : null}
       {isErrorModalOpen ?
-        <ErrorModal 
+        <ErrorModal
           errorModalHandler={errorModalHandler}
         />
       : null}
       <TopNavigation>
         <button className="cancelBtn" onClick={postCancelHandler}>
-          <FontAwesomeIcon icon={ faArrowLeft } className="icon" /> 
+          <FontAwesomeIcon icon={ faArrowLeft } className="icon" />
         </button>
         <div className="partyName">{partyInfo.name}</div>
         <button className="post" onClick={editParty}>
@@ -992,7 +958,7 @@ export default function PartyEdit ({ party, editHandler }: Props) {
                   return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
                 }}
               />
-              <input 
+              <input
                 ref={fileRef}
                 type='file'
                 className='imgInput'
@@ -1050,7 +1016,7 @@ export default function PartyEdit ({ party, editHandler }: Props) {
             <fieldset>
               <div className='label'>파티 정원 <span style={{ fontWeight: "normal" }}>(1/{partyInfo.memberLimit})</span></div>
               <SliderContainer>
-                <Slider 
+                <Slider
                   min={2}
                   max={10}
                   step={1}
@@ -1077,18 +1043,18 @@ export default function PartyEdit ({ party, editHandler }: Props) {
                 <button className={partyInfo.isOnline ? 'isOnline' : 'isOnline unfocused'} onClick={(e) => {handleIsOnline(e)}}>온라인</button>
               </div>
             </div>
-            {!partyInfo.isOnline ? 
+            {!partyInfo.isOnline ?
               <div className='mapContainer'>
                 <div id='map' className='mapDesc'>
-                  <PostMap 
-                    location={fixedLocation} 
+                  <PostMap
+                    location={fixedLocation}
                     name={partyInfo.name}
-                    image={partyInfo.image} 
+                    image={partyInfo.image}
                     handleCoordsChange={handleCoordsChange}
                     handleFormatLocationChange={handleFormatLocationChange}
                   />
                 </div>
-                <input 
+                <input
                   className='mapInput'
                   name='location'
                   type='text'
@@ -1098,7 +1064,7 @@ export default function PartyEdit ({ party, editHandler }: Props) {
                 />
               </div>
             :
-              <input 
+              <input
                 name='location'
                 type='text'
                 value={partyInfo.location}
@@ -1150,7 +1116,7 @@ export default function PartyEdit ({ party, editHandler }: Props) {
           <fieldset>
             <div className='label content'>
               퀘스트 내용
-              {isContent.err ? <div className='error'>{isContent.msg}</div> : null}  
+              {isContent.err ? <div className='error'>{isContent.msg}</div> : null}
             </div>
             <textarea
               placeholder='파티원들이 퀘스트 내용을 이해할 수 있도록 자세히 작성해주세요.'

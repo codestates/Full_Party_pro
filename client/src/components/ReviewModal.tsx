@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
+import confetti from 'canvas-confetti';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faFlag, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { faSadCry, faSadTear, faSmile, faGrinWink, faLaughBeam } from '@fortawesome/free-solid-svg-icons';
-import confetti from 'canvas-confetti';
-import { faSadCry as blankSadCry, faSadTear as blankSadTear, faSmile as blankSmile, 
+import { faSadCry as blankSadCry, faSadTear as blankSadTear, faSmile as blankSmile,
   faGrinWink as blankGrinWink, faLaughBeam as blankLaughBeam
 } from '@fortawesome/free-regular-svg-icons';
 
@@ -26,7 +26,7 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   width: 360px;
@@ -51,7 +51,7 @@ export const ModalView = styled.div`
     display: none;
     margin: 5px 0;
   }
-`
+`;
 
 export const UserInfo = styled.section`
   width: 100%;
@@ -96,7 +96,7 @@ export const UserInfo = styled.section`
       color: #50C9C3;
     }
   }
-`
+`;
 
 export const ReviewContainer = styled.section`
   display: flex;
@@ -113,7 +113,7 @@ export const ReviewContainer = styled.section`
     button {
       background-color: white;
       border: none;
-      font-size: 2rem;   
+      font-size: 2rem;
     }
 
     .label {
@@ -122,7 +122,7 @@ export const ReviewContainer = styled.section`
       font-size: 0.8rem;
     }
   }
-`
+`;
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -131,7 +131,7 @@ export const CloseBtn = styled.button`
   margin-bottom: 10px;
   background-color: white;
   border: none;
-`
+`;
 
 export const ProgressBar = styled.section`
   width: 100%;
@@ -151,7 +151,7 @@ export const ProgressBar = styled.section`
     border-radius: inherit;
     text-align: right;
   }
-`
+`;
 
 export const CompleteBtns = styled.section`
   display: flex;
@@ -186,7 +186,7 @@ type Props = {
 };
 
 interface keyable {
- [key: string]: any  
+ [key: string]: any
 };
 
 export default function ReviewModal({ reviewModalHandler, members, leaderId, isLeader, userId, partyId, handlePartyInfoChange }: Props) {
@@ -200,41 +200,37 @@ export default function ReviewModal({ reviewModalHandler, members, leaderId, isL
 
   const closeModal =() => {
     reviewModalHandler();
-  }
+  };
 
-  function reviewHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  const reviewHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     const reviewedExp = (event.currentTarget as HTMLButtonElement).value;
     setReviewMembers(reviewMembers.map((member, idx) => (idx === curIdx ? { ...member, exp: Number(reviewedExp) } : member)));
     setProgress(memberToReview > 0 ? ((members.length - memberToReview + 1)/members.length*100) : 100);
-  }
+  };
 
-  function handleMemberChange(event: React.MouseEvent<HTMLButtonElement>) {
+  const handleMemberChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     const toGo = (event.currentTarget as HTMLButtonElement).value;
     if (toGo === "left") setCurIdx(curIdx - 1);
     else setCurIdx(curIdx + 1);
-  }
+  };
 
-  async function questCompleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  const questCompleteHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     const reviewedMembers = reviewMembers.map((member) => ({ userId: member.id, exp: member.exp}));
     if (isLeader) {
       await axios.patch(`${process.env.REACT_APP_API_URL}/party/completed`, {
         partyId
-      }, {
-        withCredentials: true
-      });
+      }, { withCredentials: true });
       handlePartyInfoChange("partyState", 2);
     }
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/review`, {
       partyId,
       userId,
       exp: reviewedMembers,
-    }, {
-      withCredentials: true
-    });
+    }, { withCredentials: true });
     handlePartyInfoChange("isReviewed", true);
     confetti();
     reviewModalHandler();
-  }
+  };
 
   return (
     <ModalContainer>
@@ -331,5 +327,5 @@ export default function ReviewModal({ reviewModalHandler, members, leaderId, isL
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
-  )
+  );
 }

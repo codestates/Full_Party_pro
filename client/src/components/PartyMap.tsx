@@ -70,10 +70,10 @@ export const MapContainer = styled.section`
 type Props = {
   isMember: boolean,
   location: string,
-  image: string,
+  image: string
 };
 
-export default function PartyMap ({ isMember, location, image }: Props) {
+export default function PartyMap({ isMember, location, image }: Props) {
   const { kakao } = window;
   const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
@@ -83,7 +83,7 @@ export default function PartyMap ({ isMember, location, image }: Props) {
   useEffect(() => {
     const geocoder = new kakao.maps.services.Geocoder();
     if (location) {
-      geocoder.addressSearch(location, function(result: any, status: any) {
+      geocoder.addressSearch(location, (result: any, status: any) => {
         if (status === kakao.maps.services.Status.OK) {
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
           const { La, Ma } = coordinates;
@@ -119,7 +119,7 @@ export default function PartyMap ({ isMember, location, image }: Props) {
               <div className="partyImg" style={{background: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center"}} />
             </CustomOverlayMap>
           </>
-        : 
+        :
           <Circle
             center={coords}
             radius={800}
@@ -143,7 +143,7 @@ export default function PartyMap ({ isMember, location, image }: Props) {
               >
                 <span className="title">퀘스트 장소</span>
               </a>
-            : 
+            :
               <a href="#" onClick={e => e.preventDefault()}>
                 <span className="title">퀘스트 장소</span>
               </a>
@@ -152,5 +152,5 @@ export default function PartyMap ({ isMember, location, image }: Props) {
         </CustomOverlayMap>
       </Map>
     </MapContainer>
-  )
+  );
 }

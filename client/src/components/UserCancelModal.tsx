@@ -20,7 +20,7 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   border-radius: 30px;
@@ -59,7 +59,7 @@ export const ModalView = styled.div`
       color: #50C9C3;
     }
   }
-`
+`;
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -68,24 +68,23 @@ export const CloseBtn = styled.button`
   margin-bottom: 20px;
   background-color: white;
   border: none;
-`
+`;
+
 type Props = {
   from: string,
   userCancelHandler: Function,
   handleSignOut: Function,
-  handleWithdrawal: Function,
-}
+  handleWithdrawal: Function
+};
 
 export default function UserCancelModal({ from, userCancelHandler, handleSignOut, handleWithdrawal }: Props) {
-  const closeModal =() => {
-    userCancelHandler();
-  }
+  const closeModal =() => userCancelHandler();
 
-  function functionController(){
+  const functionController = () => {
     if (from === "signout") handleSignOut();
     else if (from === "delete") handleWithdrawal();
     userCancelHandler();
-  }
+  };
 
   return(
     <ModalContainer>
@@ -110,5 +109,5 @@ export default function UserCancelModal({ from, userCancelHandler, handleSignOut
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
-  )
+  );
 }

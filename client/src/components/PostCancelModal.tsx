@@ -19,7 +19,7 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   border-radius: 30px;
@@ -50,16 +50,16 @@ export const ModalView = styled.div`
     .exit {
       border: none;
       background-color: #50C9C3;
-      color: white; 
+      color: white;
     }
 
     .cancel {
-      border: 1px solid #50C9C3; 
+      border: 1px solid #50C9C3;
       background-color: #fff;
-      color: #50C9C3; 
+      color: #50C9C3;
     }
   }
-`
+`;
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -68,20 +68,17 @@ export const CloseBtn = styled.button`
   margin-bottom: 20px;
   background-color: white;
   border: none;
-
-`
+`;
 
 type Props = {
-  postCancelHandler: Function
+  postCancelHandler: Function,
   backToPage: Function
-}
+};
 
-const PostCancelModal = ({ postCancelHandler, backToPage }: Props) => {
-  const closeModal =() => {
-    postCancelHandler();
-  }
+export default function PostCancelModal({ postCancelHandler, backToPage }: Props) {
+  const closeModal = () => postCancelHandler();
 
-  return(
+  return (
     <ModalContainer>
       <ModalBackdrop onClick={closeModal}>
         <ModalView onClick={(e) => e.stopPropagation()}>
@@ -91,20 +88,18 @@ const PostCancelModal = ({ postCancelHandler, backToPage }: Props) => {
             <br />지금까지 작업하신 내용은 전부 사라집니다.
           </div>
           <div className="buttons">
-            <button 
-              className="exit" 
+            <button
+              className="exit"
               onClick={() => backToPage()}
             >
                 확인
             </button>
             <button className="cancel" onClick={closeModal}>
                 취소
-            </button>    
+            </button>
           </div>
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
-  )
+  );
 }
-
-export default PostCancelModal;

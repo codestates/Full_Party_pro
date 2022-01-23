@@ -22,7 +22,7 @@ export const MapContainer = styled.div`
     border: 0; 
     box-shadow: 0px 1px 2px #999;
   }
-  
+
   .infoWindow div {
     display:block;
     text-decoration:none;
@@ -63,13 +63,13 @@ export const MapContainer = styled.div`
     border-radius: 100%;
     border: 2px solid #fff;
   }
-`
+`;
 
 type Props = {
   location: string,
   image: string,
   handleFormatAddressChange: Function
-}
+};
 
 export default function UserMap({ location, image, handleFormatAddressChange }: Props) {
   const { kakao } = window;
@@ -77,9 +77,9 @@ export default function UserMap({ location, image, handleFormatAddressChange }: 
   const { lat, lng } = coords;
   const geocoder = new kakao.maps.services.Geocoder();
 
-  function searchDetailAddrFromCoords(coords: { lat: number, lng: number }, callback: Function) {
+  const searchDetailAddrFromCoords = (coords: { lat: number, lng: number }, callback: Function) => {
     geocoder.coord2Address(coords.lng, coords.lat, callback);
-  }
+  };
 
   useEffect(() => {
     if (location) {
@@ -103,7 +103,7 @@ export default function UserMap({ location, image, handleFormatAddressChange }: 
         handleFormatAddressChange(address);
       }
    });
-  },[coords])
+  },[ coords ]);
 
   if (!location) {
     return (
@@ -115,7 +115,7 @@ export default function UserMap({ location, image, handleFormatAddressChange }: 
           onZoomChanged={(map) => map.setLevel(map.getLevel() > 7 ? 7 : map.getLevel())}
         />
       </MapContainer>
-    )
+    );
   }
 
   return (
@@ -152,5 +152,5 @@ export default function UserMap({ location, image, handleFormatAddressChange }: 
         </CustomOverlayMap>
       </Map>
     </MapContainer>
-  )
+  );
 }

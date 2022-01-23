@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { NOTIFY } from "../actions/notify"
 import styled from 'styled-components';
+import Loading from '../components/Loading';
+import { Navigate, Link } from 'react-router-dom';
+import { NOTIFY } from "../actions/notify"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faBullhorn, faScroll, faTrophy, faStar, faBellSlash } from '@fortawesome/free-solid-svg-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
 import { cookieParser } from '../App';
-import Loading from '../components/Loading';
 
 export const NotificationContainer = styled.div`
   margin: 60px 0;
+
   .notificationList {
     display: flex;
     justify-content: space-between;
@@ -82,7 +83,7 @@ export const NotificationContainer = styled.div`
       color: #777;
     }
   }
-`
+`;
 
 export default function Notification() {
   const dispatch = useDispatch();
@@ -133,7 +134,7 @@ export default function Notification() {
     const betweenTimeDay = Math.floor(betweenTime / 60 / 24);
     if (betweenTimeDay < 365) return `${betweenTimeDay}일 전`;
     return `${Math.floor(betweenTimeDay / 365)}년전`;
-  }
+  };
 
   useEffect(() => {
     if (userId !== 0.1) {
@@ -209,7 +210,8 @@ export default function Notification() {
               <div className="time">{timeForToday(noti.createdAt)}</div>
             </div>
           );
-        } else {
+        }
+        else {
           return (
             <Link to={`/party/${noti.partyId}${noti.commentId ? `/${noti.commentId}` : ""}`} style={{ textDecoration: 'none' }} key={idx}>
               <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>

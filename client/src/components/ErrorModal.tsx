@@ -19,7 +19,7 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   border-radius: 30px;
@@ -47,7 +47,7 @@ export const ModalView = styled.div`
     background-color: #50C9C3;
     color: white; 
   }
-`
+`;
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -56,18 +56,14 @@ export const CloseBtn = styled.button`
   margin-bottom: 20px;
   background-color: white;
   border: none;
-`
+`;
 
 type Props = {
-  errorModalHandler: Function,
-}
+  errorModalHandler: Function
+};
 
-const ErrorModal = ({ errorModalHandler }: Props) => {
-
-  const closeModal =() => {
-    errorModalHandler();
-  }
-
+export default function ErrorModal({ errorModalHandler }: Props) {
+  const closeModal = () => errorModalHandler();
 
   return(
     <ModalContainer>
@@ -78,8 +74,8 @@ const ErrorModal = ({ errorModalHandler }: Props) => {
             네트워크 오류로 퀘스트 등록에 실패했습니다.
             <br />다시 시도해주세요.
           </div>
-          <button 
-            className="exit" 
+          <button
+            className="exit"
             onClick={closeModal}
           >
             확인
@@ -89,5 +85,3 @@ const ErrorModal = ({ errorModalHandler }: Props) => {
     </ModalContainer>
   )
 }
-
-export default ErrorModal;

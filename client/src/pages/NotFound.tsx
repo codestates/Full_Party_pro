@@ -1,6 +1,6 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 export const Container = styled.section`
   width: 100%;

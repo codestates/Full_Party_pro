@@ -25,7 +25,7 @@ const modalReducer = (state = initialState, action: IsModalDispatchType): Initia
         isModal: true,
         modalType: 'signup'
       };
-    
+
     case CLOSE_MODAL:
       return {
         ...state,

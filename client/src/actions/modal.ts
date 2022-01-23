@@ -17,4 +17,4 @@ export const modalChanger = (className: string) => (dispatch: Dispatch<IsModalDi
       type: SIGNUP_MODAL
     });
   }
-}
+};

@@ -1,11 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { cookieParser } from "../App";
+import axios from 'axios';
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart, faAngleDown, faAngleUp, faBullhorn, faBirthdayCake, faCalendarCheck, faGlobe } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
 import Loading from '../components/Loading';
 import UserInfoModal from '../components/UserInfoModal';
 import PartyJoinModal from '../components/PartyJoinModal';
@@ -13,13 +8,20 @@ import SigninModal from '../components/SigninModal';
 import ReviewModal from '../components/ReviewModal';
 import PartyCancelModal from '../components/PartyCancelModal';
 import PartyEdit from '../components/PartyEdit';
-import { NOTIFY } from '../actions/notify';
 import PartyMap from '../components/PartyMap';
 import MemberList from '../components/MemberList';
 import QnA from '../components/QnA';
 import NotFound from '../pages/NotFound';
 import { AppState } from '../reducers';
-import axios from 'axios';
+import { NOTIFY } from '../actions/notify';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { cookieParser } from "../App";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart as blankFaHeart } from "@fortawesome/free-regular-svg-icons";
+import { faArrowLeft, faShareAlt, faComments, faMapMarkerAlt, faCalendarAlt, faHeart,
+  faAngleDown, faAngleUp, faBullhorn, faBirthdayCake, faCalendarCheck, faGlobe
+} from '@fortawesome/free-solid-svg-icons';
 
 export const PartyContainer = styled.div`
   margin: 60px 0 80px 0;
@@ -35,7 +37,7 @@ export const PartyContainer = styled.div`
   .favorite {
     color: #fa3e7d;
   }
-`
+`;
 
 export const CVBtns = styled.div`
   position: fixed;
@@ -66,7 +68,7 @@ export const CVBtns = styled.div`
       margin-left: 10px;
     }
   }
-`
+`;
 
 export const Main = styled.section`
   section {
@@ -133,7 +135,7 @@ export const Main = styled.section`
     font-size: 0.8rem;
     color: #777;
   }
-`
+`;
 
 export const FavAndTag = styled.section`
   display: flex;
@@ -290,11 +292,13 @@ export default function Party() {
   const [ isPartyJoinModalOpen, setIsPartyJoinModalOpen ] = useState(false);
   const [ isSigninModalOpen, setIsSigninModalOpen ] = useState(false);
   const [ isReviewModalOpen, setIsReviewModalOpen ] = useState(false);
+
   const [ isPartyCancelModalOpen, setIsPartyCancelModalOpen ] = useState(false);
   const [ isEdit, setIsEdit ] = useState(false);
   const [ from, setFrom ] = useState("");
   const [ userInfo, setUserInfo ] = useState({});
   const [ findComment, setFindComment ] = useState(-1);
+
   const [ comments, setComments ] = useState([]);
   const [ isLoading, setIsLoading ] = useState(true);
   const [ notFound, setNotFound ] = useState(false);
@@ -368,7 +372,7 @@ export default function Party() {
         members: partyInfo.members.filter((member) => member.id !== userInfo)
       });
     }
-  }
+  };
 
   const handleMemberInfoChange = (userId: number, key: string, value: any) => {
     const newMemberInfo = partyInfo.members.map((member) => (member.id === userId ? { ...member, [key]: value } : member));
@@ -398,7 +402,7 @@ export default function Party() {
         isFavorite: true,
       });
     }
-  }
+  };
 
   const shareHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     const leader = partyInfo.members.filter((member) => member.id === partyInfo.leaderId)[0];
@@ -425,43 +429,37 @@ export default function Party() {
       },
       buttonTitle: '퀘스트 참여하기'
     });
-  }
+  };
 
-  const tagSearchHandler = (tag: string) => {
-    navigate(`../search/tag/${tag}`);
-  }
+  const tagSearchHandler = (tag: string) => navigate(`../search/tag/${tag}`);
 
-  const waitingListHandler = (): void =>{
-    setIsWaitingListOpen(!isWaitingListOpen);
-  }
+  const waitingListHandler = (): void => setIsWaitingListOpen(!isWaitingListOpen);
+
+  const editHandler = (event: React.MouseEvent<HTMLButtonElement>) => setIsEdit(!isEdit);
 
   const userInfoModalHandler = (event: React.MouseEvent<HTMLDivElement>, from: string, listIdx: number): void => {
     setFrom(from);
     if (from === "members") setUserInfo(partyInfo.members[listIdx]);
     else setUserInfo(partyInfo.waitingQueue[listIdx]);
     setIsUserInfoModalOpen(!isUserInfoModalOpen);
-  }
+  };
 
   const partyJoinModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsPartyJoinModalOpen(!isPartyJoinModalOpen);
-  }
+  };
 
   const signinModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsSigninModalOpen(!isSigninModalOpen);
-  }
+  };
 
   const reviewModalHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setIsReviewModalOpen(!isReviewModalOpen);
-  }
+  };
 
   const partyCancelModalHandler = (event: React.MouseEvent<HTMLButtonElement>, from: string): void => {
     setFrom(from);
     setIsPartyCancelModalOpen(!isPartyCancelModalOpen);
-  }
-
-  const editHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setIsEdit(!isEdit);
-  }
+  };
 
   const cancelHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyInfo.id}/cancel/${userId}`);
@@ -474,7 +472,7 @@ export default function Party() {
       ...userState,
       isWaiting: false,
     });
-  }
+  };
 
   const quitHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyInfo.id}/quit/${userId}`);
@@ -487,7 +485,7 @@ export default function Party() {
       ...userState,
       isMember: false,
     });
-  }
+  };
 
   const fullPartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/fullParty`, {
@@ -499,7 +497,7 @@ export default function Party() {
         partyState: 1
       });
     }
-  }
+  };
 
   const rePartyHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     const res = await axios.patch(`${process.env.REACT_APP_API_URL}/party/reParty`, {
@@ -511,12 +509,12 @@ export default function Party() {
         partyState: 0
       });
     }
-  }
+  };
 
   const dismissHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/${partyInfo.id}`);
     navigate('../home');
-  }
+  };
 
   useEffect(() => {
     setIsUserInfoModalOpen(false);
@@ -540,7 +538,7 @@ export default function Party() {
       }
     });
     setIsLoading(false);
-  }, [params]);
+  }, [ params ]);
 
   useEffect(() => {
     setIsLoading(true);

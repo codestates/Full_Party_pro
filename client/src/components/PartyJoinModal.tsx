@@ -22,7 +22,7 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   width: 350px;
@@ -68,8 +68,7 @@ export const ModalView = styled.div`
     color: white;
     background-color: #50C9C3; 
   }
-
-`
+`;
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -78,35 +77,35 @@ export const CloseBtn = styled.button`
   margin-bottom: 20px;
   background-color: white;
   border: none;
-`
+`;
 
 type Props = {
   partyJoinModalHandler: Function,
   userId: number,
   partyId: number
-}
+};
 
-const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
-  const navigate = useNavigate()
-  const [message, setMessage] = useState("");
+export default function PartyJoinModal({ partyJoinModalHandler, userId, partyId }: Props) {
+  const navigate = useNavigate();
+  const [ message, setMessage ] = useState("");
 
-  const closeModal =() => {
+  const closeModal = () => {
     partyJoinModalHandler();
-  }
+  };
 
-  function inputHandler(event: React.ChangeEvent<HTMLTextAreaElement>): void {
+  const inputHandler = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
     setMessage(event.target.value);
-  }
+  };
 
-  async function joinHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  const joinHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     await axios.post(`${process.env.REACT_APP_API_URL}/party/enqueued`, {
       userId,
       partyId,
-      message,
+      message
     });
     closeModal();
     navigate(`../party/${partyId}`);
-  }
+  };
 
   return (
     <ModalContainer>
@@ -120,14 +119,12 @@ const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
             value={message}
             onChange={(e) => inputHandler(e)}
             placeholder="나에 대해 파티원들에게 소개해주세요.&#13;&#10;이 메시지는 가입 신청 승인 후 파티원 모두가 열람할 수 있는 정보이므로, 민감한 정보나 개인 정보는 포함되지 않도록 주의해주세요.">
-          </textarea> 
+          </textarea>
           <button id="join" onClick={joinHandler}>
             가입 신청
           </button>
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
-  )
+  );
 }
-
-export default PartyJoinModal;

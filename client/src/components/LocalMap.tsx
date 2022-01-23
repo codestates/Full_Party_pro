@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
 
 export const MapContainer = styled.section`
-
   width: 100%;
   display: flex;
   justify-content: center;
@@ -24,10 +23,10 @@ export const MapContainer = styled.section`
   }
 
   .infoWindow:nth-of-type(n) {
-    border: 0; 
+    border: 0;
     box-shadow: 0px 1px 2px #999;
   }
-  
+
   .infoWindow .navigate {
     display:block;
     text-decoration:none;
@@ -72,22 +71,21 @@ export const MapContainer = styled.section`
 
 type Props = {
   location: string,
-  localParty: Array<{ [key: string]: any }>,
+  localParty: Array<{ [key: string]: any }>
 };
 
-export default function LocalMap ({ location, localParty }: Props) {
-
-  const { kakao } = window;
+export default function LocalMap({ location, localParty }: Props) {
   const navigate = useNavigate();
+  const { kakao } = window;
   const geocoder = new kakao.maps.services.Geocoder();
-  const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
+  const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
 
   type p = {
-    party: { [key: string]: any },
+    party: { [key: string]: any }
   };
 
   const EventMarkerContainer = ({ party }: p) => {
-    const [isVisible, setIsVisible] = useState(false)
+    const [isVisible, setIsVisible] = useState(false);
 
     return (
       <>
@@ -106,15 +104,15 @@ export default function LocalMap ({ location, localParty }: Props) {
           position={party.latlng}
           yAnchor={3.1}
         >
-          <div className="partyImg" 
-            onClick={() => navigate(`../party/${party.id}`)} 
+          <div className="partyImg"
+            onClick={() => navigate(`../party/${party.id}`)}
             onMouseOver={() => setIsVisible(true)}
             onMouseOut={() => setIsVisible(false)}
-            style={{background: `url(${party.image})`, backgroundSize: "cover", backgroundPosition: "center"}} 
+            style={{background: `url(${party.image})`, backgroundSize: "cover", backgroundPosition: "center"}}
           />
         </CustomOverlayMap>
 
-        {isVisible? 
+        {isVisible?
           <CustomOverlayMap
             position={party.latlng}
           >
@@ -130,14 +128,14 @@ export default function LocalMap ({ location, localParty }: Props) {
   }
 
   useEffect(() => {
-    geocoder.addressSearch(location, function(result: any, status: any) {
+    geocoder.addressSearch(location, (result: any, status: any) => {
       if (status === kakao.maps.services.Status.OK) {
         const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
         const { La, Ma } = coordinates;
         setCoords({ lat: Ma, lng: La });
       }
     });
-  }, [localParty]);
+  }, [ localParty ]);
 
   return (
     <MapContainer>
@@ -155,5 +153,5 @@ export default function LocalMap ({ location, localParty }: Props) {
       ))}
       </Map>
     </MapContainer>
-  )
+  );
 }

@@ -28,7 +28,6 @@ export const CardContainer = styled.div`
 `;
 
 export default function EmptyParty () {
-
   return (
     <CardContainer>
       <div className="iconContainer"><FontAwesomeIcon icon={ faSadTear } /></div>

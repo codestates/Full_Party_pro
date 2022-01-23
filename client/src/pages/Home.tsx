@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
+import AOS from "aos";
+import "../../node_modules/aos/dist/aos.css";
+import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { modalChanger } from '../actions/modal';
 import { faClipboardCheck, faMapMarkedAlt, faStreetView, faBirthdayCake, faCodeBranch, faEnvelope } from "@fortawesome/free-solid-svg-icons";
-import AOS from "aos";
-import "../../node_modules/aos/dist/aos.css";
 
 export const HomeContainer = styled.div`
   position: absolute;
@@ -144,7 +144,7 @@ export const AppInfo = styled.section`
       width: 700px;
     }
   }
-`
+`;
 
 export const Features = styled.section`
   background: linear-gradient(to bottom, #50C9C3 20%, #50C9C3 100%);
@@ -194,7 +194,7 @@ export const Features = styled.section`
   .contentBody {
     margin: 0 30px;
   }
-`
+`;
 
 export const SignIn = styled.section`
   padding: 12% 10vw;
@@ -237,7 +237,7 @@ export const SignIn = styled.section`
       width: 400px;
     }
   }
-`
+`;
 
 export const Footer = styled.footer`
   padding: 30px;
@@ -268,14 +268,14 @@ export const Footer = styled.footer`
       margin-right: 7px;
     }
   }
-`
+`;
 
 export default function Home() {
   const dispatch = useDispatch();
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement | HTMLDivElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className));
-  }
+  };
 
   useEffect(() => {
     AOS.init({

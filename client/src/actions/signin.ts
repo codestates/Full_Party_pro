@@ -7,7 +7,7 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
   document.cookie = "signupType=general";
   document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
   await axios.post(`${process.env.REACT_APP_API_URL}/signin`, userInfo, {
-    withCredentials:true
+    withCredentials: true
   })
   .then((res) => {
     if (res.status === 200) {
@@ -26,6 +26,5 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
         type: SIGNIN_FAIL
       });
     }
-  })
-
+  });
 }

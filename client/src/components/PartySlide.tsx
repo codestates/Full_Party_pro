@@ -1,13 +1,13 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import Slider from "react-slick";
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faMapMarkerAlt, faCalendarAlt, faGlobe } from '@fortawesome/free-solid-svg-icons';
 
 export const PartySlideContainer = styled.div`
   width: 100%;
-  height: 100%;  
+  height: 100%;
   padding: 0 20px;
   margin-bottom: 50px;
 
@@ -78,7 +78,7 @@ export const PartySlideContainer = styled.div`
   .slick-next:before, .slick-prev:before {
     content: '';
   }
-  
+
   .center h3 {
       transition: all .3s ease;
   }
@@ -87,9 +87,9 @@ export const PartySlideContainer = styled.div`
     opacity: 1; 
     color: #50C9C3; 
   }
-`
+`;
 
-function NextArrow(props: any) {
+const NextArrow = (props: any) => {
   const { className, onClick } = props;
   return (
     <div
@@ -99,9 +99,9 @@ function NextArrow(props: any) {
       <FontAwesomeIcon icon={ faChevronRight } />
     </div>
   );
-}
+};
 
-function PrevArrow(props: any) {
+const PrevArrow = (props: any) => {
   const { className, onClick } = props;
   return (
     <div
@@ -110,15 +110,14 @@ function PrevArrow(props: any) {
     >
       <FontAwesomeIcon icon={ faChevronLeft } />
     </div>
-    
   );
-}
+};
 
 type Props = {
-  myParty: Array<{[key: string]: any}>,
-}
+  myParty: Array<{[key: string]: any}>
+};
 
-export default function PartySlide ({ myParty }: Props) {
+export default function PartySlide({ myParty }: Props) {
   const navigate = useNavigate();
   const settings = {
     dots: true,
@@ -158,9 +157,7 @@ export default function PartySlide ({ myParty }: Props) {
     ]
   };
 
-  function formatDate(date: Date) {
-    return String(date).slice(0, 11);
-  }
+  const formatDate = (date: Date) => String(date).slice(0, 11);
 
   return (
     <PartySlideContainer>

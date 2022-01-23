@@ -19,10 +19,10 @@ export const MapContainer = styled.div`
   }
 
   .infoWindow:nth-of-type(n) {
-    border: 0; 
+    border: 0;
     box-shadow: 0px 1px 2px #999;
   }
-  
+
   .infoWindow div {
     display:block;
     text-decoration:none;
@@ -66,7 +66,7 @@ export const MapContainer = styled.div`
     border-radius: 100%;
     border: 2px solid #fff;
   }
-`
+`;
 
 type Props = {
   location: string,
@@ -74,21 +74,21 @@ type Props = {
   image: string,
   handleCoordsChange: Function,
   handleFormatLocationChange: Function
-}
+};
 
-const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocationChange }: Props) => {
+export default function PostMap({ location, name, image, handleCoordsChange, handleFormatLocationChange }: Props) {
   const { kakao } = window;
   const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
   const geocoder = new kakao.maps.services.Geocoder();
 
-  function searchAddrFromCoords(coords: { lat: number, lng: number }, callback: Function) {
+  const searchAddrFromCoords = (coords: { lat: number, lng: number }, callback: Function) => {
     geocoder.coord2RegionCode(coords.lng, coords.lat, callback);
-  }
+  };
 
   useEffect(() => {
     if (location) {
-      geocoder.addressSearch(location, function(result: any, status: any) {
+      geocoder.addressSearch(location, (result: any, status: any) => {
         if (status === kakao.maps.services.Status.OK) {
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
           const { La, Ma } = coordinates;
@@ -97,18 +97,17 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
         }
       });
     }
-
   }, [ location ]);
 
   useEffect(() => {
-    searchAddrFromCoords(coords, function(result: any, status: any) {
+    searchAddrFromCoords(coords, (result: any, status: any) => {
       if (status === kakao.maps.services.Status.OK) {
         const address = result[0].address_name;
         const region = address.split(" ")[0] + " " + address.split(" ")[1];
         handleFormatLocationChange(region);
       }
    });
-  }, [coords]);
+  }, [ coords ]);
 
   if (!location) {
     return (
@@ -120,7 +119,7 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
           onZoomChanged={(map) => map.setLevel(map.getLevel() > 7 ? 7 : map.getLevel())}
         />
       </MapContainer>
-    )
+    );
   }
 
   return (
@@ -157,7 +156,5 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
         </CustomOverlayMap>
       </Map>
     </MapContainer>
-  )
+  );
 }
-
-export default PostMap;

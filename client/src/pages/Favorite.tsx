@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import styled from 'styled-components';
+import Loading from '../components/Loading';
+import QuestCard from '../components/QuestCard';
 import { cookieParser } from "../App"
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import styled from 'styled-components';
 import { AppState } from '../reducers';
-import Loading from '../components/Loading';
-import QuestCard from '../components/QuestCard';
-import axios from 'axios';
 import { NOTIFY } from "../actions/notify"
 
 export const FavoriteContainer = styled.div`
@@ -25,7 +25,7 @@ export const FavoriteContainer = styled.div`
     font-size: 1.1rem;
     color: #777;
   }
-`
+`;
 
 export default function Favorite() {
   const dispatch = useDispatch();

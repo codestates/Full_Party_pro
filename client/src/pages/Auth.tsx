@@ -1,10 +1,10 @@
 import React from 'react';
+import axios from 'axios';
+import styled from 'styled-components';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import axios from 'axios';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { useDispatch } from 'react-redux';
-import styled from 'styled-components';
 import { cookieParser } from '../App';
 
 export const LoadingContainer = styled.div`
@@ -55,9 +55,9 @@ export default function Auth() {
 
   const handleGoogleLogin = async () => {
     const authorizationCode = new URL(window.location.href).searchParams.get("code");
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/google`, { authorizationCode }, {
-      withCredentials: true
-    });
+    const response = await axios.post(`${process.env.REACT_APP_API_URL}/google`, {
+      authorizationCode
+    }, { withCredentials: true });
     dispatch({
       type: SIGNIN_SUCCESS,
       payload: response.data.userInfo
@@ -70,9 +70,9 @@ export default function Auth() {
   const handleKakaoLogin = async () => {
     try {
       const authorizationCode = new URL(window.location.href).searchParams.get("code");
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/kakao`, { authorizationCode }, {
-        withCredentials: true
-      });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/kakao`, {
+        authorizationCode
+      }, { withCredentials: true });
       dispatch({
         type: SIGNIN_SUCCESS,
         payload: response.data.userInfo

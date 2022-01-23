@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { cookieParser } from "../App";
+import axios from 'axios';
 import styled from 'styled-components';
-import { AppState } from '../reducers';
 import Loading from '../components/Loading';
 import PartySlide from '../components/PartySlide';
 import LocalQuest from '../components/LocalQuest';
 import EmptyCard from '../components/EmptyCard';
 import AddressModal from '../components/AddressModal';
-import axios from 'axios';
+import { Navigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { cookieParser } from "../App";
+import { AppState } from '../reducers';
 import { NOTIFY } from '../actions/notify';
 
 export const ListContainer = styled.div`
@@ -29,9 +29,9 @@ export const ListContainer = styled.div`
         display: flex;
         justify-content: center;
       }
-    } 
+    }
   }
-`
+`;
 
 export default function List() {
   const dispatch = useDispatch();

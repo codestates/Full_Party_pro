@@ -1,7 +1,7 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
@@ -22,10 +22,9 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
-
   border-radius: 30px;
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
@@ -40,7 +39,6 @@ export const ModalView = styled.div`
   }
 
   .buttons {
-
     button {
       width: 100px;
       height: 50px;
@@ -61,7 +59,7 @@ export const ModalView = styled.div`
       color: #50C9C3; 
     }
   }
-`
+`;
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -70,29 +68,27 @@ export const CloseBtn = styled.button`
   margin-bottom: 20px;
   background-color: white;
   border: none;
-
-`
+`;
 
 type Props = {
   commentDeleteModalHandler: Function,
   commentToDelete: { [key: string] : number },
   partyId: number,
-}
+};
 
-const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete, partyId }: Props) => {
-
+export default function CommentDeleteModal({ commentDeleteModalHandler, commentToDelete, partyId }: Props) {
   const navigate = useNavigate();
   const { idx, commentId } = commentToDelete;
   const closeModal =() => {
     commentDeleteModalHandler();
-  }
+  };
 
-  async function deleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  const deleteHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     if (idx === 0) await axios.delete(`${process.env.REACT_APP_API_URL}/party/comment/${commentId}`);
     else await axios.delete(`${process.env.REACT_APP_API_URL}/party/subComment/${commentId}`);
     commentDeleteModalHandler();
     navigate(`../party/${partyId}`);
-  }
+  };
 
   return(
     <ModalContainer>
@@ -113,5 +109,3 @@ const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete, partyI
     </ModalContainer>
   )
 }
-
-export default CommentDeleteModal;

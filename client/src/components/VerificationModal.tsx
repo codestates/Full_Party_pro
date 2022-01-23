@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
@@ -23,21 +22,18 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   width: 80%;
   max-width: 350px;
   max-height: 90vh;
   overflow: auto;
-
   border-radius: 30px;
   background-color: white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   padding: 30px;
   text-align: center;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -46,14 +42,12 @@ export const ModalView = styled.div`
   .error {
     font-size: 0.7rem;
     color: #f34508;
-
     margin-top: 10px;
   }
 
   img {
     width: 50px;
     height: 50px;
-
     margin-bottom: 5px;
   }
 
@@ -68,58 +62,44 @@ export const ModalView = styled.div`
     height: 25px;
     border: none;
     border-bottom: 1px solid #d5d5d5;
-
     margin-top: 15px;
-
     text-align: center;
   }
 
   .request {
     width: 90px;
     height: 40px;
-
     border: none;
     border-radius: 10px;
-
     background-color: #50C9C3;
     color: #fff;
-
     cursor: pointer;
-
     margin-top: 10px;
   }
-`
+`;
 
 export const CloseBtn = styled.button`
-
   width: 100%;
   text-align: right;
-
   cursor: pointer;
   margin-bottom: 10px;
-
   background-color: white;
   border: none;
-
-`
+`;
 
 type Props = {
   userId: number,
   handleIsChange: Function,
   verficationModalHandler: Function
-}
+};
 
 export default function  VerificationModal({ userId, handleIsChange, verficationModalHandler }: Props) {
   const [ password, setPassword ] = useState('');
   const [ errorMsg, setErrorMsg ] = useState('');
 
-  const closeModal =() => {
-    verficationModalHandler();
-  }
+  const closeModal =() => verficationModalHandler();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value);
 
   const handleVerification = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const verify = await axios.post(`${process.env.REACT_APP_API_URL}/user/verification`, {
@@ -127,14 +107,14 @@ export default function  VerificationModal({ userId, handleIsChange, verfication
         userId: userId,
         password: password
       }
-    })
+    });
 
     if (verify.data.message === "Unauthorized User") setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
     else if (verify.data.message === "User Identified") {
       handleIsChange();
       closeModal();
     }
-  }
+  };
 
   return (
     <ModalContainer>
@@ -154,5 +134,5 @@ export default function  VerificationModal({ userId, handleIsChange, verfication
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
-  )
+  );
 }

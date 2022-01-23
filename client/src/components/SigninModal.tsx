@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { RootReducerType } from '../store/store';
@@ -28,7 +28,7 @@ export const ModalBackdrop = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   width: 80%;
@@ -47,7 +47,7 @@ export const ModalView = styled.div`
     margin-bottom: 15px;
     font-family: 'SilkscreenBold';
   }
-  
+
   .inputSection {
     margin-bottom: 10px;
 
@@ -73,7 +73,6 @@ export const ModalView = styled.div`
       }
     }
   }
-  
 
   .signinBtn {
     width: 80%;
@@ -152,7 +151,7 @@ export const ModalView = styled.div`
       }
     }
   }
-`
+`;
 
 const Button = styled.button`
   display: flex;
@@ -206,11 +205,11 @@ export default function SigninModal() {
 
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
-  }
+  };
 
   const signupModal = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
-  }
+  };
 
   const googleLoginHandler = () => {
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&state=google`;
@@ -237,9 +236,9 @@ export default function SigninModal() {
     document.cookie = `signupType=guest; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate('/home');
-  }
+  };
 
-  return(
+  return (
     <ModalContainer>
       <ModalBackdrop>
         <ModalView>
@@ -301,5 +300,5 @@ export default function SigninModal() {
         </ModalView>
       </ModalBackdrop>
     </ModalContainer>
-  )
+  );
 }

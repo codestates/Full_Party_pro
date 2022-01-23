@@ -1,7 +1,7 @@
 import React from 'react';
+import styled from 'styled-components';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
@@ -87,8 +87,8 @@ export const NavContainer = styled.nav`
   }
 `;
 
-export default function TopNav () {
-  const dispatch = useDispatch()
+export default function TopNav() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector(
@@ -96,8 +96,8 @@ export default function TopNav () {
   );
 
   const handleModal = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    dispatch(modalChanger(e.currentTarget.className))
-  }
+    dispatch(modalChanger(e.currentTarget.className));
+  };
 
   const isBadgeOn = useSelector(
     (state: AppState) => state.notifyReducer.isBadgeOn

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import CommentDeleteModal from './CommentDeleteModal';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
-import CommentDeleteModal from './CommentDeleteModal';
-import axios from 'axios';
 
 export const QnAContainer = styled.section`
   header {
@@ -45,7 +45,6 @@ export const QnAContainer = styled.section`
 `;
 
 export const Comments = styled.section`
-
   .commentsContainer {
     cursor: default;
     border-bottom: 1px solid #d5d5d5;
@@ -123,7 +122,6 @@ export const CommentDetails = styled.div`
 `;
 
 export const CommentInput = styled.section`
-
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -168,7 +166,7 @@ type Props = {
   isLeader: boolean,
   leaderId: number,
   comments: Array<{ [key: string]: any }>,
-  findComment: number,
+  findComment: number
 };
 
 export default function QnA ({ partyId, isLeader, leaderId, comments, findComment }: Props) {
@@ -177,72 +175,69 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
-
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
-  )
+  );
 
-  const [commentIdx, setCommentIdx] = useState(-1);
-  const [isCommentOpen, setIsCommentOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [newComment, setNewComment] = useState({comment: "", subcomment: ""});
-  const [isCommentDeleteModalOpen, setIsCommentDeleteModalOpen] = useState(false);
-  const [commentToDelete, setCommentToDelete] = useState({});
+  const [ commentIdx, setCommentIdx ] = useState(-1);
+  const [ isCommentOpen, setIsCommentOpen ] = useState(false);
+  const [ isEditMode, setIsEditMode ] = useState(false);
+  const [ newComment, setNewComment ] = useState({comment: "", subcomment: ""});
+  const [ isCommentDeleteModalOpen, setIsCommentDeleteModalOpen ] = useState(false);
+  const [ commentToDelete, setCommentToDelete ] = useState({});
   const curComments = comments.map((comment) => [ comment.comment, ...comment.subComments ])[commentIdx];
 
   const formatDate = (date: String) => date.slice(0, 10);
 
-  function editHandler(event: React.MouseEvent<HTMLButtonElement>): void {
+  const editHandler = (event: React.MouseEvent<HTMLButtonElement>): void => {
     setNewComment({ ...newComment, comment : "" });
     setIsEditMode(!isEditMode);
-  }
+  };
 
-  function commentListHandler(event: React.MouseEvent<HTMLDivElement>, idx: number): void {
+  const commentListHandler = (event: React.MouseEvent<HTMLDivElement>, idx: number): void => {
     setNewComment({ ...newComment, subcomment : "" });
     setCommentIdx(idx);
     if (!isCommentOpen) setIsCommentOpen(true);
     else if (idx === commentIdx) setIsCommentOpen(false);
-  }
+  };
 
-  function inputHandler(event: React.ChangeEvent<HTMLTextAreaElement>): void {
+  const inputHandler = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
     setNewComment({ ...newComment, [event.target.name] : event.target.value });
-  }
+  };
 
-  async function postHandler(event: React.MouseEvent<HTMLButtonElement>) {
+  const postHandler = async (event: React.MouseEvent<HTMLButtonElement>) => {
     await axios.post(`${process.env.REACT_APP_API_URL}/party/${partyId}/comment`, {
-      userId, partyId, content: newComment.comment 
-    }, {
-      withCredentials: true
-    });
+      userId,
+      partyId,
+      content: newComment.comment
+    }, { withCredentials: true });
     setIsEditMode(false);
     setCommentIdx(0);
     setIsCommentOpen(true);
     setNewComment({ ...newComment, comment: "" });
     navigate(`../party/${partyId}`);
-  }
+  };
 
-  async function replyHandler(event: React.MouseEvent<HTMLButtonElement>, commentId:number) {
+  const replyHandler = async (event: React.MouseEvent<HTMLButtonElement>, commentId:number) => {
     await axios.post(`${process.env.REACT_APP_API_URL}/party/${commentId}/subComment`, {
       userId, commentId, content: newComment.subcomment
-    }, {
-      withCredentials: true
-    });
+    }, { withCredentials: true });
     setNewComment({ ...newComment, subcomment: "" });
     navigate(`../party/${partyId}`);
-  }
+  };
 
-  function commentDeleteModalHandler(event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId: number): void {
+  const commentDeleteModalHandler = (event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId: number): void  => {
     setCommentToDelete({ idx: idx, commentId: commentId });
     setIsCommentDeleteModalOpen(!isCommentDeleteModalOpen);
-  }
+  };
 
   useEffect(() => {
-    if(findComment >= 0){
+    if (findComment >= 0) {
       const idx = comments.findIndex((comment) => comment.comment.id === findComment);
       setCommentIdx(idx);
       setIsCommentOpen(true);
     }
-  }, [comments]);
+  }, [ comments ]);
 
   if (comments.length <= 0) {
     return (
@@ -273,7 +268,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
         {isLoggedIn ? <button className="edit" onClick={editHandler}>글쓰기</button> : null}
       </header>
 
-      {isEditMode? 
+      {isEditMode?
         <CommentInput>
           <textarea
             id="commentInput"
@@ -281,27 +276,27 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
             value={newComment.comment}
             onChange={(e) => inputHandler(e)}
           />
-          <button 
-            className="submit" 
+          <button
+            className="submit"
             onClick={postHandler}
             disabled={!newComment.comment}
           >
             등록하기
-          </button>  
+          </button>
         </CommentInput>
       : null}
 
       <Comments style={{ borderTop: isEditMode? "1px solid #d5d5d5" : "none" }}>
-        {comments.map((comment, idx) => 
+        {comments.map((comment, idx) =>
           <div className="commentsContainer" key={idx}>
             <div className="commentList" onClick={(e) => commentListHandler(e, idx)}>
               <div className="content">{comment.comment.content}</div>
               <div className="date">{formatDate(comment.comment.createdAt)}</div>
             </div>
-            {isCommentOpen && idx === commentIdx ? 
+            {isCommentOpen && idx === commentIdx ?
               <CommentDetails>
                 {curComments.map((subcomment: { [key:string] : any }, idx) => {
-                    if(subcomment.userId === leaderId){
+                    if (subcomment.userId === leaderId) {
                       return (
                         <div key={idx} className="subcommentList">
                           {isLeader ?
@@ -314,7 +309,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                           : null}
                           <div className="subCommentContainer" style={{ backgroundColor: "#50C9C3", color: "#fff" }}>
                             <div className="subContent">{subcomment.content}</div>
-                            <div className="date">{formatDate(subcomment.createdAt)}</div> 
+                            <div className="date">{formatDate(subcomment.createdAt)}</div>
                           </div>
                           <div className="profileContainer">
                             <div className="profileImage" style={{ backgroundImage: `url(${subcomment.profileImage})`, backgroundSize: "cover" }} />
@@ -322,7 +317,8 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                           </div>
                         </div>
                       )
-                    } else {
+                    }
+                    else {
                       return (
                         <div key={idx} className="subcommentList">
                           <div className="profileContainer">
@@ -331,7 +327,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                           </div>
                           <div className="subCommentContainer" style={{ border: "1px solid #d5d5d5" }}>
                             <div className="subContent">{subcomment.content}</div>
-                            <div className="date">{formatDate(subcomment.createdAt)}</div> 
+                            <div className="date">{formatDate(subcomment.createdAt)}</div>
                           </div>
                           {subcomment.userId === userId ?
                             <button
@@ -342,9 +338,9 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                             </button>
                           : null}
                         </div>
-                      )
+                      );
                     }
-                  } 
+                  }
                 )}
                 {isLeader || userId === comment.comment.userId ?
                   <CommentInput>
@@ -354,7 +350,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                       onChange={(e) => inputHandler(e)}
                     />
                     <button
-                      className="submit" 
+                      className="submit"
                       onClick={(e) => replyHandler(e, comment.comment.id)}
                       disabled={!newComment.subcomment}
                     >
@@ -362,18 +358,18 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
                     </button>
                   </CommentInput>
                 : null}
-              </CommentDetails>  
+              </CommentDetails>
             : null}
           </div>
         )}
       </Comments>
 
-      {isCommentDeleteModalOpen? 
-        <CommentDeleteModal 
+      {isCommentDeleteModalOpen?
+        <CommentDeleteModal
           commentDeleteModalHandler={commentDeleteModalHandler}
           commentToDelete={commentToDelete}
           partyId={partyId}
-        /> 
+        />
       : null}
     </QnAContainer>
   );
