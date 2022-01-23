@@ -193,7 +193,6 @@ type Props = {
 const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLeader, isMember, from, userInfo, handleMemberListChange, handleMemberInfoChange }: Props) => {
 
   const navigate = useNavigate();
-
   const { id, userName, profileImage, level, message, joinDate } = userInfo;
 
   const [isEditMode, setIsEditMode] = useState(false);
@@ -226,7 +225,6 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     console.log("파티원을 추방합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userInfo.id}`);
     // handleMemberListChange(userInfo.id, "expel");
-    userInfoModalHandler();
     navigate(`../party/${partyId}`);
   }
 
@@ -234,7 +232,6 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     console.log("가입 신청을 거절합니다.");
     await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userInfo.id}`);
     // handleMemberListChange(userInfo.id, "refuse");
-    userInfoModalHandler();
     navigate(`../party/${partyId}`);
   }
 
@@ -246,7 +243,6 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
       withCredentials: true
     });
     // handleMemberListChange(userInfo.id, "accept");
-    userInfoModalHandler();
     navigate(`../party/${partyId}`);
   }
 

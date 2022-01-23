@@ -220,7 +220,7 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
 
   const [reviewMembers, setReviewMembers] = useState<Array<keyable>>(members.map((member) => ({ ...member, exp: null })));
   const curMember = reviewMembers[curIdx];
-  const { name, profileImage, exp } = curMember;
+  const { userName, profileImage, exp } = curMember;
 
   const memberToReview = reviewMembers.filter((member) => member.exp === null).length;
 
@@ -260,7 +260,7 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
         withCredentials: true
       });
 
-      handlePartyInfoChange("partyState", 2)
+      handlePartyInfoChange("partyState", 2);
     }
 
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/review`, { 
@@ -308,7 +308,7 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
                 style={{ backgroundImage: `url(${profileImage})`, backgroundSize: "cover" }} 
               />
               <div className="nameplate">
-              {curMember.id === leaderId? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {name}
+              {curMember.id === leaderId? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {userName}
               </div>
             </div>
             <button

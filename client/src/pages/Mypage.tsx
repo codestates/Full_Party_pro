@@ -331,7 +331,7 @@ export default function Mypage () {
     profileImage: signinReducer.userInfo.profileImage,
     address: signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1],
     level: 0,
-    exp: signinReducer.userInfo.exp
+    exp: 0
   });
   const [changeInfo, setChangeInfo] = useState({
     userName: '',
@@ -666,13 +666,6 @@ export default function Mypage () {
     setIsVerificationModalOpen(!isVerificationModalOpen);
   }
 
-  // function handlePwd(pwd: string) {
-  //   setChangeInfo({
-  //     ...changeInfo,
-  //     password: pwd
-  //   });
-  // };
-
   const handleFormatAddressChange = (address: string) => {
     setFormatAddress(address);
   }
@@ -683,11 +676,9 @@ export default function Mypage () {
     }
   }
 
-  //페이지 진입시 로딩
-  
   useEffect(() => {
     (async () => {
-      if (userInfoFromStore.id !== 0.1) {
+      if (userInfoFromStore.id >= 1) {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
           withCredentials: true,
         });

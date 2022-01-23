@@ -132,7 +132,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
         signupType: "google"
       });
     }
-    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "exp", "level", "signupType" ]);
+    const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
     setCookie(res, "token", String(accessToken));
     return SuccessfulResponse(res, { message: "You Have Successfully Signed In With Google Account", userInfo });
   } catch (error) {
@@ -183,7 +183,7 @@ export const kakao = async (req: Request, res: Response) => {
           signupType: "kakao"
         });
       }
-      const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "exp", "level", "signupType" ]);
+      const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
       setCookie(res, "token", String(accessToken));
       SuccessfulResponse(res, { message: "You Have Successfully Signed In With Kakao Account", userInfo });
     }
@@ -248,7 +248,6 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
 
 export const mailVerification = async (req: Request, res: Response) => {
   try {
-    console.log("🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈🌈");
     const { email } = req.body;
     const code = String(Math.floor(Math.random()*1000000)).padStart(6,"0");
     const transporter = nodemailer.createTransport({

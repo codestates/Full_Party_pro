@@ -296,7 +296,7 @@ const SignupModal = () => {
   const dispatch = useDispatch();
   const cameraRef = useRef<any>();
   const [isLoading, setIsLoading] = useState(false);
-  const [pageIdx, setPageIdx] = useState(4)
+  const [pageIdx, setPageIdx] = useState(0)
 
   type Info = {
     profileImage: any;
@@ -478,7 +478,6 @@ const SignupModal = () => {
     }
   }
 
-  // [dev] 이메일 인증 관련 함수
   const mailVerification = async () => {
     const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification`, { email: userInfo.email }, { withCredentials: true });
     setIsSent(true);
