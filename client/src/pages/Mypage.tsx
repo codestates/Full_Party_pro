@@ -666,13 +666,6 @@ export default function Mypage () {
     setIsVerificationModalOpen(!isVerificationModalOpen);
   }
 
-  // function handlePwd(pwd: string) {
-  //   setChangeInfo({
-  //     ...changeInfo,
-  //     password: pwd
-  //   });
-  // };
-
   const handleFormatAddressChange = (address: string) => {
     setFormatAddress(address);
   }
@@ -683,8 +676,6 @@ export default function Mypage () {
     }
   }
 
-  //페이지 진입시 로딩
-  
   useEffect(() => {
     (async () => {
       if (userInfoFromStore.id >= 1) {
