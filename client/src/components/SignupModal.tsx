@@ -470,9 +470,8 @@ const SignupModal = () => {
     }
   }
 
-  // [dev] 이메일 인증 관련 함수
   const mailVerification = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification/nodemailerTest`, { email: userInfo.email }, { withCredentials: true });
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification`, { email: userInfo.email }, { withCredentials: true });
     setIsSent(true);
     setVerificationData({ email: userInfo.email, code: res.data.code });
     setTimeout(handleCodeExpire, 1000 * 60 * 5);
