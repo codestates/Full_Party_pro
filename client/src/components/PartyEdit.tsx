@@ -981,9 +981,9 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     return res;
   }
 
-    useEffect(() => {
-      validationCheck();
-    }, [partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink]);
+  useEffect(() => {
+    validationCheck();
+  }, [partyInfo.startDate, partyInfo.endDate, partyInfo.privateLink]);
 
   useEffect(() => {
     if(isPosted){
@@ -1000,220 +1000,220 @@ export default function PartyEdit ({ party, editHandler }: Props) {
     }
   }, [isPosted])
 
-    if(!isLoggedIn){
-      return <Navigate to="/" />
-    }
-    
-    return (
-      <PostContainer>
-        {cancelModal ?
-          <PostCancelModal 
-            postCancelHandler={postCancelHandler}
-            backToPage={backToPage}
-          />
-        : null}
-        {isErrorModalOpen ?
-          <ErrorModal 
-            errorModalHandler={errorModalHandler}
-          />
-        : null}
-        <TopNavigation>
-          <button className="cancelBtn" onClick={postCancelHandler}>
-            <FontAwesomeIcon icon={ faArrowLeft } className="icon" /> 
-          </button>
-          <div className="partyName">{partyInfo.name}</div>
-          <button className="post" onClick={editParty}>
-            수정
-          </button>
-        </TopNavigation>
-        <PostCard>
-          <section className="basicInfo">
-            <div className="imageContainer">
-              {imgLoading ? <Loading /> :
-              <>
-                <img className="preview" src={partyInfo.image} alt="thumbnail"
-                  onError={() => {
-                    return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
-                  }}
-                />
-                <input 
-                  ref={fileRef}
-                  type='file'
-                  className='imgInput'
-                  id='partyImg'
-                  accept='image/*'
-                  name='file'
-                  hidden={true}
-                  onChange={handleImgLoad}
-                />
-              </>
-              }
-            </div>
-            <div className="infoContainer">
-              <fieldset>
-                <div className='label'>퀘스트 제목</div>
+  if(!isLoggedIn){
+    return <Navigate to="/" />
+  }
+  
+  return (
+    <PostContainer>
+      {cancelModal ?
+        <PostCancelModal 
+          postCancelHandler={postCancelHandler}
+          backToPage={backToPage}
+        />
+      : null}
+      {isErrorModalOpen ?
+        <ErrorModal 
+          errorModalHandler={errorModalHandler}
+        />
+      : null}
+      <TopNavigation>
+        <button className="cancelBtn" onClick={postCancelHandler}>
+          <FontAwesomeIcon icon={ faArrowLeft } className="icon" /> 
+        </button>
+        <div className="partyName">{partyInfo.name}</div>
+        <button className="post" onClick={editParty}>
+          수정
+        </button>
+      </TopNavigation>
+      <PostCard>
+        <section className="basicInfo">
+          <div className="imageContainer">
+            {imgLoading ? <Loading /> :
+            <>
+              <img className="preview" src={partyInfo.image} alt="thumbnail"
+                onError={() => {
+                  return (imgRef.current.src = 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultThumbnail.png')
+                }}
+              />
+              <input 
+                ref={fileRef}
+                type='file'
+                className='imgInput'
+                id='partyImg'
+                accept='image/*'
+                name='file'
+                hidden={true}
+                onChange={handleImgLoad}
+              />
+            </>
+            }
+          </div>
+          <div className="infoContainer">
+            <fieldset>
+              <div className='label'>퀘스트 제목</div>
+              <input
+                name='name'
+                type='text'
+                value={partyInfo.name}
+                maxLength={30}
+                onChange={(e) => {handleInputChange(e)}}
+              />
+              {isName.err ?
+              <div className='error'>{isName.msg}</div> : null}
+            </fieldset>
+            <fieldset>
+              <div className='label'>퀘스트 기간</div>
+              <div className="startDate">
+                <div className='date'>시작일</div>
                 <input
-                  name='name'
-                  type='text'
-                  value={partyInfo.name}
-                  maxLength={30}
+                  name='startDate'
+                  type='date'
+                  className="startDate"
+                  min={getCurrentDate()}
+                  value={partyInfo.startDate}
                   onChange={(e) => {handleInputChange(e)}}
                 />
-                {isName.err ?
-                <div className='error'>{isName.msg}</div> : null}
-              </fieldset>
-              <fieldset>
-                <div className='label'>퀘스트 기간</div>
-                <div className="startDate">
-                  <div className='date'>시작일</div>
-                  <input
-                    name='startDate'
-                    type='date'
-                    className="startDate"
-                    min={getCurrentDate()}
-                    value={partyInfo.startDate}
-                    onChange={(e) => {handleInputChange(e)}}
-                  />
-                  {isStrDate.err ?
-                  <div className='error'>{isStrDate.msg}</div> : null}
-                </div>
-                <div className="endDate">
-                  <div className='date'>종료일</div>
-                  <input
-                    name='endDate'
-                    type='date'
-                    min={partyInfo.startDate}
-                    value={partyInfo.endDate}
-                    onChange={(e) => {handleInputChange(e)}}
-                  />
-                  {isEndDate.err ?
-                  <div className='error'>{isEndDate.msg}</div> : null}
-                </div>
-              </fieldset>
-
-              <fieldset>
-                <div className='label'>파티 정원 <span style={{ fontWeight: "normal" }}>(1/{partyInfo.memberLimit})</span></div>
-                <SliderContainer>
-                  <Slider 
-                    min={2}
-                    max={10}
-                    step={1}
-                    value={partyInfo.memberLimit}
-                    onChange={handleSlider}
-                  >
-                    <div className="sign" style={{ left: `${(partyInfo.memberLimit)*12.5-26}%` }}>
-                      <span id="value">{partyInfo.memberLimit}</span>
-                    </div>
-                  </Slider>
-                </SliderContainer>
-              </fieldset>
-
-            </div>
-          </section>
-
-          <section className="infoDetails">
-            <fieldset>
-              <div className='locationTitle'>
-                <div className='label'>퀘스트 장소</div>
-                <div className="details">
-                  <button className={partyInfo.isOnline ? 'unfocused' : ''} onClick={(e) => {handleIsOnline(e)}}>오프라인</button>
-                  <span> | </span>
-                  <button className={partyInfo.isOnline ? 'isOnline' : 'isOnline unfocused'} onClick={(e) => {handleIsOnline(e)}}>온라인</button>
-                </div>
+                {isStrDate.err ?
+                <div className='error'>{isStrDate.msg}</div> : null}
               </div>
-              {!partyInfo.isOnline ? 
-                <div className='mapContainer'>
-                  <div id='map' className='mapDesc'>
-                    <PostMap 
-                      location={fixedLocation} 
-                      name={partyInfo.name}
-                      image={partyInfo.image} 
-                      handleCoordsChange={handleCoordsChange}
-                      handleFormatLocationChange={handleFormatLocationChange}
-                    />
+              <div className="endDate">
+                <div className='date'>종료일</div>
+                <input
+                  name='endDate'
+                  type='date'
+                  min={partyInfo.startDate}
+                  value={partyInfo.endDate}
+                  onChange={(e) => {handleInputChange(e)}}
+                />
+                {isEndDate.err ?
+                <div className='error'>{isEndDate.msg}</div> : null}
+              </div>
+            </fieldset>
+
+            <fieldset>
+              <div className='label'>파티 정원 <span style={{ fontWeight: "normal" }}>(1/{partyInfo.memberLimit})</span></div>
+              <SliderContainer>
+                <Slider 
+                  min={2}
+                  max={10}
+                  step={1}
+                  value={partyInfo.memberLimit}
+                  onChange={handleSlider}
+                >
+                  <div className="sign" style={{ left: `${(partyInfo.memberLimit)*12.5-26}%` }}>
+                    <span id="value">{partyInfo.memberLimit}</span>
                   </div>
-                  <input 
-                    className='mapInput'
-                    name='location'
-                    type='text'
-                    value={partyInfo.location}
-                    onChange={(e) => handleInputChange(e)}
-                    onKeyUp={(e) => handleSearchLocation(e)}
+                </Slider>
+              </SliderContainer>
+            </fieldset>
+
+          </div>
+        </section>
+
+        <section className="infoDetails">
+          <fieldset>
+            <div className='locationTitle'>
+              <div className='label'>퀘스트 장소</div>
+              <div className="details">
+                <button className={partyInfo.isOnline ? 'unfocused' : ''} onClick={(e) => {handleIsOnline(e)}}>오프라인</button>
+                <span> | </span>
+                <button className={partyInfo.isOnline ? 'isOnline' : 'isOnline unfocused'} onClick={(e) => {handleIsOnline(e)}}>온라인</button>
+              </div>
+            </div>
+            {!partyInfo.isOnline ? 
+              <div className='mapContainer'>
+                <div id='map' className='mapDesc'>
+                  <PostMap 
+                    location={fixedLocation} 
+                    name={partyInfo.name}
+                    image={partyInfo.image} 
+                    handleCoordsChange={handleCoordsChange}
+                    handleFormatLocationChange={handleFormatLocationChange}
                   />
                 </div>
-              :
                 <input 
+                  className='mapInput'
                   name='location'
                   type='text'
                   value={partyInfo.location}
-                  onChange={(e) => {handleInputChange(e)}}
+                  onChange={(e) => handleInputChange(e)}
+                  onKeyUp={(e) => handleSearchLocation(e)}
                 />
-              }
-              {isLocation.err ?
-              <div className='error'>{isLocation.msg}</div> : null}
-            </fieldset>
-            <fieldset>
-              <div className='label'>오픈채팅방 링크</div>
-              <div className="details">
-                파티원들간의 소통을 위한 오픈채팅방 링크를 입력해주세요.
               </div>
-              <input
-                name='privateLink'
+            :
+              <input 
+                name='location'
                 type='text'
-                value={partyInfo.privateLink}
+                value={partyInfo.location}
                 onChange={(e) => {handleInputChange(e)}}
               />
-              {isPLink.err ?
-              <div className='error'>{isPLink.msg}</div> : null}
-            </fieldset>
-            <fieldset>
-              <div className='label'>태그</div>
-              <TagInput>
-                <ul id='tags'>
-                  {tags.map((tag, index) => (
-                    <li key={index} className='tag'>
-                      <span className='tagTitle'>{tag}</span>
-                      <span className='tagIcon' onClick={() => {removeTag(index)}}>
-                        <FontAwesomeIcon icon={faTimes} />
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <input
-                  className='tag-input'
-                  name='tagInput'
-                  type='text'
-                  maxLength={10}
-                  value={inputTxt}
-                  placeholder={tags.length === 3 ? '' : '최대 3개까지 추가할 수 있습니다.'}
-                  onChange={(e) => setInputTxt(e.target.value)}
-                  onKeyUp={(e) => addTag(e)}
-                />
-              </TagInput>
-            </fieldset>
-            <fieldset>
-              <div className='label content'>
-                퀘스트 내용
-                {isContent.err ? <div className='error'>{isContent.msg}</div> : null}  
-              </div>
-              <textarea
-                placeholder='파티원들이 퀘스트 내용을 이해할 수 있도록 자세히 작성해주세요.'
-                name='content'
-                value={partyInfo.content}
-                onChange={(e) => {handleTextareaChange(e)}}
+            }
+            {isLocation.err ?
+            <div className='error'>{isLocation.msg}</div> : null}
+          </fieldset>
+          <fieldset>
+            <div className='label'>오픈채팅방 링크</div>
+            <div className="details">
+              파티원들간의 소통을 위한 오픈채팅방 링크를 입력해주세요.
+            </div>
+            <input
+              name='privateLink'
+              type='text'
+              value={partyInfo.privateLink}
+              onChange={(e) => {handleInputChange(e)}}
+            />
+            {isPLink.err ?
+            <div className='error'>{isPLink.msg}</div> : null}
+          </fieldset>
+          <fieldset>
+            <div className='label'>태그</div>
+            <TagInput>
+              <ul id='tags'>
+                {tags.map((tag, index) => (
+                  <li key={index} className='tag'>
+                    <span className='tagTitle'>{tag}</span>
+                    <span className='tagIcon' onClick={() => {removeTag(index)}}>
+                      <FontAwesomeIcon icon={faTimes} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <input
+                className='tag-input'
+                name='tagInput'
+                type='text'
+                maxLength={10}
+                value={inputTxt}
+                placeholder={tags.length === 3 ? '' : '최대 3개까지 추가할 수 있습니다.'}
+                onChange={(e) => setInputTxt(e.target.value)}
+                onKeyUp={(e) => addTag(e)}
               />
-            </fieldset>
-          </section>
+            </TagInput>
+          </fieldset>
+          <fieldset>
+            <div className='label content'>
+              퀘스트 내용
+              {isContent.err ? <div className='error'>{isContent.msg}</div> : null}  
+            </div>
+            <textarea
+              placeholder='파티원들이 퀘스트 내용을 이해할 수 있도록 자세히 작성해주세요.'
+              name='content'
+              value={partyInfo.content}
+              onChange={(e) => {handleTextareaChange(e)}}
+            />
+          </fieldset>
+        </section>
 
-          <div className='btn'>
-            <Button onClick={editParty} disabled={isPosted}>QUEST</Button>
-          </div>
-        </PostCard>
-        <BottomNavigation>
-          <button className="button" onClick={(e) => handleRefClick(e)}>
-            <FontAwesomeIcon icon={ faCamera } className="icon" /> 사진 등록
-          </button>
-        </BottomNavigation>
-      </PostContainer>
-    );
-  }
+        <div className='btn'>
+          <Button onClick={editParty} disabled={isPosted}>QUEST</Button>
+        </div>
+      </PostCard>
+      <BottomNavigation>
+        <button className="button" onClick={(e) => handleRefClick(e)}>
+          <FontAwesomeIcon icon={ faCamera } className="icon" /> 사진 등록
+        </button>
+      </BottomNavigation>
+    </PostContainer>
+  );
+}
