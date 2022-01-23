@@ -68,12 +68,11 @@ export const MapContainer = styled.div`
 `
 
 type Props = {
-  location: string,
   image: string,
-  handleFormatAddressChange: Function
+  address: string,
 }
 
-const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
+const UserMap = ({ image, address }: Props) => {
   
   const { kakao } = window;
 
@@ -82,14 +81,10 @@ const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
 
   const geocoder = new kakao.maps.services.Geocoder();
 
-  function searchDetailAddrFromCoords(coords: { lat: number, lng: number }, callback: Function) {
-    geocoder.coord2Address(coords.lng, coords.lat, callback);         
-  }
-
   useEffect(() => {
 
-    if(location){
-      geocoder.addressSearch(location, function(result: any, status: any) {
+    if(address){
+      geocoder.addressSearch(address, function(result: any, status: any) {
         if (status === kakao.maps.services.Status.OK) {
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
           const { La, Ma } = coordinates;
@@ -98,23 +93,9 @@ const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
       });  
     }
     
-  },[location])
+  },[address])
 
-  useEffect(() => {
-
-    searchDetailAddrFromCoords(coords, function(result: any, status: any) {
-      if (status === kakao.maps.services.Status.OK) {
-        const address = 
-          !!result[0].road_address ? 
-            result[0].road_address.address_name
-          : result[0].address.address_name;
-        handleFormatAddressChange(address);
-      }   
-   });
-
-  },[coords])
-
-  if(!location){
+  if(!address){
     return (
       <MapContainer>
         <Map

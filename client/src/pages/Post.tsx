@@ -11,11 +11,11 @@ import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icon
 import { useSelector } from 'react-redux';
 import { RootReducerType } from '../store/store';
 
-import PostMap from '../components/PostMap';
 import PostCancelModal from '../components/PostCancelModal';
 import Slider from 'rc-slider';
 import ErrorModal from '../components/ErrorModal';
 import Loading from '../components/Loading';
+import AddressInput from '../components/AddressInput';
 
 export const PostContainer = styled.div`
   width: 100%;
@@ -211,21 +211,6 @@ export const PostCard = styled.div`
     }
   }
 
-  .locationTitle {
-    color: #000;
-
-    button {
-      background-color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-
-      &.unfocused {
-        font-weight: normal;
-        color: #777;
-      }
-    }
-  }
 
   .mapDesc {
     width: 100%;
@@ -723,8 +708,6 @@ export default function Post () {
     msg: ''
   })
 
-  const [fixedLocation, setFixedLocation] = useState('');
-  const [formatLocation, setFormatLocation] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [inputTxt, setInputTxt] = useState('');
   const [isOnline, setIsOnline] = useState(false);
@@ -781,6 +764,13 @@ export default function Post () {
     if(partyInfo.content) { setIsContent({ err: false, msg: '' }) }
   }
 
+  const handleLocationChange = (location: string) => {
+    setPartyInfo({
+      ...partyInfo,
+      location,
+    });
+  }
+
   function getCurrentDate() {
     let newDate = new Date();
     let date = newDate.getDate();
@@ -835,16 +825,6 @@ export default function Post () {
     })
   }
 
-  const handleFormatLocationChange = (address: string) => {
-    setFormatLocation(address);
-  }
-
-  const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
-      setFixedLocation(partyInfo.location);
-    }
-  }
-
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const {name, value} = e.target
 
@@ -861,11 +841,11 @@ export default function Post () {
     }
   }
 
-  const handleIsOnline = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if(e.currentTarget.className === 'isOnline' || e.currentTarget.className === 'isOnline unfocused') {
-      setIsOnline(true)
+  const handleOnOff = (isOnline: boolean) => {
+    if(isOnline === true){
+      setIsOnline(true);
     } else {
-      setIsOnline(false)
+      setIsOnline(false);
     }
   }
 
@@ -887,7 +867,7 @@ export default function Post () {
   const postCancelHandler = () => {
     if(cancelModal) {
       setCancelModal(false)
-    } else{
+    } else {
       setCancelModal(true)
     }
   }
@@ -902,7 +882,11 @@ export default function Post () {
 
 
   const backToPage = () => {
-    navigate(-1)
+    if(partyInfo.location){
+      navigate(-2);
+    } else {
+      navigate(-1);
+    }
   }
   
   const createParty = () => {
@@ -915,29 +899,58 @@ export default function Post () {
         err: true,
         msg: '퀘스트 제목을 입력해주세요.'
       })
+    } else {
+      setIsName({
+        err: false,
+        msg: ''
+      })
     }
+
     if(partyInfo.startDate === '') {
       setIsStrDate({
         err: true,
         msg: '퀘스트 시작하는 날을 선택해주세요.'
       })
+    } else {
+      setIsStrDate({
+        err: false,
+        msg: ''
+      })
     }
+
     if(partyInfo.endDate === '') {
       setIsEndDate({
         err: true,
         msg: '퀘스트가 끝나는 날을 선택해주세요.'
       })
+    } else {
+      setIsEndDate({
+        err: false,
+        msg: ''
+      })
     }
+
     if(partyInfo.content === '') {
       setIsContent({
         err: true,
         msg: '퀘스트 내용을 입력해주세요.'
       })
+    } else {
+      setIsContent({
+        err: false,
+        msg: ''
+      })
     }
+
     if(partyInfo.location === '') {
       setIsLocation({
         err: true,
         msg: '퀘스트 장소를 입력해주세요.'
+      })
+    } else {
+      setIsLocation({
+        err: false,
+        msg: ''
       })
     }
 
@@ -950,6 +963,11 @@ export default function Post () {
       setIsPLink({
         err: true,
         msg: "유효한 링크를 입력해주세요. 링크는 'https://'를 포함합니다."
+      })
+    } else {
+      setIsPLink({
+        err: false,
+        msg: ''
       })
     }
 
@@ -967,12 +985,12 @@ export default function Post () {
         image: partyInfo.image,
         memberLimit: partyInfo.memberLimit,
         content: partyInfo.content,
-        region: 
+        region:
           isOnline? 
           signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
-          : formatLocation,
+          : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
         location: partyInfo.location,
-        latlng: partyInfo.latlng,
+        latlng: isOnline? {lat: 0, lng: 0} : partyInfo.latlng,
         startDate: partyInfo.startDate,
         endDate: partyInfo.endDate,
         isOnline: isOnline,
@@ -1122,45 +1140,17 @@ export default function Post () {
           <fieldset>
             <div className='locationTitle'>
               <div className='label'>퀘스트 장소</div>
-              <div className="details">
-                <button className={isOnline ? 'unfocused' : ''} onClick={(e) => {handleIsOnline(e)}}>오프라인</button>
-                <span> | </span>
-                <button className={isOnline ? 'isOnline' : 'isOnline unfocused'} onClick={(e) => {handleIsOnline(e)}}>온라인</button>
-              </div>
             </div>
-            {!isOnline ? 
-              <div className='mapContainer'>
-                <div id='map' className='mapDesc'>
-                  <PostMap 
-                    location={fixedLocation} 
-                    name={partyInfo.name}
-                    image={partyInfo.image} 
-                    handleCoordsChange={handleCoordsChange}
-                    handleFormatLocationChange={handleFormatLocationChange}
-                  />
-                </div>
-                <input 
-                  className='mapInput'
-                  name='location'
-                  type='text'
-                  value={partyInfo.location}
-                  autoComplete='off'
-                  onChange={(e) => handleInputChange(e)}
-                  onKeyUp={(e) => handleSearchLocation(e)}
-                />
-              </div>
-            :
-              <input 
-                name='location'
-                type='text'
-                value={partyInfo.location}
-                autoComplete='off'
-                onChange={(e) => {handleInputChange(e)}}
+              <AddressInput 
+                partyInfo={partyInfo}
+                handleCoordsChange={handleCoordsChange}
+                handleLocationChange={handleLocationChange}
+                handleOnOff={handleOnOff}
               />
-            }
             {isLocation.err ?
             <div className='error'>{isLocation.msg}</div> : null}
           </fieldset>
+
           <fieldset>
             <div className='label'>오픈채팅방 링크</div>
             <div className="details">

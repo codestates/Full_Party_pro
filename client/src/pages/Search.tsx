@@ -172,10 +172,6 @@ export default function Search () {
     }
 
   },[params])
-
-  useEffect(() => {
-    setIsLoading(false);
-  }, [ parties ]);
   
   if(cookieParser().isLoggedIn === "0"){
     return <Navigate to="../" />

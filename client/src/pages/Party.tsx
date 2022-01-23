@@ -618,10 +618,6 @@ export default function Party () {
     };
     setIsLoading(false);
   }, [ partyInfo ]);
-  
-  useEffect(() => {
-    setIsLoading(false);
-  }, [ userState ]);
 
   if(isLoggedIn === "0"){
     return <Navigate to="../" />
@@ -630,7 +626,7 @@ export default function Party () {
   } else if(notFound) {
     return <NotFound />
   } else if(isEdit) {
-    <PartyEdit
+    return <PartyEdit
       party={partyInfo}
       editHandler={editHandler}
     />
@@ -886,12 +882,6 @@ export default function Party () {
           dismissHandler={dismissHandler}
           partyInfoId={partyInfo.id}
         /> 
-      : null}
-      {isEdit?
-        <PartyEdit
-          party={partyInfo}
-          editHandler={editHandler}
-        />
       : null}
       {isSigninModalOpen? <SigninModal /> : null}
     </PartyContainer>
