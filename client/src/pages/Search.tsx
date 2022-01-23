@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { cookieParser, requestKeepLoggedIn } from "../App";
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -107,9 +106,6 @@ export default function Search () {
   const [parties, setParties] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  //[dev] 더미데이터입니다.
-  // const [tag, setTag] = useState(['공동구매', '무료나눔', '배달음식'])
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value)
   }
@@ -203,22 +199,6 @@ export default function Search () {
           if(!params.tag && !params.keyword) {
             return (
               <div className='result'>
-                {/* <div className='resultLabel'>
-                  인기 태그
-                </div>
-                <div className='hashtag'>
-                  {tag.map((t, idx) => 
-                    <button 
-                      key={idx} 
-                      className="tag" 
-                      onClick={() => hashtagHandler(t)}
-                      style={isLoggedIn ? { cursor: "pointer" } : { cursor: "default" }}
-                      disabled={!isLoggedIn}
-                    >
-                      #{t}
-                    </button>
-                  )}
-                </div> */}
               </div>
             )
           }

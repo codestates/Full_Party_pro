@@ -1,7 +1,6 @@
-import React, { useEffect, Fragment, useState } from 'react';
+import React, { useEffect, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import { Navigate, useNavigate } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from './reducers';
 import { RootReducerType } from './store/store';
@@ -50,8 +49,6 @@ export const requestKeepLoggedIn = async (token: string, signupType: string) => 
 
 export default function App() {
   const dispatch = useDispatch();
-  // const [isSign, setIsSign] = useState('');
-  // const [isModal, setIsModal] = useState(false);
 
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo

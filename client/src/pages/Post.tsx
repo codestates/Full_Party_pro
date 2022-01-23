@@ -3,14 +3,12 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import AWS from 'aws-sdk';
 import { useDispatch } from 'react-redux';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faArrowLeft, faCamera } from '@fortawesome/free-solid-svg-icons';
 
 import { useSelector } from 'react-redux';
-import { AppState } from '../reducers';
 import { RootReducerType } from '../store/store';
 
 import PostCancelModal from '../components/PostCancelModal';
@@ -658,7 +656,6 @@ export default function Post () {
   const navigate = useNavigate();
   const fileRef = useRef<any>();
   const imgRef = useRef<any>(null);
-  const dispatch = useDispatch();
 
   AWS.config.update({
     region: "ap-northeast-2",
