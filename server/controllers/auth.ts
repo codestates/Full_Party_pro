@@ -83,7 +83,7 @@ export const guest = async (req: Request, res: Response) => {
     return SuccessfulResponse(res, { message: "You Have Successfully Signed In", userInfo: { ...userInfo, ...guestUserInfo }});
   }
   catch (error) {
-    InternalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -136,7 +136,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
     setCookie(res, "token", String(accessToken));
     return SuccessfulResponse(res, { message: "You Have Successfully Signed In With Google Account", userInfo });
   } catch (error) {
-    InternalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -185,14 +185,14 @@ export const kakao = async (req: Request, res: Response) => {
       }
       const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
       setCookie(res, "token", String(accessToken));
-      SuccessfulResponse(res, { message: "You Have Successfully Signed In With Kakao Account", userInfo });
+      return SuccessfulResponse(res, { message: "You Have Successfully Signed In With Kakao Account", userInfo });
     }
     catch (error) {
       console.log(error)
     }
   }
   catch (error) {
-    InternalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
@@ -205,7 +205,7 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
       if (!verification) FailedResponse(res, 403, "Invalid access token");
       else if (typeof verification !== "string") {
         const userInfo = await findUser({ id: verification.id }, [ "id", "profileImage", "userName", "address", "signupType" ]);
-        SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
+        return SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
       }
     }
     else if (signupType === "kakao") {
@@ -218,7 +218,7 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
       });
       const { email } = userInfoFromKakao.data.kakao_account;
       const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
-      SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
+      return SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
     }
     else if (signupType === "google") {
       const userInfoFromGoogle = await axios({
@@ -230,19 +230,19 @@ export const keepLoggedIn = async (req: Request, res: Response) => {
       });
       const { email } = userInfoFromGoogle.data;
       const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
-      SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
+      return SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
     }
     else if (signupType === "guest") {
       const verification = verifyAccessToken(String(accessToken));
       if (!verification) FailedResponse(res, 403, "Invalid access token");
       else if (typeof verification !== "string") {
         const userInfo = await findUser({ email: verification.email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
-        SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
+        return SuccessfulResponse(res, { message: "Keep Logged In", userInfo });
       }
     }
   }
   catch (error) {
-    InternalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };
 
