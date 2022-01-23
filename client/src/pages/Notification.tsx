@@ -105,9 +105,6 @@ export default function Notification () {
     (state: AppState) => state.notifyReducer.isBadgeOn
   );
 
-  // [dev] 더미데이터 코드 실제 데이터로 변경. 
-  // 뒤에 map + reverse는 남겨둘것(최신순으로 배열하기 위해 배열 순서를 바꿈)
-  // const notification = dummyNotification.map(noti => noti).reverse();
   const [notification, setNotification] = useState<{ [key: string]: any }>([]);
   const [isLoading, setIsLoading] = useState(true);
 

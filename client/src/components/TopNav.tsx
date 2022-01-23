@@ -8,7 +8,6 @@ import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 
 import { modalChanger } from '../actions/modal';
-import axios from 'axios';
 
 export const NavContainer = styled.nav`
   width: 100vw;

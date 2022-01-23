@@ -306,19 +306,16 @@ export default function Mypage () {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const fileRef = useRef<any>();
-  const imgRef=useRef<any>(null);
   const { signupType } = cookieParser();
 
   const userInfoFromStore = useSelector(
     (state: AppState) => state.signinReducer.userInfo
   );
 
-  //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
   const [curTab, setCurTab] = useState(0);
   const [parties, setParties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInfoLoading, setIsInfoLoading] = useState(true);
-  //img 상태가 제대로 반영이 안되면 로딩창 넣어주세요
   const [imgLoading, setImgLoading] = useState(false);
   const [isChange, setIsChange] = useState(false);
   const [callModal, setCallModal] = useState(false);
@@ -365,7 +362,7 @@ export default function Mypage () {
   })
 
   const userRegion = basicInfo.address.split(" ").length < 2 ? "지역 미설정" : basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1]
-  // [CAUTION] 이미지 서버 관련 코드 => 범님 외 수정 X
+  
   AWS.config.update({
     region: "ap-northeast-2",
     credentials: new AWS.CognitoIdentityCredentials({

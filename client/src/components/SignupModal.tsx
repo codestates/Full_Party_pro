@@ -5,14 +5,11 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
-import { RootReducerType } from '../store/store';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserdata } from '../actions/signin';
+import { useDispatch } from 'react-redux';
 import { modalChanger } from '../actions/modal';
 
 import Loading from './Loading';
 import UserMap from './UserMap';
-import { url } from 'inspector';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -171,47 +168,6 @@ export const MapContainer = styled.section`
   }
 
 `
-
-// export const UserImage = styled.div`
-//   width: 100%;
-//   display: flex;
-//   flex-direction: column;
-
-//   justify-content: center;
-
-//   margin: 5vh 0;
-
-//   .label {
-//     margin: 1vh 0;
-//   }
-
-//   .circle {
-//     width: 140px;
-//     height: 140px;
-//     margin: 0 auto;
-//     border-radius: 100% !important;
-//     border: 1px solid darkcyan;
-//     overflow: hidden;
-
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//   }
-//   .pic {
-//     width: 200px;
-//     max-height: 200px;
-//     display: inline-block;
-//     margin: auto;
-//   }
-//   .imgUpload {
-//     display: none;
-//   }
-//   img {
-//     max-width: 100%;
-//     height: auto;
-//   }
-// `
-
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -795,7 +751,6 @@ const SignupModal = () => {
               return (
                 <>
                   <div className='confirm'>이 정보가 맞나요?</div>
-                  {/* <div className='profileImage' style={{ backgroundImage: `url(${userInfo.profileImage})`, backgroundSize: "cover" }}/> */}
                   <table>
                     <tr>
                       <td className='label'>이메일</td>
@@ -828,7 +783,6 @@ const SignupModal = () => {
             }
           })()}
 
-          {/* [dev] 페이지네이션 버튼 */}
           {(() => {
             if(pageIdx === 0) {
               return (

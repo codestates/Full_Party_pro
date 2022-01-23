@@ -150,7 +150,6 @@ export default function LocalMap ({ location, localParty }: Props) {
   }
 
   useEffect(() => {
-
     geocoder.addressSearch(location, function(result: any, status: any) {
       if (status === kakao.maps.services.Status.OK) {
         const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
@@ -158,49 +157,6 @@ export default function LocalMap ({ location, localParty }: Props) {
         setCoords({ lat: Ma, lng: La });
       }
     });
-
-    // const test = coordsSearch();
-    // console.log("테스트");
-    // console.log(test);
-
-    // const localPositions: Array<any> = [];
-
-    // for(let i = 0; i < localParty.length; i++){
-    //   geocoder.addressSearch(localParty[i].location, function(result: any, status: any) {
-    //     if (status === kakao.maps.services.Status.OK) {
-    //       const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
-    //       const { La, Ma } = coordinates;
-    //       localPositions.push({ title: localParty[i].name, latlng: { lat: Ma, lng: La }, image: localParty[i].image });
-    //     }
-    //   })
-    // }
-
-
-
-    // const localPositions = localParty.map((party) => {
-      
-    //   const test = geocoder.addressSearch(party.location, function(result: any, status: any) {
-    //     if (status === kakao.maps.services.Status.OK) {
-    //       const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
-    //       const { La, Ma } = coordinates;
-    //       const res = { title: party.name, latlng: { lat: Ma, lng: La }, image: party.image };
-
-    //       console.log(res)
-    //       // res 잘 출력됨
-    //       // 0번 인덱스: {title: '등 긁어주실 분...', latlng: {…}, image: 'https://pbs.twimg.com/media/Es4KAp3U4AM01nT?format=jpg'}
-    //       // 1번 인덱스: {title: '더미 파티', latlng: {…}, image: 'https://img.theqoo.net/flOqo'}
-    //       return res;
-    //     }
-    //   })
-
-    //   console.log(test)
-    //   // 값: undefined
-    //   return test;
-    // });
-
-    // console.log(localPositions);
-    //값: [undefined, undefined]
-
   }, [localParty]);
 
   return (

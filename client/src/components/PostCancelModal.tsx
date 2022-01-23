@@ -96,7 +96,6 @@ const PostCancelModal = ({ postCancelHandler, backToPage }: Props) => {
     postCancelHandler();
   }
 
-
   return(
     <ModalContainer>
       <ModalBackdrop onClick={closeModal}>
