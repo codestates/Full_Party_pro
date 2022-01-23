@@ -232,7 +232,7 @@ export const BtnContainer = styled.section`
   justify-content: space-between;
 
   button {
-    width: 90px;
+    width: 100px;
     height: 40px;
 
     border: none;
@@ -259,6 +259,13 @@ export const BtnContainer = styled.section`
     &.request {
       background-color: #50C9C3;
       color: #fff;
+      font-weight: bold;
+
+      &:disabled {
+        background-color: #fff;
+        color: #50C9C3;
+        border: 1px solid #50C9C3;
+      }
     }
   }
 `
@@ -289,7 +296,7 @@ const SignupModal = () => {
   const dispatch = useDispatch();
   const cameraRef = useRef<any>();
   const [isLoading, setIsLoading] = useState(false);
-  const [pageIdx, setPageIdx] = useState(0)
+  const [pageIdx, setPageIdx] = useState(4)
 
   type Info = {
     profileImage: any;
@@ -348,6 +355,7 @@ const SignupModal = () => {
 
   const [isSent, setIsSent] = useState(false);
   const [isTimeOut, setIsTimeOut] = useState(false);
+  const [isRequested, setIsRequested] = useState(false);
 
   const [inputCode, setInputCode] = useState('');
   const [verificationData, setVerificationData] = useState({
@@ -533,6 +541,7 @@ const SignupModal = () => {
       })
     }
     else {
+      setIsRequested(true);
       axios.post(`${process.env.REACT_APP_API_URL}/signup`,{
         userInfo: {
           userName: name,
@@ -557,6 +566,8 @@ const SignupModal = () => {
         } else {
           dispatch(modalChanger('signinModalBtn'))
         }
+
+        setIsRequested(false);
       })
       .catch((err) => console.log(err))
     }
@@ -840,7 +851,7 @@ const SignupModal = () => {
               return (
                 <BtnContainer>
                   <button onClick={handlePageChange} value="prev"><FontAwesomeIcon icon={faAngleLeft} className="icon left" /> 이전</button>
-                  <button onClick={handleSignup} className="request">완료</button>
+                  <button onClick={handleSignup} className="request" disabled={!!isRequested}>완료</button>
                 </BtnContainer>
               )
             }
