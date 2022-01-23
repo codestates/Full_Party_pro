@@ -1,22 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
-
 import CommentDeleteModal from './CommentDeleteModal';
 import axios from 'axios';
 
 export const QnAContainer = styled.section`
-
   header {
     width: 100%;
     padding: 20px;
     background-color: #50C9C3;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -30,7 +26,6 @@ export const QnAContainer = styled.section`
     .edit {
       width: 60px;
       height: 30px;
-
       background: #fff;
       color: #50C9C3;
       border: none;
@@ -58,17 +53,14 @@ export const Comments = styled.section`
 
   .commentList {
     padding: 15px 20px;
-
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     cursor: pointer;
   }
 `;
 
 export const CommentDetails = styled.div`
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -76,7 +68,6 @@ export const CommentDetails = styled.div`
   .subcommentList {
     display: flex;
     justify-content: center;
-
     width: 90%;
   }
 
@@ -85,9 +76,7 @@ export const CommentDetails = styled.div`
     flex-direction: column;
     align-items: center;
     text-align: center;
-
     overflow-wrap: normal;
-
     margin: 0 10px;
   }
 
@@ -96,7 +85,6 @@ export const CommentDetails = styled.div`
     height: 50px;
     border: 1px solid #d5d5d5;
     border-radius: 100%;
-
     margin-bottom: 5px;
   }
 
@@ -104,7 +92,6 @@ export const CommentDetails = styled.div`
     font-size: 0.8rem;
     font-weight: bold;
     word-break: break-all;
-
     width: 50px;
 
     #leader {
@@ -117,7 +104,6 @@ export const CommentDetails = styled.div`
 
     .subCommentContainer {
       border-radius: 20px;
-
       width: 100%;
       padding: 15px 20px;
       margin-bottom: 10px;
@@ -130,10 +116,8 @@ export const CommentDetails = styled.div`
 
   .delete {
     color: #777;
-
     border: none;
     background-color: white;
-
     margin: 0 15px;
   }
 `;
@@ -141,20 +125,16 @@ export const CommentDetails = styled.div`
 export const CommentInput = styled.section`
 
   width: 100%;
-
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-
   padding: 10px 20px;
 
   textarea {
     width: 100%;
     height: 80px;
-
     border: 1px solid #bebebe;
     padding: 10px;
-
     font-family: "-apple-system";
 
     &:focus {
@@ -169,12 +149,10 @@ export const CommentInput = styled.section`
   .submit {
     width: 80px;
     height: 30px;
-
     background-color: #50C9C3;
     color: #fff;
     border: none;
     border-radius: 20px;
-
     margin-top: 15px;
 
     &:disabled {
@@ -194,7 +172,6 @@ type Props = {
 };
 
 export default function QnA ({ partyId, isLeader, leaderId, comments, findComment }: Props) {
-
   const navigate = useNavigate();
 
   const isLoggedIn = useSelector(
@@ -207,13 +184,11 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
 
   const [commentIdx, setCommentIdx] = useState(-1);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
-  const curComments = comments.map((comment) => [ comment.comment, ...comment.subComments ])[commentIdx];
-
   const [isEditMode, setIsEditMode] = useState(false);
   const [newComment, setNewComment] = useState({comment: "", subcomment: ""});
-
   const [isCommentDeleteModalOpen, setIsCommentDeleteModalOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState({});
+  const curComments = comments.map((comment) => [ comment.comment, ...comment.subComments ])[commentIdx];
 
   const formatDate = (date: String) => date.slice(0, 10);
 
@@ -223,15 +198,10 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
   }
 
   function commentListHandler(event: React.MouseEvent<HTMLDivElement>, idx: number): void {
-
     setNewComment({ ...newComment, subcomment : "" });
     setCommentIdx(idx);
-
-    if(!isCommentOpen){
-      setIsCommentOpen(true);
-    } else if(idx === commentIdx) {
-      setIsCommentOpen(false);
-    }
+    if (!isCommentOpen) setIsCommentOpen(true);
+    else if (idx === commentIdx) setIsCommentOpen(false);
   }
 
   function inputHandler(event: React.ChangeEvent<HTMLTextAreaElement>): void {
@@ -262,7 +232,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
   }
 
   function commentDeleteModalHandler(event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId: number): void {
-    setCommentToDelete({ idx: idx, commentId: commentId })
+    setCommentToDelete({ idx: idx, commentId: commentId });
     setIsCommentDeleteModalOpen(!isCommentDeleteModalOpen);
   }
 
@@ -272,9 +242,9 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
       setCommentIdx(idx);
       setIsCommentOpen(true);
     }
-  }, [comments])
+  }, [comments]);
 
-  if(comments.length <= 0){
+  if (comments.length <= 0) {
     return (
       <QnAContainer>
         <header>

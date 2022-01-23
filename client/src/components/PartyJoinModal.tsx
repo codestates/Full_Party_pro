@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -9,7 +8,6 @@ import { useNavigate } from 'react-router-dom'
 export const ModalContainer = styled.div`
   width: 100vw;
   height: 100vh;
-
   position: fixed;
   left: 0;
   top: 0;
@@ -21,22 +19,17 @@ export const ModalBackdrop = styled.div`
   height: 100%;
   position: absolute;
   background-color: rgba(0,0,0,0.4);
-
   display: flex;
   justify-content: center;
   align-items: center;
 `
 
 export const ModalView = styled.div`
-
   width: 350px;
-
   border-radius: 30px;
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   padding: 30px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -46,7 +39,6 @@ export const ModalView = styled.div`
     font-family: 'SilkscreenBold';
     font-weight: bold;
     font-size: 20pt;
-    
     margin-bottom: 20px;
   }
 
@@ -57,13 +49,9 @@ export const ModalView = styled.div`
   textarea {
     width: 95%;
     height: 200px;
-
     padding: 15px;
-
     border: 1px solid #d5d5d5;
-
     margin-bottom: 20px;
-
     font-family: "-apple-system";
 
     &:focus {
@@ -75,7 +63,6 @@ export const ModalView = styled.div`
     width: 95%;
     height: 50px;
     padding: 10px 20px;
-
     border: none;
     border-radius: 20px;
     color: white;
@@ -85,16 +72,12 @@ export const ModalView = styled.div`
 `
 
 export const CloseBtn = styled.button`
-
   width: 100%;
   text-align: right;
-
   cursor: pointer;
   margin-bottom: 20px;
-
   background-color: white;
   border: none;
-
 `
 
 type Props = {
@@ -104,7 +87,6 @@ type Props = {
 }
 
 const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
-
   const navigate = useNavigate()
   const [message, setMessage] = useState("");
 
@@ -122,12 +104,11 @@ const PartyJoinModal = ({ partyJoinModalHandler, userId, partyId }: Props) => {
       partyId,
       message,
     });
-    
     closeModal();
     navigate(`../party/${partyId}`);
   }
 
-  return(
+  return (
     <ModalContainer>
       <ModalBackdrop onClick={closeModal}>
         <ModalView onClick={(e) => e.stopPropagation()}>

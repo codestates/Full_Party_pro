@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Slider from "react-slick";
-
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faMapMarkerAlt, faCalendarAlt, faGlobe } from '@fortawesome/free-solid-svg-icons';
@@ -9,7 +8,6 @@ import { faChevronLeft, faChevronRight, faMapMarkerAlt, faCalendarAlt, faGlobe }
 export const PartySlideContainer = styled.div`
   width: 100%;
   height: 100%;  
-
   padding: 0 20px;
   margin-bottom: 50px;
 
@@ -26,10 +24,8 @@ export const PartySlideContainer = styled.div`
     .partyImg {
       width: 100%;
       height: 250px;
-
       padding: 50px 20px;
       border-radius: 20px;
-
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -43,11 +39,9 @@ export const PartySlideContainer = styled.div`
 
     .title {
       height: 30px;
-      
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-
       font-size: 1.5rem;
       font-weight: bold;
       margin-bottom: 3.5px;
@@ -125,6 +119,7 @@ type Props = {
 }
 
 export default function PartySlide ({ myParty }: Props) {
+  const navigate = useNavigate();
   const settings = {
     dots: true,
     arrows: true,
@@ -163,15 +158,7 @@ export default function PartySlide ({ myParty }: Props) {
     ]
   };
 
-  const navigate = useNavigate();
-
-  function formatDate(date: Date){
-    // const date = timestamp.getDate();
-    // const month = timestamp.getMonth() + 1;
-    // const year = timestamp.getFullYear();
-
-    // return year + "/" + month + "/" + date;
-
+  function formatDate(date: Date) {
     return String(date).slice(0, 11);
   }
 
@@ -192,7 +179,7 @@ export default function PartySlide ({ myParty }: Props) {
                       {isOnline ? <><FontAwesomeIcon icon={ faGlobe } className="icon" /> 온라인 퀘스트</>
                        : <><FontAwesomeIcon icon={ faMapMarkerAlt } className="icon" /> {region}</>}
                     </div>
-                    <div className="date"><FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {formatDate(startDate)} ~ {formatDate(endDate)}</div>  
+                    <div className="date"><FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {formatDate(startDate)} ~ {formatDate(endDate)}</div>
                   </div>
                 </h3>
               </div>

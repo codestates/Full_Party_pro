@@ -2,7 +2,7 @@ import { UsersAttributes } from './../models/users';
 import axios from "axios";
 import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
+import { generateAccessToken, verifyAccessToken, setCookie } from "./functions/token";
 import { findUser, createUser, deleteUser } from "./functions/sequelize";
 import config from "../config"
 import nodemailer from "nodemailer"

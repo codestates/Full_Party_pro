@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
+import { InternalServerError, SuccessfulResponse } from "./functions/response";
 import { createNotification, findUser, getPartyInformation, invertFavorite, findFavoriteParties, checkIsRead } from './functions/sequelize';
 import { NotificationAttributes } from "../models/notification";
 

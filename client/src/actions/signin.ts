@@ -1,6 +1,5 @@
 import axios from "axios";
 import { Dispatch } from 'redux'
-import { cookieParser } from "../App";
 import { CLOSE_MODAL } from "./modalType";
 import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "./signinType";
 
@@ -11,21 +10,21 @@ export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<Use
     withCredentials:true
   })
   .then((res) => {
-    if(res.status === 200) {
+    if (res.status === 200) {
       dispatch({
         type: SIGNIN_SUCCESS,
         payload: res.data.userInfo
-      })
+      });
       dispatch({
         type: CLOSE_MODAL
-      })
+      });
     }
   })
   .catch((err) => {
-    if(err.response.status === 401) {
+    if (err.response.status === 401) {
       dispatch({
         type: SIGNIN_FAIL
-      })
+      });
     }
   })
 

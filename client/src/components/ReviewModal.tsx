@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faFlag, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { faSadCry, faSadTear, faSmile, faGrinWink, faLaughBeam } from '@fortawesome/free-solid-svg-icons';
-import { faSadCry as blankSadCry, faSadTear as blankSadTear, faSmile as blankSmile, faGrinWink as blankGrinWink, faLaughBeam as blankLaughBeam } from '@fortawesome/free-regular-svg-icons';
-
 import confetti from 'canvas-confetti';
+import { faSadCry as blankSadCry, faSadTear as blankSadTear, faSmile as blankSmile, 
+  faGrinWink as blankGrinWink, faLaughBeam as blankLaughBeam
+} from '@fortawesome/free-regular-svg-icons';
 
 export const ModalContainer = styled.div`
   width: 100vw;
   height: 100vh;
-
   position: fixed;
   left: 0;
   top: 0;
@@ -24,22 +23,17 @@ export const ModalBackdrop = styled.div`
   height: 100%;
   position: absolute;
   background-color: rgba(0,0,0,0.4);
-
   display: flex;
   justify-content: center;
   align-items: center;
 `
 
 export const ModalView = styled.div`
-
   width: 360px;
-
   border-radius: 30px;
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   padding: 30px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,22 +43,18 @@ export const ModalView = styled.div`
     font-family: 'SilkscreenBold';
     font-size: 20pt;
     font-weight: bold;
-    
     margin-bottom: 10px;
   }
 
   .description {
     font-size: 0.8rem;
     display: none;
-
     margin: 5px 0;
   }
 `
 
 export const UserInfo = styled.section`
-
   width: 100%;
-
   display: flex;
   justify-content: space-between;
 
@@ -82,7 +72,6 @@ export const UserInfo = styled.section`
     display: flex;
     flex-direction: column;
     align-items: center;
-
     margin: 10px;
     overflow-wrap: normal;
   }
@@ -92,7 +81,6 @@ export const UserInfo = styled.section`
     height: 100px;
     border: 1px solid #d5d5d5;
     border-radius: 100%;
-
     margin-bottom: 10px;
   }
 
@@ -100,7 +88,6 @@ export const UserInfo = styled.section`
     font-size: 1.2rem;
     font-weight: bold;
     word-break: break-all;
-
     min-width: 100px;
     border-bottom: 1px solid #d5d5d5;
     padding-bottom: 5px;
@@ -115,14 +102,11 @@ export const ReviewContainer = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   width: 90%;
   margin: 10px 0;
 
   .review {
-
     width: 100%;
-
     display: flex;
     justify-content: space-between;
 
@@ -141,20 +125,15 @@ export const ReviewContainer = styled.section`
 `
 
 export const CloseBtn = styled.button`
-
   width: 100%;
   text-align: right;
-
   cursor: pointer;
   margin-bottom: 10px;
-
   background-color: white;
   border: none;
-
 `
 
 export const ProgressBar = styled.section`
-
   width: 100%;
   margin: 10px 0;
   padding: 0 10px;
@@ -172,7 +151,6 @@ export const ProgressBar = styled.section`
     border-radius: inherit;
     text-align: right;
   }
-
 `
 
 export const CompleteBtns = styled.section`
@@ -182,12 +160,10 @@ export const CompleteBtns = styled.section`
   button {
     min-width: 100px;
     height: 50px;
-
     border: none;
     border-radius: 20px;
     background-color: #50C9C3; 
     color: white;
-
     margin: 8px;
     padding: 10px 20px;
 
@@ -213,11 +189,9 @@ interface keyable {
  [key: string]: any  
 };
 
-const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, partyId, handlePartyInfoChange }: Props) => {
-
+export default function ReviewModal({ reviewModalHandler, members, leaderId, isLeader, userId, partyId, handlePartyInfoChange }: Props) {
   const [curIdx, setCurIdx] = useState(0);
   const [progress, setProgress] = useState(0);
-
   const [reviewMembers, setReviewMembers] = useState<Array<keyable>>(members.map((member) => ({ ...member, exp: null })));
   const curMember = reviewMembers[curIdx];
   const { userName, profileImage, exp } = curMember;
@@ -236,47 +210,33 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
 
   function handleMemberChange(event: React.MouseEvent<HTMLButtonElement>) {
     const toGo = (event.currentTarget as HTMLButtonElement).value;
-    if(toGo === "left"){
-      setCurIdx(curIdx - 1);
-    } else {
-      setCurIdx(curIdx + 1);
-    }
+    if (toGo === "left") setCurIdx(curIdx - 1);
+    else setCurIdx(curIdx + 1);
   }
 
   async function questCompleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // partyState를 2로 바꾸는 요청을 전송함
-    // 유저 파티 테이블의 isReviewed를 true로 변경합니다.
-    // 평가한 각 유저의 exp에 영향을 줍니다.
-
-    // [dev] exp 키로 전송해줄 데이터
     const reviewedMembers = reviewMembers.map((member) => ({ userId: member.id, exp: member.exp}));
-
-    // [FEAT] 기능 확인 필요
-    if(isLeader){
+    if (isLeader) {
       await axios.patch(`${process.env.REACT_APP_API_URL}/party/completed`, {
         partyId
       }, {
         withCredentials: true
       });
-
       handlePartyInfoChange("partyState", 2);
     }
-
-    await axios.patch(`${process.env.REACT_APP_API_URL}/party/review`, { 
-      partyId, 
-      userId, 
+    await axios.patch(`${process.env.REACT_APP_API_URL}/party/review`, {
+      partyId,
+      userId,
       exp: reviewedMembers,
     }, {
       withCredentials: true
     });
-
     handlePartyInfoChange("isReviewed", true);
-
     confetti();
     reviewModalHandler();
   }
 
-  return(
+  return (
     <ModalContainer>
       <ModalBackdrop>
         <ModalView>
@@ -302,9 +262,9 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
               <FontAwesomeIcon icon={faChevronLeft} />
             </button>
             <div className="memberContainer">
-              <div 
-                className="profileImage" 
-                style={{ backgroundImage: `url(${profileImage})`, backgroundSize: "cover" }} 
+              <div
+                className="profileImage"
+                style={{ backgroundImage: `url(${profileImage})`, backgroundSize: "cover" }}
               />
               <div className="nameplate">
               {curMember.id === leaderId? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {userName}
@@ -373,5 +333,3 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
     </ModalContainer>
   )
 }
-
-export default ReviewModal;

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faPlusCircle, faBookmark, faUser } from '@fortawesome/free-solid-svg-icons';
@@ -8,31 +7,24 @@ import { faHome, faPlusCircle, faBookmark, faUser } from '@fortawesome/free-soli
 export const NavContainer = styled.nav`
   width: 100vw;
   height: 60px;
-
   position: fixed;
   left: 0;
   bottom: 0;
   z-index: 900;
-
   background-color: white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px -8px 24px;
-
   display: flex;
   justify-content: space-around;
 
   .button {
     width: 25vw;
-
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-
     padding: 10px;
-
     color: #777;
     font-size: 10pt;
-
     cursor: pointer;
 
     .icon {

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
 
 export const MapContainer = styled.div`
@@ -16,7 +15,6 @@ export const MapContainer = styled.div`
     float:left;
     border: 1px solid #ccc;
     border-bottom:2px solid #ddd;
-
     width: 100px;
   }
 
@@ -73,48 +71,41 @@ type Props = {
   handleFormatAddressChange: Function
 }
 
-const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
-  
+export default function UserMap({ location, image, handleFormatAddressChange }: Props) {
   const { kakao } = window;
-
-  const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
+  const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
-
   const geocoder = new kakao.maps.services.Geocoder();
 
   function searchDetailAddrFromCoords(coords: { lat: number, lng: number }, callback: Function) {
-    geocoder.coord2Address(coords.lng, coords.lat, callback);         
+    geocoder.coord2Address(coords.lng, coords.lat, callback);
   }
 
   useEffect(() => {
-
-    if(location){
+    if (location) {
       geocoder.addressSearch(location, function(result: any, status: any) {
         if (status === kakao.maps.services.Status.OK) {
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
           const { La, Ma } = coordinates;
           setCoords({ lat: Ma, lng: La });
         }
-      });  
+      });
     }
-    
-  },[location])
+  }, [ location ]);
 
   useEffect(() => {
-
-    searchDetailAddrFromCoords(coords, function(result: any, status: any) {
+    searchDetailAddrFromCoords(coords, (result: any, status: any) => {
       if (status === kakao.maps.services.Status.OK) {
-        const address = 
-          !!result[0].road_address ? 
+        const address =
+          !!result[0].road_address ?
             result[0].road_address.address_name
           : result[0].address.address_name;
         handleFormatAddressChange(address);
-      }   
+      }
    });
-
   },[coords])
 
-  if(!location){
+  if (!location) {
     return (
       <MapContainer>
         <Map
@@ -163,5 +154,3 @@ const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
     </MapContainer>
   )
 }
-
-export default UserMap;

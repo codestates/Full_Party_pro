@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { cookieParser } from "../App";
 import styled from 'styled-components';
@@ -15,18 +15,14 @@ import { NOTIFY } from '../actions/notify';
 export const ListContainer = styled.div`
   width: 100%;
   height: 100%;
-
   margin: 70px 0 60px 0;
   padding: 5px 25px;
 
   section.listSection {
-
     margin-bottom: 20px;
-
     header.listHeader {
       font-size: 1.7rem;
       font-weight: bold;
-
       margin-bottom: 10px;
 
       main {
@@ -37,17 +33,15 @@ export const ListContainer = styled.div`
   }
 `
 
-export default function List () {
-
+export default function List() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo
   );
 
   const searchRegion = userInfo.address.split(" ")[0] + " " + userInfo.address.split(" ")[1];
-  const [isLoading, setIsLoading] = useState(true);
+  const [ isLoading, setIsLoading ] = useState(true);
   const [ myParty, setMyParty ] = useState([]);
   const [ localParty, setLocalParty ] = useState([]);
 
@@ -64,7 +58,9 @@ export default function List () {
         }
       });
       const parsedLocalParty = response.data.localParty.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
-      setLocalParty(parsedLocalParty);
+      setLocalParty(parsedLocalParty.filter((party: any) => {
+        return party.memberLimit !== party.members.length
+      }));
       setMyParty(response.data.myParty);
     })();
   }, [ userInfo ]);
@@ -73,17 +69,12 @@ export default function List () {
     setIsLoading(false);
   }, [ localParty, myParty ]);
 
-  if(isLoading) {
-    return <Loading />
-  }
+  if (isLoading) return <Loading />
 
-  if(!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "Google" || userInfo.address === "Kakao"){
+  if (!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "Google" || userInfo.address === "Kakao")
     return <AddressModal />
-  }
 
-  if(cookieParser().isLoggedIn === "0"){
-    return <Navigate to="../" />
-  }
+  if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />
 
   return (
     <ListContainer>

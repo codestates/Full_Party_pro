@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
+import { InternalServerError, SuccessfulResponse } from "./functions/response";
 import { searchPartiesByKeyword, searchPartiesByTagName, checkIsRead } from './functions/sequelize';
 
 export const searchByTagNameOrKeyword = async (req: Request, res: Response) => {

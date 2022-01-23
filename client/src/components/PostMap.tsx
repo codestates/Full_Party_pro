@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
 
 export const MapContainer = styled.div`
@@ -16,7 +15,6 @@ export const MapContainer = styled.div`
     float:left;
     border: 1px solid #ccc;
     border-bottom:2px solid #ddd;
-
     width: 130px;
   }
 
@@ -46,7 +44,6 @@ export const MapContainer = styled.div`
     padding:10px 15px;
     font-size:14px;
     font-weight:bold;
-
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -80,21 +77,17 @@ type Props = {
 }
 
 const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocationChange }: Props) => {
-  
   const { kakao } = window;
-
-  const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
+  const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
-
   const geocoder = new kakao.maps.services.Geocoder();
 
   function searchAddrFromCoords(coords: { lat: number, lng: number }, callback: Function) {
-    geocoder.coord2RegionCode(coords.lng, coords.lat, callback);         
+    geocoder.coord2RegionCode(coords.lng, coords.lat, callback);
   }
 
   useEffect(() => {
-
-    if(location){
+    if (location) {
       geocoder.addressSearch(location, function(result: any, status: any) {
         if (status === kakao.maps.services.Status.OK) {
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
@@ -102,24 +95,22 @@ const PostMap = ({ location, name, image, handleCoordsChange, handleFormatLocati
           setCoords({ lat: Ma, lng: La });
           handleCoordsChange(Ma, La);
         }
-      });  
+      });
     }
-    
-  },[location])
+
+  }, [ location ]);
 
   useEffect(() => {
-
     searchAddrFromCoords(coords, function(result: any, status: any) {
       if (status === kakao.maps.services.Status.OK) {
         const address = result[0].address_name;
         const region = address.split(" ")[0] + " " + address.split(" ")[1];
         handleFormatLocationChange(region);
-      }   
+      }
    });
+  }, [coords]);
 
-  },[coords])
-
-  if(!location){
+  if (!location) {
     return (
       <MapContainer>
         <Map

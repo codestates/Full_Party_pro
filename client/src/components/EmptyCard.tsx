@@ -1,17 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import styled from 'styled-components';
 
 export const CardContainer = styled.section`
   width: 100%;
-
   margin-top: 40px;
 
   header.listHeader {
     font-size: 1.7rem;
     font-weight: bold;
-
     margin: 10px 0;
   } 
 
@@ -21,10 +18,8 @@ export const CardContainer = styled.section`
     justify-content: center;
     align-items: center;
     text-align: center;
-
     font-size: 1.1rem;
     line-height: 2rem;
-
     margin: 50px 0;
     padding: 20px;
 
@@ -35,14 +30,11 @@ export const CardContainer = styled.section`
       border-radius: 20px;
       background-color: #fff;
       box-shadow: rgba(80, 201, 195, 0.4) 0px 8px 24px;
-
       font-family: "silkScreenBold";
       font-size: 1.1rem;
       color: #50C9C3;
-
       margin-top: 25px;
       margin-bottom: 0;
-
       cursor: pointer;
     }
   }

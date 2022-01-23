@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare, faCheckSquare } from '@fortawesome/free-solid-svg-icons';
-
 import QuestCard from '../components/QuestCard';
 import LocalMap from '../components/LocalMap';
 
@@ -14,7 +12,6 @@ export const LocalQuestContainer = styled.section`
   header.listHeader {
     font-size: 1.7rem;
     font-weight: bold;
-
     margin-bottom: 10px;
 
     main {
@@ -26,7 +23,6 @@ export const LocalQuestContainer = styled.section`
   .listOptions {
     font-weight: normal;
     font-size: 1rem;
-
     display: flex;
     justify-content: space-between;
     margin: 15px 0;
@@ -71,20 +67,17 @@ export default function LocalQuest ({ location, localParty }: Props) {
   const [checked, setChecked] = useState({ online: true, offline: true });
 
   function checkboxHandler(event: React.ChangeEvent<HTMLInputElement>) {
-    if((checked.online || event.target.checked) && (checked.offline || event.target.checked)){
+    if((checked.online || event.target.checked) && (checked.offline || event.target.checked)) {
       setChecked({ ...checked, [event.target.id]: event.target.checked });
     }
   }
 
   useEffect(() => {
-    if(checked.online && checked.offline){
-        setPartyList(localParty.map(local => local).reverse());
-    } else if(checked.online){
-        setPartyList(localParty.filter(local => local.isOnline).reverse());
-    } else {
-        setPartyList(localParty.filter(local => !local.isOnline).reverse())
-    }
-  }, [checked])
+    if (checked.online && checked.offline) setPartyList(localParty.map(local => local).reverse());
+    else if (checked.online) setPartyList(localParty.filter(local => local.isOnline).reverse());
+    else setPartyList(localParty.filter(local => !local.isOnline).reverse())
+  }, [checked]);
+
   return (
     <LocalQuestContainer>
       <header className="listHeader">

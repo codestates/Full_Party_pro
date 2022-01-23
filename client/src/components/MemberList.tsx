@@ -1,9 +1,7 @@
 import React from 'react';
-
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag } from '@fortawesome/free-solid-svg-icons';
-
 export const MemberListContainer = styled.div`
 
   .emptyMsg {
@@ -13,20 +11,16 @@ export const MemberListContainer = styled.div`
 
   .memberList {
     width: 100%;
-
     display: flex;
     flex-wrap: wrap;
-
     margin-top: 10px;
 
     .memberContainer {
       display: flex;
       flex-direction: column;
       align-items: center;
-
       margin: 10px;
       overflow-wrap: normal;
-
       cursor: pointer;
     }
 
@@ -35,7 +29,6 @@ export const MemberListContainer = styled.div`
       height: 50px;
       border: 1px solid #d5d5d5;
       border-radius: 100%;
-
       margin-bottom: 10px;
     }
 

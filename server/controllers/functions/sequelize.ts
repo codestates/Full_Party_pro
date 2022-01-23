@@ -1,13 +1,13 @@
 import { Op } from "sequelize";
 import { Users, UsersAttributes } from "../../models/users";
-import { Parties, PartiesAttributes } from "../../models/parties";
-import { UserParty, UserPartyAttributes } from "../../models/userParty";
-import { WaitingQueue, WaitingQueueAttributes } from "../../models/waitingQueue";
+import { Parties } from "../../models/parties";
+import { UserParty } from "../../models/userParty";
+import { WaitingQueue } from "../../models/waitingQueue";
 import { Notification, NotificationAttributes } from '../../models/notification';
-import { Favorite, FavoriteAttributes } from "../../models/favorite";
-import { Tag, TagAttributes } from "../../models/tag";
-import { Comment, CommentAttributes } from "../../models/comment";
-import { SubComment, SubCommentAttributes } from "../../models/subComment";
+import { Favorite } from "../../models/favorite";
+import { Tag } from "../../models/tag";
+import { Comment } from "../../models/comment";
+import { SubComment } from "../../models/subComment";
 
 interface LocalParty extends Parties {
   favorite?: boolean;

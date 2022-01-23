@@ -4,7 +4,6 @@ import axios from 'axios';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-
 import { RootReducerType } from '../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserdata } from '../actions/signin';
@@ -26,7 +25,6 @@ export const ModalBackdrop = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: rgba(0,0,0,0.4);
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -37,25 +35,20 @@ export const ModalView = styled.div`
   max-width: 350px;
   max-height: 90vh;
   overflow: auto;
-
   border-radius: 30px;
   background-color: white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   padding: 30px;
   text-align: center;
-
 
   header {
     font-size: 25px;
     line-height: 28px;
     margin-bottom: 15px;
-
     font-family: 'SilkscreenBold';
   }
   
   .inputSection {
-
     margin-bottom: 10px;
 
     fieldset {
@@ -70,10 +63,8 @@ export const ModalView = styled.div`
       input {
         width: 80%;
         height: 30px;
-
         border: none;
         border-bottom: 1px solid #d5d5d5;
-
         text-align: center;
 
         &:focus {
@@ -87,17 +78,13 @@ export const ModalView = styled.div`
   .signinBtn {
     width: 80%;
     height: 50px;
-
     border: none;
     border-radius: 20px;
     background-color: #50C9C3;
     color: white;
-
     font-family: 'SilkscreenBold';
     font-size: 15px;
-  
     margin: 10px 0 15px 0;
-
     cursor: pointer;
   }
 
@@ -116,7 +103,6 @@ export const ModalView = styled.div`
   .notUser{
     color: #f34508;
     font-size: 10px;
-
     margin: 25px 0 10px 0;
   }
 
@@ -126,7 +112,6 @@ export const ModalView = styled.div`
     .oauthLabel {
       display: flex;
       align-items: center;
-
       font-size: 0.8rem;
       margin-bottom: 15px;
 
@@ -144,10 +129,8 @@ export const ModalView = styled.div`
       height: 50px;
       border: none;
       border-radius: 100%;
-
       margin: 0 10px;
       padding-top: 2px;
-
       cursor: pointer;
 
       img {
@@ -187,42 +170,39 @@ const Button = styled.button`
 export const CloseBtn = styled.button`
   width: 100%;
   text-align: right;
-
   cursor: pointer;
   margin-bottom: 15px;
-
   background-color: white;
   border: none;
 `
 
-const SigninModal = () => {
-
+export default function SigninModal() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
 
-  const [userInfo, setUserInfo] = useState({
+  const [ userInfo, setUserInfo ] = useState({
     email: '',
     password: ''
   });
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target
+    const { name, value } = e.target
     setUserInfo({
       ...userInfo,
       [name]: value
-    })
-  }
+    });
+  };
 
   const handleSignin = () => {
     dispatch(fetchUserdata(userInfo))
-    if(signinReducer.isLoggedIn){
+    if (signinReducer.isLoggedIn) {
       dispatch({
         type: CLOSE_MODAL
-      })
+      });
     }
-  }
+  };
 
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     dispatch(modalChanger(e.currentTarget.className))
@@ -241,7 +221,7 @@ const SigninModal = () => {
     const url = `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.REACT_APP_KAKAO_REST_API_KEY}&redirect_uri=${process.env.REACT_APP_REDIRECT_URI}&response_type=code`;
     window.location.assign(url);
   };
-  
+
   const guestLoginHandler = async () => {
     const response = await axios.post(`${process.env.REACT_APP_API_URL}/guest`, {}, {
       withCredentials: true
@@ -258,7 +238,6 @@ const SigninModal = () => {
     document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate('/home');
   }
-  
 
   return(
     <ModalContainer>
@@ -324,5 +303,3 @@ const SigninModal = () => {
     </ModalContainer>
   )
 }
-
-export default SigninModal;

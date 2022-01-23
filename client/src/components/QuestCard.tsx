@@ -11,23 +11,17 @@ import { useSelector } from 'react-redux';
 export const QuestCardContainer = styled.div`
   width: 100%;
   height: 100%; 
-
   margin: 20px 0;
   padding: 20px;
-  
   border-radius: 30px;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   cursor: pointer;
 
   header.questHeader {
     display: flex;
     justify-content: space-between;
-    /* align-items: center; */
-
     font-size: 1.2rem;
     font-family: 'silkScreenBold';
-
     margin-bottom: 10px;
 
     .rightWrapper {
@@ -35,17 +29,13 @@ export const QuestCardContainer = styled.div`
 
       button.tag {
         max-width: 100px;
-
         height: 20px;
-
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-
         background-color: #fff;
         border: none;
         color: #777;
-
         margin: 0 2px;
       }
 
@@ -58,12 +48,9 @@ export const QuestCardContainer = styled.div`
   }
 
   .favorite {
-
     margin: 0 5px;
     margin-left: 5px;
-
     font-size: 1.2rem;
-
     color: #fa3e7d;
     background-color: #fff;
     border-radius: 100%;
@@ -87,7 +74,6 @@ export const InfoWrapper = styled.div`
     height: 50px;
     border: 1px solid #d5d5d5;
     border-radius: 100%;
-
     margin-right: 10px;
   }
 
@@ -108,7 +94,6 @@ export const InfoWrapper = styled.div`
 
     .details {
       display: flex;
-
       color: #777;
       font-size: 0.9rem;
 
@@ -120,7 +105,6 @@ export const InfoWrapper = styled.div`
     @media screen and (max-width: 450px) {
       .details {
         flex-direction: column;
-
         margin-bottom: 5px;
 
         .location {
@@ -145,7 +129,6 @@ export const MemberWrapper = styled.div`
       height: 28px;
       border: 1px solid #d5d5d5;
       border-radius: 100%;
-
       display: flex;
       justify-content: center;
       align-items: center;
@@ -173,18 +156,18 @@ type Props = {
 }
 
 export default function QuestCard ({ party }: Props) {
-
   const navigate = useNavigate();
   const { id, name, memberLimit, startDate, endDate, leaderId, favorite, tag, isOnline, region, members } = party;
+
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
   );
+
   const [ like, setLike ] = useState(favorite);
 
   const formatDate = (date: Date) => String(date).slice(0, 11);
 
   const favoriteHandler = async (event: React.MouseEvent<HTMLDivElement>) => {
-    // [dev] 서버 통신 후에는 setIsFavorite 삭제하기
     event.stopPropagation();
     const response = await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${id}`, { userId, partyId: id }, {
       withCredentials: true
@@ -192,15 +175,10 @@ export default function QuestCard ({ party }: Props) {
     if (response.data.message === "Like selected") setLike(true);
     else if (response.data.message === "Like canceled") setLike(false);
   }
-  
+
   return (
     <QuestCardContainer 
       onClick={() => navigate(`../party/${id}`)}
-      // style={{background: 
-      //   isOnline ? 
-      //   "linear-gradient(to bottom, #50C9C3 19%, #fff 10%)"
-      //   : "linear-gradient(to bottom, #50C9C3 19%, #fff 10%)"
-      // }}
     >
       <header className="questHeader">
         <div>

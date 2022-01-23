@@ -1,10 +1,9 @@
-import exp from "constants";
 import { SIGNIN_FAIL, SIGNIN_SUCCESS, UserInfo, UserInfoDispatchType } from "../actions/signinType";
 
 interface InitialState {
-  isLoggedIn?: boolean | null
-  userInfo: UserInfo
-}
+  isLoggedIn?: boolean | null;
+  userInfo: UserInfo;
+};
 
 const initialState: InitialState = {
   isLoggedIn: null,
@@ -15,7 +14,7 @@ const initialState: InitialState = {
     address: "",
     signupType: ""
   }
-}
+};
 
 const signinReducer = (state = initialState, action: UserInfoDispatchType): InitialState => {
   switch (action.type) {
@@ -30,10 +29,10 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
           address: "",
           signupType: ""
         }
-      }
+      };
 
     case SIGNIN_SUCCESS:
-      const { id, userName, profileImage, address, signupType } = action.payload
+      const { id, userName, profileImage, address, signupType } = action.payload;
       return {
         ...state,
         isLoggedIn: true,
@@ -44,7 +43,7 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
           address,
           signupType
         }
-      }
+      };
 
     default:
       return state;

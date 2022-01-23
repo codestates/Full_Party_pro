@@ -109,11 +109,9 @@ type Props = {
   verficationModalHandler: Function
 }
 
-const VerificationModal = ({ userId, handleIsChange, verficationModalHandler }: Props) => {
-
-  const [password, setPassword] = useState('');
-
-  const [errorMsg, setErrorMsg] = useState('');
+export default function  VerificationModal({ userId, handleIsChange, verficationModalHandler }: Props) {
+  const [ password, setPassword ] = useState('');
+  const [ errorMsg, setErrorMsg ] = useState('');
 
   const closeModal =() => {
     verficationModalHandler();
@@ -131,23 +129,21 @@ const VerificationModal = ({ userId, handleIsChange, verficationModalHandler }: 
       }
     })
 
-    if(verify.data.message === "Unauthorized User"){
-      setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
-    } else if(verify.data.message === "User Identified"){
-
+    if (verify.data.message === "Unauthorized User") setErrorMsg('비밀번호가 틀렸습니다. 다시 확인해주세요.');
+    else if (verify.data.message === "User Identified") {
       handleIsChange();
       closeModal();
     }
   }
 
-  return(
+  return (
     <ModalContainer>
       <ModalBackdrop onClick={closeModal}>
         <ModalView onClick={(e) => e.stopPropagation()}>
           <CloseBtn onClick={closeModal}><FontAwesomeIcon icon={faTimes} /></CloseBtn>
             <img src="img/404logo.png" alt="logo" />
             <div className="title">비밀번호를 입력해주세요.</div>
-            <input 
+            <input
               name='password'
               type='password'
               value={password}
@@ -160,5 +156,3 @@ const VerificationModal = ({ userId, handleIsChange, verficationModalHandler }: 
     </ModalContainer>
   )
 }
-
-export default VerificationModal;

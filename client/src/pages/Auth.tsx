@@ -1,6 +1,6 @@
 import React from 'react';
 import { useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import axios from 'axios';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { useDispatch } from 'react-redux';
@@ -10,7 +10,6 @@ import { cookieParser } from '../App';
 export const LoadingContainer = styled.div`
   width: 100vw;
   height: 100vh;
-
   position: fixed;
   left: 0;
   top: 0;
@@ -26,9 +25,7 @@ export const LoadingBackdrop = styled.div`
   height: 100%;
   position: absolute;
   background-color: rgba(255,255,255,0.8);
-
   padding-top: 40vh;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -42,7 +39,6 @@ export const LoadingBackdrop = styled.div`
   img {
     width: 50px;
     height: 50px;
-
     margin-bottom: 15px;
   }
 `;
@@ -52,7 +48,7 @@ export default function Auth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const address = new URL(window.location.href).searchParams.get("code")
+    const address = new URL(window.location.href).searchParams.get("code");
     if (address && address[1] !== "/") handleKakaoLogin();
     else if (address && address[1] === "/") handleGoogleLogin();
   }, []);
@@ -90,10 +86,8 @@ export default function Auth() {
     }
   };
 
-  if(cookieParser().isLoggedIn === "1"){
-    navigate('../home');
-  }
-  
+  if (cookieParser().isLoggedIn === "1") navigate('../home');
+
   return (
     <LoadingContainer>
       <LoadingBackdrop>

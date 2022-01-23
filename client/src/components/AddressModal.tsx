@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
-
 import UserMap from './UserMap';
-
 import { AppState } from '../reducers';
 import { useDispatch, useSelector } from 'react-redux';
 import { SIGNIN_SUCCESS } from '../actions/signinType';
@@ -26,7 +23,6 @@ export const ModalBackdrop = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: rgba(0,0,0,0.4);
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -37,14 +33,11 @@ export const ModalView = styled.div`
   max-width: 350px;
   max-height: 90vh;
   overflow: auto;
-
   border-radius: 30px;
   background-color: white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   padding: 30px;
   text-align: center;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -53,7 +46,6 @@ export const ModalView = styled.div`
   .error {
     font-size: 0.7rem;
     color: #f34508;
-
     margin-top: 5px;
   }
 `
@@ -62,7 +54,6 @@ export const MapContainer = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   width: 90%;
 
   img {
@@ -92,7 +83,6 @@ export const MapContainer = styled.section`
     height: 25px;
     border: none;
     border-bottom: 1px solid #d5d5d5;
-
     margin: 15px 0;
 
     &:focus {
@@ -104,21 +94,16 @@ export const MapContainer = styled.section`
 
 export const BtnContainer = styled.section`
   width: 100%;
-
   display: flex;
   justify-content: space-between;
 
   button {
     width: 90px;
     height: 40px;
-
     border: none;
     border-radius: 10px;
-
     background-color: white;
-
     cursor: pointer;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -140,18 +125,14 @@ export const BtnContainer = styled.section`
   }
 `
 
-const AddressModal = () => {
-
+export default function  AddressModal() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const [pageIdx, setPageIdx] = useState(0);
-
-  const [address, setAddress] = useState('');
-  const [fixedLocation, setFixedLocation] = useState('');
-  const [formatAddress, setFormatAddress] = useState('');
-
-  const [errorMsg, setErrorMsg] = useState('');
+  const [ pageIdx, setPageIdx ] = useState(0);
+  const [ address, setAddress ] = useState('');
+  const [ fixedLocation, setFixedLocation ] = useState('');
+  const [ formatAddress, setFormatAddress ] = useState('');
+  const [ errorMsg, setErrorMsg ] = useState('');
 
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo
@@ -166,40 +147,34 @@ const AddressModal = () => {
   }
 
   const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
-      setFixedLocation(address);
-    }
+    if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') setFixedLocation(address);
   }
 
-  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {    
+  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     const toGo = (event.currentTarget as HTMLButtonElement).value;
-    if(toGo === "next"){
-      setPageIdx(pageIdx + 1);
-    } else {
-      setPageIdx(pageIdx - 1);
-    }
+    if (toGo === "next") setPageIdx(pageIdx + 1);
+    else setPageIdx(pageIdx - 1);
   }
 
   const handleAddressRegister = async () => {
-    if(address){
-      setErrorMsg('')
+    if (address) {
+      setErrorMsg('');
       const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/address/${userInfo.id}`, {
         userId: userInfo.id, address: formatAddress
       });
 
-      if(res.status === 200) {
+      if (res.status === 200) {
         dispatch({
           type: SIGNIN_SUCCESS,
           payload: {
             ...userInfo,
             address: formatAddress
           }
-        })
+        });
         navigate('../');
       }
-    } else {
-      setErrorMsg('주소를 입력해주세요.')
     }
+    else setErrorMsg('주소를 입력해주세요.');
   }
 
   return(
@@ -256,5 +231,3 @@ const AddressModal = () => {
     </ModalContainer>
   )
 }
-
-export default AddressModal;

@@ -6,7 +6,6 @@ function notifyReducer(state = initialState, action: { type: string; payload: { 
 
   switch (action.type) {
     case NOTIFY:
-      //TODO
       return { isBadgeOn: action.payload.isBadgeOn };
 
     default:
