@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { cookieParser, requestKeepLoggedIn } from "../App";
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-
+import { NOTIFY } from '../actions/notify';
 import { useSelector } from 'react-redux';
 import { AppState } from '../reducers';
 import { RootReducerType } from '../store/store';
@@ -41,6 +40,10 @@ export const SearchBar = styled.div`
     border: 1px solid #d5d5d5;
     border-radius: 20px;
     font-size: 1.1rem;
+
+    &:focus {
+      outline-style:none;
+    }
   }
   .faSearch {
     position: absolute;
@@ -103,9 +106,6 @@ export default function Search () {
   const [parties, setParties] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  //[dev] 더미데이터입니다.
-  // const [tag, setTag] = useState(['태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333', '태그1', '태그2', '태그333333333'])
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value)
   }
@@ -132,10 +132,17 @@ export default function Search () {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?tagName=${tag}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
         const parsedData = partyData.map((party: any) => ({ ...party, "latlng": JSON.parse(party.latlng) }));
+        dispatch({
+          type: NOTIFY,
+          payload: {
+            isBadgeOn: res.data.notification
+          }
+        });
         if (isComponentMounted) {
           setWord(tag);
           setParties(parsedData);
         }
+
       }
       searchData();
     } 
@@ -145,6 +152,12 @@ export default function Search () {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/search?keyword=${keyword}&region=${searchRegion}&userId=${userId}`)
         const partyData = res.data.result;
         const parsedData = partyData.map((party: any) => ({ ...party, latlng: JSON.parse(party.latlng) }));
+        dispatch({
+          type: NOTIFY,
+          payload: {
+            isBadgeOn: res.data.notification
+          }
+        });
         if (isComponentMounted) {
           setWord(keyword);
           setParties(parsedData);
@@ -153,17 +166,20 @@ export default function Search () {
       searchData();
     }
 
+    setIsLoading(false)
     return () => {
       isComponentMounted = false
     }
 
-  },[params.tag, params.keyword])
+  },[params])
 
   useEffect(() => {
     setIsLoading(false);
   }, [ parties ]);
   
-  if(isLoading){
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
+  } else if(isLoading){
     return <Loading />
   }
 
@@ -187,22 +203,6 @@ export default function Search () {
           if(!params.tag && !params.keyword) {
             return (
               <div className='result'>
-                {/* <div className='resultLabel'>
-                  인기 태그
-                </div>
-                <div className='hashtag'>
-                  {tag.map((t, idx) => 
-                    <button 
-                      key={idx} 
-                      className="tag" 
-                      onClick={() => hashtagHandler(t)}
-                      style={isLoggedIn ? { cursor: "pointer" } : { cursor: "default" }}
-                      disabled={!isLoggedIn}
-                    >
-                      #{t}
-                    </button>
-                  )}
-                </div> */}
               </div>
             )
           }

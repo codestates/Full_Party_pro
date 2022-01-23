@@ -1,26 +1,32 @@
 import axios from "axios";
 import { Dispatch } from 'redux'
 import { cookieParser } from "../App";
+import { CLOSE_MODAL } from "./modalType";
 import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "./signinType";
 
 export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<UserInfoDispatchType>) => {
-  try {
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/signin`, userInfo, {
-      withCredentials: true
-    });
-    const payload = response.data.userInfo;
-    document.cookie = "signupType=general";
-    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
-    document.cookie = "isLoggedIn=1;"
-    // window.location.assign(cookieParser().location);
+  document.cookie = "signupType=general";
+  document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+  await axios.post(`${process.env.REACT_APP_API_URL}/signin`, userInfo, {
+    withCredentials:true
+  })
+  .then((res) => {
+    if(res.status === 200) {
+      dispatch({
+        type: SIGNIN_SUCCESS,
+        payload: res.data.userInfo
+      })
+      dispatch({
+        type: CLOSE_MODAL
+      })
+    }
+  })
+  .catch((err) => {
+    if(err.response.status === 401) {
+      dispatch({
+        type: SIGNIN_FAIL
+      })
+    }
+  })
 
-    dispatch({
-      type: SIGNIN_SUCCESS,
-      payload
-    })
-  } catch(err) {
-    dispatch({
-      type: SIGNIN_FAIL
-    })
-  }
 }

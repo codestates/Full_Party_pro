@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { cookieParser, requestKeepLoggedIn } from "../App";
+import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
@@ -17,7 +17,7 @@ export const ListContainer = styled.div`
   height: 100%;
 
   margin: 70px 0 60px 0;
-  padding: 20px 25px;
+  padding: 5px 25px;
 
   section.listSection {
 
@@ -41,10 +41,6 @@ export default function List () {
 
   const dispatch = useDispatch();
 
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
-
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo
   );
@@ -67,7 +63,9 @@ export default function List () {
         }
       });
       const parsedLocalParty = response.data.localParty.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
-      setLocalParty(parsedLocalParty);
+      setLocalParty(parsedLocalParty.filter((party: any) => {
+        return party.memberLimit !== party.members.length
+      }));
       setMyParty(response.data.myParty);
     })();
   }, [ userInfo ]);
@@ -80,8 +78,12 @@ export default function List () {
     return <Loading />
   }
 
-  if(!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "unidentified" || userInfo.address === "KAKAO"){
+  if(!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "Google" || userInfo.address === "Kakao"){
     return <AddressModal />
+  }
+
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
   }
 
   return (

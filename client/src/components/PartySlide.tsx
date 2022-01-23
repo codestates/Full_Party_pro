@@ -42,6 +42,8 @@ export const PartySlideContainer = styled.div`
     }
 
     .title {
+      height: 30px;
+      
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -123,7 +125,6 @@ type Props = {
 }
 
 export default function PartySlide ({ myParty }: Props) {
-  console.log(myParty)
   const settings = {
     dots: true,
     arrows: true,
@@ -165,12 +166,6 @@ export default function PartySlide ({ myParty }: Props) {
   const navigate = useNavigate();
 
   function formatDate(date: Date){
-    // const date = timestamp.getDate();
-    // const month = timestamp.getMonth() + 1;
-    // const year = timestamp.getFullYear();
-
-    // return year + "/" + month + "/" + date;
-
     return String(date).slice(0, 11);
   }
 
@@ -181,14 +176,15 @@ export default function PartySlide ({ myParty }: Props) {
 				<Slider {...settings}>
           {myParty.map((party, idx) => {
             const { id, name, image, startDate, endDate, isOnline, location } = party;
+            const region = location && location.split(" ").length >= 2 ? location.split(" ")[0] + " " + location.split(" ")[1] : location;
             return (
               <div key={idx} className="cover" onClick={() => navigate(`../party/${id}`)}>
-                <h3 style={{ backgroundImage: `url(${image})`, backgroundSize: "cover" }} >
-                  <div className="partyImg" style={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}>
+                <h3 style={{ backgroundImage: `url(${image})`, backgroundSize: "cover", backgroundPosition: "center" }} >
+                  <div className="partyImg" style={{ backgroundColor: "rgba(0, 0, 0, 0.4)" }}>
                     <div className="title">{name}</div>
                     <div className="location">
                       {isOnline ? <><FontAwesomeIcon icon={ faGlobe } className="icon" /> 온라인 퀘스트</>
-                       : <><FontAwesomeIcon icon={ faMapMarkerAlt } className="icon" /> {location.split(" ")[1] + " " + location.split(" ")[2]}</>}
+                       : <><FontAwesomeIcon icon={ faMapMarkerAlt } className="icon" /> {region}</>}
                     </div>
                     <div className="date"><FontAwesomeIcon icon={ faCalendarAlt } className="icon" /> {formatDate(startDate)} ~ {formatDate(endDate)}</div>  
                   </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import styled from 'styled-components';
@@ -153,6 +154,12 @@ export const CommentInput = styled.section`
 
     border: 1px solid #bebebe;
     padding: 10px;
+
+    font-family: "-apple-system";
+
+    &:focus {
+      outline-style:none;
+    }
   }
 
   #commentInput {
@@ -188,6 +195,8 @@ type Props = {
 
 export default function QnA ({ partyId, isLeader, leaderId, comments, findComment }: Props) {
 
+  const navigate = useNavigate();
+
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
@@ -198,7 +207,6 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
 
   const [commentIdx, setCommentIdx] = useState(-1);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
-  console.log(comments);
   const curComments = comments.map((comment) => [ comment.comment, ...comment.subComments ])[commentIdx];
 
   const [isEditMode, setIsEditMode] = useState(false);
@@ -231,21 +239,26 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
   }
 
   async function postHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev] userId, partyId, content 서버로 전송
     await axios.post(`${process.env.REACT_APP_API_URL}/party/${partyId}/comment`, {
       userId, partyId, content: newComment.comment 
     }, {
       withCredentials: true
     });
+    setIsEditMode(false);
+    setCommentIdx(0);
+    setIsCommentOpen(true);
+    setNewComment({ ...newComment, comment: "" });
+    navigate(`../party/${partyId}`);
   }
 
   async function replyHandler(event: React.MouseEvent<HTMLButtonElement>, commentId:number) {
-    // [dev] userId, commentId, content 서버로 전송
     await axios.post(`${process.env.REACT_APP_API_URL}/party/${commentId}/subComment`, {
       userId, commentId, content: newComment.subcomment
     }, {
       withCredentials: true
     });
+    setNewComment({ ...newComment, subcomment: "" });
+    navigate(`../party/${partyId}`);
   }
 
   function commentDeleteModalHandler(event: React.MouseEvent<HTMLButtonElement>, idx: number, commentId: number): void {
@@ -259,7 +272,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
       setCommentIdx(idx);
       setIsCommentOpen(true);
     }
-  }, [findComment])
+  }, [comments])
 
   if(comments.length <= 0){
     return (
@@ -276,7 +289,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
             value={newComment.comment}
             onChange={(e) => inputHandler(e)}
           />
-          <button onClick={postHandler} disabled={!newComment.comment}>등록하기</button>  
+          <button className="submit" onClick={postHandler} disabled={!newComment.comment}>등록하기</button>  
         </CommentInput>
       : null}
       </QnAContainer>
@@ -389,6 +402,7 @@ export default function QnA ({ partyId, isLeader, leaderId, comments, findCommen
         <CommentDeleteModal 
           commentDeleteModalHandler={commentDeleteModalHandler}
           commentToDelete={commentToDelete}
+          partyId={partyId}
         /> 
       : null}
     </QnAContainer>

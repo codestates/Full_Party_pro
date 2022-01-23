@@ -1,9 +1,6 @@
-import { Parties } from './../models/parties';
-import { Favorite } from './../models/favorite';
 import { Request, Response } from "express";
-import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
-import { createNotification, findUser, getPartyInformation, invertFavorite, findFavoriteParties } from './functions/sequelize';
+import { InternalServerError, SuccessfulResponse } from "./functions/response";
+import { createNotification, findUser, getPartyInformation, invertFavorite, findFavoriteParties, checkIsRead } from './functions/sequelize';
 import { NotificationAttributes } from "../models/notification";
 
 export const handleFavorite = async (req: Request, res: Response) => {
@@ -22,21 +19,21 @@ export const handleFavorite = async (req: Request, res: Response) => {
         isRead: false
       };
       await createNotification(notificationInfo);
-      return SuccessfulResponse(res, { message: "Like selected" })
+      return SuccessfulResponse(res, { message: "Like Selected" });
     }
-    else return FailedResponse(res, 200, "Like canceled");
+    else return SuccessfulResponse(res, { message: "Like Canceled" });
   }
   catch (error) {
     return InternalServerError(res, error);
   }
 };
 
-
 export const getFavoriteParty = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const partyList = await findFavoriteParties(Number(userId));
-    return SuccessfulResponse(res, { message: "Successfully loaded", partyList });
+    const notification = await checkIsRead(Number(userId));
+    return SuccessfulResponse(res, { message: "Successfully loaded", partyList, notification });
   }
   catch (error) {
     return InternalServerError(res, error);

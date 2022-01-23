@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -75,6 +75,10 @@ export const ModalView = styled.div`
         border-bottom: 1px solid #d5d5d5;
 
         text-align: center;
+
+        &:focus {
+          outline-style:none;
+        }
       }
     }
   }
@@ -110,8 +114,6 @@ export const ModalView = styled.div`
   }
 
   .notUser{
-    display: none;
-
     color: #f34508;
     font-size: 10px;
 
@@ -196,6 +198,7 @@ export const CloseBtn = styled.button`
 const SigninModal = () => {
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
 
@@ -213,10 +216,12 @@ const SigninModal = () => {
   }
 
   const handleSignin = () => {
-    dispatch(fetchUserdata(userInfo));
-    dispatch({
-      type: CLOSE_MODAL
-    })
+    dispatch(fetchUserdata(userInfo))
+    if(signinReducer.isLoggedIn){
+      dispatch({
+        type: CLOSE_MODAL
+      })
+    }
   }
 
   const closeModal = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -249,10 +254,9 @@ const SigninModal = () => {
     dispatch({
       type: CLOSE_MODAL
     });
-    document.cookie = "signupType=guest";
-    document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
-    document.cookie = "isLoggedIn=1;"
-    window.location.assign(cookieParser().location);
+    document.cookie = `signupType=guest; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    navigate('/home');
   }
   
 

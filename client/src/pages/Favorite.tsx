@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { cookieParser, requestKeepLoggedIn } from "../App"
+import { cookieParser } from "../App"
 import { Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
 import QuestCard from '../components/QuestCard';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 import axios from 'axios';
+import { NOTIFY } from "../actions/notify"
 
 export const FavoriteContainer = styled.div`
   width: 100%;
@@ -45,6 +45,12 @@ export default function Favorite () {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/favorite/${userId}`, {
         withCredentials: true
       });
+      dispatch({
+        type: NOTIFY,
+        payload: {
+          isBadgeOn: response.data.notification
+        }
+      });
       setFavoriteList(response.data.partyList);
     })();
   }, [ userInfo ]);
@@ -53,8 +59,8 @@ export default function Favorite () {
     setIsLoading(false);
   }, [ favoriteList ]);
 
-  if(!cookieParser().isLoggedIn){
-    return <Navigate to="/" />
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
   } else if(isLoading){
     return <Loading />
   }

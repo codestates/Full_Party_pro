@@ -205,21 +205,22 @@ type Props = {
   leaderId: number,
   isLeader: boolean,
   userId: number,
-  partyId: number
+  partyId: number,
+  handlePartyInfoChange: Function
 };
 
 interface keyable {
  [key: string]: any  
 };
 
-const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, partyId }: Props) => {
+const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, partyId, handlePartyInfoChange }: Props) => {
 
   const [curIdx, setCurIdx] = useState(0);
   const [progress, setProgress] = useState(0);
 
   const [reviewMembers, setReviewMembers] = useState<Array<keyable>>(members.map((member) => ({ ...member, exp: null })));
   const curMember = reviewMembers[curIdx];
-  const { name, profileImage, exp } = curMember;
+  const { userName, profileImage, exp } = curMember;
 
   const memberToReview = reviewMembers.filter((member) => member.exp === null).length;
 
@@ -230,7 +231,7 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
   function reviewHandler(event: React.MouseEvent<HTMLButtonElement>) {
     const reviewedExp = (event.currentTarget as HTMLButtonElement).value;
     setReviewMembers(reviewMembers.map((member, idx) => (idx === curIdx ? { ...member, exp: Number(reviewedExp) } : member)));
-    setProgress((members.length - memberToReview + 1)/members.length*100);
+    setProgress(memberToReview > 0 ? ((members.length - memberToReview + 1)/members.length*100) : 100);
   }
 
   function handleMemberChange(event: React.MouseEvent<HTMLButtonElement>) {
@@ -243,21 +244,15 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
   }
 
   async function questCompleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // partyState를 2로 바꾸는 요청을 전송함
-    // 유저 파티 테이블의 isReviewed를 true로 변경합니다.
-    // 평가한 각 유저의 exp에 영향을 줍니다.
-
-    // [dev] exp 키로 전송해줄 데이터
     const reviewedMembers = reviewMembers.map((member) => ({ userId: member.id, exp: member.exp}));
-    console.log("퀘스트를 완료합니다.");
-
-    // [FEAT] 기능 확인 필요
     if(isLeader){
       await axios.patch(`${process.env.REACT_APP_API_URL}/party/completed`, {
         partyId
       }, {
         withCredentials: true
       });
+
+      handlePartyInfoChange("partyState", 2);
     }
 
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/review`, { 
@@ -267,6 +262,8 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
     }, {
       withCredentials: true
     });
+
+    handlePartyInfoChange("isReviewed", true);
 
     confetti();
     reviewModalHandler();
@@ -303,7 +300,7 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
                 style={{ backgroundImage: `url(${profileImage})`, backgroundSize: "cover" }} 
               />
               <div className="nameplate">
-              {curMember.id === leaderId? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {name}
+              {curMember.id === leaderId? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {userName}
               </div>
             </div>
             <button

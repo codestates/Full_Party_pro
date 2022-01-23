@@ -1,19 +1,18 @@
-import { UsersAttributes } from './../models/users';
 import { Request, Response } from "express";
 import axios from 'axios';
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { deleteUser, findCompletedParty, findLeadingParty, findParticipatingParty, findUser, getNotification, updateUser } from "./functions/sequelize";
-import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
+import { deleteUser, findCompletedParty, findLeadingParty, findParticipatingParty, findUser, updateUser, checkIsRead } from "./functions/sequelize";
+import { verifyAccessToken } from "./functions/token";
 
 export const getUserInfo = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const notifications = await getNotification(Number(userId));
+    const notification = await checkIsRead(Number(userId));
     const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "address", "exp", "level", "signupType" ]);
-    if (userInfo && notifications) return SuccessfulResponse(res, {
+    if (userInfo) return SuccessfulResponse(res, {
       message: "Loaded Successfully",
       userInfo,
-      notifications
+      notification
     });
     return FailedResponse(res, 400, "Bad Request");
   }
@@ -107,8 +106,8 @@ export const verifyUser = async (req: Request, res: Response) => {
 
 export const modifyUserInfo = async (req: Request, res: Response) => {
   try {
-    const { userId, password, userName, birth, gender, region, mobile, profileImage } = req.body.userInfo;
-    const userInfo: any = { userName, password, birth, gender, region, mobile, profileImage };
+    const { userId, password, userName, birth, gender, address, mobile, profileImage } = req.body.userInfo;
+    const userInfo: any = { userName, password, birth, gender, address, mobile, profileImage };
     const updated = await updateUser(userId, userInfo);
     const updatedUserInfo = await findUser({ id: userId }, [ "userName", "password", "birth", "gender", "address", "mobile", "profileImage" ]);
     if (updated) return SuccessfulResponse(res, { message: "Successfully Modified", userInfo: updatedUserInfo });
@@ -124,9 +123,9 @@ export const updateUserAddress = async (req: Request, res: Response) => {
     const { userId, address } = req.body;
     const updated = await updateUser(userId, { address });
     if (!updated) return FailedResponse(res, 400, "Bad Request");
-    SuccessfulResponse(res, { message: "Successfully modified" });
+    return SuccessfulResponse(res, { message: "Successfully modified" });
   }
   catch (error) {
-    InternalServerError(res, error);
+    return InternalServerError(res, error);
   }
 };

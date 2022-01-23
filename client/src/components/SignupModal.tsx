@@ -5,14 +5,11 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
-import { RootReducerType } from '../store/store';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserdata } from '../actions/signin';
+import { useDispatch } from 'react-redux';
 import { modalChanger } from '../actions/modal';
 
 import Loading from './Loading';
 import UserMap from './UserMap';
-import { url } from 'inspector';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -85,10 +82,19 @@ export const ModalView = styled.div`
         height: 25px;
 
         text-align: center; 
+
+        &:focus {
+          outline-style:none;
+        }
       }
 
       input[type=date] {
         font-family: "-apple-system";
+        background-color: #fff;
+
+        &:focus {
+          outline-style:none;
+        }
       }
 
       select {
@@ -97,6 +103,11 @@ export const ModalView = styled.div`
 
         border: none;
         border-bottom: 1px solid #d5d5d5;
+        background-color: #fff;
+
+        &:focus {
+          outline-style:none;
+        }
       }
     }
   }
@@ -150,50 +161,13 @@ export const MapContainer = styled.section`
     border-bottom: 1px solid #d5d5d5;
 
     margin: 15px 0;
+
+    &:focus {
+      outline-style:none;
+    }
   }
 
 `
-
-// export const UserImage = styled.div`
-//   width: 100%;
-//   display: flex;
-//   flex-direction: column;
-
-//   justify-content: center;
-
-//   margin: 5vh 0;
-
-//   .label {
-//     margin: 1vh 0;
-//   }
-
-//   .circle {
-//     width: 140px;
-//     height: 140px;
-//     margin: 0 auto;
-//     border-radius: 100% !important;
-//     border: 1px solid darkcyan;
-//     overflow: hidden;
-
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//   }
-//   .pic {
-//     width: 200px;
-//     max-height: 200px;
-//     display: inline-block;
-//     margin: auto;
-//   }
-//   .imgUpload {
-//     display: none;
-//   }
-//   img {
-//     max-width: 100%;
-//     height: auto;
-//   }
-// `
-
 
 export const CloseBtn = styled.button`
   width: 100%;
@@ -214,7 +188,7 @@ export const BtnContainer = styled.section`
   justify-content: space-between;
 
   button {
-    width: 90px;
+    width: 100px;
     height: 40px;
 
     border: none;
@@ -241,6 +215,13 @@ export const BtnContainer = styled.section`
     &.request {
       background-color: #50C9C3;
       color: #fff;
+      font-weight: bold;
+
+      &:disabled {
+        background-color: #fff;
+        color: #50C9C3;
+        border: 1px solid #50C9C3;
+      }
     }
   }
 `
@@ -330,6 +311,7 @@ const SignupModal = () => {
 
   const [isSent, setIsSent] = useState(false);
   const [isTimeOut, setIsTimeOut] = useState(false);
+  const [isRequested, setIsRequested] = useState(false);
 
   const [inputCode, setInputCode] = useState('');
   const [verificationData, setVerificationData] = useState({
@@ -452,9 +434,8 @@ const SignupModal = () => {
     }
   }
 
-  // [dev] 이메일 인증 관련 함수
   const mailVerification = async () => {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification/nodemailerTest`, { email: userInfo.email }, { withCredentials: true });
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/mailVerification`, { email: userInfo.email }, { withCredentials: true });
     setIsSent(true);
     setVerificationData({ email: userInfo.email, code: res.data.code });
     setTimeout(handleCodeExpire, 1000 * 60 * 5);
@@ -515,6 +496,7 @@ const SignupModal = () => {
       })
     }
     else {
+      setIsRequested(true);
       axios.post(`${process.env.REACT_APP_API_URL}/signup`,{
         userInfo: {
           userName: name,
@@ -539,6 +521,8 @@ const SignupModal = () => {
         } else {
           dispatch(modalChanger('signinModalBtn'))
         }
+
+        setIsRequested(false);
       })
       .catch((err) => console.log(err))
     }
@@ -726,9 +710,7 @@ const SignupModal = () => {
                       <input
                         type='tel'
                         name='mobile'
-                        maxLength={13}
                         value={userInfo.mobile}
-                        maxLength={13}
                         autoComplete='off'
                         onChange={(e) => handleInputChange(e)}
                         placeholder="'-'을 포함하여 입력해주세요."
@@ -769,7 +751,6 @@ const SignupModal = () => {
               return (
                 <>
                   <div className='confirm'>이 정보가 맞나요?</div>
-                  {/* <div className='profileImage' style={{ backgroundImage: `url(${userInfo.profileImage})`, backgroundSize: "cover" }}/> */}
                   <table>
                     <tr>
                       <td className='label'>이메일</td>
@@ -802,7 +783,6 @@ const SignupModal = () => {
             }
           })()}
 
-          {/* [dev] 페이지네이션 버튼 */}
           {(() => {
             if(pageIdx === 0) {
               return (
@@ -824,7 +804,7 @@ const SignupModal = () => {
               return (
                 <BtnContainer>
                   <button onClick={handlePageChange} value="prev"><FontAwesomeIcon icon={faAngleLeft} className="icon left" /> 이전</button>
-                  <button onClick={handleSignup} className="request">완료</button>
+                  <button onClick={handleSignup} className="request" disabled={!!isRequested}>완료</button>
                 </BtnContainer>
               )
             }

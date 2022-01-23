@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
 import styled from 'styled-components';
@@ -8,7 +8,6 @@ import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
 import { AppState } from '../reducers';
 
 import { modalChanger } from '../actions/modal';
-import axios from 'axios';
 
 export const NavContainer = styled.nav`
   width: 100vw;
@@ -53,6 +52,15 @@ export const NavContainer = styled.nav`
       font-size: 20pt;
     }
 
+    button {
+      width: 150px; 
+      /* display: flex;
+      justifyContent: 'center', alignItems: 'center',  */
+      color: #777;
+      background-color: #fff;
+      border: none;
+    }
+
     #notification {
       width: 10px;
       height: 10px;
@@ -82,9 +90,9 @@ export const NavContainer = styled.nav`
 
       border: none;
       background-color: white;
-      color: #777;
       font-size: 12pt;
       font-weight: bold;
+      color: #777;
 
       cursor: pointer;
       
@@ -98,6 +106,7 @@ export const NavContainer = styled.nav`
 
 export default function TopNav () {
   const dispatch = useDispatch()
+  const navigate = useNavigate();
 
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
@@ -114,25 +123,29 @@ export default function TopNav () {
   return (
     <NavContainer>
       <button id="logo">
-        <Link to="/" style={{ color: 'black', textDecoration: 'none' }}>
+        <Link to="/">
           <img src="img/navLogo.png" alt="logo" />
         </Link>
       </button>
       {isLoggedIn ?
         <div className="userMenu">
-          <Link 
-            to="/search" 
-            style={{ width: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#777', textDecoration: 'none' }}
-          >
-            <FontAwesomeIcon icon={ faSearch } className="icon" /> 
-          </Link>
-          <Link 
-            to="/notification" 
-            style={{ width: '150px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#777', textDecoration: 'none' }}
-          >
-            {isBadgeOn ? <div id="notification" /> : null}
-            <FontAwesomeIcon icon={ faBell } className="icon" />
-          </Link>
+          <button>
+            <Link to="/search" style={{ color: "#777", textDecoration: "none" }}>
+              <FontAwesomeIcon icon={ faSearch } className="icon" /> 
+            </Link>  
+          </button>
+          {window.location.pathname === "/notification" ?
+            <button
+             onClick={() => navigate(-1)}
+            >
+              <FontAwesomeIcon icon={ faBell } className="icon" onClick={() => navigate(-1)} />
+            </button>
+          : <button>
+              <Link to="/notification" style={{ color: "#777", textDecoration: "none" }}>
+                {isBadgeOn ? <div id="notification" /> : null}
+                <FontAwesomeIcon icon={ faBell } className="icon" />
+              </Link>
+            </button>}
         </div>
       : <div className="menu">
           <button className='signinModalBtn' onClick={(e) => handleModal(e)}>로그인</button>

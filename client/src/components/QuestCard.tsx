@@ -184,7 +184,6 @@ export default function QuestCard ({ party }: Props) {
   const formatDate = (date: Date) => String(date).slice(0, 11);
 
   const favoriteHandler = async (event: React.MouseEvent<HTMLDivElement>) => {
-    // [dev] 서버 통신 후에는 setIsFavorite 삭제하기
     event.stopPropagation();
     const response = await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${id}`, { userId, partyId: id }, {
       withCredentials: true
@@ -196,11 +195,6 @@ export default function QuestCard ({ party }: Props) {
   return (
     <QuestCardContainer 
       onClick={() => navigate(`../party/${id}`)}
-      // style={{background: 
-      //   isOnline ? 
-      //   "linear-gradient(to bottom, #50C9C3 19%, #fff 10%)"
-      //   : "linear-gradient(to bottom, #50C9C3 19%, #fff 10%)"
-      // }}
     >
       <header className="questHeader">
         <div>

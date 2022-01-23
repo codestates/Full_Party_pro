@@ -149,6 +149,10 @@ export const PostCard = styled.div`
       border-bottom: 1px solid #d5d5d5;
 
       padding: 5px;
+
+      &:focus {
+        outline-style:none;
+      }
     }
 
     .details {
@@ -194,6 +198,11 @@ export const PostCard = styled.div`
 
       input[type=date] {
         font-family: "-apple-system";
+        background-color: #fff;
+
+        &:focus {
+          outline-style:none;
+        }
       }
 
       div.startDate {
@@ -232,6 +241,10 @@ export const PostCard = styled.div`
 
     border: 1px solid #d5d5d5;
     font-family: "-apple-system";
+
+    &:focus {
+      outline-style:none;
+    }
   }
 
   .error {

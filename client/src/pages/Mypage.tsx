@@ -3,12 +3,11 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import AWS from 'aws-sdk';
-import { cookieParser, requestKeepLoggedIn } from "../App";
+import { cookieParser } from "../App";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
 import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
-
+import { NOTIFY } from "../actions/notify";
 import { RootReducerType } from '../store/store';
 import { AppState } from '../reducers';
 import Loading from '../components/Loading';
@@ -18,9 +17,7 @@ import VerificationModal from '../components/VerificationModal';
 import UserMap from '../components/UserMap';
 import EmptyParty from '../components/EmptyParty';
 
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyList from '../static/dummyList';
-import { SIGNIN_FAIL } from '../actions/signinType';
+import { SIGNIN_FAIL, SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const MypageContainer = styled.div`
   width: 100%;
@@ -110,9 +107,9 @@ export const MypageHeader = styled.header`
     justify-content: center;
 
     .userName {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
     }
 
     .icon {
@@ -214,10 +211,15 @@ export const InfoTable = styled.table`
       height: 25px;
 
       text-align: center; 
+
+      &:focus {
+        outline-style:none;
+      }
     }
 
     input[type=date] {
       font-family: "-apple-system";
+      background-color: #fff;
     }
 
     select {
@@ -226,6 +228,11 @@ export const InfoTable = styled.table`
 
       border: none;
       border-bottom: 1px solid #d5d5d5;
+      background-color: #fff;
+
+      &:focus {
+        outline-style:none;
+      }
     }
   }
 
@@ -299,23 +306,16 @@ export default function Mypage () {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const fileRef = useRef<any>();
-  const imgRef=useRef<any>(null);
   const { signupType } = cookieParser();
-  
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
 
   const userInfoFromStore = useSelector(
     (state: AppState) => state.signinReducer.userInfo
   );
 
-  //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
   const [curTab, setCurTab] = useState(0);
   const [parties, setParties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInfoLoading, setIsInfoLoading] = useState(true);
-  //img 상태가 제대로 반영이 안되면 로딩창 넣어주세요
   const [imgLoading, setImgLoading] = useState(false);
   const [isChange, setIsChange] = useState(false);
   const [callModal, setCallModal] = useState(false);
@@ -361,7 +361,8 @@ export default function Mypage () {
     confirmPasswordMsg: '',
   })
 
-  // [CAUTION] 이미지 서버 관련 코드 => 범님 외 수정 X
+  const userRegion = basicInfo.address.split(" ").length < 2 ? "지역 미설정" : basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1]
+  
   AWS.config.update({
     region: "ap-northeast-2",
     credentials: new AWS.CognitoIdentityCredentials({
@@ -444,6 +445,12 @@ export default function Mypage () {
           ...isError,
           isName: false,
           nameMsg: "두 글자 이상 입력해주세요."
+        })
+      } else {
+        setIsError({
+          ...isError,
+          isName: true,
+          nameMsg: ''
         })
       }
     }
@@ -530,7 +537,7 @@ export default function Mypage () {
         axiosMsg: '입력하신 정보를 확인해주세요.',
       })
     }
-    else if(password === '') {      
+    else if(password === '') {
       setIsError({
         isName: true,
         isMobile: true,
@@ -544,15 +551,23 @@ export default function Mypage () {
           userId: signinReducer.userInfo?.id,
           profileImage,
           userName,
-          password: nowPwd,
           birth,
           gender,
           address: formatAddress,
           mobile
         }
       })
-      if(res.data.message === "Successfully Modified") {
-        setIsChange(false)
+      if(res.status === 200) {
+        setIsChange(false);
+        const payload = {
+          id: signinReducer.userInfo?.id,
+          userName: changeInfo.userName,
+          profileImage: changeInfo.profileImage,
+          address: changeInfo.address,
+          signupType: signinReducer.userInfo?.signupType
+        }
+        dispatch({ type: SIGNIN_SUCCESS, payload });
+        navigate('/mypage');
       }
     } 
     else if (password !== '') {
@@ -561,15 +576,24 @@ export default function Mypage () {
           userId: signinReducer.userInfo?.id,
           profileImage,
           userName,
-          password,
+          password: nowPwd,
           birth,
           gender,
           address: formatAddress,
           mobile
         }
       })
-      if(res.data.message === "Successfully Modified") {
-        setIsChange(false)
+      if(res.status === 200) {
+        setIsChange(false);
+        const payload = {
+          id: signinReducer.userInfo.id,
+          userName,
+          profileImage,
+          address: formatAddress,
+          signupType,
+        }
+        dispatch({ type: SIGNIN_SUCCESS, payload });
+        navigate('/mypage');
       }
     }
   }
@@ -580,7 +604,7 @@ export default function Mypage () {
     const myParty = res.data.myParty
     setParties(myParty)
   }
-  const fetchRecruiteParty = async () => {
+  const fetchRecruitParty = async () => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
     const myParty = res.data.myParty
     setParties(myParty)
@@ -593,10 +617,10 @@ export default function Mypage () {
 
   const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
     if(e.currentTarget.value === 0) {
-      fetchJoinParty()
+      fetchRecruitParty();
     }
     else if(e.currentTarget.value === 1) {
-      fetchRecruiteParty()
+      fetchJoinParty()
     }
     else if(e.currentTarget.value === 2) {
       fetchCompleteParty()
@@ -605,20 +629,19 @@ export default function Mypage () {
   }
 
   const handleSignOut = async () => {
-    const { token, signupType, location } = cookieParser();
+    const { token, signupType } = cookieParser();
     await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {
       access_token: token, 
       signup_type: signupType
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
   const handleWithdrawal = async () => {
-    const { token, signupType, location } = cookieParser();
+    const { token, signupType } = cookieParser();
     const userId = signinReducer.userInfo?.id;
     await axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}/${signupType}`, {
       headers: {
@@ -626,10 +649,9 @@ export default function Mypage () {
       }
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
   const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
@@ -651,31 +673,41 @@ export default function Mypage () {
     }
   }
 
-  //페이지 진입시 로딩
-  
   useEffect(() => {
     (async () => {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
-        withCredentials: true,
-      });
-      const userInfo = res.data.userInfo;
-      setBasicInfo({
-        userName: userInfo.userName,
-        profileImage: userInfo.profileImage,
-        address: userInfo.address,
-        level: userInfo.level,
-        exp: userInfo.exp
-      });
+      if (userInfoFromStore.id >= 1) {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
+          withCredentials: true,
+        });
+        dispatch({
+          type: NOTIFY,
+          payload: {
+            isBadgeOn: res.data.notification
+          }
+        });
+        const userInfo = res.data.userInfo;
+        setBasicInfo({
+          userName: userInfo.userName,
+          profileImage: userInfo.profileImage,
+          address: userInfo.address,
+          level: userInfo.level,
+          exp: userInfo.exp
+        });
+        setChangeInfo({
+          ...changeInfo,
+          profileImage: userInfo.profileImage
+        });
+      }
     })();
-    fetchJoinParty();
+    fetchRecruitParty();
   }, [ userInfoFromStore ]);
   
   useEffect(() => {
     setIsLoading(false);
   }, [ basicInfo ]);
 
-  if(!cookieParser().isLoggedIn){
-    return <Navigate to="/" />
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
   }
 
   if(isLoading) {
@@ -692,16 +724,13 @@ export default function Mypage () {
             <img
               src={basicInfo.profileImage ? basicInfo.profileImage : 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
               alt='thumbnail'
-              // onError={() => {
-              //   return(imgRef.current.src = 'img/bubble.png')
-              // }}
             />
           </div>
         </div>
         <p className='mainProfile'>
           <div className='userName'>{basicInfo.userName}</div>
           <div className="info">
-            <FontAwesomeIcon icon={faMapMarkerAlt} className='icon'/>{basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1]}
+            <FontAwesomeIcon icon={faMapMarkerAlt} className='icon'/>{userRegion}
           </div>
           <div className="info">
             <FontAwesomeIcon icon={faTrophy} className='icon'/>Lv. {basicInfo.level}
@@ -755,32 +784,36 @@ export default function Mypage () {
                         <div className='error'>{isError.nameMsg}</div>
                       </td>
                     </tr>
-                    <tr>
-                      <td className='label'>비밀번호</td>
-                      <td className='input'>
-                        <input
-                          placeholder='비밀번호 수정시에만 입력하세요'
-                          name='password'
-                          type='password'
-                          value={changeInfo.password}
-                          onChange={(e) => handleInputChange(e)}
-                        ></input>
-                        <div className='error'>{isPassword.passwordMsg}</div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className='label'>비밀번호<br />확인</td>
-                      <td className='input'>
-                        <input
-                          placeholder='비밀번호 수정시에만 입력하세요'
-                          name='confirm'
-                          type='password'
-                          value={changeInfo.confirm}
-                          onChange={(e) => handleInputChange(e)}
-                        ></input>
-                        <div className='error'>{isConfirmPassword.confirmPasswordMsg}</div>
-                      </td>
-                    </tr>
+                    {signupType === 'general' ? 
+                      <>
+                        <tr>
+                          <td className='label'>비밀번호</td>
+                          <td className='input'>
+                            <input
+                              placeholder='비밀번호 수정시에만 입력하세요'
+                              name='password'
+                              type='password'
+                              value={changeInfo.password}
+                              onChange={(e) => handleInputChange(e)}
+                            ></input>
+                            <div className='error'>{isPassword.passwordMsg}</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className='label'>비밀번호<br />확인</td>
+                          <td className='input'>
+                            <input
+                              placeholder='비밀번호 수정시에만 입력하세요'
+                              name='confirm'
+                              type='password'
+                              value={changeInfo.confirm}
+                              onChange={(e) => handleInputChange(e)}
+                            ></input>
+                            <div className='error'>{isConfirmPassword.confirmPasswordMsg}</div>
+                          </td>
+                        </tr>
+                      </>
+                    : null}
                     <tr>
                       <td className='label'>생일</td>
                       <td className='input'>
@@ -869,11 +902,11 @@ export default function Mypage () {
           <div className='subject'>내 파티</div>
           <fieldset className='cardTabContainer'>
             <ol className='cardTab'>
-              <li value={0} className={`tab ${curTab === 0 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>참여중 파티</li>
+              <li value={0} className={`tab ${curTab === 0 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>운영중 파티</li>
               <li> | </li>
-              <li value={1} className={`tab ${curTab === 1 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>운영중 파티</li>
+              <li value={1} className={`tab ${curTab === 1 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>참여중 파티</li>
               <li> | </li>
-              <li value={2} className={`tab ${curTab === 2 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>완료 파티</li>
+              <li value={2} className={`tab ${curTab === 2 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>완료된 파티</li>
             </ol>
           </fieldset>
             {(() => {

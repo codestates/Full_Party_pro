@@ -1,7 +1,6 @@
 import React, { useEffect, Fragment } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import { Navigate, useNavigate } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from './reducers';
 import { RootReducerType } from './store/store';
@@ -50,12 +49,14 @@ export const requestKeepLoggedIn = async (token: string, signupType: string) => 
 
 export default function App() {
   const dispatch = useDispatch();
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
+
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo
   )
+
+  const isLoggedIn = useSelector(
+    (state: AppState) => state.signinReducer.isLoggedIn
+  );
 
   const { Kakao } = window;
   const modalReducer = useSelector((state: RootReducerType) => state.modalReducer)
@@ -65,12 +66,11 @@ export default function App() {
       initialize();
     }
     if (!document.cookie) {
-      document.cookie = "token=temp;";
-      document.cookie = "signupType=temp;";
-      document.cookie = "isLoggedIn=0;";
-      document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
+      document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     }
-    const { token, signupType, location, isLoggedIn } = cookieParser();
+    const { token, signupType, isLoggedIn } = cookieParser();
     if (token !== "temp" && signupType !== "temp" && isLoggedIn !== "0") {
       requestKeepLoggedIn(token, signupType).then((res) => {
         dispatch({
@@ -78,7 +78,6 @@ export default function App() {
           payload: res.data.userInfo
         });
       });
-      document.cookie = "isLoggedIn=1;";
     }
   }, []);
 
@@ -94,15 +93,14 @@ export default function App() {
               <Fragment>
                 <Route path="/" element={<Home />} />
                 <Route path="/auth" element={<Auth />} />
-                <Route path="/home" element={cookieParser().isLoggedIn === "1" ? <List /> : <Home />} />
+                <Route path="/home" element={isLoggedIn ? <List /> : <Home />} />
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
                 </Route>
                 <Route path="/post" element={<Post />} />
-                <Route path="/search" element={<Search />}>
-                  <Route path="/keyword/:keyword" element={<Search />} />
-                  <Route path="/tag/:tag" element={<Search />} />
-                </Route>
+                <Route path="/search" element={<Search />} />
+                <Route path="/search/keyword/:keyword" element={<Search />} />
+                <Route path="/search/tag/:tag" element={<Search />} />
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/favorite" element={<Favorite />} />
                 <Route path="/mypage" element={<Mypage />} />

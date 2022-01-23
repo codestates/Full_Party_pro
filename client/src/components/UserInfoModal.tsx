@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import styled from 'styled-components';
@@ -87,6 +88,10 @@ export const ModalView = styled.div`
       min-height: 20px;
 
       text-align: center;
+
+      &:focus {
+        outline-style:none;
+      }
     }
   }
 
@@ -180,11 +185,14 @@ type Props = {
   isLeader: boolean,
   isMember: boolean,
   from: string,
-  userInfo: { [key: string]: any }
+  userInfo: { [key: string]: any },
+  handleMemberListChange: Function,
+  handleMemberInfoChange: Function,
 }
 
-const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLeader, isMember, from, userInfo }: Props) => {
+const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLeader, isMember, from, userInfo, handleMemberListChange, handleMemberInfoChange }: Props) => {
 
+  const navigate = useNavigate();
   const { id, userName, profileImage, level, message, joinDate } = userInfo;
 
   const [isEditMode, setIsEditMode] = useState(false);
@@ -204,36 +212,35 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
     setIsEditMode(!isEditMode);
   }
 
-  async function confirmHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [FEAT] 기능 확인 필요
+  async function editConfirmHandler(event: React.MouseEvent<HTMLButtonElement>) {
+    console.log("유저 상태메세지를 수정합니다.");
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/message`, {
-      userId, partyId, message: newMsg,
+      userId: userInfo.id, partyId, message: newMsg,
     });
+    handleMemberInfoChange(userInfo.id, "message", newMsg);
     setIsEditMode(!isEditMode);
   }
 
   async function expelHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [FEAT] 기능 확인 필요
-    await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userId}`);
-    userInfoModalHandler();
+    console.log("파티원을 추방합니다.");
+    await axios.delete(`${process.env.REACT_APP_API_URL}/party/quit/${partyId}/expel/${userInfo.id}`);
+    navigate(`../party/${partyId}`);
   }
 
   async function refuseHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [FEAT] 기능 확인 필요
-    await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userId}`);
-    userInfoModalHandler();
+    console.log("가입 신청을 거절합니다.");
+    await axios.delete(`${process.env.REACT_APP_API_URL}/party/dequeued/${partyId}/deny/${userInfo.id}`);
+    navigate(`../party/${partyId}`);
   }
 
   async function acceptHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [FEAT] 기능 확인 필요
-    // 이 멤버의 가입을 승인했을 때, 멤버 수가 멤버 정원에 도달했을 경우 
-    // partyState를 1로 바꿉니다.
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/party/approval`, { 
-      userId, partyId
-     }, {
+    console.log("가입신청을 승인합니다.");
+    await axios.post(`${process.env.REACT_APP_API_URL}/party/approval`, { 
+      userId: userInfo.id, partyId
+      }, {
       withCredentials: true
     });
-    userInfoModalHandler();
+    navigate(`../party/${partyId}`);
   }
 
   return(
@@ -278,18 +285,15 @@ const UserInfoModal = ({ userInfoModalHandler, partyId, userId, leaderId, isLead
             </div>
           </section>
           <UserStateBtns>
-            {/* 내 정보인 경우 */}
             {id === userId && !isEditMode ? 
               <button onClick={editHandler}>메시지 수정</button> 
             : null}
             {id === userId && isEditMode ? 
-              <button onClick={confirmHandler}>변경 사항 적용</button> 
+              <button onClick={editConfirmHandler}>변경 사항 적용</button> 
             : null}
-            {/* 클라이언트가 리더이며, 본인이 아닌 파티원 정보를 보는 경우 */}
             {isLeader && id !== userId && from === "members" ? 
               <button onClick={expelHandler}>파티원 퇴출</button> 
             : null} 
-            {/* 클라이언트가 리더이며, 대기자 리스트를 보는 경우 */}
             {isLeader && from === "waitingQueue" ? 
               <div>
                 <button onClick={refuseHandler}>가입 거절</button> 

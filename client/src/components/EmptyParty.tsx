@@ -6,7 +6,7 @@ import { faSadTear } from "@fortawesome/free-solid-svg-icons";
 
 export const CardContainer = styled.div`
   width: 100%;
-  height: 230px;
+  height: 250px;
   border-radius: 25px;
   
   margin: 15px 0;
@@ -25,6 +25,10 @@ export const CardContainer = styled.div`
   .iconContainer {
     font-size: 2rem;
     margin-bottom: 10px;
+  }
+
+  @media screen and (max-width: 450px) {
+    height: 200px;
   }
 `;
 

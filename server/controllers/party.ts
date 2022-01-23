@@ -1,11 +1,9 @@
 import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { generateAccessToken, verifyAccessToken, setCookie, clearCookie } from "./functions/token";
 import { 
   getPartyInformation, compileComments, createWaitingQueue, deleteWaitingQueue, createNotification, 
   createUserParty, deleteParty, deleteUserParty, findUser, updatePartyState, makeComment, makeSubComment,
-  getPartyId, removeComment, removeSubComment, updateUserParty, createNotificationsAtOnce, getMembers,
-  updatePartyInformation, updateExpAtOnce,
+  getPartyId, removeComment, removeSubComment, updateUserParty, updatePartyInformation, updateExpAtOnce, checkIsRead
 } from "./functions/sequelize";
 import { NotificationAttributes } from "../models/notification";
 
@@ -13,8 +11,14 @@ export const getPartyInfo = async (req: Request, res: Response) => {
   try {
     const { partyId, userId } = req.params;
     const partyInfo = await getPartyInformation(Number(partyId), Number(userId));
-    const comments = await compileComments(Number(partyId));
-    return SuccessfulResponse(res, { message: "Party Information Loaded", partyInfo, comments });
+    const notification = await checkIsRead(Number(userId));
+    if(!partyInfo.id){
+      return FailedResponse(res, 404, "Not Found");
+    } 
+    else {
+      const comments = await compileComments(Number(partyId));
+      return SuccessfulResponse(res, { message: "Party Information Loaded", partyInfo, comments, notification });
+    }
   }
   catch (error) {
     return InternalServerError(res, error);
@@ -52,26 +56,28 @@ export const enqueue = async (req: Request, res: Response) => {
   }
 };
 
-export const dequeue = async (req: Request, res: Response) => {
-  try {
-    const { userId, partyId, action } = req.params;
-    const deleted = await deleteWaitingQueue(Number(userId), Number(partyId));
-    if (action === "deny") {
-      const notificationInfo: NotificationAttributes = {
-        content: "deny", 
-        userId: Number(userId), 
-        partyId: Number(partyId),
-        isRead: false
-      };
-      await createNotification(notificationInfo);
+  export const dequeue = async (req: Request, res: Response) => {
+    try {
+      const { userId, partyId, action } = req.params;
+      const party = await getPartyInformation(Number(partyId));
+      if (action === "deny") {
+        const notificationInfo: NotificationAttributes = {
+          content: "deny", 
+          userId: Number(userId), 
+          partyId: Number(partyId),
+          partyName: party.name, 
+          isRead: false
+        };
+        await createNotification(notificationInfo);
+      }
+      const deleted = await deleteWaitingQueue(Number(userId), Number(partyId));
+      if (deleted) return SuccessfulResponse(res, { message: "Dequeued Successfully" });
+      return FailedResponse(res, 400, "Bad Request");
     }
-    if (deleted) return SuccessfulResponse(res, { message: "Dequeued Successfully" });
-    return FailedResponse(res, 400, "Bad Request");
-  }
-  catch (error) {
-    return InternalServerError(res, error);
-  }
-};
+    catch (error) {
+      return InternalServerError(res, error);
+    }
+  };
 
 export const approveMember = async (req: Request, res: Response) => {
   try {
@@ -197,7 +203,6 @@ export const createSubComment = async (req: Request, res: Response) => {
     const user = await findUser({ id: userId }, [ "userName" ]);
     const partyId = await getPartyId(commentId);
     const party = await getPartyInformation(Number(partyId));
-    console.log("123123123", party);
     if (userId === Number(party.leaderId)) {
       const notificationInfo: NotificationAttributes = {
         content: "answer", 

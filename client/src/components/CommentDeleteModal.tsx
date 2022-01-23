@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -86,9 +87,12 @@ export const CloseBtn = styled.button`
 type Props = {
   commentDeleteModalHandler: Function,
   commentToDelete: { [key: string] : number },
+  partyId: number,
 }
 
-const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete }: Props) => {
+const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete, partyId }: Props) => {
+
+  const navigate = useNavigate();
 
   const { idx, commentId } = commentToDelete;
 
@@ -97,17 +101,15 @@ const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete }: Prop
   }
 
   async function deleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev] 덧글의 경우 코멘트 아이디, 대댓글의 경우 서브코멘트아이디 패러미터로 전달
     if (idx === 0){
       await axios.delete(`${process.env.REACT_APP_API_URL}/party/comment/${commentId}`);
-      console.log("덧글을 삭제합니다.");
     } 
     else {
       await axios.delete(`${process.env.REACT_APP_API_URL}/party/subComment/${commentId}`);
-      console.log("대댓글을 삭제합니다.")
     }
 
     commentDeleteModalHandler();
+    navigate(`../party/${partyId}`);
   }
 
   return(

@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import axios from 'axios';
-
+import { NOTIFY } from "../actions/notify"
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faBullhorn, faScroll, faTrophy, faStar, faBellSlash } from '@fortawesome/free-solid-svg-icons';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { AppState } from '../reducers';
 
-import Loading from '../components/Loading';
+import { cookieParser } from '../App';
 
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyNotification from '../static/dummyNotification';
+import Loading from '../components/Loading';
 
 export const NotificationContainer = styled.div`
 
@@ -28,6 +27,8 @@ export const NotificationContainer = styled.div`
 
     color: #000;
     border-bottom: 1px solid #d5d5d5;
+
+    cursor: pointer;
 
     .contentWrapper {
       display: flex;
@@ -95,22 +96,15 @@ export const NotificationContainer = styled.div`
 `
 
 export default function Notification () {
-
+  const dispatch = useDispatch();
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
-  );
-
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const isBadgeOn = useSelector(
     (state: AppState) => state.notifyReducer.isBadgeOn
   );
 
-  // [dev] 더미데이터 코드 실제 데이터로 변경. 
-  // 뒤에 map + reverse는 남겨둘것(최신순으로 배열하기 위해 배열 순서를 바꿈)
-  // const notification = dummyNotification.map(noti => noti).reverse();
   const [notification, setNotification] = useState<{ [key: string]: any }>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -132,7 +126,8 @@ export default function Notification () {
     "question": "님의 퀘스트 문의가 도착했습니다.",
     "answer": "퀘스트 문의에 대한 답변이 도착했습니다.",
     "reply": "님의 답변에 대한 재문의가 도착했습니다.",
-    "levelup": "로 레벨이 올랐습니다!"
+    "levelup": "로 레벨이 올랐습니다!",
+    "leveldown": "로 레벨이 떨어졌습니다."
   };
 
   function timeForToday(value: Date) {
@@ -160,19 +155,27 @@ export default function Notification () {
 
   useEffect(() => {
     //[FEAT] 기능확인 필요
-    (async () => {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/notification/${userId}`);
-      setNotification(response.data.notifications);
-    })();
-  }, []);
+    if (userId !== 0.1) {
+      setIsLoading(true);
+      (async () => {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/notification/${userId}`);
+        dispatch({
+          type: NOTIFY,
+          payload: {
+            isBadgeOn: response.data.notification
+          }
+        });
+        setNotification(response.data.notifications);
+      })();
+    }
+  }, [ userId ]);
   
   useEffect(() => {
     setIsLoading(false);
-    // document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/party/${partyInfo.id}`;
   }, [ notification ]);
 
-  if(!isLoggedIn){
-    return <Navigate to="/" />
+  if(cookieParser().isLoggedIn === "0"){
+    return <Navigate to="../" />
   } else if(isLoading){
     return <Loading />
   }
@@ -182,7 +185,7 @@ export default function Notification () {
       <div className="notificationList">
         <div className="contentWrapper">
           <div className="iconContainer">
-            <FontAwesomeIcon icon={ faBellSlash } className="icon bell" />
+            <FontAwesomeIcon icon={ faBellSlash } className="icon bell"/>
           </div>
           <div className="titleContainer">
             <div className="partyNameContainer">
@@ -210,6 +213,23 @@ export default function Notification () {
               </div>
             </Link>
           );
+        } else if(noti.content === "dismiss"){
+          return (
+            <div key={idx} className="notificationList" style={{ background: noti.isRead? "#fff" : "rgb(80,201,195, 0.1)" }}>
+              <div className="contentWrapper">
+                <div className="iconContainer">
+                  <FontAwesomeIcon icon={ faBullhorn } className="icon horn" /> 
+                </div>
+                <div className="titleContainer">
+                  <div className="partyNameContainer">
+                    [<div className="partyName">{noti.partyName}</div>]
+                  </div>
+                  <div className="content">{message[noti.content]}</div> 
+                </div> 
+              </div>
+              <div className="time">{timeForToday(noti.createdAt)}</div>
+            </div>  
+          );
         } else {
           return (
             <Link to={`/party/${noti.partyId}${noti.commentId ? `/${noti.commentId}` : ""}`} style={{ textDecoration: 'none' }} key={idx}>
@@ -235,7 +255,7 @@ export default function Notification () {
             </Link>   
           );
         }
-      })}
+      }).reverse()}
     </NotificationContainer>
   );
 }
