@@ -51,7 +51,7 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
           level
         }
       }
-      
+
     default:
       return state;
   }

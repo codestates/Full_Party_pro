@@ -134,7 +134,6 @@ export const googleSignIn = async (req: Request, res: Response) => {
     }
     const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "exp", "level", "signupType" ]);
     setCookie(res, "token", String(accessToken));
-    console.log(userInfo)
     return SuccessfulResponse(res, { message: "You Have Successfully Signed In With Google Account", userInfo });
   } catch (error) {
     InternalServerError(res, error);
@@ -184,7 +183,7 @@ export const kakao = async (req: Request, res: Response) => {
           signupType: "kakao"
         });
       }
-      const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
+      const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "exp", "level", "signupType" ]);
       setCookie(res, "token", String(accessToken));
       SuccessfulResponse(res, { message: "You Have Successfully Signed In With Kakao Account", userInfo });
     }
