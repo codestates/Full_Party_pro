@@ -365,7 +365,6 @@ export default function Mypage () {
   })
 
   const userRegion = basicInfo.address.split(" ").length < 2 ? "지역 미설정" : basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1]
-  
   // [CAUTION] 이미지 서버 관련 코드 => 범님 외 수정 X
   AWS.config.update({
     region: "ap-northeast-2",
@@ -688,27 +687,29 @@ export default function Mypage () {
   
   useEffect(() => {
     (async () => {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
-        withCredentials: true,
-      });
-      dispatch({
-        type: NOTIFY,
-        payload: {
-          isBadgeOn: res.data.notification
-        }
-      });
-      const userInfo = res.data.userInfo;
-      setBasicInfo({
-        userName: userInfo.userName,
-        profileImage: userInfo.profileImage,
-        address: userInfo.address,
-        level: userInfo.level,
-        exp: userInfo.exp
-      });
-      setChangeInfo({
-        ...changeInfo,
-        profileImage: userInfo.profileImage
-      })
+      if (userInfoFromStore.id !== 0.1) {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
+          withCredentials: true,
+        });
+        dispatch({
+          type: NOTIFY,
+          payload: {
+            isBadgeOn: res.data.notification
+          }
+        });
+        const userInfo = res.data.userInfo;
+        setBasicInfo({
+          userName: userInfo.userName,
+          profileImage: userInfo.profileImage,
+          address: userInfo.address,
+          level: userInfo.level,
+          exp: userInfo.exp
+        });
+        setChangeInfo({
+          ...changeInfo,
+          profileImage: userInfo.profileImage
+        });
+      }
     })();
     fetchRecruitParty();
   }, [ userInfoFromStore ]);

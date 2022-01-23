@@ -65,7 +65,6 @@ export default function List () {
       });
       const parsedLocalParty = response.data.localParty.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
       setLocalParty(parsedLocalParty);
-      console.log(response.data)
       setMyParty(response.data.myParty);
     })();
   }, [ userInfo ]);
