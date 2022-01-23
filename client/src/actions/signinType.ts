@@ -8,9 +8,7 @@ export type UserInfo = {
   userName: string
   profileImage: string
   address: string,
-  signupType: string,
-  exp: number,
-  level: number
+  signupType: string
 }
 
 export interface signinFailDispatch{

@@ -14,8 +14,7 @@ const initialState: InitialState = {
     profileImage: "https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png",
     address: "",
     signupType: "",
-    exp: 0,
-    level: 0
+
   }
 }
 
@@ -30,14 +29,12 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
           userName: "",
           profileImage: "",
           address: "",
-          signupType: "",
-          exp: 0,
-          level: 0
+          signupType: ""
         }
       }
 
     case SIGNIN_SUCCESS:
-      const { id, userName, profileImage, address, signupType, exp, level } = action.payload
+      const { id, userName, profileImage, address, signupType } = action.payload
       return {
         ...state,
         isLoggedIn: true,
@@ -46,9 +43,7 @@ const signinReducer = (state = initialState, action: UserInfoDispatchType): Init
           userName,
           profileImage,
           address,
-          signupType,
-          exp,
-          level
+          signupType
         }
       }
 
