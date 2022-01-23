@@ -91,7 +91,7 @@ export const invertFavorite = async (userId: number, partyId: number) => {
 
 export const getLeadingParty = async (userId: number) => {
   const leadingParty = await Parties.findAll({
-    where: { leaderId: userId },
+    where: { leaderId: userId, partyState: [ 0, 1 ] },
     attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ]
   });
   return leadingParty;
@@ -105,12 +105,12 @@ export const getParticipatingParty = async (userId: number) => {
   const party: any[] = [];
   for (let i = 0; i < partyIdArr.length; i++) {
     party[i] = await Parties.findOne({
-      where: { id: partyIdArr[i].partyId },
+      where: { id: partyIdArr[i].partyId, partyState: [0, 1] },
       attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline", "location" ],
       raw: true
     });
   }
-  return party;
+  return !party[0] && !party[1] ? [] : party;
 };
 
 export const findParticipatingParty = async (userId: number) => {

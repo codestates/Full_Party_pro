@@ -260,7 +260,7 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
         withCredentials: true
       });
 
-      handlePartyInfoChange("partyState", 2)
+      handlePartyInfoChange("partyState", 2);
     }
 
     await axios.patch(`${process.env.REACT_APP_API_URL}/party/review`, { 
@@ -308,7 +308,7 @@ const ReviewModal = ({ reviewModalHandler, members, leaderId, isLeader, userId, 
                 style={{ backgroundImage: `url(${profileImage})`, backgroundSize: "cover" }} 
               />
               <div className="nameplate">
-              {curMember.id === leaderId? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {name}
+              {curMember.id === leaderId ? <FontAwesomeIcon icon={ faFlag } id="leader" /> : null} {name}
               </div>
             </div>
             <button
