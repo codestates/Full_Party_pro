@@ -1,13 +1,13 @@
-import { UsersAttributes } from './../models/users';
 import axios from "axios";
-import { Request, Response } from "express";
-import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
-import { generateAccessToken, verifyAccessToken, setCookie } from "./functions/token";
-import { findUser, createUser, deleteUser } from "./functions/sequelize";
 import config from "../config"
 import nodemailer from "nodemailer"
 import dotenv from "dotenv"
 dotenv.config();
+import { UsersAttributes } from './../models/users';
+import { Request, Response } from "express";
+import { InternalServerError, SuccessfulResponse, FailedResponse } from "./functions/response";
+import { generateAccessToken, verifyAccessToken, setCookie } from "./functions/token";
+import { findUser, createUser, deleteUser } from "./functions/sequelize";
 
 export const signin = async (req: Request, res: Response) => {
   try {
@@ -143,6 +143,7 @@ export const googleSignIn = async (req: Request, res: Response) => {
 export const kakao = async (req: Request, res: Response) => {
   try {
     const { authorizationCode } = req.body;
+    const { kakaoClientId, kakaoClientSecret } = config.kakao;
     try {
       const response = await axios({
         method: "POST",
@@ -152,8 +153,8 @@ export const kakao = async (req: Request, res: Response) => {
         },
         params : {
           grant_type: "authorization_code",
-          client_id: "dfdae48bc5a2f6e1f3326d50455762b3",
-          client_secret: "eHYGMf3Vm2V5IbA0frZ1qfvdsgJwgZcv",
+          client_id: kakaoClientId,
+          client_secret: kakaoClientSecret,
           redirect_uri: process.env.REACT_APP_REDIRECT_URI,
           code: authorizationCode
         }

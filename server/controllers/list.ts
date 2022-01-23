@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { InternalServerError, SuccessfulResponse } from "./functions/response";
-import { findUser, findPartyId, getLeadingParty, getParticipatingParty, getLocalParty, checkIsRead, createNewParty, findTag } from "./functions/sequelize";
+import { findUser, findPartyId, getLeadingParty, getParticipatingParty, getLocalParty,
+  checkIsRead, createNewParty, findTag
+} from "./functions/sequelize";
 
 export const getPartyList = async (req: Request, res: Response) => {
   try {
