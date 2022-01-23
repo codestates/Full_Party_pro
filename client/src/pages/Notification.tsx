@@ -129,7 +129,8 @@ export default function Notification () {
     "question": "님의 퀘스트 문의가 도착했습니다.",
     "answer": "퀘스트 문의에 대한 답변이 도착했습니다.",
     "reply": "님의 답변에 대한 재문의가 도착했습니다.",
-    "levelup": "로 레벨이 올랐습니다!"
+    "levelup": "로 레벨이 올랐습니다!",
+    "leveldown": "로 레벨이 떨어졌습니다."
   };
 
   function timeForToday(value: Date) {
@@ -157,17 +158,20 @@ export default function Notification () {
 
   useEffect(() => {
     //[FEAT] 기능확인 필요
-    (async () => {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/notification/${userId}`);
-      dispatch({
-        type: NOTIFY,
-        payload: {
-          isBadgeOn: response.data.notification
-        }
-      });
-      setNotification(response.data.notifications);
-    })();
-  }, []);
+    if (userId !== 0.1) {
+      setIsLoading(true);
+      (async () => {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/notification/${userId}`);
+        dispatch({
+          type: NOTIFY,
+          payload: {
+            isBadgeOn: response.data.notification
+          }
+        });
+        setNotification(response.data.notifications);
+      })();
+    }
+  }, [ userId ]);
   
   useEffect(() => {
     setIsLoading(false);
