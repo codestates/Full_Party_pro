@@ -6,8 +6,7 @@ import { UserInfoDispatchType, SIGNIN_SUCCESS, SIGNIN_FAIL } from "./signinType"
 
 export const fetchUserdata = (userInfo: object) => async (dispatch: Dispatch<UserInfoDispatchType>) => {
   document.cookie = "signupType=general";
-  document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
-  document.cookie = "isLoggedIn=1;"
+  document.cookie = `isLoggedIn=1; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
   await axios.post(`${process.env.REACT_APP_API_URL}/signin`, userInfo, {
     withCredentials:true
   })

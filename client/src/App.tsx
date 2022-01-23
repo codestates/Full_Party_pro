@@ -69,12 +69,11 @@ export default function App() {
       initialize();
     }
     if (!document.cookie) {
-      document.cookie = "token=temp;";
-      document.cookie = "signupType=temp;";
-      document.cookie = "isLoggedIn=0;";
-      document.cookie = `location=${process.env.REACT_APP_CLIENT_URL}/home`;
+      document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     }
-    const { token, signupType, location, isLoggedIn } = cookieParser();
+    const { token, signupType, isLoggedIn } = cookieParser();
     if (token !== "temp" && signupType !== "temp" && isLoggedIn !== "0") {
       requestKeepLoggedIn(token, signupType).then((res) => {
         dispatch({
@@ -82,7 +81,6 @@ export default function App() {
           payload: res.data.userInfo
         });
       });
-      document.cookie = "isLoggedIn=1;";
     }
   }, []);
 

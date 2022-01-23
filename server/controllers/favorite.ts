@@ -22,15 +22,14 @@ export const handleFavorite = async (req: Request, res: Response) => {
         isRead: false
       };
       await createNotification(notificationInfo);
-      return SuccessfulResponse(res, { message: "Like selected" });
+      return SuccessfulResponse(res, { message: "Like Selected" });
     }
-    else return SuccessfulResponse(res, { message: "Like canceled" });
+    else return SuccessfulResponse(res, { message: "Like Canceled" });
   }
   catch (error) {
     return InternalServerError(res, error);
   }
 };
-
 
 export const getFavoriteParty = async (req: Request, res: Response) => {
   try {

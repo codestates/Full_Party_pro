@@ -65,7 +65,6 @@ export default function List () {
       });
       const parsedLocalParty = response.data.localParty.map((item: any) => ({ ...item, latlng: JSON.parse(item.latlng) }));
       setLocalParty(parsedLocalParty);
-      console.log(response.data)
       setMyParty(response.data.myParty);
     })();
   }, [ userInfo ]);
@@ -78,7 +77,7 @@ export default function List () {
     return <Loading />
   }
 
-  if(!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "unidentified" || userInfo.address === "KAKAO"){
+  if(!userInfo.address || userInfo.address === 'Guest' || userInfo.address === "Google" || userInfo.address === "Kakao"){
     return <AddressModal />
   }
 
