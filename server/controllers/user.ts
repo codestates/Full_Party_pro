@@ -9,7 +9,7 @@ export const getUserInfo = async (req: Request, res: Response) => {
     const { userId } = req.params;
     const notification = await checkIsRead(Number(userId));
     const userInfo = await findUser({ id: userId }, [ "id", "userName", "profileImage", "address", "exp", "level", "signupType" ]);
-    if (userInfo && notification) return SuccessfulResponse(res, {
+    if (userInfo) return SuccessfulResponse(res, {
       message: "Loaded Successfully",
       userInfo,
       notification

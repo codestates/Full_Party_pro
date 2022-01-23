@@ -101,14 +101,11 @@ const CommentDeleteModal = ({ commentDeleteModalHandler, commentToDelete, partyI
   }
 
   async function deleteHandler(event: React.MouseEvent<HTMLButtonElement>) {
-    // [dev] 덧글의 경우 코멘트 아이디, 대댓글의 경우 서브코멘트아이디 패러미터로 전달
     if (idx === 0){
       await axios.delete(`${process.env.REACT_APP_API_URL}/party/comment/${commentId}`);
-      console.log("덧글을 삭제합니다.");
     } 
     else {
       await axios.delete(`${process.env.REACT_APP_API_URL}/party/subComment/${commentId}`);
-      console.log("대댓글을 삭제합니다.")
     }
 
     commentDeleteModalHandler();

@@ -687,7 +687,7 @@ export default function Mypage () {
   
   useEffect(() => {
     (async () => {
-      if (userInfoFromStore.id !== 0.1) {
+      if (userInfoFromStore.id >= 1) {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
           withCredentials: true,
         });
