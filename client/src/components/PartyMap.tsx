@@ -69,29 +69,20 @@ export const MapContainer = styled.section`
 
 type Props = {
   isMember: boolean,
-  location: string,
+  latlng: { lat: number, lng: number },
   image: string
 };
 
-export default function PartyMap({ isMember, location, image }: Props) {
+export default function PartyMap({ isMember, latlng, image }: Props) {
   const { kakao } = window;
-  const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
+  const [ coords, setCoords ] = useState(latlng);
   const { lat, lng } = coords;
   const level = (isMember ? 4 : 5);
   const zoomable = (isMember ? true : false);
 
   useEffect(() => {
-    const geocoder = new kakao.maps.services.Geocoder();
-    if (location) {
-      geocoder.addressSearch(location, (result: any, status: any) => {
-        if (status === kakao.maps.services.Status.OK) {
-          const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
-          const { La, Ma } = coordinates;
-          setCoords({ lat: Ma, lng: La });
-        }
-      });
-    }
-  }, [ location ]);
+    setCoords(latlng)
+  }, [ latlng ]);
 
   return (
     <MapContainer>

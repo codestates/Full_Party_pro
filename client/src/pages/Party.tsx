@@ -322,7 +322,7 @@ export default function Party() {
     partyState: 0,
     region: "",
     location: "",
-    latlng: "",
+    latlng: { lat: 0, lng: 0 },
     memberLimit: 2,
     isReviewed: false,
     isFavorite: false,
@@ -522,7 +522,7 @@ export default function Party() {
     if (params.commentId) setFindComment(Number(params.commentId));
     axios.get(`${process.env.REACT_APP_API_URL}/party/${params.partyId}/${userId}`)
     .then(res => {
-      setPartyInfo(res.data.partyInfo);
+      setPartyInfo({ ...res.data.partyInfo, latlng: JSON.parse(res.data.partyInfo.latlng) });
       setComments(res.data.comments);
       dispatch({
         type: NOTIFY,
@@ -691,7 +691,7 @@ export default function Party() {
           <div className="mapDesc">
             <PartyMap
               isMember={isMember}
-              location={partyInfo.location}
+              latlng={partyInfo.latlng}
               image={partyInfo.image}
             />  
             {!isMember? "파티원에게는 더 정확한 장소가 표시됩니다." : null}
