@@ -298,10 +298,10 @@ export const getPartyInformation = async (partyId: number, userId?: number | und
       raw: true
     });
     const isReviewed = checkReviewed?.isReviewed ? true : false;
-    const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed, isFavorite };
+    const partyInfo = { ...party, isOnline: Boolean(party?.isOnline), favorite: favoriteCount, tag, members, waitingQueue, isReviewed, isFavorite };
     return partyInfo;
   }
-  const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed: false, isFavorite: false };
+  const partyInfo = { ...party, isOnline: Boolean(party?.isOnline), favorite: favoriteCount, tag, members, waitingQueue, isReviewed: false, isFavorite: false };
     return partyInfo;
 };
 
