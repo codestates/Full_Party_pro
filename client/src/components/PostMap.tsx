@@ -78,7 +78,7 @@ type Props = {
 
 export default function PostMap({ latlng, location, name, image, handleCoordsChange }: Props) {
   const { kakao } = window;
-  const [ coords, setCoords ] = useState(latlng);
+  const [ coords, setCoords ] = useState(latlng.lat === 0 ? { lat: 37.496562, lng: 127.024761 } : latlng);
   const { lat, lng } = coords;
   const geocoder = new kakao.maps.services.Geocoder();
 

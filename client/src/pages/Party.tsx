@@ -346,6 +346,11 @@ export default function Party() {
 
   const formatDate = (date: String) => date.slice(0, 11);
 
+  const handleOnOff = (isOnline: boolean) => {
+    if (isOnline) setPartyInfo({ ...partyInfo, isOnline });
+    else setPartyInfo({ ...partyInfo, isOnline });
+  };
+
   const handlePartyInfoChange = (key: string, value: any) => {
     setPartyInfo({
       ...partyInfo,
@@ -573,6 +578,7 @@ export default function Party() {
     return <PartyEdit
       party={partyInfo}
       editHandler={editHandler}
+      handleOnOff={handleOnOff}
     />
   }
 
@@ -681,7 +687,7 @@ export default function Party() {
             <div className="details">
               <div className="icon"><FontAwesomeIcon icon={ faGlobe } /></div>
               {isMember? 
-                <a href={partyInfo.location}>{partyInfo.location}</a>
+                <a href={partyInfo.location} target="_blank" rel="noreferer" >{partyInfo.location}</a>
               : "이 퀘스트는 온라인으로 진행되는 퀘스트입니다." }
             </div>
           : null}

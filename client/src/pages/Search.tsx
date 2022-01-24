@@ -64,6 +64,12 @@ export const SearchBar = styled.div`
       right: 20%;
     }
   }
+
+  @media screen and (min-width: 1900px) {
+    .faSearch {
+      right: 23%;
+    }
+  }
 `;
 
 export const SearchContent = styled.div`

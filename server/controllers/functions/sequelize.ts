@@ -246,7 +246,9 @@ export const createNewParty = async (userId: number, partyInfo: PartyInfo) => {
 };
 
 export const updatePartyInformation = async (partyId: number, partyInfo: PartyInfo) => {
-  const updated = await Parties.update({ ...partyInfo, id: partyId }, {
+  console.log("🌈", partyInfo);
+  const latlng = JSON.stringify(partyInfo.latlng);
+  const updated = await Parties.update({ ...partyInfo, id: partyId, latlng }, {
     where: { id: partyId }
   });
   await deleteTag(partyId);
@@ -434,6 +436,7 @@ export const deleteParty = async (partyId: number) => {
   const deleted = await Parties.destroy({
     where: { id: partyId }
   });
+  await deleteNotification(partyId);
   return deleted;
 };
 
@@ -682,4 +685,19 @@ export const findFavoriteParties = async (userId: number) => {
     else favoriteParties[i] = { ...partyList[i], favorite: false, members, tag };
   }
   return favoriteParties;
+};
+
+export const findCommentWriterId = async (commentId: number) => {
+  const result = await Comment.findOne({
+    where: { id: commentId },
+    attributes: [ "userId" ],
+    raw: true
+  });
+  return result?.userId;
+};
+
+export const deleteNotification = async (partyId: number) => {
+  await Notification.destroy({
+    where: { partyId }
+  });
 };
