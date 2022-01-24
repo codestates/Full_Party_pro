@@ -578,7 +578,6 @@ export default function PartyEdit({ party, editHandler }: Props) {
   const [ tags, setTags ] = useState<string[]>(partyInfo.tag);
   const [ inputTxt, setInputTxt ] = useState('');
 
-  const [ isOnline, setIsOnline ] = useState(false);
   const [ isPosted, setIsPosted ] = useState(false);
   const [ imgLoading, setImgLoading ] = useState(false);
   const [ cancelModal, setCancelModal ] = useState(false);
@@ -701,8 +700,8 @@ export default function PartyEdit({ party, editHandler }: Props) {
   };
 
   const handleOnOff = (isOnline: boolean) => {
-    if(isOnline === true) setIsOnline(true);
-    else setIsOnline(false);
+    if(isOnline === true) setPartyInfo({ ...partyInfo, isOnline: true });
+    else setPartyInfo({ ...partyInfo, isOnline: false });
   };
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -796,11 +795,11 @@ export default function PartyEdit({ party, editHandler }: Props) {
         image: partyInfo.image,
         memberLimit: partyInfo.memberLimit,
         region:
-          isOnline? 
+          partyInfo.isOnline? 
           signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
           : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
         location: partyInfo.location,
-        latlng: isOnline? JSON.stringify({lat: 0, lng: 0}) : JSON.stringify(partyInfo.latlng),
+        latlng: partyInfo.isOnline? JSON.stringify({lat: 0, lng: 0}) : JSON.stringify(partyInfo.latlng),
         startDate: partyInfo.startDate,
         endDate: partyInfo.endDate,
         isOnline: partyInfo.isOnline,

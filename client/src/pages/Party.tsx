@@ -316,7 +316,7 @@ export default function Party() {
     favorite: 0,
     id: 0,
     image: "",
-    isOnline: 0,
+    isOnline: false,
     leaderId: 0,
     privateLink: "",
     partyState: 0,
@@ -570,7 +570,7 @@ export default function Party() {
   else if (isLoading) return <Loading />
   else if (notFound) return <NotFound />
   else if (isEdit) {
-    <PartyEdit
+    return <PartyEdit
       party={partyInfo}
       editHandler={editHandler}
     />
