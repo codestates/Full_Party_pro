@@ -567,7 +567,7 @@ export default function PartyEdit({ party, editHandler }: Props) {
     (state: RootReducerType) => state.signinReducer
   );
 
-  const [  isName, setIsName  ] = useState({ err: false, msg: '' });
+  const [ isName, setIsName ] = useState({ err: false, msg: '' });
   const [ isStrDate, setIsStrDate ] = useState({ err: false, msg: '' });
   const [ isEndDate, setIsEndDate ] = useState({ err: false, msg: '' });
   const [ isContent, setIsContent ] = useState({ err: false, msg: '' });
@@ -578,7 +578,7 @@ export default function PartyEdit({ party, editHandler }: Props) {
   const [ tags, setTags ] = useState<string[]>(partyInfo.tag);
   const [ inputTxt, setInputTxt ] = useState('');
 
-  const [ isOnline, setIsOnline ] = useState(false);
+  const [ isOnline, setIsOnline ] = useState(partyInfo.isOnline);
   const [ isPosted, setIsPosted ] = useState(false);
   const [ imgLoading, setImgLoading ] = useState(false);
   const [ cancelModal, setCancelModal ] = useState(false);
@@ -602,12 +602,12 @@ export default function PartyEdit({ party, editHandler }: Props) {
     const promise = upload.promise();
     promise.then(
       (data) => {
-        console.log("✅ Uploaded Successfully")
+        console.log("✅ Uploaded Successfully");
         setPartyInfo({
           ...partyInfo,
           image: data.Location
-        })
-        setImgLoading(false)
+        });
+        setImgLoading(false);
       },
       (err) => console.log("🚫 Upload Failed")
     );
@@ -728,9 +728,7 @@ export default function PartyEdit({ party, editHandler }: Props) {
     else setIsErrorModalOpen(true);
   };
 
-  const backToPage = () => {
-    editHandler();
-  };
+  const backToPage = () => editHandler();
 
   const editParty = () => {
     const regex = {
@@ -803,7 +801,7 @@ export default function PartyEdit({ party, editHandler }: Props) {
         latlng: isOnline? JSON.stringify({lat: 0, lng: 0}) : JSON.stringify(partyInfo.latlng),
         startDate: partyInfo.startDate,
         endDate: partyInfo.endDate,
-        isOnline: partyInfo.isOnline,
+        isOnline,
         privateLink: partyInfo.privateLink,
         tag: tags
       }

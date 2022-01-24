@@ -4,7 +4,8 @@ import { NotificationAttributes } from "../models/notification";
 import {
   getPartyInformation, compileComments, createWaitingQueue, deleteWaitingQueue, createNotification,
   createUserParty, deleteParty, deleteUserParty, findUser, updatePartyState, makeComment, makeSubComment,
-  getPartyId, removeComment, removeSubComment, updateUserParty, updatePartyInformation, updateExpAtOnce, checkIsRead
+  getPartyId, removeComment, removeSubComment, updateUserParty, updatePartyInformation, updateExpAtOnce,
+  checkIsRead, findCommentWriterId
 } from "./functions/sequelize";
 
 export const getPartyInfo = async (req: Request, res: Response) => {
@@ -30,6 +31,7 @@ export const modifyPartyInfo = async (req: Request, res: Response) => {
     const { partyId, partyInfo } = req.body;
     const updated = await updatePartyInformation(partyId, partyInfo);
     const editedPartyInfo = await getPartyInformation(partyId);
+    console.log("🌈", partyInfo);
     if (updated) return SuccessfulResponse(res, {
       message: "Successfully Edited",
       partyInfo: {
@@ -43,7 +45,7 @@ export const modifyPartyInfo = async (req: Request, res: Response) => {
     InternalServerError(res, error);
   }
 }
-  
+
 export const enqueue = async (req: Request, res: Response) => {
   try {
     const { userId, partyId, message } = req.body;
@@ -204,9 +206,10 @@ export const createSubComment = async (req: Request, res: Response) => {
     const partyId = await getPartyId(commentId);
     const party = await getPartyInformation(Number(partyId));
     if (userId === Number(party.leaderId)) {
+      const commentWriterId = await findCommentWriterId(commentId);
       const notificationInfo: NotificationAttributes = {
         content: "answer", 
-        userId, 
+        userId: Number(commentWriterId),
         partyId: Number(partyId), 
         partyName: party.name, 
         commentId,

@@ -172,8 +172,8 @@ export default function QuestCard ({ party }: Props) {
     const response = await axios.post(`${process.env.REACT_APP_API_URL}/favorite/${id}`, { userId, partyId: id }, {
       withCredentials: true
     });
-    if (response.data.message === "Like selected") setLike(true);
-    else if (response.data.message === "Like canceled") setLike(false);
+    if (response.data.message === "Like Selected") setLike(true);
+    else if (response.data.message === "Like Canceled") setLike(false);
   };
 
   return (

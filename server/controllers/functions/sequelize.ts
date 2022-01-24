@@ -298,10 +298,10 @@ export const getPartyInformation = async (partyId: number, userId?: number | und
       raw: true
     });
     const isReviewed = checkReviewed?.isReviewed ? true : false;
-    const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed, isFavorite };
+    const partyInfo = { ...party, isOnline: Boolean(party?.isOnline), favorite: favoriteCount, tag, members, waitingQueue, isReviewed, isFavorite };
     return partyInfo;
   }
-  const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed: false, isFavorite: false };
+  const partyInfo = { ...party, isOnline: Boolean(party?.isOnline), favorite: favoriteCount, tag, members, waitingQueue, isReviewed: false, isFavorite: false };
     return partyInfo;
 };
 
@@ -434,6 +434,7 @@ export const deleteParty = async (partyId: number) => {
   const deleted = await Parties.destroy({
     where: { id: partyId }
   });
+  await deleteNotification(partyId);
   return deleted;
 };
 
@@ -682,4 +683,19 @@ export const findFavoriteParties = async (userId: number) => {
     else favoriteParties[i] = { ...partyList[i], favorite: false, members, tag };
   }
   return favoriteParties;
+};
+
+export const findCommentWriterId = async (commentId: number) => {
+  const result = await Comment.findOne({
+    where: { id: commentId },
+    attributes: [ "userId" ],
+    raw: true
+  });
+  return result?.userId;
+};
+
+export const deleteNotification = async (partyId: number) => {
+  await Notification.destroy({
+    where: { partyId }
+  });
 };
