@@ -246,7 +246,6 @@ export const createNewParty = async (userId: number, partyInfo: PartyInfo) => {
 };
 
 export const updatePartyInformation = async (partyId: number, partyInfo: PartyInfo) => {
-  console.log("🌈", partyInfo);
   const latlng = JSON.stringify(partyInfo.latlng);
   const updated = await Parties.update({ ...partyInfo, id: partyId, latlng }, {
     where: { id: partyId }
