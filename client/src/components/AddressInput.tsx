@@ -54,7 +54,7 @@ const AddressInput = ({ partyInfo, handleCoordsChange, handleLocationChange, han
   const [ isOnline, setIsOnline ] = useState(partyInfo.isOnline);
   const [ onlineLocation, setOnlineLocation ] = useState(partyInfo.location);
   const [ fullAddress, setFullAddress ] = useState({
-    address: partyInfo.location,
+    address: "",
     detailedAddress: "",
     extraAddress: "",
   });
@@ -130,6 +130,7 @@ const AddressInput = ({ partyInfo, handleCoordsChange, handleLocationChange, han
           <div className='mapContainer'>
             <div id='map' className='mapDesc'>
               <PostMap 
+                latlng={partyInfo.latlng}
                 location={partyInfo.location} 
                 name={partyInfo.name}
                 image={partyInfo.image} 
