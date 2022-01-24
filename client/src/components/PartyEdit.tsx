@@ -799,7 +799,7 @@ export default function PartyEdit({ party, editHandler }: Props) {
           signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
           : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
         location: partyInfo.location,
-        latlng: partyInfo.isOnline? JSON.stringify({lat: 0, lng: 0}) : JSON.stringify(partyInfo.latlng),
+        latlng: partyInfo.isOnline? { lat: 0, lng: 0 } : partyInfo.latlng,
         startDate: partyInfo.startDate,
         endDate: partyInfo.endDate,
         isOnline: partyInfo.isOnline,

@@ -31,7 +31,6 @@ export const modifyPartyInfo = async (req: Request, res: Response) => {
     const { partyId, partyInfo } = req.body;
     const updated = await updatePartyInformation(partyId, partyInfo);
     const editedPartyInfo = await getPartyInformation(partyId);
-    console.log("🌈", partyInfo);
     if (updated) return SuccessfulResponse(res, {
       message: "Successfully Edited",
       partyInfo: {
