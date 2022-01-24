@@ -567,7 +567,7 @@ export default function PartyEdit({ party, editHandler }: Props) {
     (state: RootReducerType) => state.signinReducer
   );
 
-  const [ isName, setIsName ] = useState({ err: false, msg: '' });
+  const [  isName, setIsName  ] = useState({ err: false, msg: '' });
   const [ isStrDate, setIsStrDate ] = useState({ err: false, msg: '' });
   const [ isEndDate, setIsEndDate ] = useState({ err: false, msg: '' });
   const [ isContent, setIsContent ] = useState({ err: false, msg: '' });
@@ -578,7 +578,6 @@ export default function PartyEdit({ party, editHandler }: Props) {
   const [ tags, setTags ] = useState<string[]>(partyInfo.tag);
   const [ inputTxt, setInputTxt ] = useState('');
 
-  const [ isOnline, setIsOnline ] = useState(partyInfo.isOnline);
   const [ isPosted, setIsPosted ] = useState(false);
   const [ imgLoading, setImgLoading ] = useState(false);
   const [ cancelModal, setCancelModal ] = useState(false);
@@ -602,12 +601,12 @@ export default function PartyEdit({ party, editHandler }: Props) {
     const promise = upload.promise();
     promise.then(
       (data) => {
-        console.log("✅ Uploaded Successfully");
+        console.log("✅ Uploaded Successfully")
         setPartyInfo({
           ...partyInfo,
           image: data.Location
-        });
-        setImgLoading(false);
+        })
+        setImgLoading(false)
       },
       (err) => console.log("🚫 Upload Failed")
     );
@@ -701,8 +700,8 @@ export default function PartyEdit({ party, editHandler }: Props) {
   };
 
   const handleOnOff = (isOnline: boolean) => {
-    if(isOnline === true) setIsOnline(true);
-    else setIsOnline(false);
+    if(isOnline === true) setPartyInfo({ ...partyInfo, isOnline: true });
+    else setPartyInfo({ ...partyInfo, isOnline: false });
   };
 
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -728,7 +727,9 @@ export default function PartyEdit({ party, editHandler }: Props) {
     else setIsErrorModalOpen(true);
   };
 
-  const backToPage = () => editHandler();
+  const backToPage = () => {
+    editHandler();
+  };
 
   const editParty = () => {
     const regex = {
@@ -794,14 +795,14 @@ export default function PartyEdit({ party, editHandler }: Props) {
         image: partyInfo.image,
         memberLimit: partyInfo.memberLimit,
         region:
-          isOnline? 
+          partyInfo.isOnline? 
           signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
           : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
         location: partyInfo.location,
-        latlng: isOnline? JSON.stringify({lat: 0, lng: 0}) : JSON.stringify(partyInfo.latlng),
+        latlng: partyInfo.isOnline? JSON.stringify({lat: 0, lng: 0}) : JSON.stringify(partyInfo.latlng),
         startDate: partyInfo.startDate,
         endDate: partyInfo.endDate,
-        isOnline,
+        isOnline: partyInfo.isOnline,
         privateLink: partyInfo.privateLink,
         tag: tags
       }
@@ -994,7 +995,7 @@ export default function PartyEdit({ party, editHandler }: Props) {
           <fieldset>
             <div className='label content'>
               퀘스트 내용
-              {isContent.err ? <div className='error'>{isContent.msg}</div> : null}  
+              {isContent.err ? <div className='error'>{isContent.msg}</div> : null}
             </div>
             <textarea
               placeholder='파티원들이 퀘스트 내용을 이해할 수 있도록 자세히 작성해주세요.'

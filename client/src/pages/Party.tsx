@@ -316,7 +316,7 @@ export default function Party() {
     favorite: 0,
     id: 0,
     image: "",
-    isOnline: 0,
+    isOnline: false,
     leaderId: 0,
     privateLink: "",
     partyState: 0,

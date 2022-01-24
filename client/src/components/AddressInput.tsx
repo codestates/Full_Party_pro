@@ -51,10 +51,10 @@ type Props = {
 
 const AddressInput = ({ partyInfo, handleCoordsChange, handleLocationChange, handleOnOff }: Props) => {
   const [ isSearch, setIsSearch ] = useState(false);
-  const [ isOnline, setIsOnline ] = useState(false);
-  const [ onlineLocation, setOnlineLocation ] = useState('');
+  const [ isOnline, setIsOnline ] = useState(partyInfo.isOnline);
+  const [ onlineLocation, setOnlineLocation ] = useState(partyInfo.location);
   const [ fullAddress, setFullAddress ] = useState({
-    address: "",
+    address: partyInfo.location,
     detailedAddress: "",
     extraAddress: "",
   });
