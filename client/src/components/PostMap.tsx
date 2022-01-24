@@ -69,15 +69,16 @@ export const MapContainer = styled.div`
 `;
 
 type Props = {
+  latlng: { lat: number, lng: number },
   location: string,
   name: string,
   image: string,
   handleCoordsChange: Function
 };
 
-export default function PostMap({ location, name, image, handleCoordsChange }: Props) {
+export default function PostMap({ latlng, location, name, image, handleCoordsChange }: Props) {
   const { kakao } = window;
-  const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
+  const [ coords, setCoords ] = useState(latlng);
   const { lat, lng } = coords;
   const geocoder = new kakao.maps.services.Geocoder();
 
