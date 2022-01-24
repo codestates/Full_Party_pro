@@ -182,7 +182,7 @@ export default function  AddressModal() {
             address
           }
         });
-        navigate('../');
+        navigate('../home');
       }
     }
     else setErrorMsg('주소를 입력해주세요.');
