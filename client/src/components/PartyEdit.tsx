@@ -545,10 +545,11 @@ export const Button = styled.button`
 
 type Props = {
   party: { [key: string]: any },
-  editHandler: Function
+  editHandler: Function,
+  handleOnOff: Function
 };
 
-export default function PartyEdit({ party, editHandler }: Props) {
+export default function PartyEdit({ party, editHandler, handleOnOff }: Props) {
   const navigate = useNavigate();
   const fileRef = useRef<any>();
   const imgRef = useRef<any>(null);
@@ -567,7 +568,7 @@ export default function PartyEdit({ party, editHandler }: Props) {
     (state: RootReducerType) => state.signinReducer
   );
 
-  const [  isName, setIsName  ] = useState({ err: false, msg: '' });
+  const [ isName, setIsName ] = useState({ err: false, msg: '' });
   const [ isStrDate, setIsStrDate ] = useState({ err: false, msg: '' });
   const [ isEndDate, setIsEndDate ] = useState({ err: false, msg: '' });
   const [ isContent, setIsContent ] = useState({ err: false, msg: '' });
@@ -699,11 +700,6 @@ export default function PartyEdit({ party, editHandler }: Props) {
     }
   };
 
-  const handleOnOff = (isOnline: boolean) => {
-    if(isOnline === true) setPartyInfo({ ...partyInfo, isOnline: true });
-    else setPartyInfo({ ...partyInfo, isOnline: false });
-  };
-
   const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.code === 'Enter' || e.code === 'Space') {
       if (!tags.includes(inputTxt) && inputTxt && tags.length < 3) {
@@ -795,14 +791,14 @@ export default function PartyEdit({ party, editHandler }: Props) {
         image: partyInfo.image,
         memberLimit: partyInfo.memberLimit,
         region:
-          partyInfo.isOnline? 
+          party.isOnline ?
           signinReducer.userInfo.address.split(" ")[0] + " " + signinReducer.userInfo.address.split(" ")[1]
           : partyInfo.location.split(" ")[0] + " " + partyInfo.location.split(" ")[1],
         location: partyInfo.location,
-        latlng: partyInfo.isOnline? { lat: 0, lng: 0 } : partyInfo.latlng,
+        latlng: party.isOnline ? { lat: 0, lng: 0 } : partyInfo.latlng,
         startDate: partyInfo.startDate,
         endDate: partyInfo.endDate,
-        isOnline: partyInfo.isOnline,
+        isOnline: party.isOnline,
         privateLink: partyInfo.privateLink,
         tag: tags
       }
