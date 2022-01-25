@@ -121,7 +121,7 @@ export default function TopNav() {
             <button
              onClick={() => navigate(-1)}
             >
-              <FontAwesomeIcon icon={ faBell } className="icon" onClick={() => navigate(-1)} />
+              <FontAwesomeIcon icon={ faBell } className="icon" />
             </button>
           : <button>
               <Link to="/notification" style={{ color: "#777", textDecoration: "none" }}>

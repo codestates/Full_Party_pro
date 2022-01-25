@@ -157,6 +157,7 @@ export const UserStateBtns = styled.section`
 type Props = {
   userInfoModalHandler: Function,
   partyId: number,
+  partyState: number,
   userId: number,
   leaderId: number,
   isLeader: boolean,
@@ -167,7 +168,7 @@ type Props = {
   handleMemberInfoChange: Function
 };
 
-export default function UserInfoModal({ userInfoModalHandler, partyId, userId, leaderId, isLeader, isMember, from,
+export default function UserInfoModal({ userInfoModalHandler, partyId, userId, leaderId, partyState, isLeader, isMember, from,
   userInfo, handleMemberListChange, handleMemberInfoChange }: Props) {
   const navigate = useNavigate();
   const { id, userName, profileImage, level, message, joinDate } = userInfo;
@@ -194,6 +195,7 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
     });
     handleMemberInfoChange(userInfo.id, "message", newMsg);
     setIsEditMode(!isEditMode);
+    navigate(`../party/${partyId}`);
   };
 
   const expelHandler = async () => {
@@ -261,7 +263,7 @@ export default function UserInfoModal({ userInfoModalHandler, partyId, userId, l
             {id === userId && isEditMode ? 
               <button onClick={editConfirmHandler}>변경 사항 적용</button> 
             : null}
-            {isLeader && id !== userId && from === "members" ? 
+            {isLeader && id !== userId && from === "members" && partyState < 2 ? 
               <button onClick={expelHandler}>파티원 퇴출</button> 
             : null} 
             {isLeader && from === "waitingQueue" ? 

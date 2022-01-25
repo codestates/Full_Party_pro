@@ -672,8 +672,6 @@ export default function Post() {
     msg: ''
   });
 
-  const [ fixedLocation, setFixedLocation ] = useState('');
-  const [ formatLocation, setFormatLocation ] = useState('');
   const [ tags, setTags ] = useState<string[]>([]);
   const [ inputTxt, setInputTxt ] = useState('');
   const [ isOnline, setIsOnline ] = useState(false);
@@ -690,11 +688,12 @@ export default function Post() {
   const handleImgLoad = async (e: any) => {
     setImgLoading(true);
     let file = e.target.files[0]
+    const code = String(Math.floor(Math.random()*1000000)).padStart(8,"0");
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
-        Key: `${signinReducer.userInfo.id}_${partyInfo.name}_image.jpg`,
-        Body: file,
+        Key: `${signinReducer.userInfo.id}_${code}_image.jpg`,
+        Body: file
       }
     });
     const promise = upload.promise();
@@ -707,9 +706,7 @@ export default function Post() {
         })
         setImgLoading(false);
       },
-      (err) => {
-        return console.log('🚫 Upload Failed:', err.message);
-      }
+      (err) => console.log('🚫 Upload Failed:', err.message)
     );
   };
 
