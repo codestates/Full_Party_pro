@@ -1,21 +1,26 @@
-export const SIGNIN_SUCCESS = 'SIGNIN_SUCCESS'
-export const SIGNIN_FAIL = 'SIGNIN_FAIL'
+export const SIGNIN_SUCCESS = 'SIGNIN_SUCCESS';
+export const SIGNIN_FAIL = 'SIGNIN_FAIL';
+export const CLOSE_MODAL = 'CLOSE_MODAL';
 
 export type UserInfo = {
-  id: number
-  userName: string
-  profileImage: string
+  id: number,
+  userName: string,
+  profileImage: string,
   address: string,
   signupType: string
-}
+};
 
 export interface signinFailDispatch{
-  type: typeof SIGNIN_FAIL
-}
+  type: typeof SIGNIN_FAIL;
+};
 
 export interface signinSuccessDispatch {
-  type: typeof SIGNIN_SUCCESS
-  payload: UserInfo
-}
+  type: typeof SIGNIN_SUCCESS;
+  payload: UserInfo;
+};
 
-export type UserInfoDispatchType = signinFailDispatch | signinSuccessDispatch
+export interface closeModalDispatch {
+  type: typeof CLOSE_MODAL;
+};
+
+export type UserInfoDispatchType = signinFailDispatch | signinSuccessDispatch | closeModalDispatch;

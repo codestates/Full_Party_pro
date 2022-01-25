@@ -1,670 +1,785 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import AWS from 'aws-sdk';
-import { cookieParser, requestKeepLoggedIn } from "../App";
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkerAlt, faCrown } from '@fortawesome/free-solid-svg-icons';
-
-import { RootReducerType } from '../store/store';
-import { AppState } from '../reducers';
+import AWS from 'aws-sdk';
 import Loading from '../components/Loading';
 import UserCancelModal from '../components/UserCancelModal'
 import PartySlide from '../components/PartySlide';
-
-// [dev] 더미데이터: 서버 통신되면 삭제
-import dummyList from '../static/dummyList';
-import { SIGNIN_FAIL } from '../actions/signinType';
+import VerificationModal from '../components/VerificationModal';
+import PostCodeModal from '../components/PostCodeModal';
+import EmptyParty from '../components/EmptyParty';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { cookieParser } from "../App";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMapMarkerAlt, faTrophy } from '@fortawesome/free-solid-svg-icons';
+import { NOTIFY } from "../actions/notify";
+import { RootReducerType } from '../store/store';
+import { AppState } from '../reducers';
+import { SIGNIN_FAIL, SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const MypageContainer = styled.div`
   width: 100%;
-  height: 100%;
-  max-width: 1280px;
-  padding: 60px 1px;
-
-  .subject {
-    font-size: 22px;
-    font-family: 'DungGeunMo';
-  }
+  padding: 60px 0;
 
   .imgChange {
-    width: 40%;
-    margin: 0 30%;
+    width: 90%;
+    display: flex;
+    justify-content: flex-end;
+
     .imgChangeBtn {
-      width: 100%;
-      height: 30px;
-      border: none;
-      border-radius: 20px;
-      background-color: darkcyan;
+      margin-top: 0;
+      width: 150px;
+      height: 40px;
+      border: 1px solid #50C9C3;
+      border-radius: 30px;
+      color: #50C9C3;
+      background-color: #fff;
+      padding: 0 10px;
+      cursor: pointer;
     }
   }
-`
 
-export const MypageHeader = styled.div`
+  .subject {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  section {
+    margin: 30px 0;
+    padding: 0 10%;
+  }
+
+  .error {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #f34508;
+  }
+`;
+
+export const MypageHeader = styled.header`
   width: 100%;
-  min-height: 150px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  margin: 30px 0;
+  padding: 0 10%;
 
-  .profileImage {
-    display: block;
-    width: 120px;
-    height: 120px;
-    border-radius: 100%;
-    overflow: hidden;
+  .leftWrapper {
+    width: 40%;
+    height: 100%;
+    display: flex;
+    justify-content: flex-end;
+
+    .profileImageContainer {
+      width: 100px;
+      height: 100px;
+      border-radius: 100%;
+      overflow: hidden;
+      border: 1px solid #d5d5d5;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
   }
 
   .mainProfile {
-    margin: 0 3vw;
+    margin: 0 30px;
+    margin-top: 5px;
+    width: 60%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-  }
-  .userName {
-    font-size: 30px;
-    margin-bottom: 1vh;
-  }
-  .mapMarker{
-    margin: 0 9px;
-    color: darkcyan;
-  }
-  .crown{
-    margin: 0 5px;
-    color: darkcyan;
-  }
+    justify-content: center;
 
-  @media screen and (min-width: 500px) {
-    justify-content: flex-start;
-    padding: 1vh 15vw;
-  }
-`
+    .userName {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
 
-export const MypageInfo = styled.div`
+    .icon {
+      margin-right: 8px;
+    }
+
+    .info {
+      color: #777;
+      margin-bottom: 5px;
+    }
+
+  }
+`;
+
+export const MypageInfo = styled.section`
   width: 100%;
-  min-height: 200px;
   display: flex;
   flex-direction: column;
-  padding: 3vh 13vw;
 
   .changeInfo {
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: center;
+  }
+
+  button {
+    width: 120px;
+    height: 40px;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    background-color: #50C9C3;
+    margin: 10px 20px 0 0;
+    cursor: pointer;
   }
 
   .btns {
     width: 100%;
     display: flex;
-    justify-content: space-around;
   }
 
-  .changeInfoBtn {
-    width: 100px;
-    height: 30px;
-    margin: 25px 0;
+  .buttons {
+    width: 100%;
+    padding: 0 5%;
+    margin: 20px 0;
 
-    border: none;
-    border-radius: 20px;
-    color: #888;
-    background-color: #cff4d2;
-  }
-  .signoutBtn {
-    width: 100px;
-    height: 30px;
-    margin: 25px 0;
+    display: flex;
+    justify-content: center;
 
-    border: none;
-    border-radius: 20px;
-    color: #888;
-    background-color: #cff4d2;
-  }
-  .deleteBtn{
-    width: 100px;
-    height: 30px;
-    margin: 25px 0;
-
-    border: none;
-    border-radius: 20px;
-    color: #888;
-    background-color: #cff4d2;
-  }
-  .submitInfoBtn {
-    width: 160px;
-    height: 30px;
-    margin: 2px 0 0 0;
-
-    border: none;
-    border-radius: 20px;
-    color: #888;
-    background-color: #cff4d2;
-  }
-  .cancelInfoBtn {
-    width: 160px;
-    height: 30px;
-    margin: 2px 0 0 0;
-
-    border: none;
-    border-radius: 20px;
-    color: #888;
-    background-color: #cff4d2;
-  }
-  .error {
-    font-size: 12px;
-    color: red;
-    padding-left: 12px;
-  }
-
-  @media screen and (min-width: 500px) {
-    .changeInfoBtn {
-      border-radius: 30px;
-      width: 200px;
-      height: 40px;
-      font-size: 15px;
-    }
-    .signoutBtn {
-      border-radius: 30px;
-      width: 200px;
-      height: 40px;
-      font-size: 15px;
-    }
-    .deleteBtn {
-      border-radius: 30px;
-      width: 200px;
-      height: 40px;
-      font-size: 15px;
+    .cancel {
+      border: 1px solid #50C9C3;
+      color: #50C9C3;
+      background-color: #fff;
     }
   }
-`
+
+  @media screen and (max-width: 600px) {
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      margin: 10px 0;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+`;
+
 export const InfoTable = styled.table`
-  width: 300px;
-  margin: 30px 0 15px 0;
+  margin: 10px 0 20px 0;
+
+  td {
+    height: 50px;
+  }
 
   .label {
-    width: 70px;
-    height: 33px;
-    font-size: 15px;
-    font-family: 'DungGeunMo'; 
+    padding-right: 15px;
     text-align: center;
-  }
-  input {
-    width: 170px;
-    height: 33px;
-    background-color: white;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid #d5d5d5;
-    margin: 10px;
-    padding: 0 2px;
+    font-weight: bold;
 
-    font-size: 13px;
-    text-align: center;
-  }
-  select {
-    width: 170px;
-    height: 33px;
-    background-color: white;
-    outline: none;
-    border: none;
-    border-bottom: 1px solid #d5d5d5;
-    margin: 10px;
-    padding: 0 2px;
+    &.search {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
 
-    font-size: 13px;
-    text-align: center;
+      #search {
+        width: 80px;
+        height: 30px;
+        margin: 0;
+        margin-top: 5px;
+      }
+    }
   }
 
-  @media screen and (min-width: 500px) {
-    width: 600px;
-    margin-left: 12vw;
+  .input {
+    padding: 0 8px;
+    max-width: 400px;
+
+    input {
+      border: none;
+      border-bottom: 1px solid #d5d5d5;
+      width: 100%;
+      height: 25px;
+      text-align: center; 
+
+      &:focus {
+        outline-style:none;
+      }
+
+      &:disabled {
+        background-color: #fff;
+      }
+    }
+
+    input[type=date] {
+      font-family: "-apple-system";
+      background-color: #fff;
+    }
 
     select {
-      width: 300px;
-    }
-    input {
-      width: 300px;
+      width: 100%;
+      text-align: center;
+      border: none;
+      border-bottom: 1px solid #d5d5d5;
+      background-color: #fff;
+
+      &:focus {
+        outline-style:none;
+      }
     }
   }
-`
 
-export const ProgressBar = styled.div<{ exp: number }>`
-  display: inline-block;
-  width: 150px;
-  height: 20px;
-  background-color: #d6d3d3;
-  margin: 2px 5px;
-  border-radius: 20px;
+  .error {
+    margin-top: 5px;
+  }
 
- .bar {
-   display: inline-block;
-   width: ${(props) => props.exp || 0}%;
-   height: 20px;
-   background-color: #cff4d2;
-   border-radius: 20px;
- }
+  .map {
+    display: none;
+  }
 
- @media screen and (min-width: 1000px) {
-   width: 270px;
- }
-`
+  @media screen and (max-width: 600px) {
+    .input {
+      max-width: 200px;
+    }
+  }
+`;
 
-export const MypartyCards = styled.div`
+export const ProgressBar = styled.div`
+  margin-top: 5px;
+
+ .barContainer {
+    height: 10px;
+    width: 100%;
+    max-width: 200px;
+    border-radius: 50px;
+    background-color: #e9e7e7;
+  }
+
+  .barFiller {
+    height: 100%;
+    background-color: #50C9C3;
+    border-radius: inherit;
+    text-align: right;
+  }
+`;
+
+export const MypartyCards = styled.section`
   width: 100%;
-  min-height: 300px;
-  padding: 3vh 13vw;
-  
+
   fieldset {
     border: none;
-  }
-  
-  .partyCardContainer {
-    border: 1px solid black;
-    width: 100%;
-    height: 100%;
-
-    padding: 10px 15px;
-    
-    section {
-      margin-bottom: 20px;
-    }
-
-    main {
-      display: flex;
-      justify-content: center;
-    }
+    margin-bottom: 10px;
   }
 
-  .cardTabContainer{
-    width: 325px;
-    margin: 1vh 0;
-  }
   .cardTab {
     list-style: none;
 
     li {
       float: left;
-      margin: 0 3px;
+      margin: 5px 3px;
+    }
+
+    .tab {
+      cursor: pointer;
       color: #d5d5d5;
-    }
-    .disabled {
-      color: black;
-    }
-    .focus {
-      color: black;
-    }
-    .join {
-      cursor: pointer;
-    }
-    .recruite {
-      cursor: pointer;
-    }
-    .favorite {
-      cursor: pointer;
-    }
-    .complete {
-      cursor: pointer;
+
+      &.focus {
+        color: black;
+        font-weight: bold;
+      }
     }
   }
-`
+`;
 
-export default function Mypage () {
-  // [dev] 더미데이터: 서버 통신되면 삭제
-  const { userInfo, myParty, localParty } = dummyList;
-  //isLoading과 isInfoLoading, isChange는 최종단계에서 true, true, false가 기본값 입니다.
-  const [curTab, setCurTab] = useState(0);
-  const [parties, setParties] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isInfoLoading, setIsInfoLoading] = useState(false);
-  //img 상태가 제대로 반영이 안되면 로딩창 넣어주세요
-  const [imgLoading, setImgLoading] = useState(false);
-  const [isChange, setIsChange] = useState(true);
-  const [callModal, setCallModal] = useState<string | null>(null);
-  const [basicInfo, setBasicInfo] = useState({
-    userName: '베이직이름',
-    profileImage: '/img/defaultThumbnail.png',
-    region: '베이직지역',
-    level: 7,
-    exp: 148
+export default function Mypage() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const fileRef = useRef<any>();
+
+  const { signupType } = cookieParser();
+
+  const signinReducer = useSelector(
+    (state: RootReducerType) => state.signinReducer
+  );
+  const userInfoFromStore = useSelector(
+    (state: AppState) => state.signinReducer.userInfo
+  );
+
+  const [ isLoading, setIsLoading ] = useState(true);
+  const [ isInfoLoading, setIsInfoLoading ] = useState(true);
+  const [ imgLoading, setImgLoading ] = useState(false);
+  const [ isSearch, setIsSearch ] = useState(false);
+  const [ isChange, setIsChange ] = useState(false);
+  const [ isVerificationModalOpen, setIsVerificationModalOpen ] = useState(false);
+  const [ callModal, setCallModal ] = useState(false);
+
+  const [ curTab, setCurTab ] = useState(0);
+  const [ parties, setParties ] = useState([]);
+  const [ from, setFrom ] = useState('');
+  const [ fixedLocation, setFixedLocation ] = useState('');
+  const [ formatAddress, setFormatAddress ] = useState('');
+  const [ basicInfo, setBasicInfo ] = useState({
+    userName: "",
+    profileImage: "",
+    address: "",
+    level: 0,
+    exp: 0
   });
-  const [changeInfo, setChangeInfo] = useState({
+  const [ changeInfo, setChangeInfo ] = useState({
     userName: '',
     profileImage: '',
     password: '',
     confirm: '',
     birth: '',
     gender: '',
-    region: '',
+    address: '',
     mobile: '',
     nowPwd: ''
   });
-  const [wrongConfirm, setWrongConfirm] = useState({
-    err: false,
-    msg: '비밀번호를 다시 확인해주세요'
+  const [ isError, setIsError ] = useState({
+    isName: true,
+    isMobile: true,
+    isAxios: true,
+    nameMsg: '',
+    mobileMsg: '',
+    axiosMsg: '',
   });
-  const [wrongMobile, setWrongMobile] =useState({
-    err: false,
-    msg: "'-'를 포함하여 입력하세요"
+  const [ isPassword, setIsPassword ] = useState({
+    isValid: false,
+    passwordMsg: '',
+  });
+  const [ isConfirmPassword, setIsConfirmPassword ] = useState({
+    isValid: false,
+    confirmPasswordMsg: '',
   });
 
-  const expBar = Number( Math.floor(basicInfo.exp % 20) * 5 );
-  let today: any = new Date();
-  const signinReducer = useSelector((state: RootReducerType) => state.signinReducer);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const fileRef = useRef<any>();
-  const imgRef=useRef<any>(null);
+  const [ fullAddress, setFullAddress ] = useState({
+    address: "",
+    detailedAddress: "",
+    extraAddress: "",
+  });
+
+  const userRegion = basicInfo.address.split(" ").length < 2 ?
+    "지역 미설정" :
+    basicInfo.address.split(" ")[0] + " " + basicInfo.address.split(" ")[1];
+
+  const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
+
+  const autoCompleteHandler = (address: string, extraAddress: string) => {
+    if(!!fullAddress.detailedAddress)
+      setChangeInfo({ ...changeInfo, address: `${address} ${fullAddress.detailedAddress} ${extraAddress ? `(${extraAddress})` : ''}` });
+    else
+      setChangeInfo({ ...changeInfo, address: `${address} ${extraAddress ? `(${extraAddress})` : ''}` });
+
+    setFullAddress({
+      ...fullAddress,
+      address,
+      extraAddress,
+    })
+    setIsSearch(false);
+  };
 
   AWS.config.update({
     region: "ap-northeast-2",
     credentials: new AWS.CognitoIdentityCredentials({
       IdentityPoolId: "ap-northeast-2:d4282d0a-72a9-4d98-a6b6-335f48bbf863"
     })
-  })
+  });
+
   const handleRefClick = (e: any) => {
     e.preventDefault();
     fileRef.current.click();
-  }
-  const handleImgLoad = async (e: any) => {
-    setImgLoading(true)
-    let file = e.target.files[0]
+  };
 
+  const handleImgLoad = async (e: any) => {
+    setImgLoading(true);
+    let file = e.target.files[0];
+    const code = String(Math.floor(Math.random()*1000000)).padStart(8, "0");
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
-        Key: `${signinReducer.userInfo.id}_profileImage`,
+        Key: `${signinReducer.userInfo.id}_${code}_profileImage.jpg`,
         Body: file,
       }
-    })
-    const promise = upload.promise()
-
+    });
+    const promise = upload.promise();
     promise.then(
-      function (data: any) {
-        console.log("이미지 업로드에 성공했습니다 👉🏻 URL: ",data.Location)
+      (data: any) => {
+        console.log("✅ Uploaded Successfully");
         setChangeInfo({
           ...changeInfo,
           profileImage: data.Location
-        })
+        });
         setBasicInfo({
           ...basicInfo,
           profileImage: data.Location
-        })
+        });
         setImgLoading(false)
       },
-      function (err: any) {
-        return console.log('오류가 발생했습니다: ', err.message)
-      }
-    )
-  }
+      (err: any) => console.log("🚫 Upload Failed:", err.message)
+    );
+  };
 
   const handleIsChange = async () => {
-    if(isChange) {
-      setIsChange(false)
-    } else {
-      const res = await axios.get(`${process.env.REACT_APP_CLIENT_URL}/user/profile/${signinReducer.userInfo?.id}`)
-      const userInfo = res.data.userInfo
+    if (isChange) setIsChange(false);
+    else {
+      setIsInfoLoading(true);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/profile/${signinReducer.userInfo?.id}`);
+      const userInfo = res.data.userInfo;
       setChangeInfo({
         ...changeInfo,
         userName: userInfo.userName,
         birth: userInfo.birth,
-        region: userInfo.region,
+        address: userInfo.address,
         gender: userInfo.gender,
         mobile: userInfo.mobile
-      })
-      setIsInfoLoading(false)
+      });
+      setIsInfoLoading(false);
+      setIsChange(true);
     }
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const regex = {
+    const { name, value } = e.target;
+    const regex={
+      password: /^(?=.*[a-zA-Z])((?=.*\d)(?=.*\W).{8,16}$)/,
       mobile: /^[0-9]{2,3}-[0-9]{3,4}-[0-9]{4}/
     };
 
     setChangeInfo({
       ...changeInfo,
-      [e.target.name]: e.target.value
-    })
+      [name]: value,
+    });
 
-    if(e.target.name === 'confirm') {
-      if(e.target.value === changeInfo.password) {
-        setWrongConfirm({
-          ...wrongConfirm,
-          err: false
-        })
+    if (name === 'userName') {
+      if (value.length < 2) {
+        setIsError({
+          ...isError,
+          isName: false,
+          nameMsg: "두 글자 이상 입력해주세요."
+        });
+      }
+      else {
+        setIsError({
+          ...isError,
+          isName: true,
+          nameMsg: ''
+        });
       }
     }
-    else if(e.target.name === 'mobile') {
-      if(!regex.mobile.test(e.target.value)) {
-        setWrongMobile({
-          ...wrongMobile,
-          err: true
-        })
-      } else {
-        setWrongMobile({
-          ...wrongMobile,
-          err: false
-        })
+
+    if (name === 'password') {
+      if (!regex.password.test(value)) {
+        setIsPassword({
+          isValid: false,
+          passwordMsg: '숫자/영문자/특수문자를 포함한 8~16자리의 비밀번호여야 합니다.'
+        });
       }
-    }
+      else {
+        setIsPassword({
+          isValid: true,
+          passwordMsg: '',
+        });
+      }
+
+      if(changeInfo.confirm !== value){
+        setIsConfirmPassword({
+          isValid: false,
+          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.'
+        });
+      }
+      else {
+        setIsConfirmPassword({
+          isValid: true,
+          confirmPasswordMsg: '',
+        });
+      }
+    };
+
+    if (name === 'confirmPassword') {
+      if (changeInfo.password !== value) {
+        setIsConfirmPassword({
+          isValid: false,
+          confirmPasswordMsg: '비밀번호가 일치하지 않습니다.',
+        });
+      }
+      else {
+        setIsConfirmPassword({
+          isValid: true,
+          confirmPasswordMsg: '',
+        });
+      }
+    };
+
+    if (name === 'mobile') {
+      if (!regex.mobile.test(value)) {
+        setIsError({
+          ...isError,
+          isMobile: false,
+          mobileMsg: "'-'를 포함하여 입력해주세요."
+        });
+      }
+      else {
+        setIsError({
+          ...isError,
+          isMobile: true,
+          mobileMsg: ''
+        });
+      }
+    };
   }
+
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setChangeInfo({
       ...changeInfo,
       [e.target.name]: e.target.value
-    })
-  }
+    });
+  };
 
-  const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
-    if(e.currentTarget.value === 0) {
-      fetchJoinParty()
-    }
-    else if(e.currentTarget.value === 1) {
-      fetchRecruiteParty()
-    }
-    else if(e.currentTarget.value === 2) {
-      fetchCompleteParty()
-    }
-    setCurTab(e.currentTarget.value)
-  }
+  const getCurrentDate = () => {
+    let newDate = new Date();
+    let date = newDate.getDate();
+    let month = newDate.getMonth() + 1;
+    let year = newDate.getFullYear();
+    return year + "-" + (month < 10 ? `0${month}` : `${month}`) + "-" + date;
+  };
 
   const submitInfo = async () => {
-    const { userName, profileImage, password, confirm, birth, gender, region, mobile, nowPwd } = changeInfo
-    if(password !== confirm) {
-      setWrongConfirm({
-        ...wrongConfirm,
-        err: true
-      })
-      return;
+    const { userName, profileImage, password, confirm, birth, gender, address, mobile, nowPwd } = changeInfo;
+    const { isName, isMobile } = isError;
+    if (password !== confirm || !isName || !isMobile) {
+      setIsError({
+        ...isError,
+        isAxios: false,
+        axiosMsg: '입력하신 정보를 확인해주세요.',
+      });
     }
-
-    const verify = await axios.post('https://localhost:443/user/verification', {
-      userInfo: {
-        id: signinReducer.userInfo?.id,
-        password: nowPwd
-        //API확인해주세요 (email제외)
+    else if (password === '') {
+      setIsError({
+        isName: true,
+        isMobile: true,
+        isAxios: true,
+        nameMsg: '',
+        mobileMsg: '',
+        axiosMsg: '',
+      });
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
+        userInfo: {
+          userId: signinReducer.userInfo?.id,
+          profileImage,
+          userName,
+          birth,
+          gender,
+          address,
+          mobile
+        }
+      });
+      if (res.status === 200) {
+        setIsChange(false);
+        const payload = {
+          id: signinReducer.userInfo?.id,
+          userName: changeInfo.userName,
+          profileImage: changeInfo.profileImage,
+          address: changeInfo.address,
+          signupType: signinReducer.userInfo?.signupType
+        }
+        dispatch({ type: SIGNIN_SUCCESS, payload });
+        navigate('/mypage');
       }
-    })
-    if(verify.data.message === "User Identified") {
-      if(password === '') {
-        const res = await axios.patch('https://localhost:443/user/profile', {
-          userInfo: {
-            profileImage,
-            userName,
-            password: nowPwd,
-            birth,
-            gender,
-            region,
-            mobile
-          }
-        })
-        if(res.data.message === "Successfully Modified") {
-          setIsChange(false)
+    }
+    else if (password !== '') {
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/profile`, {
+        userInfo: {
+          userId: signinReducer.userInfo?.id,
+          profileImage,
+          userName,
+          password: nowPwd,
+          birth,
+          gender,
+          address,
+          mobile
         }
-      } 
-      else if (password !== '') {
-        const res = await axios.patch('https://localhost:443/user/profile', {
-          userInfo: {
-            profileImage: profileImage,
-            userName: userName,
-            password: password,
-            birth: birth,
-            gender: gender,
-            region: region,
-            mobile: mobile
-          }
-        })
-        if(res.data.message === "Successfully Modified") {
-          setIsChange(false)
-        }
+      });
+      if (res.status === 200) {
+        setIsChange(false);
+        const payload = {
+          id: signinReducer.userInfo.id,
+          userName,
+          profileImage,
+          address,
+          signupType,
+        };
+        dispatch({ type: SIGNIN_SUCCESS, payload });
+        navigate('/mypage');
       }
     }
   }
 
-  //파티 데이터
   const fetchJoinParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
-  const fetchRecruiteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/participating/${signinReducer.userInfo?.id}`);
+    const myParty = res.data.myParty;
+    setParties(myParty);
+  };
+
+  const fetchRecruitParty = async () => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/recruiting/${signinReducer.userInfo?.id}`);
+    const myParty = res.data.myParty;
+    setParties(myParty);
+  };
+
   const fetchCompleteParty = async () => {
-    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completed/${signinReducer.userInfo?.id}`)
-    const myParty = res.data.myParty
-    setParties(myParty)
-  }
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/completing/${signinReducer.userInfo?.id}`);
+    const myParty = res.data.myParty;
+    setParties(myParty);
+  };
+
+  const handleLiClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+    if (e.currentTarget.value === 0) fetchRecruitParty();
+    else if (e.currentTarget.value === 1) fetchJoinParty();
+    else if (e.currentTarget.value === 2) fetchCompleteParty();
+    setCurTab(e.currentTarget.value);
+  };
+
   const handleSignOut = async () => {
-    const { token, signupType, location } = cookieParser();
-    await axios.post("https://localhost:443/signout", {
-      access_token: token, 
-      signup_type: signupType
+    const { token, signupType } = cookieParser();
+    await axios.post(`${process.env.REACT_APP_API_URL}/signout`, {}, {
+      headers: {
+        access_token: token,
+        signup_type: signupType
+      }
     });
     dispatch({ type: SIGNIN_FAIL });
-    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
+    document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
     navigate("/");
   };
+
   const handleWithdrawal = async () => {
-    const { token, signupType, location } = cookieParser();
+    const { token, signupType } = cookieParser();
     const userId = signinReducer.userInfo?.id;
-    await axios.delete(`https://localhost:443/user/${userId}/${signupType}`, {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/user/${userId}/${signupType}`, {
       headers: {
         access_token: token
       }
     });
-    document.cookie = `token=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `signupType=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `location=; expires=${new Date()}; domain=localhost; path=/;`;
-    document.cookie = `isLoggedIn=; expires=${new Date()}; domain=localhost; path=/;`;
     dispatch({ type: SIGNIN_FAIL });
-    navigate("http://localhost:3000");
-  };
-  const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    if(callModal !== null) {
-      setCallModal(null)
-    }
-    else if(callModal === null) {
-      const type = e.currentTarget.className
-      if(type === 'signoutBtn') {
-        setCallModal('signout')
-      }
-      else if(type === 'deleteBtn') {
-        setCallModal('delete')
-      }
-    }
+    document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    navigate("/");
   };
 
-  //페이지 진입시 로딩
+  const userCancelHandler = (e: React.MouseEvent<HTMLButtonElement>, from: string) => {
+    setFrom(from);
+    setCallModal(!callModal);
+  };
+
+  const verficationModalHandler = (e: React.MouseEvent<HTMLDivElement | HTMLButtonElement>) => {
+    setIsVerificationModalOpen(!isVerificationModalOpen);
+  };
+
+  const handleFormatAddressChange = (address: string) => {
+    setFormatAddress(address);
+  };
+
+  const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') setFixedLocation(changeInfo.address);
+  };
+
   useEffect(() => {
-    setIsLoading(true)
-    const fetchBasicInfo = async () => {
-      const res = await axios.get(`https://localhost:443/user/${signinReducer.userInfo?.id}`, {
-        withCredentials: true,
-      });
-      const userInfo = res.data.userInfo;
-      setBasicInfo({
-        userName: userInfo.userName,
-        profileImage: userInfo.profileImage,
-        region: userInfo.region,
-        level: userInfo.region,
-        exp: userInfo.exp
-      })
-    }
-    fetchBasicInfo();
-    fetchJoinParty();
-    setIsLoading(false);
-  },[])
-  
-  const isLoggedIn = useSelector(
-    (state: AppState) => state.signinReducer.isLoggedIn
-  );
-  if(!isLoggedIn){
-    return <Navigate to="/" />
-  }
+    (async () => {
+      if (userInfoFromStore.id >= 1) {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/user/${userInfoFromStore.id}`, {
+          withCredentials: true,
+        });
+        dispatch({
+          type: NOTIFY,
+          payload: {
+            isBadgeOn: res.data.notification
+          }
+        });
+        const userInfo = res.data.userInfo;
+        setBasicInfo({
+          userName: userInfo.userName,
+          profileImage: userInfo.profileImage,
+          address: userInfo.address,
+          level: userInfo.level,
+          exp: userInfo.exp
+        });
+        setChangeInfo({
+          ...changeInfo,
+          profileImage: userInfo.profileImage
+        });
+      }
+    })();
+    fetchRecruitParty();
+  }, [ userInfoFromStore ]);
 
-  if(isLoading) {
-    return <Loading />
-  }
+  useEffect(() => {
+    setIsLoading(false);
+  }, [ basicInfo ]);
+
+  if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />
+  if (isLoading) return <Loading />
 
   return (
     <MypageContainer>
-      {callModal === 'signout'?
-      <UserCancelModal from={'signout'} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} />
-      : null}
-      {callModal === 'delete'?
-      <UserCancelModal from={'delete'} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} />
+      {callModal? <UserCancelModal from={from} userCancelHandler={userCancelHandler} handleSignOut={handleSignOut} handleWithdrawal={handleWithdrawal} /> : null}
+      {isVerificationModalOpen? <VerificationModal userId={userInfoFromStore?.id} handleIsChange={handleIsChange} verficationModalHandler={verficationModalHandler} /> : null}
+      {isSearch ?
+        <PostCodeModal
+          searchHandler={searchHandler}
+          autoCompleteHandler={autoCompleteHandler}
+        />
       : null}
       <MypageHeader>
-        <div className='profileImage'>
-          <img className='profileImage' 
-            src={basicInfo.profileImage}
-            alt='thumbnail'
-            onError={() => {
-              return(imgRef.current.src = '/img/bubble.png')
-            }}
-          />
+        <div className="leftWrapper">
+          <div className='profileImageContainer'>
+            <img
+              src={basicInfo.profileImage ? basicInfo.profileImage : 'https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png'}
+              alt='thumbnail'
+            />
+          </div>
         </div>
         <p className='mainProfile'>
           <div className='userName'>{basicInfo.userName}</div>
-          <div>
-            <FontAwesomeIcon icon={faMapMarkerAlt} className='mapMarker'/><span className='text'>{basicInfo.region}</span>
+          <div className="info">
+            <FontAwesomeIcon icon={faMapMarkerAlt} className='icon'/>{userRegion}
           </div>
-          <div>
-            <FontAwesomeIcon icon={faCrown} className='crown'/><span className='text'>Lv.{basicInfo.level}</span>
+          <div className="info">
+            <FontAwesomeIcon icon={faTrophy} className='icon'/>Lv. {basicInfo.level}
           </div>
-          <ProgressBar exp={expBar}>
-            <span className='bar' />
+          <ProgressBar>
+            <div className="barContainer">
+              <div className="barFiller" style={{ width: `${Math.floor(basicInfo.exp % 20) * 5}%` }} />
+            </div>
           </ProgressBar>
         </p>
       </MypageHeader>
-      <div className='imgChange'>
-        {isChange ? 
-        <div>
-          <button 
-            className='imgChangeBtn'
-            onClick={(e) => handleRefClick(e)
-          }>
-          이미지 수정
-          </button>
-          <input 
-            ref={fileRef}
-            type='file'
-            className='imgInput'
-            id='profileImg'
-            accept='image/*'
-            name='file'
-            hidden={true}
-            onChange={handleImgLoad}
-          />
-        </div>
+      {isChange ?
+          <div className="imgChange">
+            <button
+              className='imgChangeBtn'
+              onClick={(e) => handleRefClick(e)
+            }>
+            프로필 이미지 수정
+            </button>
+            <input
+              ref={fileRef}
+              type='file'
+              className='imgInput'
+              id='profileImg'
+              accept='image/*'
+              name='file'
+              hidden={true}
+              onChange={handleImgLoad}
+            />
+          </div>
         : null }
-      </div>
       <MypageInfo>
         <div className='subject'>프로필</div>
         {(() => {
@@ -677,58 +792,62 @@ export default function Mypage () {
                   <InfoTable>
                     <tr>
                       <td className='label'>닉네임</td>
-                      <td>
+                      <td className='input'>
                         <input
                           name='userName'
                           value={changeInfo.userName}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                         ></input>
+                        <div className='error'>{isError.nameMsg}</div>
                       </td>
                     </tr>
-                    <tr>
-                      <td className='label'>비밀번호</td>
-                      <td>
-                        <input
-                          placeholder='비밀번호 수정시에만 입력하세요'
-                          name='password'
-                          type='password'
-                          value={changeInfo.password}
-                          onChange={(e) => handleInputChange(e)}
-                        ></input>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className='label'>비밀번호<br />확인</td>
-                      <td>
-                        <input
-                          placeholder='비밀번호 수정시에만 입력하세요'
-                          name='confirm'
-                          type='password'
-                          value={changeInfo.confirm}
-                          onChange={(e) => handleInputChange(e)}
-                        ></input>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td />
-                      {wrongConfirm.err ? 
-                      <td className='error'>{wrongConfirm.msg}</td> : <td />}
-                    </tr>
+                    {signupType === 'general' ?
+                      <>
+                        <tr>
+                          <td className='label'>비밀번호</td>
+                          <td className='input'>
+                            <input
+                              placeholder='비밀번호 수정시에만 입력하세요'
+                              name='password'
+                              type='password'
+                              value={changeInfo.password}
+                              onChange={(e) => handleInputChange(e)}
+                            ></input>
+                            <div className='error'>{isPassword.passwordMsg}</div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className='label'>비밀번호<br />확인</td>
+                          <td className='input'>
+                            <input
+                              placeholder='비밀번호 수정시에만 입력하세요'
+                              name='confirm'
+                              type='password'
+                              value={changeInfo.confirm}
+                              onChange={(e) => handleInputChange(e)}
+                            ></input>
+                            <div className='error'>{isConfirmPassword.confirmPasswordMsg}</div>
+                          </td>
+                        </tr>
+                      </>
+                    : null}
                     <tr>
                       <td className='label'>생일</td>
-                      <td>
+                      <td className='input'>
                         <input
                           type='date'
-                          max={today}
+                          max={getCurrentDate()}
                           name='birth'
                           value={changeInfo.birth}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                         ></input>
                       </td>
                     </tr>
                     <tr>
                       <td className='label'>젠더</td>
-                      <td>
+                      <td className='input'>
                         <select
                           name='gender'
                           value={changeInfo.gender}
@@ -742,102 +861,81 @@ export default function Mypage () {
                       </td>
                     </tr>
                     <tr>
-                      <td className='label'>지역</td>
-                      <td>
-                        <input
-                          name='region'
-                          value={changeInfo.region}
-                          onChange={(e) => handleInputChange(e)}
-                        ></input>
+                      <td className='label search'>
+                        주소
+                        <button id="search" onClick={searchHandler}>주소 검색</button>
+                      </td>
+                      <td className='input' id="address">
+                        <div className="addressInput">
+                          <div className="inputs">
+                            <input id="fullAddress" type="text" value={changeInfo.address} placeholder="주소" disabled={true} /><br />
+                            <input type="text" 
+                              onChange={(e) => setFullAddress({...fullAddress, detailedAddress: e.target.value})}
+                              value={fullAddress.detailedAddress} 
+                              placeholder="상세주소" 
+                              autoComplete="off"
+                            />
+                          </div>
+                        </div>
                       </td>
                     </tr>
                     <tr>
-                      <td className='label'>휴대폰</td>
-                      <td>
+                      <td className='label'>전화번호</td>
+                      <td className='input'>
                         <input
                           name='mobile'
                           value={changeInfo.mobile}
+                          autoComplete='off'
                           onChange={(e) => handleInputChange(e)}
                           placeholder="'-'을 포함해 입력하세요"
                         ></input>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td />
-                      {wrongMobile.err ?
-                      <td className='error'>{wrongMobile.msg}</td> : <td />}
-                    </tr>
-                    <tr>
-                      <td className='label'>현재<br />비밀번호</td>
-                      <td>
-                        <input
-                          name='nowPwd'
-                          value={changeInfo.nowPwd}
-                          onChange={(e) => handleInputChange(e)}
-                          placeholder='비밀번호를 입력한뒤 제출하세요'
-                        ></input>
+                        <div className='error'>{isError.mobileMsg}</div>
                       </td>
                     </tr>
                   </InfoTable>
-                  <button className='submitInfoBtn' onClick={submitInfo}>제출</button><br />
-                  <button className='cancelInfoBtn' onClick={handleIsChange}>취소</button>
+                  <div className='error'>{isError.axiosMsg}</div>
+                  <div className="buttons">
+                    <button onClick={submitInfo}>변경</button>
+                    <button onClick={handleIsChange} className="cancel">취소</button>
+                    <button onClick={(e) => userCancelHandler(e, "delete")} className="cancel">회원 탈퇴</button>
+                  </div>
                 </div>
               )
             }
           } else {
             return(
-              <section className='btns'>
-                <button
-                  className='changeInfoBtn'
-                  onClick={handleIsChange}
-                >
+              <div className='btns'>
+                <button onClick={signupType === 'general' ? verficationModalHandler : handleIsChange}>
                   개인 정보 수정
                 </button>
-                {/* 로그아웃 구현한 함수 넣어주세요 */}
-                <button onClick={(e) => userCancelHandler(e)}
-                  className='signoutBtn'
-                >
+                <button onClick={(e) => userCancelHandler(e, "signout")}>
                   로그아웃
                 </button>
-                <button onClick={(e) => userCancelHandler(e)}
-                  className='deleteBtn'
-                >회원탈퇴</button>
-              </section>
+              </div>
             )}
         })()}
       </MypageInfo>
-      <MypartyCards>
-        <div className='subject'>내 파티</div>
-        <fieldset className='cardTabContainer'>
-          <ol className='cardTab'>
-            <li value={0} className={`join${curTab === 0 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>참여중 파티</li>
-            <li className='disabled'> | </li>
-            <li value={1} className={`recruite${curTab === 1 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>모집중 파티</li>
-            <li className='disabled'> | </li>
-            <li value={2} className={`complete${curTab === 2 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>완료 파티</li>
-          </ol>
-        </fieldset>
-        <fieldset className='partyCardContainer'>
-          {(() => {
-            if(curTab === 0) {
-              return (<div>참여 파티 카드</div>)
-              // return (
-              //   <section>
-              //     <main className='joinParty'>
-              //       <PartySlide myParty={parties} />
-              //     </main>
-              //   </section>
-              // )
-            }
-            else if(curTab === 1) {
-              return (<div> 모집 파티 카드</div>)
-            }
-            else if(curTab === 2) {
-              return (<div> 완료 파티 카드</div>)
-            }
-          })()}
-        </fieldset>
-      </MypartyCards>
+      {!isChange ?
+        <MypartyCards>
+          <div className='subject'>내 파티</div>
+          <fieldset className='cardTabContainer'>
+            <ol className='cardTab'>
+              <li value={0} className={`tab ${curTab === 0 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>운영중 파티</li>
+              <li> | </li>
+              <li value={1} className={`tab ${curTab === 1 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>참여중 파티</li>
+              <li> | </li>
+              <li value={2} className={`tab ${curTab === 2 ? ' focus' : ''}`} onClick={(e) => handleLiClick(e)}>완료된 파티</li>
+            </ol>
+          </fieldset>
+            {(() => {
+              if(parties.length > 0){
+                return <PartySlide myParty={parties} />
+              } else {
+                return <EmptyParty />
+              }
+            })()}
+        </MypartyCards>
+      : null}
     </MypageContainer>
   );
 }

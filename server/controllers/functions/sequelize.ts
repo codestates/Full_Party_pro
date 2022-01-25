@@ -1,13 +1,13 @@
 import { Op } from "sequelize";
 import { Users, UsersAttributes } from "../../models/users";
-import { Parties, PartiesAttributes } from "../../models/parties";
-import { UserParty, UserPartyAttributes } from "../../models/userParty";
-import { WaitingQueue, WaitingQueueAttributes } from "../../models/waitingQueue";
+import { Parties } from "../../models/parties";
+import { UserParty } from "../../models/userParty";
+import { WaitingQueue } from "../../models/waitingQueue";
 import { Notification, NotificationAttributes } from '../../models/notification';
-import { Favorite, FavoriteAttributes } from "../../models/favorite";
-import { Tag, TagAttributes } from "../../models/tag";
-import { Comment, CommentAttributes } from "../../models/comment";
-import { SubComment, SubCommentAttributes } from "../../models/subComment";
+import { Favorite } from "../../models/favorite";
+import { Tag } from "../../models/tag";
+import { Comment } from "../../models/comment";
+import { SubComment } from "../../models/subComment";
 
 interface LocalParty extends Parties {
   favorite?: boolean;
@@ -91,8 +91,9 @@ export const invertFavorite = async (userId: number, partyId: number) => {
 
 export const getLeadingParty = async (userId: number) => {
   const leadingParty = await Parties.findAll({
-    where: { leaderId: userId },
-    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ]
+    where: { leaderId: userId, partyState: [ 0, 1 ] },
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ],
+    raw: true
   });
   return leadingParty;
 };
@@ -105,14 +106,15 @@ export const getParticipatingParty = async (userId: number) => {
   const party: any[] = [];
   for (let i = 0; i < partyIdArr.length; i++) {
     party[i] = await Parties.findOne({
-      where: { id: partyIdArr[i].partyId },
-      attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ],
+      where: { id: partyIdArr[i].partyId, partyState: [ 0, 1 ] },
+      attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline", "location" ],
       raw: true
     });
   }
-  return party;
+  let removeNull: any[] = [];
+  party.map(item => item ? removeNull.push(item) : item);
+  return !party[0] && !party[1] ? [] : removeNull;
 };
-
 
 export const findParticipatingParty = async (userId: number) => {
   const partyIds = await UserParty.findAll({
@@ -122,8 +124,14 @@ export const findParticipatingParty = async (userId: number) => {
   });
   const partyIdArr = partyIds.map(item => item.partyId);
   const participatingParty = await Parties.findAll({
-    where: { id: partyIdArr, partyState: [ 0, 1 ] },
-    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    where: { 
+      id: partyIdArr, 
+      partyState: [ 0, 1 ], 
+      leaderId: {
+        [Op.not]: userId
+      }
+    },
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline" ],
     raw: true
   });
   return participatingParty;
@@ -160,10 +168,10 @@ export const getNotification = async (userId: number) => {
 };
 
 export const checkIsRead = async (userId: number) => {
-  const notifications = await getNotification(userId);
-  for (let i = 0; i < notifications.length; i++) {
-    if (!notifications[i].isRead) return true;
-  }
+  const notifications = await Notification.findAll({
+    where: { userId, isRead: false }
+  });
+  if (notifications.length) return true;
   return false;
 };
 
@@ -197,6 +205,16 @@ export const createTag = async (tag: Tag[], partyId: number) => {
   }
 };
 
+export const findTag = async (partyId: number) => {
+  const tagsArr = await Tag.findAll({
+    where: { partyId },
+    attributes: [ "name" ],
+    raw: true
+  });
+  const tag = tagsArr.map(item => item.name);
+  return tag;
+};
+
 export const deleteTag = async (partyId: number) => {
   await Tag.destroy({
     where: { partyId }
@@ -215,9 +233,9 @@ export const getTag = async (partyId: number) => {
 
 export const createNewParty = async (userId: number, partyInfo: PartyInfo) => {
   const newParty = await Parties.create({ ...partyInfo, partyState: 0, leaderId: userId });
-  const withoutTag = partyInfo;
+  const withoutTag = { ...partyInfo };
   delete withoutTag.tag;
-  const party = await Parties.findOne({
+  const party: any = await Parties.findOne({
     where: { ...withoutTag },
     attributes: [ "id" ],
     raw: true
@@ -228,7 +246,8 @@ export const createNewParty = async (userId: number, partyInfo: PartyInfo) => {
 };
 
 export const updatePartyInformation = async (partyId: number, partyInfo: PartyInfo) => {
-  const updated = await Parties.update({ ...partyInfo, id: partyId }, {
+  const latlng = JSON.stringify(partyInfo.latlng);
+  const updated = await Parties.update({ ...partyInfo, id: partyId, latlng }, {
     where: { id: partyId }
   });
   await deleteTag(partyId);
@@ -280,10 +299,10 @@ export const getPartyInformation = async (partyId: number, userId?: number | und
       raw: true
     });
     const isReviewed = checkReviewed?.isReviewed ? true : false;
-    const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed, isFavorite };
+    const partyInfo = { ...party, isOnline: Boolean(party?.isOnline), favorite: favoriteCount, tag, members, waitingQueue, isReviewed, isFavorite };
     return partyInfo;
   }
-  const partyInfo = { ...party, favorite: favoriteCount, tag, members, waitingQueue, isReviewed: false, isFavorite: false };
+  const partyInfo = { ...party, isOnline: Boolean(party?.isOnline), favorite: favoriteCount, tag, members, waitingQueue, isReviewed: false, isFavorite: false };
     return partyInfo;
 };
 
@@ -416,6 +435,7 @@ export const deleteParty = async (partyId: number) => {
   const deleted = await Parties.destroy({
     where: { id: partyId }
   });
+  await deleteNotification(partyId);
   return deleted;
 };
 
@@ -430,7 +450,7 @@ export const updatePartyState = async (partyId: number, partyState: number) => {
   const updated = await Parties.update({ partyState }, {
     where: { id: partyId }
   });
-  let notificationContent;
+  let notificationContent = "";
   switch (partyState) {
     case 0: notificationContent = "reparty"; break;
     case 1: notificationContent = "fullparty"; break;
@@ -469,6 +489,17 @@ export const removeSubComment = async (subCommentId: number) => {
   return subCommentDeleted;
 };
 
+export const findPartyId = async (partyInfo: any) => {
+  delete partyInfo.tag;
+  const latlng = JSON.stringify(partyInfo.latlng);
+  const partyIdObj = await Parties.findOne({
+    where: { ...partyInfo, latlng},
+    attributes: [ "id" ],
+    raw: true
+  });
+  return partyIdObj?.id;
+};
+
 export const getPartyId = async (commentId: number) => {
   const party = await Comment.findOne({
     where: { id: commentId },
@@ -494,39 +525,52 @@ export const updateUserParty = async (userId: number, partyId: number, isReviewe
   return updated;
 };
 
-export const updateLevel = async (userId: number, exp: number) => {
+export const updateLevel = async (userId: number, exp: number, level: number) => {
   let levelRange:number[] = [ 0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200 ];
   for (let i = 0; i < levelRange.length; i++) {
-    if (exp - levelRange[i] < 20) {
+    if ((exp - levelRange[i]) < 20) {
       await Users.update({ level: i }, {
         where: { id: userId }
       });
-      const notificationInfo: NotificationAttributes = {
-        content: "levelup",
-        userId,
-        isRead: false,
-        level: i
-      };
-      createNotification(notificationInfo);
-      break;
+      if (level < i) {
+        const notificationInfo: NotificationAttributes = {
+          content: "levelup",
+          userId,
+          isRead: false,
+          level: i
+        };
+        createNotification(notificationInfo);
+        return;
+      }
+      else if (level > i) {
+        const notificationInfo: NotificationAttributes = {
+          content: "leveldown",
+          userId,
+          isRead: false,
+          level: i
+        };
+        createNotification(notificationInfo);
+        return;
+      }
+      else return;
     }
   }
 };
 
 export const updateExp = async (userId: number, exp: number) => {
-  const presentExp = await Users.findOne({
+  const presentExpAndLv = await Users.findOne({
     where: { id: userId },
-    attributes: [ "exp" ],
+    attributes: [ "exp", "level" ],
     raw: true
   });
   let updated: [number, Users[]] | boolean;
   let newExp: number;
-  if (presentExp) {
-    newExp = presentExp.exp + exp;
+  if (presentExpAndLv) {
+    newExp = presentExpAndLv.exp + exp;
     updated = await Users.update({ exp: newExp }, {
       where: { id: userId }
     });
-    await updateLevel(userId, newExp);
+    await updateLevel(userId, newExp, presentExpAndLv.level);
   }
   else updated = false;
   return updated;
@@ -598,7 +642,7 @@ export const searchPartiesByKeyword = async (keyword: string, region: string, us
 export const findLeadingParty = async (userId: number) => {
   const leadingParty = await Parties.findAll({
     where: { leaderId: userId, partyState: [ 0, 1 ] },
-    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location" ],
     raw: true
   });
   return leadingParty;
@@ -613,7 +657,7 @@ export const findCompletedParty = async (userId: number) => {
   let partyIdArr = userParty.map(item => item.partyId);
   const completedParty = await Parties.findAll({
     where: { [Op.or]: [ { leaderId: userId }, { id: partyIdArr } ], partyState: 2 },
-    attributes: [ "id", "name", "image", "startDate", "endDate" ],
+    attributes: [ "id", "name", "image", "startDate", "endDate", "location" ],
     raw: true
   });
   return completedParty;
@@ -640,4 +684,19 @@ export const findFavoriteParties = async (userId: number) => {
     else favoriteParties[i] = { ...partyList[i], favorite: false, members, tag };
   }
   return favoriteParties;
+};
+
+export const findCommentWriterId = async (commentId: number) => {
+  const result = await Comment.findOne({
+    where: { id: commentId },
+    attributes: [ "userId" ],
+    raw: true
+  });
+  return result?.userId;
+};
+
+export const deleteNotification = async (partyId: number) => {
+  await Notification.destroy({
+    where: { partyId }
+  });
 };

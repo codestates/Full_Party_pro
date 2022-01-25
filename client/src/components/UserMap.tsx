@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
 
 export const MapContainer = styled.div`
@@ -16,7 +15,6 @@ export const MapContainer = styled.div`
     float:left;
     border: 1px solid #ccc;
     border-bottom:2px solid #ddd;
-
     width: 100px;
   }
 
@@ -24,7 +22,7 @@ export const MapContainer = styled.div`
     border: 0; 
     box-shadow: 0px 1px 2px #999;
   }
-  
+
   .infoWindow div {
     display:block;
     text-decoration:none;
@@ -65,57 +63,32 @@ export const MapContainer = styled.div`
     border-radius: 100%;
     border: 2px solid #fff;
   }
-`
+`;
 
 type Props = {
-  location: string,
   image: string,
-  handleFormatAddressChange: Function
-}
+  address: string
+};
 
-const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
-  
+export default function UserMap({ image, address }: Props) {
   const { kakao } = window;
-
-  const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
+  const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
   const { lat, lng } = coords;
-
   const geocoder = new kakao.maps.services.Geocoder();
 
-  function searchDetailAddrFromCoords(coords: { lat: number, lng: number }, callback: Function) {
-    geocoder.coord2Address(coords.lng, coords.lat, callback);         
-  }
-
   useEffect(() => {
-
-    if(location){
-      geocoder.addressSearch(location, function(result: any, status: any) {
+    if (address) {
+      geocoder.addressSearch(address, (result: any, status: any) => {
         if (status === kakao.maps.services.Status.OK) {
           const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
           const { La, Ma } = coordinates;
           setCoords({ lat: Ma, lng: La });
         }
-      });  
+      });
     }
-    
-  },[location])
+  },[ address ]);
 
-  useEffect(() => {
-
-    searchDetailAddrFromCoords(coords, function(result: any, status: any) {
-      if (status === kakao.maps.services.Status.OK) {
-        const address = 
-          !!result[0].road_address ? 
-            result[0].road_address.address_name
-          : result[0].address.address_name;
-        console.log(address);
-        handleFormatAddressChange(address);
-      }   
-   });
-
-  },[coords])
-
-  if(!location){
+  if (!address) {
     return (
       <MapContainer>
         <Map
@@ -125,7 +98,7 @@ const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
           onZoomChanged={(map) => map.setLevel(map.getLevel() > 7 ? 7 : map.getLevel())}
         />
       </MapContainer>
-    )
+    );
   }
 
   return (
@@ -162,7 +135,5 @@ const UserMap = ({ location, image, handleFormatAddressChange }: Props) => {
         </CustomOverlayMap>
       </Map>
     </MapContainer>
-  )
+  );
 }
-
-export default UserMap;

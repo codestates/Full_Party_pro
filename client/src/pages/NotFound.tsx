@@ -1,15 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 export const Container = styled.section`
   width: 100%;
   height: 98vh;
-
   padding-top: 5vh;
   overflow: hidden;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -49,20 +46,17 @@ export const Container = styled.section`
     border-radius: 20px;
     background-color: #fff;
     box-shadow: rgba(80, 201, 195, 0.4) 0px 8px 24px;
-
     font-family: "silkScreenBold";
     font-size: 1.1rem;
     color: #50C9C3;
-
     margin-top: 25px;
     margin-bottom: 0;
   }
 `;
 
 export default function NotFound () {
-
   const navigate = useNavigate();
-   
+
   return (
     <Container>
       <header>
@@ -76,7 +70,7 @@ export default function NotFound () {
           <br />페이지가 삭제되었을 수 있습니다.
           <br />주소를 다시 한 번 확인해주세요.
         </div>
-        <button id="return" onClick={() => navigate('../')}>return to home</button>    
+        <button id="return" onClick={() => navigate('../home')}>return to home</button>
       </main>
     </Container>
   );

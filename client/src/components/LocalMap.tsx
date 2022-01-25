@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-
 import styled from 'styled-components';
-
+import { useNavigate } from 'react-router-dom';
 import { Map, MapMarker, CustomOverlayMap } from 'react-kakao-maps-sdk';
 
 export const MapContainer = styled.section`
-
   width: 100%;
   display: flex;
   justify-content: center;
@@ -17,7 +14,6 @@ export const MapContainer = styled.section`
 
   .infoWindow {
     position: relative;
-
     width: 100px;
     bottom: 85px;
     border-radius: 20px;
@@ -27,10 +23,10 @@ export const MapContainer = styled.section`
   }
 
   .infoWindow:nth-of-type(n) {
-    border: 0; 
+    border: 0;
     box-shadow: 0px 1px 2px #999;
   }
-  
+
   .infoWindow .navigate {
     display:block;
     text-decoration:none;
@@ -46,31 +42,15 @@ export const MapContainer = styled.section`
     display:block;
     text-align:center;
     background:#fff;
-    /* margin-right:22px; */
     padding:10px 15px;
     font-size:10px;
     font-weight:bold;
-
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   .infoWindow:after {
-    /* // 그림자 없는 것
-    content: '';
-    position:absolute;
-    margin-left:-12px;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border: 10px solid transparent;
-    border-top-color: #fff;
-    border-bottom: 0;
-    margin-left: -10px;
-    margin-bottom: -10px; */
-
     content:'';
     position:absolute;
     margin-left:-12px;
@@ -91,23 +71,21 @@ export const MapContainer = styled.section`
 
 type Props = {
   location: string,
-  localParty: Array<{ [key: string]: any }>,
+  localParty: Array<{ [key: string]: any }>
 };
 
-export default function LocalMap ({ location, localParty }: Props) {
-
-  const { kakao } = window;
+export default function LocalMap({ location, localParty }: Props) {
   const navigate = useNavigate();
-
+  const { kakao } = window;
   const geocoder = new kakao.maps.services.Geocoder();
-  const [coords, setCoords] = useState({ lat: 37.496562, lng: 127.024761 });
+  const [ coords, setCoords ] = useState({ lat: 37.496562, lng: 127.024761 });
 
   type p = {
-    party: { [key: string]: any },
+    party: { [key: string]: any }
   };
 
   const EventMarkerContainer = ({ party }: p) => {
-    const [isVisible, setIsVisible] = useState(false)
+    const [isVisible, setIsVisible] = useState(false);
 
     return (
       <>
@@ -126,15 +104,15 @@ export default function LocalMap ({ location, localParty }: Props) {
           position={party.latlng}
           yAnchor={3.1}
         >
-          <div className="partyImg" 
-            onClick={() => navigate(`../party/${party.id}`)} 
+          <div className="partyImg"
+            onClick={() => navigate(`../party/${party.id}`)}
             onMouseOver={() => setIsVisible(true)}
             onMouseOut={() => setIsVisible(false)}
-            style={{background: `url(${party.image})`, backgroundSize: "cover", backgroundPosition: "center"}} 
+            style={{background: `url(${party.image})`, backgroundSize: "cover", backgroundPosition: "center"}}
           />
         </CustomOverlayMap>
-       
-        {isVisible? 
+
+        {isVisible?
           <CustomOverlayMap
             position={party.latlng}
           >
@@ -150,58 +128,14 @@ export default function LocalMap ({ location, localParty }: Props) {
   }
 
   useEffect(() => {
-
-    geocoder.addressSearch(location, function(result: any, status: any) {
+    geocoder.addressSearch(location, (result: any, status: any) => {
       if (status === kakao.maps.services.Status.OK) {
         const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
         const { La, Ma } = coordinates;
         setCoords({ lat: Ma, lng: La });
       }
     });
-
-    // const test = coordsSearch();
-    // console.log("테스트");
-    // console.log(test);
-
-    // const localPositions: Array<any> = [];
-
-    // for(let i = 0; i < localParty.length; i++){
-    //   geocoder.addressSearch(localParty[i].location, function(result: any, status: any) {
-    //     if (status === kakao.maps.services.Status.OK) {
-    //       const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
-    //       const { La, Ma } = coordinates;
-    //       localPositions.push({ title: localParty[i].name, latlng: { lat: Ma, lng: La }, image: localParty[i].image });
-    //     }
-    //   })
-    // }
-
-
-
-    // const localPositions = localParty.map((party) => {
-      
-    //   const test = geocoder.addressSearch(party.location, function(result: any, status: any) {
-    //     if (status === kakao.maps.services.Status.OK) {
-    //       const coordinates = new kakao.maps.LatLng(result[0].y, result[0].x);
-    //       const { La, Ma } = coordinates;
-    //       const res = { title: party.name, latlng: { lat: Ma, lng: La }, image: party.image };
-
-    //       console.log(res)
-    //       // res 잘 출력됨
-    //       // 0번 인덱스: {title: '등 긁어주실 분...', latlng: {…}, image: 'https://pbs.twimg.com/media/Es4KAp3U4AM01nT?format=jpg'}
-    //       // 1번 인덱스: {title: '더미 파티', latlng: {…}, image: 'https://img.theqoo.net/flOqo'}
-    //       return res;
-    //     }
-    //   })
-
-    //   console.log(test)
-    //   // 값: undefined
-    //   return test;
-    // });
-
-    // console.log(localPositions);
-    //값: [undefined, undefined]
-
-  }, [localParty]);
+  }, [ localParty ]);
 
   return (
     <MapContainer>
@@ -219,5 +153,5 @@ export default function LocalMap ({ location, localParty }: Props) {
       ))}
       </Map>
     </MapContainer>
-  )
+  );
 }

@@ -5,7 +5,6 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import config from "./config";
 import sequelize from "./models";
-// import express_async_errors from "express-async-errors"; // module not found
 
 import authRouter from "./router/auth";
 import listRouter from "./router/list";
@@ -14,7 +13,6 @@ import partyRouter from "./router/party";
 import favoriteRouter from "./router/favorite";
 import searchRouter from "./router/search";
 import notificationRouter from "./router/notification";
-import mailVerification from "./router/mailVerification";
 
 const app = express();
 
@@ -22,36 +20,35 @@ const corsOption = {
   origin: config.cors.allowedOrigin,
   optionsSuccessStatus: 200,
   "Access-Control-Allow-Credentials" : true,
-  credentials: true,
+  credentials: true
 };
 
 app.use(cors(corsOption));
+app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).send("Welcome to Full Party!");
 });
 
 app.use("/", authRouter);
-app.use("/mailVerification", mailVerification);
 app.use("/list", listRouter);
 app.use("/user", userRouter);
 app.use("/party", partyRouter);
 app.use("/favorite", favoriteRouter);
 app.use("/search", searchRouter);
 app.use("/notification", notificationRouter);
+
 app.use((req, res) => {
-  res.status(400).json({ message: "Invalid request" });
+  res.status(400).json({ message: "Invalid Request" });
 });
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  res.status(500).json({ message: `Something went wrong: ${err}` });
+  res.status(500).json({ message: `Something Went Wrong: ${err}` });
 });
 
-const HTTPS_PORT = config.port || 4000;
-
+const HTTPS_PORT = config.port || 80;
 let server;
 if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
   const privateKey = fs.readFileSync(__dirname + '/key.pem', 'utf8');
@@ -60,12 +57,12 @@ if (fs.existsSync('./key.pem') && fs.existsSync('./cert.pem')) {
 
   server = https.createServer(credentials, app);
   server.listen(HTTPS_PORT, async () => {
-    console.log(`✅ https server running in ${HTTPS_PORT}`);
     await sequelize.authenticate()
       .then(async () => console.log("✅ DB connection success"))
-      .catch(error => console.log(error))
+      .catch(error => console.log(error));
+    console.log(`✅ https server running in ${HTTPS_PORT}`);
   });
-} else {
-  server = app.listen(HTTPS_PORT, () => console.log('✅ http server runnning'));
 }
+else server = app.listen(HTTPS_PORT, () => console.log('✅ http server running'));
+
 export default server;

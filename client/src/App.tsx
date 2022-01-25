@@ -1,11 +1,6 @@
-import React, { useEffect, Fragment } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-
-import { useSelector } from 'react-redux';
-import { AppState } from './reducers';
-import { RootReducerType } from './store/store';
-
+import React, { useEffect, Fragment } from 'react';
+import axios from "axios";
 import Home from './pages/Home';
 import List from './pages/List';
 import Party from './pages/Party';
@@ -15,20 +10,25 @@ import Notification from './pages/Notification';
 import Favorite from './pages/Favorite';
 import Mypage from './pages/Mypage';
 import NotFound from './pages/NotFound';
-import axios from "axios";
+import Auth from './pages/Auth';
 import TopNav from './components/TopNav';
 import BottomNav from './components/BottomNav';
 import SigninModal from './components/SigninModal';
 import SignupModal from './components/SignupModal';
-
 import initialize from './config/initialize';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppState } from './reducers';
+import { RootReducerType } from './store/store';
+import { SIGNIN_SUCCESS } from './actions/signinType';
 
 declare global {
   interface Window {
     Kakao: any;
     kakao: any;
   }
-}
+};
+
 export const cookieParser = () => {
   const cookieString = document.cookie.split("; ");
   const keyAndValue = cookieString.map(item => item.split("="));
@@ -38,7 +38,7 @@ export const cookieParser = () => {
 };
 
 export const requestKeepLoggedIn = async (token: string, signupType: string) => {
-  const response = await axios.post("https://localhost:443/keeping", {}, {
+  const response = await axios.post(`${process.env.REACT_APP_API_URL}/keeping`, {}, {
     headers: {
       access_token: token,
       signup_type: signupType
@@ -48,16 +48,30 @@ export const requestKeepLoggedIn = async (token: string, signupType: string) => 
 };
 
 export default function App() {
+  const dispatch = useDispatch();
+
   const isLoggedIn = useSelector(
     (state: AppState) => state.signinReducer.isLoggedIn
   );
 
   const { Kakao } = window;
-  const modalReducer = useSelector((state: RootReducerType) => state.modalReducer)
+  const modalReducer = useSelector((state: RootReducerType) => state.modalReducer);
 
   useEffect(() => {
-    if(!Kakao.isInitialized()){
-      initialize();
+    if (!Kakao.isInitialized()) initialize();
+    if (!document.cookie) {
+      document.cookie = `token=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      document.cookie = `signupType=temp; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+      document.cookie = `isLoggedIn=0; domain=${process.env.REACT_APP_COOKIE_DOMAIN}; path=/;`;
+    }
+    const { token, signupType, isLoggedIn } = cookieParser();
+    if (token !== "temp" && signupType !== "temp" && isLoggedIn !== "0") {
+      requestKeepLoggedIn(token, signupType).then((res) => {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: res.data.userInfo
+        });
+      });
     }
   }, []);
 
@@ -71,14 +85,13 @@ export default function App() {
           <section className="features">
             <Routes>
               <Fragment>
-                {/* <Route path="/" element={isLoggedIn ? <List /> : <Home />} /> */}
                 <Route path="/" element={<Home />} />
-                <Route path="/home" element={<List />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/home" element={isLoggedIn ? <List /> : <Home />} />
                 <Route path="/party/:partyId" element={<Party />}>
                   <Route path=":commentId" element={<Party />} />
                 </Route>
                 <Route path="/post" element={<Post />} />
-                <Route path="/post/:partyInfo" element={<Post />} /> 
                 <Route path="/search" element={<Search />} />
                 <Route path="/search/keyword/:keyword" element={<Search />} />
                 <Route path="/search/tag/:tag" element={<Search />} />

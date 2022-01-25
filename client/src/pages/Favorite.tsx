@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { cookieParser, requestKeepLoggedIn } from "../App"
-import { Navigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import axios from 'axios';
 import styled from 'styled-components';
-import { AppState } from '../reducers';
 import Loading from '../components/Loading';
 import QuestCard from '../components/QuestCard';
-import { SIGNIN_SUCCESS } from '../actions/signinType';
-import axios from 'axios';
+import { cookieParser } from "../App"
+import { Navigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppState } from '../reducers';
+import { NOTIFY } from "../actions/notify"
 
 export const FavoriteContainer = styled.div`
   width: 100%;
   height: 100%;
-
   margin: 70px 0;
   padding: 20px 30px;
 
@@ -26,38 +25,31 @@ export const FavoriteContainer = styled.div`
     font-size: 1.1rem;
     color: #777;
   }
-`
+`;
 
-export default function Favorite () {
+export default function Favorite() {
   const dispatch = useDispatch();
+
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo
   );
   const userId = useSelector(
     (state: AppState) => state.signinReducer.userInfo.id
   );
-  
+
   const [ isLoading, setIsLoading ] = useState(true);
   const [ favoriteList, setFavoriteList ] = useState<Array<Object>>([]);
-
-  useEffect(() => {
-    setIsLoading(true);
-    (async () => {
-      const { token, signupType, location } = cookieParser();
-      await requestKeepLoggedIn(token, signupType).then((res) => {
-        dispatch({
-          type: SIGNIN_SUCCESS,
-          payload: res.data.userInfo
-        });
-        document.cookie = "location=http://localhost:3000/favorite";
-      });
-    })();
-  }, []);
 
   useEffect(() => {
     (async () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/favorite/${userId}`, {
         withCredentials: true
+      });
+      dispatch({
+        type: NOTIFY,
+        payload: {
+          isBadgeOn: response.data.notification
+        }
       });
       setFavoriteList(response.data.partyList);
     })();
@@ -67,11 +59,8 @@ export default function Favorite () {
     setIsLoading(false);
   }, [ favoriteList ]);
 
-  if(!cookieParser().isLoggedIn){
-    return <Navigate to="/" />
-  } else if(isLoading){
-    return <Loading />
-  }
+  if (cookieParser().isLoggedIn === "0") return <Navigate to="../" />
+  else if(isLoading) return <Loading />
 
   return (
     <FavoriteContainer>

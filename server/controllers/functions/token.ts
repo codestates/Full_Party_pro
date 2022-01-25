@@ -1,6 +1,6 @@
+import config from "../../config/index"
 import { Response } from "express";
 import { JwtPayload, sign, verify } from "jsonwebtoken";
-import config from "../../config/index"
 
 export const generateAccessToken = (data: any) => {
   try {
@@ -15,8 +15,8 @@ export const verifyAccessToken = (token: string): JwtPayload | string | undefine
   try {
     return verify(token, config.accessSecret);
   }
-  catch (error) {
-    console.log(error);
+  catch (error: any) {
+    return error;
   }
 };
 

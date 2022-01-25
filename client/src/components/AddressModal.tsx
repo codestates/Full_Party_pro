@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import UserMap from './UserMap';
 import styled from 'styled-components';
 import axios from 'axios';
-
+import UserAddressInput from './UserAddressInput';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
-
-import UserMap from './UserMap';
-
 import { AppState } from '../reducers';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { SIGNIN_SUCCESS } from '../actions/signinType';
 
 export const ModalContainer = styled.div`
   width: 100vw;
@@ -25,102 +24,51 @@ export const ModalBackdrop = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: rgba(0,0,0,0.4);
-
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 export const ModalView = styled.div`
   width: 80%;
   max-width: 350px;
   max-height: 90vh;
   overflow: auto;
-
   border-radius: 30px;
   background-color: white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-
   padding: 30px;
   text-align: center;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  header {
-    font-size: 25px;
-    margin-bottom: 15px;
-
-    font-family: 'SilkscreenBold';
-  }
-
-  table {
-    td {
-      height: 50px;
-    }
-
-    .label {
-      font-size: 0.9rem;
-      font-weight: bold;
-    }
-
-    .input, .info {
-      width: 186px;
-      font-size: 0.9rem;
-    }
-
-    .input {
-      padding: 0 8px;
-
-      input {
-        border: none;
-        border-bottom: 1px solid #d5d5d5;
-
-        width: 170px;
-        height: 25px;
-
-        text-align: center; 
-      }
-
-      input[type=date] {
-        font-family: "-apple-system";
-      }
-
-      select {
-        width: 170px;
-        text-align: center;
-
-        border: none;
-        border-bottom: 1px solid #d5d5d5;
-      }
-    }
-  }
-
-  .profileImage {
-    width: 100px;
-    height: 100px;
-  }
-
-  .confirm {
-    margin: 8px 0;
-    font-size: 0.9rem;
-  }
-
   .error {
     font-size: 0.7rem;
     color: #f34508;
-
     margin-top: 5px;
   }
-`
+
+  .confirm {
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  table {
+    margin-bottom: 10px;
+
+    .label {
+      width: 50px;
+      font-weight: bold;
+    }
+  }
+`;
 
 export const MapContainer = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-
   width: 90%;
 
   img {
@@ -140,9 +88,11 @@ export const MapContainer = styled.section`
     margin-bottom: 20px;
   }
 
-  #map {
+  .mapInput {
     width: 100%;
-    height: 150px;
+    height: 250px;
+
+    margin-bottom: 10px;
   }
 
   input {
@@ -150,29 +100,26 @@ export const MapContainer = styled.section`
     height: 25px;
     border: none;
     border-bottom: 1px solid #d5d5d5;
+    margin: 8px 0;
 
-    margin: 15px 0;
+    &:focus {
+      outline-style:none;
+    }
   }
-
-`
+`;
 
 export const BtnContainer = styled.section`
   width: 100%;
-
   display: flex;
   justify-content: space-between;
 
   button {
     width: 90px;
     height: 40px;
-
     border: none;
     border-radius: 10px;
-
     background-color: white;
-
     cursor: pointer;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -192,19 +139,16 @@ export const BtnContainer = styled.section`
       color: #fff;
     }
   }
-`
+`;
 
-const AddressModal = () => {
-
+export default function  AddressModal() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [pageIdx, setPageIdx] = useState(0);
-
-  const [address, setAddress] = useState('');
-  const [fixedLocation, setFixedLocation] = useState('');
-  const [formatAddress, setFormatAddress] = useState('');
-
-  const [errorMsg, setErrorMsg] = useState('');
+  const [ pageIdx, setPageIdx ] = useState(0);
+  const [ address, setAddress ] = useState('');
+  const [ errorMsg, setErrorMsg ] = useState('');
+  const [ isSearch, setIsSearch ] = useState(false);
 
   const userInfo = useSelector(
     (state: AppState) => state.signinReducer.userInfo
@@ -212,37 +156,36 @@ const AddressModal = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddress(e.target.value);
-  }
+  };
 
-  const handleFormatAddressChange = (address: string) => {
-    setFormatAddress(address);
-  }
+  const handleAddressChange = (address: string) => setAddress(address);
 
-  const handleSearchLocation = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if(e.code === 'Enter' || e.code === 'Space' || e.code === 'ArrowRight') {
-      setFixedLocation(address);
-    }
-  }
+  const searchHandler = (event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>) => setIsSearch(!isSearch);
 
-  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {    
+  const handlePageChange = (event: React.MouseEvent<HTMLButtonElement>) => {
     const toGo = (event.currentTarget as HTMLButtonElement).value;
-    if(toGo === "next"){
-      setPageIdx(pageIdx + 1);
-    } else {
-      setPageIdx(pageIdx - 1);
-    }
-  }
+    if (toGo === "next") setPageIdx(pageIdx + 1);
+    else setPageIdx(pageIdx - 1);
+  };
 
   const handleAddressRegister = async () => {
-    if(address){
-      setErrorMsg('')
-      await axios.patch(`${process.env.REACT_APP_API_URL}/address/${userInfo.id}`, {
-        userId: userInfo.id, address: formatAddress
+    if (address) {
+      setErrorMsg('');
+      const res = await axios.patch(`${process.env.REACT_APP_API_URL}/user/address/${userInfo.id}`, {
+        userId: userInfo.id, address
       });
-      navigate(`../`);
-    } else {
-      setErrorMsg('주소를 입력해주세요.')
+      if (res.status === 200) {
+        dispatch({
+          type: SIGNIN_SUCCESS,
+          payload: {
+            ...userInfo,
+            address
+          }
+        });
+        navigate('../home');
+      }
     }
+    else setErrorMsg('주소를 입력해주세요.');
   }
 
   return(
@@ -257,25 +200,21 @@ const AddressModal = () => {
                     <div className="mapTitle">주소를 등록해주세요!</div>
                     <div className="details">이 위치를 기반으로 퀘스트가 검색됩니다.</div>
                 </div>
-                <div id='map' className='mapDesc'>
-                    <UserMap 
-                    location={fixedLocation} 
-                    image={userInfo.profileImage} 
-                    handleFormatAddressChange={handleFormatAddressChange}
-                    />
+                <div className='mapInput'>
+                  <UserAddressInput 
+                    profileImage={userInfo.profileImage ? userInfo.profileImage : "https://teo-img.s3.ap-northeast-2.amazonaws.com/defaultProfile.png"}
+                    address={userInfo.address}
+                    handleAddressChange={handleAddressChange}
+                    isSearch={isSearch}
+                    searchHandler={searchHandler}
+                  />
                 </div>
-                <input 
-                    className='mapInput'
-                    name='address'
-                    type='text'
-                    value={address}
-                    onChange={(e) => handleInputChange(e)}
-                    onKeyUp={(e) => handleSearchLocation(e)}
-                />
               </MapContainer>
               <BtnContainer style={{ justifyContent: "flex-end" }}>
+                <div />
+                <button onClick={searchHandler} className="request">주소 검색</button>
                 <button onClick={handlePageChange} value="next">다음 <FontAwesomeIcon icon={faAngleRight} className="icon right" /></button>
-              </BtnContainer> 
+              </BtnContainer>
             </>
           : null}
           {pageIdx === 1 ?
@@ -284,7 +223,7 @@ const AddressModal = () => {
                 <table>
                   <tr>
                     <td className='label'>주소</td>
-                    <td className='info'>{!address ? '' : formatAddress}</td>
+                    <td className='info'>{address}</td>
                   </tr>
                 </table>
               <div className='error'>{errorMsg}</div>
@@ -299,5 +238,3 @@ const AddressModal = () => {
     </ModalContainer>
   )
 }
-
-export default AddressModal;
