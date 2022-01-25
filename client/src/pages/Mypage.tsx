@@ -397,10 +397,11 @@ export default function Mypage() {
   const handleImgLoad = async (e: any) => {
     setImgLoading(true);
     let file = e.target.files[0];
+    const code = String(Math.floor(Math.random()*1000000)).padStart(8, "0");
     const upload = new AWS.S3.ManagedUpload({
       params: {
         Bucket: "teo-img",
-        Key: `${signinReducer.userInfo.id}_profileImage.jpg`,
+        Key: `${signinReducer.userInfo.id}_${code}_profileImage.jpg`,
         Body: file,
       }
     });

@@ -106,7 +106,7 @@ export const getParticipatingParty = async (userId: number) => {
   const party: any[] = [];
   for (let i = 0; i < partyIdArr.length; i++) {
     party[i] = await Parties.findOne({
-      where: { id: partyIdArr[i].partyId, partyState: [0, 1] },
+      where: { id: partyIdArr[i].partyId, partyState: [ 0, 1 ] },
       attributes: [ "id", "name", "image", "startDate", "endDate", "location", "isOnline", "location" ],
       raw: true
     });

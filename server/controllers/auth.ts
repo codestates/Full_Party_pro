@@ -18,7 +18,7 @@ export const signin = async (req: Request, res: Response) => {
     setCookie(res, "token", String(accessToken));
     return SuccessfulResponse(res, { message: "You Have Successfully Signed In", userInfo });
   }
-  catch (error) { 
+  catch (error) {
     return InternalServerError(res, error);
   }
 };
@@ -52,7 +52,6 @@ export const signup = async (req: Request, res: Response) => {
   try {
     const { userInfo } = req.body;
     const result = await createUser({ ...userInfo, signupType: "general" });
-    
     if (result) return SuccessfulResponse(res, { message: "Welcome!" });
     return FailedResponse(res, 409, "Already Signed Up");
   }
@@ -90,7 +89,7 @@ export const guest = async (req: Request, res: Response) => {
 export const googleSignIn = async (req: Request, res: Response) => {
   try {
     const { authorizationCode } = req.body;
-    let newAuthorization = ""
+    let newAuthorization = "";
     if ( authorizationCode[1] === "/" ) {
       newAuthorization = authorizationCode.replace("/", "%2F");
     }
@@ -135,7 +134,8 @@ export const googleSignIn = async (req: Request, res: Response) => {
     const userInfo = await findUser({ email }, [ "id", "userName", "profileImage", "address", "signupType" ]);
     setCookie(res, "token", String(accessToken));
     return SuccessfulResponse(res, { message: "You Have Successfully Signed In With Google Account", userInfo });
-  } catch (error) {
+  }
+  catch (error) {
     return InternalServerError(res, error);
   }
 };

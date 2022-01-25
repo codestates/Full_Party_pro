@@ -791,6 +791,7 @@ export default function Party() {
         <UserInfoModal 
           userInfoModalHandler={userInfoModalHandler}
           partyId={partyInfo.id}
+          partyState={partyInfo.partyState}
           userId={userId}
           leaderId={partyInfo.leaderId}
           isLeader={isLeader}

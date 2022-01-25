@@ -3,6 +3,7 @@ import axios from 'axios';
 import styled from 'styled-components';
 import confetti from 'canvas-confetti';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useNavigate } from 'react-router';
 import { faTimes, faFlag, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { faSadCry, faSadTear, faSmile, faGrinWink, faLaughBeam } from '@fortawesome/free-solid-svg-icons';
 import { faSadCry as blankSadCry, faSadTear as blankSadTear, faSmile as blankSmile,
@@ -190,6 +191,7 @@ interface keyable {
 };
 
 export default function ReviewModal({ reviewModalHandler, members, leaderId, isLeader, userId, partyId, handlePartyInfoChange }: Props) {
+  const navigate = useNavigate();
   const [curIdx, setCurIdx] = useState(0);
   const [progress, setProgress] = useState(0);
   const [reviewMembers, setReviewMembers] = useState<Array<keyable>>(members.map((member) => ({ ...member, exp: null })));
@@ -230,6 +232,7 @@ export default function ReviewModal({ reviewModalHandler, members, leaderId, isL
     handlePartyInfoChange("isReviewed", true);
     confetti();
     reviewModalHandler();
+    navigate(`../party/${partyId}`);
   };
 
   return (
